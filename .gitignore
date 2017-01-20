@@ -253,3 +253,5 @@ paket-files/
 *.vcxproj
 *.filters
 *.sln
+/SuperNautic/SuperNautic_Game/lib
+/SuperNautic/SuperNautic_Game/include
