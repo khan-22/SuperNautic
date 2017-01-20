@@ -255,3 +255,4 @@ paket-files/
 *.sln
 /SuperNautic/SuperNautic_Game/lib
 /SuperNautic/SuperNautic_Game/include
+/SuperNautic.zip
