@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <SFML\Graphics.hpp>
+#include <SFML\Window.hpp>
 #include <glm\glm.hpp>
 
 #include "Log.h"
