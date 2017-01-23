@@ -14,10 +14,13 @@ int main()
 
 	glm::vec3 test(0.4f, 0.4f, 1.0f);
 
-	while (window.isOpen()) {
+	while (window.isOpen()) 
+	{
 		sf::Event event;
-		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::Closed) {
+		while (window.pollEvent(event)) 
+		{
+			if (event.type == sf::Event::Closed) 
+			{
 				window.close();
 			}
 		}
