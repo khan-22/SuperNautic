@@ -19,7 +19,18 @@ Game::Game()
 	glEnable(GL_DEPTH_TEST);
 
 	GFX::VertexDataImporter importer("./res/models/");
-	auto test = importer.importVertexData("test.fbx");
+	GFX::RawMeshCollection* test = importer.importVertexData("test.fbx");
+
+	if (test == nullptr)
+	{
+		LOG("Hey guys, you don't have the mesh file. No worries. This only proves that the error is working :)");
+	}
+	else
+	{
+		LOG("The loaded mesh has: ", test->meshes[0].vertices.size(), " vertices");
+		delete test;
+	}
+
 
 	// Test importing a model
 	//const aiScene* testModel = nullptr;
