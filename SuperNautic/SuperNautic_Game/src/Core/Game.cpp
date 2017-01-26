@@ -10,6 +10,7 @@
 
 #include "../Log.h"
 #include "../GFX/VertexDataImporter.h"
+#include "PlayApplicationState.hpp"
 
 Game::Game()
 	: _window(sf::VideoMode(800, 600), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
@@ -47,7 +48,9 @@ Game::Game()
 	//	LOG("Size of aiVector3D: ", sizeof(testModel->mMeshes[0]->mTextureCoords[0]));
 	//	LOG("Size of glm::vec2: ", sizeof(glm::vec2));
 	//}
-	
+
+	std::unique_ptr<ApplicationState> playState(new PlayApplicationState(_stateStack, _context));
+	_stateStack.push(playState);
 }
 
 Game::~Game()
@@ -89,6 +92,11 @@ void Game::handleEvents()
 			{
 				_window.close();
 			}
+			break;
+
+        default:
+            _stateStack.handleEvent(event);
+            break;
 		}
 	}
 
@@ -96,13 +104,13 @@ void Game::handleEvents()
 
 void Game::update(float dt)
 {
-
+    _stateStack.update(dt);
 }
 
 void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+    _stateStack.render();
 	_window.display();
 }
