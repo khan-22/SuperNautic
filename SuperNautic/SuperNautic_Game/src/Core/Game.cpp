@@ -10,6 +10,7 @@
 
 #include "../Log.h"
 #include "../GFX/VertexDataImporter.h"
+#include "PlayApplicationState.hpp"
 
 #include "AssetCache.hpp"
 
@@ -35,7 +36,9 @@ Game::Game()
 		LOG("The loaded mesh has: ", testModel.get()->meshes[0].vertices.size(), " vertices");
 	}
 
-	
+
+	std::unique_ptr<ApplicationState> playState(new PlayApplicationState(_stateStack, _context));
+	_stateStack.push(playState);
 }
 
 Game::~Game()
@@ -77,6 +80,11 @@ void Game::handleEvents()
 			{
 				_window.close();
 			}
+			break;
+
+        default:
+            _stateStack.handleEvent(event);
+            break;
 		}
 	}
 
@@ -84,13 +92,13 @@ void Game::handleEvents()
 
 void Game::update(float dt)
 {
-
+    _stateStack.update(dt);
 }
 
 void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+    _stateStack.render();
 	_window.display();
 }
