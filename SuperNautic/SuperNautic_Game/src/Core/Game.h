@@ -5,6 +5,9 @@
 
 #include <SFML/Window.hpp>
 
+#include "ApplicationStateStack.hpp"
+#include "ApplicationContext.hpp"
+
 class Game
 {
 public:
@@ -22,7 +25,8 @@ protected:
 
 private:
 	sf::Window	_window;
-	
+	ApplicationStateStack _stateStack;
+	ApplicationContext _context;
 
 
 };
