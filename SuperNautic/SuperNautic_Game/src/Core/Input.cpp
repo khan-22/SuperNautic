@@ -27,17 +27,22 @@ bool Input::checkActive()
 	return sf::Joystick::isConnected(_controllerId);
 }
 
-bool Input::getA()
+bool Input::bGetAValue()
 {
 	return _bButtonA;
 }
 
-float Input::getLeftX()
+float Input::getLeftStickXValue()
 {
 	return _leftStickX;
 }
 
-float Input::getTriggers()
+float Input::getTriggersValue()
 {
 	return _triggers;
+}
+
+int Input::getControllerId()
+{
+	return _controllerId;
 }

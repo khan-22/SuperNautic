@@ -12,9 +12,11 @@ public:
 	void update();
 	bool checkActive();
 
-	bool getA();
-	float getLeftX();
-	float getTriggers();
+	bool bGetAValue();
+	float getLeftStickXValue();
+	float getTriggersValue();
+
+	int getControllerId();
 
 protected:
 	
