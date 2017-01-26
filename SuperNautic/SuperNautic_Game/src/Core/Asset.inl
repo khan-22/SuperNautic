@@ -7,7 +7,7 @@ Asset<AssetT>::Asset(std::shared_ptr<AssetT>& asset)
 : _asset(asset)
 , _parentAsset(asset)
 {
-    assert(asset != nullptr);
+    //assert(asset != nullptr);
 }
 
 template<typename AssetT>

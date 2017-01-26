@@ -27,7 +27,6 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 	const aiScene* importedData = aiImportFile(filepath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
 	if (importedData == nullptr)
 	{
-		LOG_ERROR("Failed to load mesh: ", filepath);
 		return nullptr;
 	}
 
@@ -47,6 +46,7 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		memcpy(data.texCoords.data(), &mesh->mTextureCoords[0], sizeof(mesh->mTextureCoords[0]) * mesh->mNumVertices);
 		memcpy(data.normals.data(), &mesh->mNormals[0], sizeof(mesh->mNormals[0]) * mesh->mNumVertices);
 
+		data.name = mesh->mName.C_Str();
 	}
 
 	LOG("Loaded ", collection->meshes.size(), " meshes...");

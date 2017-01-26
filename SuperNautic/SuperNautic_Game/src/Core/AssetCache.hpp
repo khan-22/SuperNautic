@@ -3,10 +3,8 @@
 #ifndef ASSET_CACHE_HPP
 #define ASSET_CACHE_HPP
 
-#include "Asset.hpp"
-
+#include "Asset.hpp
 #include <map>
-
 
 template<typename AssetT, typename KeyT>
 class AssetCache
