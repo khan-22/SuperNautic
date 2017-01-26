@@ -6,8 +6,8 @@ Asset<AssetT> AssetCache<AssetT, KeyT>::load(KeyT key)
     std::shared_ptr<AssetT> asset = loadAsset<AssetT>(key);
     if(asset == nullptr)
     {
-        LOG_ERROR("Failed to load asset.");
-        throw std::runtime_error("");
+        LOG_ERROR("Asset Cache failed to load asset of type \"", typeid(AssetT).name(), "\": ", key);
+        //throw std::runtime_error("");
     }
 
     std::shared_ptr<AssetT>& cachedAsset = _cache[key];

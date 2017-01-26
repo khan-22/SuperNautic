@@ -11,42 +11,30 @@
 #include "../Log.h"
 #include "../GFX/VertexDataImporter.h"
 
+#include "AssetCache.hpp"
+
 Game::Game()
 	: _window(sf::VideoMode(800, 600), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
 {
 	LOG("Game is being constructed...");
-
+	
 	glEnable(GL_DEPTH_TEST);
 
-	GFX::VertexDataImporter importer("./res/models/");
-	GFX::RawMeshCollection* test = importer.importVertexData("test.fbx");
 
-	if (test == nullptr)
+	// Cached asset loading **DEMO**
+	AssetCache<GFX::RawMeshCollection, std::string> meshCache;
+
+	Asset<GFX::RawMeshCollection> testModel = meshCache.get("test.fbx");
+
+	if (testModel.get() == nullptr)
 	{
-		LOG("Hey guys, you don't have the mesh file. No worries. This only proves that the error is working :)");
+		LOG("Failed to load model... Oopsie poopsie!");
 	}
 	else
 	{
-		LOG("The loaded mesh has: ", test->meshes[0].vertices.size(), " vertices");
-		delete test;
+		LOG("The loaded mesh has: ", testModel.get()->meshes[0].vertices.size(), " vertices");
 	}
 
-
-	// Test importing a model
-	//const aiScene* testModel = nullptr;
-	//if ((testModel = aiImportFile("./res/models/test.fbx", aiProcessPreset_TargetRealtime_MaxQuality)) == nullptr)
-	//{
-	//	LOG_ERROR("FAILED TO LOAD TEST.FBX");
-	//}
-	//else
-	//{
-	//	LOG("Num meshes in test file: ", testModel->mNumMeshes);
-	//	LOG("Num vertices in mesh 1: ", testModel->mMeshes[0]->mNumVertices);
-	//	LOG("Size of aiVector3D: ", sizeof(testModel->mMeshes[0]->mVertices[0]));
-	//	LOG("Size of glm::vec3: ", sizeof(glm::vec3));
-	//	LOG("Size of aiVector3D: ", sizeof(testModel->mMeshes[0]->mTextureCoords[0]));
-	//	LOG("Size of glm::vec2: ", sizeof(glm::vec2));
-	//}
 	
 }
 
