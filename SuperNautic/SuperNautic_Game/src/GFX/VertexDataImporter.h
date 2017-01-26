@@ -13,7 +13,7 @@ namespace GFX {
 	struct RawVertexData 
 	{
 		std::vector<glm::vec3> vertices;
-		std::vector<glm::vec2> texCoords;
+		std::vector<glm::vec3> texCoords;
 		std::vector<glm::vec3> normals;
 	};
 
