@@ -23,7 +23,6 @@ Game::Game()
 
 	// Cached asset loading **DEMO**
 	AssetCache<GFX::RawMeshCollection, std::string> meshCache;
-
 	Asset<GFX::RawMeshCollection> testModel = meshCache.get("test.fbx");
 
 	if (testModel.get() == nullptr)
