@@ -47,6 +47,7 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		memcpy(data.texCoords.data(), &mesh->mTextureCoords[0], sizeof(mesh->mTextureCoords[0]) * mesh->mNumVertices);
 		memcpy(data.normals.data(), &mesh->mNormals[0], sizeof(mesh->mNormals[0]) * mesh->mNumVertices);
 
+		data.name = mesh->mName.C_Str();
 	}
 
 	LOG("Loaded ", collection->meshes.size(), " meshes...");
