@@ -1,11 +1,5 @@
 #include "LoadAsset.hpp"
 
-
-template<typename AssetT, typename KeyT>
-AssetCache<AssetT, KeyT>::AssetCache()
-{
-}
-
 template<typename AssetT, typename KeyT>
 Asset<AssetT> AssetCache<AssetT, KeyT>::load(KeyT key)
 {

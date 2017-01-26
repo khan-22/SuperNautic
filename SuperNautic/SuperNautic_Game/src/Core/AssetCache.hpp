@@ -10,7 +10,6 @@ template<typename AssetT, typename KeyT>
 class AssetCache
 {
 public:
-    AssetCache();
     Asset<AssetT> get(KeyT key);
 
 private:
