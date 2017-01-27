@@ -1,5 +1,6 @@
 #pragma once
-#ifndef WORLDAUDIO_H
+#ifndef WORLDAUDIO_HPP
+#define WORLDAUDIO_HPP
 
 #include <SFML\Audio.hpp>
 
@@ -18,19 +19,5 @@ private:
 	sf::Music music;
 
 };
-
-WorldAudio::WorldAudio()
-{
-	if (!music.openFromFile(folder + "ariel" + fileSuffix))
-	{
-	}
-
-	music.setLoop(true);
-	music.play();
-}
-
-WorldAudio::~WorldAudio()
-{
-}
 
 #endif // !WORLDAUDIO_H

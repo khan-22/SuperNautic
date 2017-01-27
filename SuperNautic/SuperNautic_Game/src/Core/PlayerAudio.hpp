@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef PLAYERAUDIO_H
-#define PLAYERAUDIO_H
+#ifndef PLAYERAUDIO_HPP
+#define PLAYERAUDIO_HPP
 
 #include <SFML\Audio.hpp>
 #include <string.h>

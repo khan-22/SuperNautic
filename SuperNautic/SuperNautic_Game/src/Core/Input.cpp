@@ -1,6 +1,6 @@
 #include <SFML\Window\Joystick.hpp>
 
-#include "Input.h"
+#include "Input.hpp"
 
 #include "../Log.hpp"
 
