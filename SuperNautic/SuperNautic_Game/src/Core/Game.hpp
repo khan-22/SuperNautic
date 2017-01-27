@@ -9,6 +9,8 @@
 #include "ApplicationStateStack.hpp"
 #include "ApplicationContext.hpp"
 
+#include "Player.hpp"
+
 class Game
 {
 public:
@@ -32,7 +34,7 @@ private:
 	ApplicationStateStack _stateStack;
 	ApplicationContext _context;
 
-
+	std::list<Player> _players;
 };
 
 #endif //GAME_HPP

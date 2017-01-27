@@ -12,15 +12,13 @@
 
 #include "../GFX/ShaderLoader.hpp"
 
-#include "Input.hpp"
-
 Game::Game()
 	: _window(sf::VideoMode(800, 600), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
 	, _context(_window)
 {
 	LOG("Game is being constructed...");
-	
 
+	_players.push_back(Player());
 }
 
 Game::~Game()
@@ -73,8 +71,6 @@ void Game::run()
 {
 	sf::Clock clock;
 	sf::Time deltaTime = clock.restart();
-
-	Input input;
 
 	while (_window.isOpen())
 	{

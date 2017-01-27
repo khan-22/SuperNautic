@@ -4,16 +4,16 @@
 
 #include "../Log.hpp"
 
-Input::Input()
+Input::Input() : 
+	_controllerId(0),
+	_bLeftStickDormant(true)
 {
-	_controllerId = 0;
-	_bLeftStickDormant = true;
 }
 
-Input::Input(int id)
+Input::Input(int id) :
+	_controllerId(id),
+	_bLeftStickDormant(true)
 {
-	_controllerId = id;
-	_bLeftStickDormant = true;
 }
 
 Input::~Input()
