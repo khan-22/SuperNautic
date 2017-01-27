@@ -6,12 +6,10 @@
 #include <string>
 #include <GL/glew.h>
 
+#include "Shaders/Shader.h"
+
 namespace GFX
 {
-	struct Shader
-	{
-		GLuint	shaderProgram;
-	};
 
 	class ShaderLoader
 	{

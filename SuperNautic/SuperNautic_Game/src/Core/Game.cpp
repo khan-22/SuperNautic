@@ -57,8 +57,9 @@ bool Game::bInitialize()
 	}
 	else
 	{
-		LOG("The loaded shader has ID: ", testShader.get()->shaderProgram);
+		LOG("The test shader has been loaded!");
 	}
+	
 
 	std::unique_ptr<ApplicationState> playState(new PlayApplicationState(_stateStack, _context));
 	_stateStack.push(playState);
