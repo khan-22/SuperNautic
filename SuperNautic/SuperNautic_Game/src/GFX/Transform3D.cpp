@@ -2,11 +2,11 @@
 
 using namespace GFX;
 
-Transform3D::Transform3D()
-{
-}
-
-
-Transform3D::~Transform3D()
-{
-}
+//Transform3D::Transform3D()
+//{
+//}
+//
+//
+//Transform3D::~Transform3D()
+//{
+//}
