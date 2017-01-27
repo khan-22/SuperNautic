@@ -3,7 +3,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SFML/Window.hpp>
+#include "SFML/Window.hpp"
+#include "SFML/Graphics/RenderWindow.hpp"
 
 #include "ApplicationStateStack.hpp"
 #include "ApplicationContext.hpp"
@@ -24,7 +25,8 @@ protected:
 
 
 private:
-	sf::Window	_window;
+	//sf::Window	_window;
+	sf::RenderWindow _window;
 	ApplicationStateStack _stateStack;
 	ApplicationContext _context;
 
