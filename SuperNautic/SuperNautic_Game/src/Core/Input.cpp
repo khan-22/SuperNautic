@@ -2,9 +2,12 @@
 
 #include "Input.h"
 
+#include "../Log.h"
+
 Input::Input()
 {
 	_controllerId = 0;
+	_bLeftStickDormant = true;
 }
 
 Input::~Input()
@@ -18,7 +21,30 @@ void Input::update()
 	{
 		_bButtonA = sf::Joystick::isButtonPressed(_controllerId, 0);
 		_leftStickX = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::X);
+		_leftStickY = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Y);
 		_triggers = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Z);
+	}
+
+	_events.clear();
+
+	if (_bLeftStickDormant)
+	{
+		if (_leftStickY > 10)
+		{
+			_events.push_back(InputEvent::LEFTSTICK_UP);
+		}
+		else if (_leftStickY < 10)
+		{
+			_events.push_back(InputEvent::LEFTSTICK_DOWN);
+		}
+		else if (_leftStickX > 10)
+		{
+			_events.push_back(InputEvent::LEFTSTICK_RIGHT);
+		}
+		else if (_leftStickX < 10)
+		{
+			_events.push_back(InputEvent::LEFTSTICK_LEFT);
+		}
 	}
 }
 
@@ -40,6 +66,11 @@ float Input::getLeftStickXValue()
 float Input::getTriggersValue()
 {
 	return _triggers;
+}
+
+InputEvent Input::getEvent()
+{
+	return _events.front();
 }
 
 int Input::getControllerId()

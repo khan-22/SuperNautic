@@ -14,10 +14,6 @@
 
 #include "AssetCache.hpp"
 
-#include "WorldAudio.h"
-#include "PlayerAudio.h"
-#include "Input.h"
-
 Game::Game()
 	: _window(sf::VideoMode(800, 600), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
 	, _context(_window)
@@ -58,23 +54,12 @@ void Game::run()
 	sf::Clock clock;
 	sf::Time deltaTime = clock.restart();
 
-	WorldAudio wa;
-	PlayerAudio pa;
-	Input in;
-
 
 	while (_window.isOpen())
 	{
 		handleEvents();
 		update(deltaTime.asSeconds());
 		render();
-
-		in.update();
-		if (in.bGetAValue())
-		{
-			pa.playAudio(pa.cat);
-			LOG("Playing Seven");
-		}
 
 		deltaTime = clock.restart();
 	}
