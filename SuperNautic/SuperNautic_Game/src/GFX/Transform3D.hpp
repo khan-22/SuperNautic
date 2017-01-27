@@ -3,14 +3,12 @@
 #ifndef TRANSFORM_3D_HPP
 #define TRANSFORM_3D_HPP
 
+#include <glm/glm.hpp>
+
 namespace GFX
 {
-	class Transform3D
-	{
-	public:
-		Transform3D();
-		~Transform3D();
-	};
+	//using Transform3D = glm::mat4;
+
 }
 
 #endif // TRANSFORM_3D_HPP
