@@ -9,7 +9,7 @@ namespace sf
 }
 
 class ApplicationStateStack;
-class ApplicationContext;
+struct ApplicationContext;
 
 class ApplicationState
 {
