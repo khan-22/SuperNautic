@@ -8,19 +8,19 @@ GuiButton::GuiButton(const sf::Text& text, std::function<void()> callback)
 {
     sf::FloatRect textBounds = _text.getLocalBounds();
     setOrigin(textBounds.width / 2.f, textBounds.height / 2.f);
-    _text.setColor(sf::Color::Black);
+    _text.setFillColor(sf::Color::Black);
 }
 
 void GuiButton::select()
 {
     setScale(1.2f, 1.2f);
-    _text.setColor(sf::Color::White);
+    _text.setFillColor(sf::Color::White);
 }
 
 void GuiButton::deselect()
 {
     setScale(1.0f, 1.0f);
-    _text.setColor(sf::Color::Black);
+    _text.setFillColor(sf::Color::Black);
 }
 
 bool GuiButton::bIsActivatable() const
