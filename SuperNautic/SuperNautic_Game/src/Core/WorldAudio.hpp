@@ -1,4 +1,5 @@
 #pragma once
+
 #ifndef WORLDAUDIO_HPP
 #define WORLDAUDIO_HPP
 
@@ -13,10 +14,10 @@ public:
 protected:
 
 private:
-	std::string folder = "res/audio/", fileSuffix = ".wav";
+	std::string _folder = "res/audio/", _fileSuffix = ".wav";
 
-	sf::Sound buttonClick;
-	sf::Music music;
+	sf::Sound _buttonClick;
+	sf::Music _music;
 
 };
 

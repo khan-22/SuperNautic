@@ -23,9 +23,9 @@ public:
 protected:
 
 private:
-	std::string folder = "res/audio/", fileSuffix = ".wav";
-	sf::Sound sCat;
-	sf::SoundBuffer sbCat;
+	std::string _folder = "res/audio/", _fileSuffix = ".wav";
+	sf::Sound _sCat;
+	sf::SoundBuffer _sbCat;
 
 	void loadFromBuffers();
 

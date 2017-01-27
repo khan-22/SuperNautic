@@ -2,12 +2,12 @@
 
 WorldAudio::WorldAudio()
 {
-	if (!music.openFromFile(folder + "ariel" + fileSuffix))
+	if (!_music.openFromFile(_folder + "ariel" + _fileSuffix))
 	{
 	}
 
-	music.setLoop(true);
-	music.play();
+	_music.setLoop(true);
+	_music.play();
 }
 
 WorldAudio::~WorldAudio()
