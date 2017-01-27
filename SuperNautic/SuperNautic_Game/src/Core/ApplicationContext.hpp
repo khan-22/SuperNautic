@@ -3,11 +3,19 @@
 #ifndef APPLICATION_CONTEXT_HPP
 #define APPLICATION_CONTEXT_HPP
 
-#include "AssetCache.hpp"
+namespace sf
+{
+    class RenderWindow;
+}
 
 struct ApplicationContext
 {
-    AssetCache<float, std::string> floatCache; // Just an example.
+    ApplicationContext(sf::RenderWindow& window)
+    : window(window)
+    {
+    }
+
+    sf::RenderWindow& window;
 };
 
 
