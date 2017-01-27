@@ -26,6 +26,7 @@ int main()
 	}
 	else
 	{
+		game.bInitialize();
 		game.run();
 	}
 

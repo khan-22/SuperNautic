@@ -14,6 +14,8 @@ public:
 	Game();
 	~Game();
 
+	bool bInitialize();
+
 	void run();
 
 	void handleEvents();
