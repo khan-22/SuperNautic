@@ -3,14 +3,19 @@
 
 #include "LoadAsset.hpp"
 
+#include <SFML/Graphics/Font.hpp>
+
 #include "../GFX/VertexDataImporter.h"
 #include "../GFX/ShaderLoader.h"
+
 
 struct Mesh
 {
 
 };
 
+
+// Load raw mesh/vertex data
 template<>
 std::shared_ptr<GFX::RawMeshCollection> loadAsset<GFX::RawMeshCollection>(std::string key)
 {
@@ -18,9 +23,25 @@ std::shared_ptr<GFX::RawMeshCollection> loadAsset<GFX::RawMeshCollection>(std::s
     return std::shared_ptr<GFX::RawMeshCollection>(importer.importVertexData(key));
 }
 
+// Load shaders
 template<>
 std::shared_ptr<GFX::Shader> loadAsset<GFX::Shader>(std::string key)
 {
 	GFX::ShaderLoader loader("./src/GFX/Shaders/");
 	return std::shared_ptr<GFX::Shader>(loader.loadShader(key));
+}
+
+// Load fonts
+template<>
+std::shared_ptr<sf::Font> loadAsset<sf::Font>(std::string key)
+{
+	auto font = std::make_shared<sf::Font>();
+	if (font->loadFromFile(key))
+	{
+		return font;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
