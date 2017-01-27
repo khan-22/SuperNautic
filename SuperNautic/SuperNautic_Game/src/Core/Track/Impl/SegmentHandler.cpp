@@ -6,12 +6,13 @@
 // Loads SegmentInfos from file with name fileName
 SegmentHandler::SegmentHandler(std::string fileName)
 {
-	std::ifstream infoFile { fileName };
+	std::ifstream infoFile {fileName};
 
-	if (infoFile.fail())
+	if (infoFile.bad())
 	{
 		// File could not be opened
 		LOG_ERROR("Could not open SegmentInfo file ", fileName );
+		return;
 	}
 
 	std::string segmentName;
@@ -19,20 +20,19 @@ SegmentHandler::SegmentHandler(std::string fileName)
 	std::string endConnection;
 
 	// Read SegmentInfos
-	try
+	while (infoFile >> segmentName)
 	{
-		while (infoFile >> segmentName)
+		if (!(infoFile >> startConnection && infoFile >> endConnection))
 		{
-			infoFile >> startConnection;
-			infoFile >> endConnection;
-
-			_segmentInfos.push_back(SegmentInfo{ std::move(segmentName), std::move(startConnection), std::move(endConnection) });
+			// Wrong number of arguments
+			LOG_ERROR("Incorrect input in SegmentInfo file ", fileName);
+			return;
 		}
+
+		// Add read SegmentInfo to vector
+		_segmentInfos.push_back(SegmentInfo{ std::move(segmentName), std::move(startConnection), std::move(endConnection) });
 	}
-	catch (std::ios_base::failure e)
-	{
-		LOG_ERROR(e.what());
-	}
+
 }
 
 // Load segment from fbx file using info from _segments[i], returns reference to loaded segment
