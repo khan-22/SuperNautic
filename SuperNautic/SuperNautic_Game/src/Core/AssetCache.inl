@@ -1,6 +1,10 @@
 #include "LoadAsset.hpp"
 
 template<typename AssetT, typename KeyT>
+std::map<KeyT, std::shared_ptr<AssetT>> AssetCache<AssetT, KeyT>::_cache;
+
+
+template<typename AssetT, typename KeyT>
 Asset<AssetT> AssetCache<AssetT, KeyT>::load(KeyT key)
 {
     std::shared_ptr<AssetT> asset = loadAsset<AssetT>(key);
@@ -19,7 +23,7 @@ template<typename AssetT, typename KeyT>
 Asset<AssetT> AssetCache<AssetT, KeyT>::get(KeyT key)
 {
     auto cachedIterator = _cache.find(key);
-    if(cachedIterator == _cache.end())
+    if(cachedIterator == _cache.end() || cachedIterator->second == nullptr)
     {
         return load(key);
     }

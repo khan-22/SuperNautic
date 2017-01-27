@@ -10,12 +10,12 @@ template<typename AssetT, typename KeyT>
 class AssetCache
 {
 public:
-    Asset<AssetT> get(KeyT key);
+    static Asset<AssetT> get(KeyT key);
 
 private:
-    std::map<KeyT, std::shared_ptr<AssetT>> _cache;
+    static std::map<KeyT, std::shared_ptr<AssetT>> _cache;
 
-    Asset<AssetT> load(KeyT key);
+    static Asset<AssetT> load(KeyT key);
 };
 
 #include "AssetCache.inl"

@@ -4,6 +4,7 @@
 #define PLAY_APPLICATION_STATE_HPP
 
 #include "ApplicationState.hpp"
+#include "ApplicationContext.hpp"
 
 class PlayApplicationState : public ApplicationState
 {
