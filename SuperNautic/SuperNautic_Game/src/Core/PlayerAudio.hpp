@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef PLAYERAUDIO_H
-#define PLAYERAUDIO_H
+#ifndef PLAYERAUDIO_HPP
+#define PLAYERAUDIO_HPP
 
 #include <SFML\Audio.hpp>
 #include <string.h>
@@ -23,9 +23,9 @@ public:
 protected:
 
 private:
-	std::string folder = "res/audio/", fileSuffix = ".wav";
-	sf::Sound sCat;
-	sf::SoundBuffer sbCat;
+	std::string _folder = "res/audio/", _fileSuffix = ".wav";
+	sf::Sound _sCat;
+	sf::SoundBuffer _sbCat;
 
 	void loadFromBuffers();
 

@@ -17,8 +17,8 @@ Game::Game()
 	, _context(_window)
 {
 	LOG("Game is being constructed...");
-	
 
+	_players.push_back(Player());
 }
 
 Game::~Game()
@@ -71,7 +71,6 @@ void Game::run()
 {
 	sf::Clock clock;
 	sf::Time deltaTime = clock.restart();
-
 
 	while (_window.isOpen())
 	{

@@ -1,4 +1,4 @@
-#include "PlayerAudio.h"
+#include "PlayerAudio.hpp"
 
 PlayerAudio::PlayerAudio()
 {
@@ -15,9 +15,9 @@ void PlayerAudio::playAudio(Sounds sound)
 	switch (sound)
 	{
 	case cat:
-		if (sCat.getStatus() != sCat.Playing)
+		if (_sCat.getStatus() != _sCat.Playing)
 		{
-			sCat.play();
+			_sCat.play();
 		}
 		break;
 	default:
@@ -30,7 +30,7 @@ void PlayerAudio::setPitch(Sounds sound, float pitchValue)
 	switch (sound)
 	{
 	case cat:
-		sCat.setPitch(pitchValue);
+		_sCat.setPitch(pitchValue);
 		break;
 	default:
 		break;
@@ -42,7 +42,7 @@ void PlayerAudio::setVolume(Sounds sound, float volumeValue)
 	switch (sound)
 	{
 	case cat:
-		sCat.setVolume(volumeValue);
+		_sCat.setVolume(volumeValue);
 		break;
 	default:
 		break;
@@ -51,8 +51,8 @@ void PlayerAudio::setVolume(Sounds sound, float volumeValue)
 
 void PlayerAudio::loadFromBuffers()
 {
-	if (sbCat.loadFromFile(folder + "cat" + fileSuffix))
+	if (_sbCat.loadFromFile(_folder + "cat" + _fileSuffix))
 	{
-		sCat.setBuffer(sbCat);
+		_sCat.setBuffer(_sbCat);
 	}
 }
