@@ -4,6 +4,8 @@
 #define GUI_BUTTON_HPP
 
 
+#include <functional>
+
 #include "SFML/Graphics/Text.hpp"
 
 #include "GuiElement.hpp"
