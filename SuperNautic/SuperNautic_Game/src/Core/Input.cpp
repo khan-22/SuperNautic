@@ -68,9 +68,9 @@ float Input::getTriggersValue()
 	return _triggers;
 }
 
-InputEvent Input::getEvent()
+std::list<InputEvent> Input::getEvent()
 {
-	return _events.front();
+	return _events;
 }
 
 int Input::getControllerId()
