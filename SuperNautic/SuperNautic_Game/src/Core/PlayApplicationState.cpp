@@ -8,6 +8,8 @@
 #include "ApplicationContext.hpp"
 #include "AssetCache.hpp"
 #include "GuiButton.hpp"
+#include "../GFX/SfmlRenderer.hpp"
+#include "Camera.h"
 
 
 PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
@@ -32,7 +34,10 @@ PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, Applica
 
 bool PlayApplicationState::bRender()
 {
-    _context.window.draw(_guiContainer);
+    GFX::SfmlRenderer renderer;
+    renderer.render(_guiContainer);
+    renderer.display(_context.window, Camera(90, 5, 5));
+//    _context.window.draw(_guiContainer);
     return true;
 }
 
