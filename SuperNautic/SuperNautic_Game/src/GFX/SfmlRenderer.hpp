@@ -9,7 +9,7 @@
 
 namespace GFX
 {
-    using SfmlRenderer = Renderer<sf::Drawable, sf::Transform>;
+    using SfmlRenderer = Renderer<sf::Drawable>;
 }
 
 
