@@ -14,6 +14,7 @@
 
 Game::Game()
 	: _window(sf::VideoMode(800, 600), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
+	, _context(_window)
 {
 	LOG("Game is being constructed...");
 	
@@ -97,6 +98,10 @@ void Game::handleEvents()
 			{
 				_window.close();
 			}
+			else
+            {
+                _stateStack.handleEvent(event);
+            }
 			break;
 
         default:
