@@ -10,6 +10,12 @@ Input::Input()
 	_bLeftStickDormant = true;
 }
 
+Input::Input(int id)
+{
+	_controllerId = id;
+	_bLeftStickDormant = true;
+}
+
 Input::~Input()
 {
 

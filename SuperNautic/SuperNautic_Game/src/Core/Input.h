@@ -18,6 +18,7 @@ class Input
 {
 public:
 	Input();
+	Input(int id);
 	~Input();
 
 	void update();
