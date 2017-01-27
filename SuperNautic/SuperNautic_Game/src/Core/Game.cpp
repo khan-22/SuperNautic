@@ -1,12 +1,8 @@
 #include "Game.h"
 
-#include <SFML/OpenGL.hpp>
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <glm/vec3.hpp>
-#include <glm/vec2.hpp>
-
 
 #include "../Log.h"
 #include "../GFX/VertexDataImporter.h"
@@ -14,18 +10,30 @@
 
 #include "AssetCache.hpp"
 
+#include "../GFX/ShaderLoader.h"
+
 Game::Game()
 	: _window(sf::VideoMode(800, 600), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
 	, _context(_window)
 {
 	LOG("Game is being constructed...");
+	
 
+}
+
+Game::~Game()
+{
+	LOG("Game is being destructed...");
+
+	CLOSE_LOG();
+}
+
+bool Game::bInitialize()
+{
 	glEnable(GL_DEPTH_TEST);
-
 
 	// Cached asset loading **DEMO**
 	AssetCache<GFX::RawMeshCollection, std::string> meshCache;
-
 	Asset<GFX::RawMeshCollection> testModel = meshCache.get("test.fbx");
 
 	if (testModel.get() == nullptr)
@@ -37,16 +45,26 @@ Game::Game()
 		LOG("The loaded mesh has: ", testModel.get()->meshes[0].vertices.size(), " vertices");
 	}
 
+	// Shader loading **DEMO**
+	//GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
+	//GFX::Shader* testShader = shaderLoader.loadShader("forward");
+	AssetCache<GFX::Shader, std::string> shaderCache;
+	Asset<GFX::Shader> testShader = shaderCache.get("forward");
+	
+	if (testShader.get() == 0)
+	{
+		LOG("Failed to load shader... Oopsie poopsie!");
+	}
+	else
+	{
+		LOG("The test shader has been loaded!");
+	}
+	
 
 	std::unique_ptr<ApplicationState> playState(new PlayApplicationState(_stateStack, _context));
 	_stateStack.push(playState);
-}
 
-Game::~Game()
-{
-	LOG("Game is being destructed...");
-
-	CLOSE_LOG();
+	return true;
 }
 
 void Game::run()
