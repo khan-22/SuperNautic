@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GAME_H
-#define GAME_H
+#ifndef GAME_HPP
+#define GAME_HPP
 
 #include "SFML/Window.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
@@ -35,4 +35,4 @@ private:
 
 };
 
-#endif //GAME_H
+#endif //GAME_HPP

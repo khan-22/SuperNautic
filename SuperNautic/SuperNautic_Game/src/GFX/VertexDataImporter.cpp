@@ -1,10 +1,10 @@
-#include "VertexDataImporter.h"
+#include "VertexDataImporter.hpp"
 
 #include <assimp/scene.h>
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 
-#include "../Log.h"
+#include "../Log.hpp"
 
 namespace GFX {
 

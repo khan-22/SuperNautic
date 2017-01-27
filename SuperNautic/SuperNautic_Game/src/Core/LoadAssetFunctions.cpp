@@ -5,8 +5,8 @@
 
 #include <SFML/Graphics/Font.hpp>
 
-#include "../GFX/VertexDataImporter.h"
-#include "../GFX/ShaderLoader.h"
+#include "../GFX/VertexDataImporter.hpp"
+#include "../GFX/ShaderLoader.hpp"
 
 
 struct Mesh
