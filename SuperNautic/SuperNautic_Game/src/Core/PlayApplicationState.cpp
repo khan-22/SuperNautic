@@ -19,7 +19,7 @@ PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, Applica
 
 
 
-    static Asset<sf::Font> arialFont = AssetCache<sf::Font, std::string>::get("arial.ttf");
+    static Asset<sf::Font> arialFont = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
     sf::Text text("Click me!", *arialFont.get());
     text.setFillColor(sf::Color::White);
     auto button1 = std::unique_ptr<GuiElement>(new GuiButton(text, [](){std::cout << "Clicky clicky 1!" << std::endl;}));

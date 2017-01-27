@@ -18,6 +18,7 @@ class Input
 {
 public:
 	Input();
+	Input(int id);
 	~Input();
 
 	void update();
@@ -27,7 +28,7 @@ public:
 	float getLeftStickXValue();
 	float getTriggersValue();
 
-	InputEvent getEvent();
+	std::list<InputEvent> getEvent();
 
 	int getControllerId();
 
