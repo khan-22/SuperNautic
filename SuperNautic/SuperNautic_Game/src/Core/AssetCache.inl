@@ -19,7 +19,7 @@ template<typename AssetT, typename KeyT>
 Asset<AssetT> AssetCache<AssetT, KeyT>::get(KeyT key)
 {
     auto cachedIterator = _cache.find(key);
-    if(cachedIterator == _cache.end())
+    if(cachedIterator == _cache.end() || cachedIterator->second == nullptr)
     {
         return load(key);
     }
