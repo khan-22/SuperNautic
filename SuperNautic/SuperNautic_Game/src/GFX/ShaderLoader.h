@@ -27,7 +27,7 @@ namespace GFX
 	private:
 		std::string		_rootPath;
 
-		const char* loadSource(std::string filename) const;
+		std::string loadSource(std::string filename) const;
 		GLuint compileShader(const char* source, GLenum type) const;
 		GLuint linkProgram(GLuint vs, GLuint gs, GLuint fs) const;
 	};

@@ -23,26 +23,26 @@ Shader* ShaderLoader::loadShader(std::string shaderName)
 	GLuint fragmentShader	= 0U;
 
 	// Will throw if not present...
-	const char* vertexSource = loadSource(_rootPath + shaderName + "_vs.glsl");
-	vertexShader = compileShader(vertexSource, GL_VERTEX_SHADER);
+	std::string vertexSource = loadSource(_rootPath + shaderName + "_vs.glsl");
+	vertexShader = compileShader(vertexSource.c_str(), GL_VERTEX_SHADER);
 	
 	// Will be caught if not present since geometry shaders are
 	// non-essential.
 	try
 	{
-		const char* geometrySource = loadSource(_rootPath + shaderName + "_gs.glsl");
-		geometryShader = compileShader(geometrySource, GL_GEOMETRY_SHADER);
+		std::string geometrySource = loadSource(_rootPath + shaderName + "_gs.glsl");
+		geometryShader = compileShader(geometrySource.c_str(), GL_GEOMETRY_SHADER);
 	}
 	catch (const std::exception&) {}
 
 	// Will throw if not present... (May change?)
-	const char* fragmentSource = loadSource(_rootPath + shaderName + "_fs.glsl");
-	fragmentShader = compileShader(fragmentSource, GL_FRAGMENT_SHADER);
+	std::string fragmentSource = loadSource(_rootPath + shaderName + "_fs.glsl");
+	fragmentShader = compileShader(fragmentSource.c_str(), GL_FRAGMENT_SHADER);
 
 	return new Shader{linkProgram(vertexShader, geometryShader, fragmentShader)};
 }
 
-const char * GFX::ShaderLoader::loadSource(std::string filename) const
+std::string GFX::ShaderLoader::loadSource(std::string filename) const
 {
 	std::ifstream inputStream(filename);
 	std::string text;
@@ -58,7 +58,7 @@ const char * GFX::ShaderLoader::loadSource(std::string filename) const
 		throw std::runtime_error("Failed to load shader");
 	}
 
-	return text.c_str();
+	return text;
 }
 
 GLuint GFX::ShaderLoader::compileShader(const char * source, GLenum type) const
@@ -89,6 +89,10 @@ GLuint GFX::ShaderLoader::linkProgram(GLuint vs, GLuint gs, GLuint fs) const
 	glAttachShader(shaderProgram, fs);
 
 	glLinkProgram(shaderProgram);
+
+	glDeleteShader(vs);
+	glDeleteShader(gs);
+	glDeleteShader(fs);
 
 	GLint	success = 0;
 	GLchar	programError[1024] = { 0 };

@@ -4,6 +4,7 @@
 #include "LoadAsset.hpp"
 
 #include "../GFX/VertexDataImporter.h"
+#include "../GFX/ShaderLoader.h"
 
 struct Mesh
 {
@@ -15,4 +16,11 @@ std::shared_ptr<GFX::RawMeshCollection> loadAsset<GFX::RawMeshCollection>(std::s
 {
 	GFX::VertexDataImporter importer("./res/models/");
     return std::shared_ptr<GFX::RawMeshCollection>(importer.importVertexData(key));
+}
+
+template<>
+std::shared_ptr<GFX::Shader> loadAsset<GFX::Shader>(std::string key)
+{
+	GFX::ShaderLoader loader("./src/GFX/Shaders/");
+	return std::shared_ptr<GFX::Shader>(loader.loadShader(key));
 }
