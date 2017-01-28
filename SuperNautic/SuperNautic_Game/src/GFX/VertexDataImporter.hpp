@@ -12,7 +12,9 @@ namespace GFX {
 
 	struct RawVertexData 
 	{
-		std::string name;
+		std::string	 name;
+		unsigned int textureIndex;
+
 		std::vector<glm::vec3> vertices;
 		std::vector<glm::vec3> texCoords;
 		std::vector<glm::vec3> normals;
