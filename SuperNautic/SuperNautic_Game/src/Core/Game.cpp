@@ -1,24 +1,24 @@
-#include "Game.h"
+#include "Game.hpp"
 
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "../Log.h"
-#include "../GFX/VertexDataImporter.h"
+#include "../Log.hpp"
+#include "../GFX/VertexDataImporter.hpp"
 #include "PlayApplicationState.hpp"
 
 #include "AssetCache.hpp"
 
-#include "../GFX/ShaderLoader.h"
+#include "../GFX/ShaderLoader.hpp"
 
 Game::Game()
 	: _window(sf::VideoMode(800, 600), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
 	, _context(_window)
 {
 	LOG("Game is being constructed...");
-	
 
+	_players.push_back(Player());
 }
 
 Game::~Game()
@@ -71,7 +71,6 @@ void Game::run()
 {
 	sf::Clock clock;
 	sf::Time deltaTime = clock.restart();
-
 
 	while (_window.isOpen())
 	{

@@ -1,7 +1,7 @@
 #include <fstream>
 
 #include "../SegmentHandler.h"
-#include "../../../Log.h"
+#include "../../../Log.hpp"
 
 // Loads SegmentInfos from file with name fileName
 SegmentHandler::SegmentHandler(std::string fileName)

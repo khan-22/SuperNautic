@@ -1,12 +1,12 @@
 #pragma once
 
-#ifndef SHADER_LOADER_H
-#define SHADER_LOADER_H
+#ifndef SHADER_LOADER_HPP
+#define SHADER_LOADER_HPP
 
 #include <string>
 #include <GL/glew.h>
 
-#include "Shaders/Shader.h"
+#include "Shaders/Shader.hpp"
 
 namespace GFX
 {
@@ -31,4 +31,4 @@ namespace GFX
 	};
 }
 
-#endif //SHADER_LOADER_H
+#endif //SHADER_LOADER_HPP

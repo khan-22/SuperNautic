@@ -1,13 +1,15 @@
 #pragma once
 
-#ifndef GAME_H
-#define GAME_H
+#ifndef GAME_HPP
+#define GAME_HPP
 
 #include "SFML/Window.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
 
 #include "ApplicationStateStack.hpp"
 #include "ApplicationContext.hpp"
+
+#include "Player.hpp"
 
 class Game
 {
@@ -32,7 +34,7 @@ private:
 	ApplicationStateStack _stateStack;
 	ApplicationContext _context;
 
-
+	std::list<Player> _players;
 };
 
-#endif //GAME_H
+#endif //GAME_HPP

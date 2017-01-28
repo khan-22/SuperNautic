@@ -9,8 +9,8 @@
 #include <glm\glm.hpp>
 #include <crtdbg.h> // Leak-checking
 
-#include "Log.h"
-#include "Core\Game.h"
+#include "Log.hpp"
+#include "Core\Game.hpp"
 
 
 int main()

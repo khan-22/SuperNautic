@@ -1,4 +1,4 @@
-#include "ModelLoader.h"
+#include "ModelLoader.hpp"
 
 namespace GFX {
 

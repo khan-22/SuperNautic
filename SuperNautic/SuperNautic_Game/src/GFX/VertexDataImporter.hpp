@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef VERTEX_DATA_IMPORTER_H
-#define VERTEX_DATA_IMPORTER_H
+#ifndef VERTEX_DATA_IMPORTER_HPP
+#define VERTEX_DATA_IMPORTER_HPP
 
 #include <string>
 #include <vector>
@@ -38,4 +38,4 @@ namespace GFX {
 	};
 
 }
-#endif //VERTEX_DATA_IMPORTER_H
+#endif //VERTEX_DATA_IMPORTER_HPP
