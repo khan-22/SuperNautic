@@ -8,10 +8,8 @@ using namespace GFX;
 
 Framebuffer Framebuffer::DEFAULT;
 
-Framebuffer::Framebuffer(sf::Window* window, float normalizedX, float normalizedY, float normalizedWidth, float normalizedHeight, unsigned int numColorAttachments, DepthType depthType)
-	: _window(window)
-	, _normalizedX(normalizedX), _normalizedY(normalizedY)
-	, _normalizedWidth(normalizedWidth), _normalizedHeight(normalizedHeight)
+Framebuffer::Framebuffer(unsigned int width, unsigned int height, unsigned int numColorAttachments, DepthType depthType)
+	: _width(width), _height(height)
 	, _numColorAttachments(numColorAttachments), _bHasDepthAttachment(depthType != NO_DEPTH)
 	, _depthTexture(0)
 {
@@ -20,15 +18,15 @@ Framebuffer::Framebuffer(sf::Window* window, float normalizedX, float normalized
 	glGenFramebuffers(1, &_fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
 
-	const int ACTUAL_WIDTH	= _window->getSize().x * _normalizedX;
-	const int ACTUAL_HEIGHT	= _window->getSize().y * _normalizedY;
+	//const int ACTUAL_WIDTH	= _window->getSize().x * _normalizedX;
+	//const int ACTUAL_HEIGHT	= _window->getSize().y * _normalizedY;
 
 	glGenTextures(numColorAttachments, _textures);
 
 	for (int i = 0; i < numColorAttachments; i++)
 	{
 		glBindTexture(GL_TEXTURE_2D, _textures[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, ACTUAL_WIDTH, ACTUAL_HEIGHT, 0, GL_RGB, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _width, _height, 0, GL_RGB, GL_FLOAT, nullptr);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, _textures[i], 0);
 	}
 
@@ -37,7 +35,7 @@ Framebuffer::Framebuffer(sf::Window* window, float normalizedX, float normalized
 		glGenTextures(1, &_depthTexture);
 		
 		glBindTexture(GL_TEXTURE_2D, _depthTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, depthType, ACTUAL_WIDTH, ACTUAL_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, depthType, _width, _height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexture, 0);
 	}
 
@@ -60,7 +58,6 @@ Framebuffer::Framebuffer(sf::Window* window, float normalizedX, float normalized
 }
 
 Framebuffer::Framebuffer()
-	: _window(nullptr) 
 {
 	// For the DEFAULT framebuffer
 	_fbo = 0;
@@ -92,4 +89,9 @@ void Framebuffer::setReadBuffer(GLuint attachment) const
 {
 	assert(attachment <= MAX_COLOR_ATTACHMENTS);
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment);
+}
+
+void Framebuffer::setViewport() const
+{
+	glViewport(0, 0, _width, _height);
 }

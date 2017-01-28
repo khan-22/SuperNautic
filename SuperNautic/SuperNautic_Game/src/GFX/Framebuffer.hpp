@@ -23,7 +23,7 @@ namespace GFX
 		};
 
 
-		Framebuffer(sf::Window* window, float normalizedX, float normalizedY, float normalizedWidth, float normalizedHeight, unsigned int numColorAttachments, DepthType depthType = FLOAT32);
+		Framebuffer(unsigned int width, unsigned int height, unsigned int numColorAttachments, DepthType depthType = FLOAT32);
 		~Framebuffer();
 		
 		void bindWrite() const;
@@ -31,18 +31,21 @@ namespace GFX
 		void bindBoth() const;
 
 		void setReadBuffer(GLuint attachment) const;
-
+		void setViewport() const;
 
 	protected:
 
 
 	private:
-		sf::Window*	_window;
+		//sf::Window*	_window;
 
-		float		_normalizedX;
-		float		_normalizedY;
-		float		_normalizedWidth;
-		float		_normalizedHeight;
+		//float		_normalizedX;
+		//float		_normalizedY;
+		//float		_normalizedWidth;
+		//float		_normalizedHeight;
+
+		unsigned int	_width;
+		unsigned int	_height;
 
 		GLuint			_fbo;
 		unsigned int	_numColorAttachments;
