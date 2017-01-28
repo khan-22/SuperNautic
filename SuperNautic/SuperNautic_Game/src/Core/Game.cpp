@@ -15,6 +15,7 @@
 Game::Game()
 	: _window(sf::VideoMode(800, 600), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
 	, _context(_window)
+	, _quitTimer(0.f)
 {
 	LOG("Game is being constructed...");
 
@@ -33,8 +34,7 @@ bool Game::bInitialize()
 	glEnable(GL_DEPTH_TEST);
 
 	// Cached asset loading **DEMO**
-	AssetCache<GFX::RawMeshCollection, std::string> meshCache;
-	Asset<GFX::RawMeshCollection> testModel = meshCache.get("test.fbx");
+	Asset<GFX::RawMeshCollection> testModel = AssetCache<GFX::RawMeshCollection, std::string>::get("test.fbx");
 
 	if (testModel.get() == nullptr)
 	{
@@ -48,8 +48,7 @@ bool Game::bInitialize()
 	// Shader loading **DEMO**
 	//GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
 	//GFX::Shader* testShader = shaderLoader.loadShader("forward");
-	AssetCache<GFX::Shader, std::string> shaderCache;
-	Asset<GFX::Shader> testShader = shaderCache.get("forward");
+	Asset<GFX::Shader> testShader = AssetCache<GFX::Shader, std::string>::get("forward");
 	
 	if (testShader.get() == 0)
 	{
@@ -96,13 +95,19 @@ void Game::handleEvents()
 		case sf::Event::KeyPressed:
 			if (event.key.code == sf::Keyboard::Escape)
 			{
-				_window.close();
+				LOG("Keep holding to shutdown...");
+				//_window.close();
 			}
 			else
             {
                 _stateStack.handleEvent(event);
             }
 			break;
+		case sf::Event::KeyReleased:
+			if (event.key.code == sf::Keyboard::Escape)
+			{
+				_quitTimer = 0.f;
+			}
 
         default:
             _stateStack.handleEvent(event);
@@ -115,6 +120,16 @@ void Game::handleEvents()
 void Game::update(float dt)
 {
     _stateStack.update(dt);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+	{
+		_quitTimer += dt;
+		
+		if (_quitTimer > 0.7f)
+		{
+			_window.close();
+		}
+	}
 }
 
 void Game::render()

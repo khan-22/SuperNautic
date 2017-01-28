@@ -30,11 +30,13 @@ protected:
 
 private:
 	//sf::Window	_window;
-	sf::RenderWindow _window;
-	ApplicationStateStack _stateStack;
-	ApplicationContext _context;
+	sf::RenderWindow		_window;
+	ApplicationStateStack	_stateStack;
+	ApplicationContext		_context;
+	
+	std::list<Player>		_players;
 
-	std::list<Player> _players;
+	float					_quitTimer;
 };
 
 #endif //GAME_HPP
