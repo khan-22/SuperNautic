@@ -66,6 +66,8 @@ Framebuffer::Framebuffer()
 
 Framebuffer::~Framebuffer()
 {
+	glDeleteTextures(_numColorAttachments, _textures);
+	glDeleteTextures(1, &_depthTexture);
 
 	glDeleteFramebuffers(1, &_fbo);
 }
