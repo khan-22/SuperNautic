@@ -1,10 +1,6 @@
 #include "Renderable3D.hpp"
 
-
-
-Renderable3D::Renderable3D()
-{
-}
+using namespace GFX;
 
 
 Renderable3D::~Renderable3D()

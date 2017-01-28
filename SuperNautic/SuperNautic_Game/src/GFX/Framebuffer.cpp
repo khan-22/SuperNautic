@@ -1,0 +1,95 @@
+﻿#include "Framebuffer.hpp"
+
+#include <assert.h>
+
+#include "../Log.hpp"
+
+using namespace GFX;
+
+Framebuffer Framebuffer::DEFAULT;
+
+Framebuffer::Framebuffer(sf::Window* window, float normalizedX, float normalizedY, float normalizedWidth, float normalizedHeight, unsigned int numColorAttachments, DepthType depthType)
+	: _window(window)
+	, _normalizedX(normalizedX), _normalizedY(normalizedY)
+	, _normalizedWidth(normalizedWidth), _normalizedHeight(normalizedHeight)
+	, _numColorAttachments(numColorAttachments), _bHasDepthAttachment(depthType != NO_DEPTH)
+	, _depthTexture(0)
+{
+	assert(numColorAttachments <= MAX_COLOR_ATTACHMENTS);
+
+	glGenFramebuffers(1, &_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
+
+	const int ACTUAL_WIDTH	= _window->getSize().x * _normalizedX;
+	const int ACTUAL_HEIGHT	= _window->getSize().y * _normalizedY;
+
+	glGenTextures(numColorAttachments, _textures);
+
+	for (int i = 0; i < numColorAttachments; i++)
+	{
+		glBindTexture(GL_TEXTURE_2D, _textures[i]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, ACTUAL_WIDTH, ACTUAL_HEIGHT, 0, GL_RGB, GL_FLOAT, nullptr);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, _textures[i], 0);
+	}
+
+	if (_bHasDepthAttachment)
+	{
+		glGenTextures(1, &_depthTexture);
+		
+		glBindTexture(GL_TEXTURE_2D, _depthTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, depthType, ACTUAL_WIDTH, ACTUAL_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexture, 0);
+	}
+
+	// Defines which attachments will be seen as outputs in the fragment shader.
+	// Here I define an amount of MAX_COLOR_ATTACHMENTS, but note that in the next gl call I am only sending the amount 
+	// of actual color attachments that are present!
+	GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, 
+							 GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6, GL_COLOR_ATTACHMENT7 };
+	glDrawBuffers(numColorAttachments, drawBuffers);
+
+	// Now we must check if something went wrong
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		LOG_ERROR("FAILED TO CREATE FRAMEBUFFER!");
+	}
+
+	// Rebinds the default for both reading and writing
+	DEFAULT.bindBoth();
+}
+
+Framebuffer::Framebuffer()
+	: _window(nullptr) 
+{
+	// For the DEFAULT framebuffer
+	_fbo = 0;
+}
+
+
+Framebuffer::~Framebuffer()
+{
+
+	glDeleteFramebuffers(1, &_fbo);
+}
+
+void Framebuffer::bindWrite() const
+{
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo);
+}
+
+void Framebuffer::bindRead() const
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo);
+}
+
+void Framebuffer::bindBoth() const
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
+}
+
+void Framebuffer::setReadBuffer(GLuint attachment) const
+{
+	assert(attachment <= MAX_COLOR_ATTACHMENTS);
+	glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment);
+}
