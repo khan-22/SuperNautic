@@ -17,6 +17,7 @@ public:
 
 	bool bGetAValue();
 	float getLeftStickXValue();
+	float getLeftStickYValue();
 	float getTriggersValue();
 
 	std::list<sf::Event> getEvents();

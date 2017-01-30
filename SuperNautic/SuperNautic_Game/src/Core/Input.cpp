@@ -34,8 +34,10 @@ void Input::update()
 
 	_events.clear();
 
+	const int thresh = 50;
+
 	sf::Event event;
-	if (_leftStickY < -50 && _bLeftStickDormant)
+	if (_leftStickY < -thresh && _bLeftStickDormant)
 	{
 		event.type = sf::Event::KeyPressed;
 		event.key.code = sf::Keyboard::Up;
@@ -43,7 +45,7 @@ void Input::update()
 		_bLeftStickDormant = false;
 		LOG("Stick up", _leftStickY);
 	}
-	else if (_leftStickY > 50 && _bLeftStickDormant)
+	else if (_leftStickY > thresh && _bLeftStickDormant)
 	{
 		event.type = sf::Event::KeyPressed;
 		event.key.code = sf::Keyboard::Down;
@@ -51,7 +53,7 @@ void Input::update()
 		_bLeftStickDormant = false;
 		LOG("Stick downs ", _leftStickY);
 	}
-	else if (_leftStickX > 50 && _bLeftStickDormant)
+	else if (_leftStickX > thresh && _bLeftStickDormant)
 	{
 		event.type = sf::Event::KeyPressed;
 		event.key.code = sf::Keyboard::Right;
@@ -59,7 +61,7 @@ void Input::update()
 		_bLeftStickDormant = false;
 		LOG("Stick right", _leftStickX);
 	}
-	else if (_leftStickX < 50 && _bLeftStickDormant)
+	else if (_leftStickX < -thresh && _bLeftStickDormant)
 	{
 		event.type = sf::Event::KeyPressed;
 		event.key.code = sf::Keyboard::Left;
@@ -67,7 +69,7 @@ void Input::update()
 		_bLeftStickDormant = false;
 		LOG("Stick left", _leftStickX);
 	}
-	else
+	else if (_leftStickX > -thresh && _leftStickX < thresh && _leftStickY > -thresh && _leftStickY < thresh)
 	{
 		_bLeftStickDormant = true;
 	}
@@ -85,12 +87,17 @@ bool Input::bGetAValue()
 
 float Input::getLeftStickXValue()
 {
-	return _leftStickX;
+	return _leftStickX / 100;
+}
+
+float Input::getLeftStickYValue()
+{
+	return _leftStickX / 100;
 }
 
 float Input::getTriggersValue()
 {
-	return _triggers;
+	return _triggers / 100;
 }
 
 std::list<sf::Event> Input::getEvents()
