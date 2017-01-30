@@ -1,12 +1,10 @@
-#include <SFML\Graphics\Text.hpp>
-#include <SFML\Graphics\RenderTarget.hpp>
-
 #include <string>
 
 #include "HUD.hpp"
 #include "AssetCache.hpp"
 
 HUD::HUD(int windowWidth, int windowHeight) :
+	SceneNode(),
 	_heat(0),
 	_speed(0),
 	_position(0),

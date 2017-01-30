@@ -4,6 +4,8 @@
 #define HUD_HPP
 
 #include <SFML\Graphics\Font.hpp>
+#include <SFML\Graphics\Text.hpp>
+#include <SFML\Graphics\RenderTarget.hpp>
 
 #include "SceneNode.hpp"
 
