@@ -3,6 +3,8 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
+#include <SFML\Window\Event.hpp>
+
 #include "Input.hpp"
 #include "Ship.hpp"
 
@@ -13,7 +15,7 @@ public:
 	Player(int id);
 	~Player();
 
-	std::list<InputEvent> getEvents();
+	std::list<sf::Event> getEvents();
 private:
 	Input _input;
 	int _playerId;

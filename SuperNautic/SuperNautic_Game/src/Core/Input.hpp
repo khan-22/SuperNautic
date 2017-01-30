@@ -5,15 +5,6 @@
 
 #include <list>
 
-enum class InputEvent : unsigned char
-{
-	A_PRESSED,
-	LEFTSTICK_LEFT,
-	LEFTSTICK_UP,
-	LEFTSTICK_DOWN,
-	LEFTSTICK_RIGHT
-};
-
 class Input
 {
 public:
@@ -28,7 +19,7 @@ public:
 	float getLeftStickXValue();
 	float getTriggersValue();
 
-	std::list<InputEvent> getEvent();
+	std::list<sf::Event> getEvents();
 
 	int getControllerId();
 
@@ -43,7 +34,7 @@ private:
 
 	int _controllerId;
 
-	std::list<InputEvent> _events;
+	std::list<sf::Event> _events;
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include <SFML\Window\Joystick.hpp>
+#include <SFML\Window\Event.hpp>
 
 #include "Input.hpp"
 
@@ -33,24 +34,42 @@ void Input::update()
 
 	_events.clear();
 
-	if (_bLeftStickDormant)
+	sf::Event event;
+	if (_leftStickY < -50 && _bLeftStickDormant)
 	{
-		if (_leftStickY > 10)
-		{
-			_events.push_back(InputEvent::LEFTSTICK_UP);
-		}
-		else if (_leftStickY < 10)
-		{
-			_events.push_back(InputEvent::LEFTSTICK_DOWN);
-		}
-		else if (_leftStickX > 10)
-		{
-			_events.push_back(InputEvent::LEFTSTICK_RIGHT);
-		}
-		else if (_leftStickX < 10)
-		{
-			_events.push_back(InputEvent::LEFTSTICK_LEFT);
-		}
+		event.type = sf::Event::KeyPressed;
+		event.key.code = sf::Keyboard::Up;
+		_events.push_back(event);
+		_bLeftStickDormant = false;
+		LOG("Stick up", _leftStickY);
+	}
+	else if (_leftStickY > 50 && _bLeftStickDormant)
+	{
+		event.type = sf::Event::KeyPressed;
+		event.key.code = sf::Keyboard::Down;
+		_events.push_back(event);
+		_bLeftStickDormant = false;
+		LOG("Stick downs ", _leftStickY);
+	}
+	else if (_leftStickX > 50 && _bLeftStickDormant)
+	{
+		event.type = sf::Event::KeyPressed;
+		event.key.code = sf::Keyboard::Right;
+		_events.push_back(event);
+		_bLeftStickDormant = false;
+		LOG("Stick right", _leftStickX);
+	}
+	else if (_leftStickX < 50 && _bLeftStickDormant)
+	{
+		event.type = sf::Event::KeyPressed;
+		event.key.code = sf::Keyboard::Left;
+		_events.push_back(event);
+		_bLeftStickDormant = false;
+		LOG("Stick left", _leftStickX);
+	}
+	else
+	{
+		_bLeftStickDormant = true;
 	}
 }
 
@@ -74,7 +93,7 @@ float Input::getTriggersValue()
 	return _triggers;
 }
 
-std::list<InputEvent> Input::getEvent()
+std::list<sf::Event> Input::getEvents()
 {
 	return _events;
 }

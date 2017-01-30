@@ -16,7 +16,7 @@ Player::~Player()
 {
 }
 
-std::list<InputEvent> Player::getEvents()
+std::list<sf::Event> Player::getEvents()
 {
-	return _input.getEvent();
+	return _input.getEvents();
 }
