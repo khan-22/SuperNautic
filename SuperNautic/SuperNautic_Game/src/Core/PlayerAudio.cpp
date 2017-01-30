@@ -1,6 +1,8 @@
 #include "PlayerAudio.hpp"
+#include "AssetCache.hpp"
 
-PlayerAudio::PlayerAudio()
+PlayerAudio::PlayerAudio() :
+	_sbVag(AssetCache<sf::SoundBuffer, std::string>::get("cat"))
 {
 	loadFromBuffers();
 }
@@ -14,10 +16,10 @@ void PlayerAudio::playAudio(Sounds sound)
 {
 	switch (sound)
 	{
-	case cat:
-		if (_sCat.getStatus() != _sCat.Playing)
+	case vag:
+		if (_sVag.getStatus() != _sVag.Playing)
 		{
-			_sCat.play();
+			_sVag.play();
 		}
 		break;
 	default:
@@ -29,8 +31,8 @@ void PlayerAudio::setPitch(Sounds sound, float pitchValue)
 {
 	switch (sound)
 	{
-	case cat:
-		_sCat.setPitch(pitchValue);
+	case vag:
+		_sVag.setPitch(pitchValue);
 		break;
 	default:
 		break;
@@ -41,8 +43,8 @@ void PlayerAudio::setVolume(Sounds sound, float volumeValue)
 {
 	switch (sound)
 	{
-	case cat:
-		_sCat.setVolume(volumeValue);
+	case vag:
+		_sVag.setVolume(volumeValue);
 		break;
 	default:
 		break;
@@ -51,8 +53,5 @@ void PlayerAudio::setVolume(Sounds sound, float volumeValue)
 
 void PlayerAudio::loadFromBuffers()
 {
-	if (_sbCat.loadFromFile(_folder + "cat" + _fileSuffix))
-	{
-		_sCat.setBuffer(_sbCat);
-	}
+	_sVag.setBuffer(*_sbVag.get());
 }

@@ -14,8 +14,6 @@ public:
 protected:
 
 private:
-	std::string _folder = "res/audio/", _fileSuffix = ".wav";
-
 	sf::Sound _buttonClick;
 	sf::Music _music;
 

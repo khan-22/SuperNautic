@@ -2,7 +2,7 @@
 
 WorldAudio::WorldAudio()
 {
-	if (!_music.openFromFile(_folder + "ariel" + _fileSuffix))
+	if (!_music.openFromFile("ariel"))
 	{
 	}
 
