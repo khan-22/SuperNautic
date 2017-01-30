@@ -31,6 +31,8 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 	}
 
 	collection = new RawMeshCollection();
+
+	// Import meshes
 	for (int i = 0; i < importedData->mNumMeshes; i++)
 	{
 		aiMesh* mesh = importedData->mMeshes[i];
@@ -41,14 +43,31 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		data.vertices.resize(mesh->mNumVertices);
 		data.texCoords.resize(mesh->mNumVertices);
 		data.normals.resize(mesh->mNumVertices);
+		data.faces.resize(mesh->mNumFaces);
 
 		memcpy(data.vertices.data(), &mesh->mVertices[0], sizeof(mesh->mVertices[0]) * mesh->mNumVertices);
 		memcpy(data.texCoords.data(), &mesh->mTextureCoords[0], sizeof(mesh->mTextureCoords[0]) * mesh->mNumVertices);
 		memcpy(data.normals.data(), &mesh->mNormals[0], sizeof(mesh->mNormals[0]) * mesh->mNumVertices);
+		memcpy(data.faces.data(), &mesh->mFaces[0], sizeof(mesh->mFaces[0]) * mesh->mNumFaces);
 
 		data.textureIndex = mesh->mMaterialIndex;
-
+		
 		data.name = mesh->mName.C_Str();
+	}
+
+	// Import cameras...
+	for (int i = 0; i < importedData->mNumCameras; i++)
+	{
+		glm::mat4 endMatrix;
+		aiMatrix4x4 cameraMatrix;
+		importedData->mCameras[i]->GetCameraMatrix(cameraMatrix);
+		
+		endMatrix = { cameraMatrix.a1, cameraMatrix.a2, cameraMatrix.a3, cameraMatrix.a4,
+					  cameraMatrix.b1, cameraMatrix.b2, cameraMatrix.b3, cameraMatrix.b4,
+					  cameraMatrix.c1, cameraMatrix.c2, cameraMatrix.c3, cameraMatrix.c4,
+					  cameraMatrix.d1, cameraMatrix.d2, cameraMatrix.d3, cameraMatrix.d4 };
+
+		collection->cameras.push_back(endMatrix);
 	}
 
 	LOG("Loaded ", collection->meshes.size(), " meshes...");

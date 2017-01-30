@@ -34,7 +34,7 @@ bool Game::bInitialize()
 	glEnable(GL_DEPTH_TEST);
 
 	// Cached asset loading **DEMO**
-	Asset<GFX::RawMeshCollection> testRawMesh = AssetCache<GFX::RawMeshCollection, std::string>::get("test.fbx");
+	RawMeshAsset testRawMesh = RawMeshCache::get("test.fbx");
 
 	if (testRawMesh.get() == nullptr)
 	{
