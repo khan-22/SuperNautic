@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "Segment.h"
+#include "Segment.hpp"
 
 // Holds basic information about an uninstantiated track segment 
 struct SegmentInfo

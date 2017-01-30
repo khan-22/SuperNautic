@@ -1,6 +1,6 @@
 #include <fstream>
 
-#include "../SegmentHandler.h"
+#include "../SegmentHandler.hpp"
 #include "../../../Log.hpp"
 
 // Loads SegmentInfos from file with name fileName
@@ -48,6 +48,14 @@ const Segment* SegmentHandler::loadSegment(unsigned i)
 	else
 	{
 		// Load Segment from file
-		// TODO
+		_segments.push_back(Segment{
+			_segmentInfos[i]._fileName, 
+			_segmentInfos[i]._startConnection, 
+			_segmentInfos[i]._endConnection		});
+
+		// Set index in corresponding SegmentInfo
+		_segmentInfos[i].loadedIndex = static_cast<int>(_segments.size()) - 1;
+
+		return &_segments[_segmentInfos[i].loadedIndex];
 	}
 }
