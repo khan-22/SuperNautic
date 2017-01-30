@@ -12,6 +12,14 @@ Model::~Model()
 {
 }
 
+void GFX::Model::render()
+{
+	for (auto& mesh : _meshes)
+	{
+		mesh.render();
+	}
+}
+
 Model::Mesh& GFX::Model::addMesh()
 {
 	_meshes.emplace_back();
@@ -23,12 +31,19 @@ Model::Mesh& GFX::Model::addMesh()
 ////	Model::Mesh
 ///////////////////////////////////////////////////////////////
 
-GFX::Model::Mesh::Mesh()
+Model::Mesh::Mesh()
 {
 }
 
-GFX::Model::Mesh::~Mesh()
+Model::Mesh::~Mesh()
 {
+}
+
+void Model::Mesh::render()
+{
+	_vao.bind();
+	_vao.render();
+	_vao.unbind();
 }
 
 VertexArrayObject& GFX::Model::Mesh::getVertexArrayObject()

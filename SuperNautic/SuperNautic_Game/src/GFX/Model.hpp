@@ -21,6 +21,8 @@ namespace GFX
 			Mesh();
 			~Mesh();
 
+			void render();
+
 		protected:
 		private:
 			VertexArrayObject	_vao;
@@ -33,6 +35,7 @@ namespace GFX
 		Model();
 		~Model();
 
+		void render();
 
 	protected:
 	private:

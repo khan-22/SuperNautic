@@ -45,10 +45,17 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		data.normals.resize(mesh->mNumVertices);
 		data.faces.resize(mesh->mNumFaces);
 
-		memcpy(data.vertices.data(), &mesh->mVertices[0], sizeof(mesh->mVertices[0]) * mesh->mNumVertices);
-		memcpy(data.texCoords.data(), &mesh->mTextureCoords[0], sizeof(mesh->mTextureCoords[0]) * mesh->mNumVertices);
-		memcpy(data.normals.data(), &mesh->mNormals[0], sizeof(mesh->mNormals[0]) * mesh->mNumVertices);
-		memcpy(data.faces.data(), &mesh->mFaces[0], sizeof(mesh->mFaces[0]) * mesh->mNumFaces);
+		memcpy(&data.vertices[0], &mesh->mVertices[0], sizeof(mesh->mVertices[0]) * mesh->mNumVertices);
+		memcpy(&data.texCoords[0], &mesh->mTextureCoords[0], sizeof(mesh->mTextureCoords[0]) * mesh->mNumVertices);
+		memcpy(&data.normals[0], &mesh->mNormals[0], sizeof(mesh->mNormals[0]) * mesh->mNumVertices);
+		//memcpy(&data.faces[0], &mesh->mFaces[0], sizeof(mesh->mFaces[0].mIndices[0]) * 3 * mesh->mNumFaces);
+
+		// Faces must be copied manually
+		for (int i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace currentFace = mesh->mFaces[i];
+			data.faces[i] = glm::uvec3(currentFace.mIndices[0], currentFace.mIndices[1], currentFace.mIndices[2]);
+		}
 
 		data.textureIndex = mesh->mMaterialIndex;
 		

@@ -32,6 +32,16 @@ void GFX::VertexArrayObject::sendDataToBuffer(GLubyte bufferIndex, GLubyte attri
 	unbind();
 }
 
+void VertexArrayObject::setDrawCount(GLuint drawCount)
+{
+	_drawCount = drawCount;
+}
+
+void VertexArrayObject::render()
+{
+	glDrawArrays(GL_TRIANGLES, 0, _drawCount);
+}
+
 void VertexArrayObject::bind() const
 {
 	glBindVertexArray(_vao);

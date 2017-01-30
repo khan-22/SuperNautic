@@ -24,6 +24,9 @@ namespace GFX
 
 		void addVertexBuffer(GLsizei sizeInBytes, GLenum usage);
 		void sendDataToBuffer(GLubyte bufferIndex, GLubyte attributeIndex, GLuint offset, GLsizei size, GLvoid* data, GLubyte count, GLenum type);
+		void setDrawCount(GLuint drawCount);
+
+		void render();
 
 		void bind() const;
 		static void unbind();
@@ -43,6 +46,7 @@ namespace GFX
 		};
 		
 		GLuint	_vao;
+		GLuint	_drawCount;
 		std::vector<VertexBuffer>	_vertexBuffers;
 
 	};

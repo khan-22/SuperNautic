@@ -4,6 +4,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <glm/gtx/transform.hpp>
+
 #include "../Log.hpp"
 #include "../GFX/VertexDataImporter.hpp"
 #include "MainMenuApplicationState.hpp"
@@ -49,7 +51,7 @@ bool Game::bInitialize()
 	//GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
 	//GFX::Shader* testShader = shaderLoader.loadShader("forward");
 
-	Asset<GFX::Shader> testShader = AssetCache<GFX::Shader, std::string>::get("forward");
+	Asset<GFX::Shader> testShader = ShaderCache::get("forward");
 
 	if (testShader.get() == 0)
 	{
@@ -75,6 +77,8 @@ bool Game::bInitialize()
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
 
+	_model = ModelCache::get("test.fbx");
+	_shader = ShaderCache::get("forward");
 
 	return true;
 }
@@ -147,6 +151,32 @@ void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    _stateStack.render();
+
+	GFX::Shader* shader = _shader.get();
+	_shader.get()->bind();
+	
+	static float time = 0.f;
+	time += 0.0001f;
+
+	glm::mat4 model(1.f);
+	glm::mat4 view = glm::lookAt(glm::vec3{ 3.f * sinf(time), 0.f, 3.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
+	glm::mat4 projection = glm::perspective(90.f, 1.f, 0.1f, 100.f);
+
+	glm::vec4 color(1.f, 0.f, 0.f, 1.f);
+
+	_shader.get()->setUniform("uModel", model);
+	_shader.get()->setUniform("uView", view);
+	_shader.get()->setUniform("uProjection", projection);
+
+	_shader.get()->setUniform("uColor", color);
+
+	_model.get()->render();
+	
+
+
+	_window.pushGLStates();
+    //_stateStack.render();
+	_window.popGLStates();
+
 	_window.display();
 }

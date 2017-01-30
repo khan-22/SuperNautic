@@ -39,7 +39,8 @@ Shader* ShaderLoader::loadShader(std::string shaderName)
 	std::string fragmentSource = loadSource(_rootPath + shaderName + "_fs.glsl");
 	fragmentShader = compileShader(fragmentSource.c_str(), GL_FRAGMENT_SHADER);
 
-	return new Shader{linkProgram(vertexShader, geometryShader, fragmentShader)};
+	Shader* shader = new Shader(linkProgram(vertexShader, geometryShader, fragmentShader));
+	return shader;
 }
 
 std::string GFX::ShaderLoader::loadSource(std::string filename) const

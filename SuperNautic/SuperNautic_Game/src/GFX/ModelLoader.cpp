@@ -73,7 +73,9 @@ Model* GFX::ModelLoader::loadModel(std::string filePath)
 		VertexArrayObject& newMesh = model->addMesh().getVertexArrayObject();
 		newMesh.addVertexBuffer(group.totalSizeInBytes, GL_STATIC_DRAW);
 		
+
 		// Send all vertex data...
+		GLuint drawCount = 0U;
 		GLuint offset = 0U;
 		for (int index : group.indices)
 		{
@@ -81,7 +83,10 @@ Model* GFX::ModelLoader::loadModel(std::string filePath)
 			GLsizei sizeInBytes = rawMesh.vertices.size() * sizeof(rawMesh.vertices[0]);
 			newMesh.sendDataToBuffer(0, 0, offset, sizeInBytes, rawMesh.vertices.data(), 3, GL_FLOAT);
 			offset += sizeInBytes;
+
+			drawCount += rawMesh.vertices.size();
 		}
+		newMesh.setDrawCount(drawCount);
 
 		// Send all texCoord data...
 		for (int index : group.indices)
