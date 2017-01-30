@@ -33,6 +33,23 @@ void PointLight::ToggleLight(bool bLightActive)
 	_bLightActive = bLightActive;
 }
 
+const PointLightProperties PointLight::GetLightProperties()
+{
+	PointLightProperties Properties
+	{
+		_Position, 
+		_AmbientColor,
+		_DiffuseColor,
+		_Intensity,
+		_bLightActive,
+		_Constant,
+		_Linear,
+		_Quadratic
+	};
+	
+	return Properties;
+}
+
 PointLight::~PointLight()
 {
 
