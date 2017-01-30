@@ -27,8 +27,8 @@ struct SegmentInfo
 class SegmentHandler
 {
 public:
-	// Loads SegmentInfos from file with name fileName
-	SegmentHandler(std::string fileName);
+	// Loads SegmentInfos from file with name fileName in path
+	SegmentHandler(std::string fileName, std::string path);
 
 
 	// Returns reference to segment infos
@@ -42,6 +42,9 @@ public:
 	const Segment* loadSegment(unsigned i);
 
 private:
+	// Base path to load files from
+	std::string _path;
+
 	// Segments that have been loaded from an fbx file
 	std::vector<Segment>		_segments;
 
