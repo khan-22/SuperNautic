@@ -24,6 +24,8 @@ Input::~Input()
 
 void Input::update()
 {
+	const int thresh = 50;
+
 	if (checkActive())
 	{
 		_bButtonA = sf::Joystick::isButtonPressed(_controllerId, 0);
@@ -34,16 +36,21 @@ void Input::update()
 
 	_events.clear();
 
-	const int thresh = 50;
-
 	sf::Event event;
+	if (_bButtonA)
+	{
+		event.type = sf::Event::KeyPressed;
+		event.key.code = sf::Keyboard::A;
+		_events.push_back(event);
+		LOG("A pressed");
+	}
 	if (_leftStickY < -thresh && _bLeftStickDormant)
 	{
 		event.type = sf::Event::KeyPressed;
 		event.key.code = sf::Keyboard::Up;
 		_events.push_back(event);
 		_bLeftStickDormant = false;
-		LOG("Stick up", _leftStickY);
+		LOG("Stick up ", _leftStickY);
 	}
 	else if (_leftStickY > thresh && _bLeftStickDormant)
 	{
@@ -59,7 +66,7 @@ void Input::update()
 		event.key.code = sf::Keyboard::Right;
 		_events.push_back(event);
 		_bLeftStickDormant = false;
-		LOG("Stick right", _leftStickX);
+		LOG("Stick right ", _leftStickX);
 	}
 	else if (_leftStickX < -thresh && _bLeftStickDormant)
 	{
@@ -67,7 +74,7 @@ void Input::update()
 		event.key.code = sf::Keyboard::Left;
 		_events.push_back(event);
 		_bLeftStickDormant = false;
-		LOG("Stick left", _leftStickX);
+		LOG("Stick left ", _leftStickX);
 	}
 	else if (_leftStickX > -thresh && _leftStickX < thresh && _leftStickY > -thresh && _leftStickY < thresh)
 	{
