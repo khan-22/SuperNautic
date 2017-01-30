@@ -19,7 +19,7 @@ Game::Game()
 {
 	LOG("Game is being constructed...");
 
-	_players.push_back(Player());
+	_players.emplace_back();
 }
 
 Game::~Game()
