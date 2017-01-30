@@ -9,62 +9,44 @@
 
 namespace GFX
 {
-	struct Vertex
-	{
-		glm::vec3 position;
-		glm::vec3 texCoord;
-		glm::vec3 normal;
-	};
-
-	//class VertexArrayObject
+	//struct Vertex
 	//{
-	//public:
-	//	VertexArrayObject();
-	//	~VertexArrayObject();
-
-	//	template <typename dataT>
-	//	bool addVertexBuffer();
-
-	//	void bind() const;
-	//	static void unbind();
-
-	//protected:
-	//private:
-	//	template <typename dataT>
-	//	class VertexBuffer
-	//	{
-	//	public:
-	//		VertexBuffer(std::vector<dataT>& data);
-	//		~VertexBuffer();
-	//	protected:
-	//	private:
-	//		GLuint	_vbo;
-	//	};
-	//	
-	//	GLuint	_vao;
-	//	std::vector<VertexBuffer>	_vertexBuffers;
-
+	//	glm::vec3 position;
+	//	glm::vec3 texCoord;
+	//	glm::vec3 normal;
 	//};
 
-	//template <typename dataT>
-	//bool VertexArrayObject::addVertexBuffer()
-	//{
-	//	bind();
+	class VertexArrayObject
+	{
+	public:
+		VertexArrayObject();
+		~VertexArrayObject();
 
-	//	_vertexBuffers.emplace_back();
-	//	VertexBuffer& vertexBuffer = _vertexBuffers.back();
+		void addVertexBuffer(GLsizei sizeInBytes, GLenum usage);
+		void sendDataToBuffer(GLubyte index, GLuint offset, GLsizei size, GLvoid* data, GLubyte count, GLenum type);
 
-	//}
+		void bind() const;
+		static void unbind();
 
-	//template <typename dataT>
-	//VertexArrayObject::VertexBuffer<dataT>::VertexBuffer(std::vector<dataT>& data)
-	//{
-	//	glGenBuffers(1, &_vbo);
-	//	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-	//	glBufferData(GL_ARRAY_BUFFER, )
+	protected:
+	private:
+		class VertexBuffer
+		{
+		public:
+			VertexBuffer(GLsizei sizeInBytes, GLenum usage);
+			~VertexBuffer();
 
+			void sendData(GLuint offset, GLsizei size, GLvoid* data);
+		protected:
+		private:
+			GLuint	_vbo;
+		};
+		
+		GLuint	_vao;
+		std::vector<VertexBuffer>	_vertexBuffers;
 
-	//}
+	};
+
 }
 
 #endif //VERTEX_ARRAY_OBJECT
