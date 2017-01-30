@@ -15,8 +15,8 @@ public:
     AssetT* get() const;
 
 private:
-    const std::shared_ptr<AssetT> _asset;
-    std::shared_ptr<AssetT>& _parentAsset;
+    std::shared_ptr<AssetT> _asset;
+    std::shared_ptr<AssetT>* _parentAsset;
 };
 
 #include "Asset.inl"
