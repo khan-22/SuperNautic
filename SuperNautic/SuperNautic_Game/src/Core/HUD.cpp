@@ -10,23 +10,23 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_position(0),
 	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 {
-	int widthStep = windowWidth / 10;
-	int heightStep = windowHeight / 10;
+	float widthStep = windowWidth / 10.f;
+	float heightStep = windowHeight / 10.f;
 
 	_tHeat.setFont(*_font.get());
 	_tHeat.setFillColor(sf::Color::Cyan);
 	_tHeat.setPosition(widthStep, heightStep);
-	_tHeat.setScale(1, 1);
+	_tHeat.setCharacterSize(windowWidth / 10);
 
 	_tSpeed.setFont(*_font.get());
 	_tSpeed.setFillColor(sf::Color::Cyan);
 	_tSpeed.setPosition(widthStep * 9, heightStep);
-	_tSpeed.setScale(1, 1);
+	_tSpeed.setCharacterSize(windowWidth / 10);
 
 	_tPosition.setFont(*_font.get());
 	_tPosition.setFillColor(sf::Color::Cyan);
 	_tPosition.setPosition(widthStep * 5, heightStep);
-	_tPosition.setScale(2, 2);
+	_tPosition.setCharacterSize(windowWidth / 5);
 }
 
 HUD::~HUD()
