@@ -4,6 +4,7 @@
 #define PLAYER_HPP
 
 #include "Input.hpp"
+#include "Ship.hpp"
 
 class Player
 {
@@ -16,6 +17,7 @@ public:
 private:
 	Input _input;
 	int _playerId;
+	Ship _ship;
 
 };
 
