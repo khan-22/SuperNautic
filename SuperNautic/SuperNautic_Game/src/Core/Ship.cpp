@@ -23,7 +23,7 @@ void Ship::updateEngineTemperature(float dt)
     // tempIncrease(speed) = K * speed + M
     static const float K = 1.5f;
     static const float BREAK_EVEN_SPEED = 10.f;
-    static const float M = -K * BREAK_EVEN_SPEED;
+    static const float M = K * BREAK_EVEN_SPEED;
     static const float K_NORMALIZED = K / 100.f;
     static const float M_NORMALIZED = M / 100.f;
     _engineTemperature += (_forwardVelocity * K_NORMALIZED - M_NORMALIZED) * dt;
@@ -73,4 +73,14 @@ void Ship::jump()
     }
 
     _bIsJumping = true;
+}
+
+float Ship::getEngineTemperature() const
+{
+    return _engineTemperature;
+}
+
+float Ship::getSpeed() const
+{
+    return _forwardVelocity;
 }

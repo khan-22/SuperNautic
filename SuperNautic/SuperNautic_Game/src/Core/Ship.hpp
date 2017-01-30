@@ -18,6 +18,9 @@ public:
 	void accelerate(float magnitude); // magnitude = [-1, 1]
 	void jump();
 
+	float getEngineTemperature() const; // [0, 1]
+	float getSpeed() const;
+
 private:
     float _steerVelocity;
     float _forwardVelocity;
