@@ -9,7 +9,7 @@ SegmentHandler::SegmentHandler(std::string path, std::string fileName) : _path{p
 {
 	std::ifstream infoFile {_path + fileName};
 
-	if (infoFile.bad())
+	if (!infoFile.is_open())
 	{
 		// File could not be opened
 		LOG_ERROR("Could not open SegmentInfo file ", path + fileName );
