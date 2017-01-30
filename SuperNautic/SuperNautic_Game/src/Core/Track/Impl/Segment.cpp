@@ -251,7 +251,7 @@ std::vector<glm::vec3>&& Segment::createWaypoints()
 	if (middles.size() < 2)
 	{
 		LOG_ERROR("Segment ", _segmentName, " has fewer than 2 waypoints. Not good :(");
-		return;
+		return move(std::vector<glm::vec3>{});
 	}
 
 	// Will accumulate the length between waypoints
@@ -307,7 +307,7 @@ std::vector<glm::vec3>&& Segment::createAverageWaypoints(std::vector<aiMesh*>& m
 	{
 		// Initialize average position
 		middles.push_back(glm::vec3{ 0, 0, 0 });
-		const int index = middles.size() - 1;
+		const size_t index = middles.size() - 1;
 
 		// Add the position of every vertex in the model
 		for (unsigned j = 0; j < meshes[i]->mNumVertices; ++j)
