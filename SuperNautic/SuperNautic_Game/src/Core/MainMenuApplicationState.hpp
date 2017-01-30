@@ -8,6 +8,7 @@
 #include "ApplicationState.hpp"
 #include "Asset.hpp"
 #include "GuiContainer.hpp"
+#include "Input.hpp"
 
 class MainMenuApplicationState : public ApplicationState
 {
@@ -20,6 +21,7 @@ public:
 
 private:
     GuiContainer _guiContainer;
+    Input _input;
     Asset<sf::Font> _font;
 };
 
