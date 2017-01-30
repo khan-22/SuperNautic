@@ -16,7 +16,16 @@ Player::~Player()
 {
 }
 
-std::list<sf::Event> Player::getEvents()
+
+void Player::render()
 {
-	return _input.getEvents();
+    // ...
+}
+
+void Player::update(float dt)
+{
+    _ship.steer(_input.getLeftStickXValue() * dt);
+    _ship.accelerate(_input.getTriggersValue() * dt);
+
+    _ship.update(dt);
 }
