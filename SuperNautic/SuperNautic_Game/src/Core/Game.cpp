@@ -1,32 +1,40 @@
-#include "Game.h"
+#include "Game.hpp"
 
-#include <SFML/OpenGL.hpp>
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <glm/vec3.hpp>
-#include <glm/vec2.hpp>
 
-
-#include "../Log.h"
-#include "../GFX/VertexDataImporter.h"
-#include "PlayApplicationState.hpp"
+#include "../Log.hpp"
+#include "../GFX/VertexDataImporter.hpp"
+#include "MainMenuApplicationState.hpp"
 
 #include "AssetCache.hpp"
+
+#include "../GFX/ShaderLoader.hpp"
 
 Game::Game()
 	: _window(sf::VideoMode(800, 600), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
 	, _context(_window)
+	, _quitTimer(0.f)
 {
 	LOG("Game is being constructed...");
 
+	_players.push_back(Player());
+}
+
+Game::~Game()
+{
+	LOG("Game is being destructed...");
+
+	CLOSE_LOG();
+}
+
+bool Game::bInitialize()
+{
 	glEnable(GL_DEPTH_TEST);
 
-
 	// Cached asset loading **DEMO**
-	AssetCache<GFX::RawMeshCollection, std::string> meshCache;
-
-	Asset<GFX::RawMeshCollection> testModel = meshCache.get("test.fbx");
+	Asset<GFX::RawMeshCollection> testModel = AssetCache<GFX::RawMeshCollection, std::string>::get("test.fbx");
 
 	if (testModel.get() == nullptr)
 	{
@@ -37,16 +45,26 @@ Game::Game()
 		LOG("The loaded mesh has: ", testModel.get()->meshes[0].vertices.size(), " vertices");
 	}
 
+	// Shader loading **DEMO**
+	//GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
+	//GFX::Shader* testShader = shaderLoader.loadShader("forward");
 
-	std::unique_ptr<ApplicationState> playState(new PlayApplicationState(_stateStack, _context));
-	_stateStack.push(playState);
-}
+	Asset<GFX::Shader> testShader = AssetCache<GFX::Shader, std::string>::get("forward");
 
-Game::~Game()
-{
-	LOG("Game is being destructed...");
+	if (testShader.get() == 0)
+	{
+		LOG("Failed to load shader... Oopsie poopsie!");
+	}
+	else
+	{
+		LOG("The test shader has been loaded!");
+	}
 
-	CLOSE_LOG();
+
+	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
+	_stateStack.push(mainMenu);
+
+	return true;
 }
 
 void Game::run()
@@ -54,12 +72,16 @@ void Game::run()
 	sf::Clock clock;
 	sf::Time deltaTime = clock.restart();
 
-
 	while (_window.isOpen())
 	{
 		handleEvents();
 		update(deltaTime.asSeconds());
 		render();
+
+		if(_stateStack.bIsEmpty())
+        {
+            _window.close();
+        }
 
 		deltaTime = clock.restart();
 	}
@@ -79,13 +101,19 @@ void Game::handleEvents()
 		case sf::Event::KeyPressed:
 			if (event.key.code == sf::Keyboard::Escape)
 			{
-				_window.close();
+				LOG("Keep holding to shutdown...");
+				//_window.close();
 			}
 			else
             {
                 _stateStack.handleEvent(event);
             }
 			break;
+		case sf::Event::KeyReleased:
+			if (event.key.code == sf::Keyboard::Escape)
+			{
+				_quitTimer = 0.f;
+			}
 
         default:
             _stateStack.handleEvent(event);
@@ -98,6 +126,16 @@ void Game::handleEvents()
 void Game::update(float dt)
 {
     _stateStack.update(dt);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+	{
+		_quitTimer += dt;
+
+		if (_quitTimer > 0.7f)
+		{
+			_window.close();
+		}
+	}
 }
 
 void Game::render()

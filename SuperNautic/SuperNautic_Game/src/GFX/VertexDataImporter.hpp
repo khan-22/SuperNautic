@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef VERTEX_DATA_IMPORTER_H
-#define VERTEX_DATA_IMPORTER_H
+#ifndef VERTEX_DATA_IMPORTER_HPP
+#define VERTEX_DATA_IMPORTER_HPP
 
 #include <string>
 #include <vector>
@@ -12,7 +12,9 @@ namespace GFX {
 
 	struct RawVertexData 
 	{
-		std::string name;
+		std::string	 name;
+		unsigned int textureIndex;
+
 		std::vector<glm::vec3> vertices;
 		std::vector<glm::vec3> texCoords;
 		std::vector<glm::vec3> normals;
@@ -38,4 +40,4 @@ namespace GFX {
 	};
 
 }
-#endif //VERTEX_DATA_IMPORTER_H
+#endif //VERTEX_DATA_IMPORTER_HPP

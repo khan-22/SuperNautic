@@ -96,10 +96,17 @@ void GuiContainer::selectNext()
         unsigned int iteration = 1;
         do
         {
-            _selection++;
             if(_selection == _elements.end())
             {
                 _selection = _elements.begin();
+            }
+            else
+            {
+                _selection++;
+                if(_selection == _elements.end())
+                {
+                    _selection = _elements.begin();
+                }
             }
 
             iteration++;

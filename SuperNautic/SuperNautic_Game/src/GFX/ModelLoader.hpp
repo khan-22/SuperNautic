@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef MODEL_LOADER_H
-#define MODEL_LOADER_H
+#ifndef MODEL_LOADER_HPP
+#define MODEL_LOADER_HPP
 
 namespace GFX {
 
@@ -22,4 +22,4 @@ namespace GFX {
 
 }
 
-#endif //MODEL_LOADER_H
+#endif //MODEL_LOADER_HPP

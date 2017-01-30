@@ -1,10 +1,10 @@
-#include "VertexDataImporter.h"
+#include "VertexDataImporter.hpp"
 
 #include <assimp/scene.h>
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 
-#include "../Log.h"
+#include "../Log.hpp"
 
 namespace GFX {
 
@@ -45,6 +45,8 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		memcpy(data.vertices.data(), &mesh->mVertices[0], sizeof(mesh->mVertices[0]) * mesh->mNumVertices);
 		memcpy(data.texCoords.data(), &mesh->mTextureCoords[0], sizeof(mesh->mTextureCoords[0]) * mesh->mNumVertices);
 		memcpy(data.normals.data(), &mesh->mNormals[0], sizeof(mesh->mNormals[0]) * mesh->mNumVertices);
+
+		data.textureIndex = mesh->mMaterialIndex;
 
 		data.name = mesh->mName.C_Str();
 	}
