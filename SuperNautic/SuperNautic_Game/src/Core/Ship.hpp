@@ -14,13 +14,15 @@ public:
 
 	void update(float dt);
 
-	void steer(float magnitude);
-	void accelerate(float magnitude);
+	void steer(float magnitude); // magnitude = [-1, 1]
+	void accelerate(float magnitude); // magnitude = [-1, 1]
 	void jump();
 
 private:
     float _steerVelocity;
     float _forwardVelocity;
+    float _maxSteerAcceleration;
+    float _maxForwardAcceleration;
     bool _bIsJumping;
 };
 

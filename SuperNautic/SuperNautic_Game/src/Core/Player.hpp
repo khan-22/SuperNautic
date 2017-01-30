@@ -15,7 +15,9 @@ public:
 	Player(int id);
 	~Player();
 
-	std::list<sf::Event> getEvents();
+	void update(float dt);
+	void render();
+
 private:
 	Input _input;
 	int _playerId;

@@ -99,15 +99,8 @@ void Game::handleEvents()
 			_window.close();
 			break;
 		case sf::Event::KeyPressed:
-			if (event.key.code == sf::Keyboard::Escape)
-			{
-				LOG("Keep holding to shutdown...");
-				//_window.close();
-			}
-			else
-            {
-                _stateStack.handleEvent(event);
-            }
+            LOG("Keep holding to shutdown...");
+            _stateStack.handleEvent(event);
 			break;
 		case sf::Event::KeyReleased:
 			if (event.key.code == sf::Keyboard::Escape)
