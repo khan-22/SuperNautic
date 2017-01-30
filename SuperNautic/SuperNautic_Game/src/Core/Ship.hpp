@@ -23,7 +23,12 @@ private:
     float _forwardVelocity;
     float _maxSteerAcceleration;
     float _maxForwardAcceleration;
+    float _engineTemperature; // [0, 1]
     bool _bIsJumping;
+
+    void updateEngineTemperature(float dt);
+
+
 };
 
 #endif // SHIP_HPP
