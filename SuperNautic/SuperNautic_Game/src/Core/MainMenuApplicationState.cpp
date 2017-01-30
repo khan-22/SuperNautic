@@ -2,6 +2,7 @@
 
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Graphics/Text.hpp"
+#include "SFML/Window/Event.hpp"
 
 #include "MainMenuApplicationState.hpp"
 #include "ApplicationStateStack.hpp"
@@ -16,6 +17,7 @@
 MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
+, _input()
 {
     std::cout << "Welcome to MainMenu state." << std::endl;
 
@@ -63,5 +65,34 @@ bool MainMenuApplicationState::bUpdate(float dtSeconds)
 bool MainMenuApplicationState::bHandleEvent(const sf::Event& event)
 {
     _guiContainer.handleEvent(event);
+    if(_input.checkActive())
+    {
+        _input.update();
+        for(const InputEvent& e : _input.getEvent())
+        {
+            sf::Event inputEvent;
+            inputEvent.type = sf::Event::KeyPressed;
+            switch(e)
+            {
+                case InputEvent::LEFTSTICK_UP:
+                    inputEvent.key.code = sf::Keyboard::Return;
+                    _guiContainer.handleEvent(inputEvent);
+                    break;
+
+                case InputEvent::LEFTSTICK_DOWN:
+                    inputEvent.key.code = sf::Keyboard::Down;
+                    _guiContainer.handleEvent(inputEvent);
+                    break;
+
+                case InputEvent::A_PRESSED:
+                    inputEvent.key.code = sf::Keyboard::Up;
+                    _guiContainer.handleEvent(inputEvent);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
     return true;
 }
