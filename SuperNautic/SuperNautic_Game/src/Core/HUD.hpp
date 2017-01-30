@@ -3,12 +3,16 @@
 #ifndef HUD_HPP
 #define HUD_HPP
 
+#include <SFML\Graphics\Font.hpp>
+
 #include "SceneNode.hpp"
+
+#include "Asset.hpp"
 
 class HUD : public SceneNode
 {
 public:
-	HUD();
+	HUD(int windowWidth, int windowHeight);
 	~HUD();
 
 	void setHeat(float heat);
@@ -23,7 +27,7 @@ private:
 	float _speed;
 	int _position;
 
-	sf::Font _font;
+	Asset<sf::Font> _font;
 	sf::Text _tHeat;
 	sf::Text _tSpeed;
 	sf::Text _tPosition;
