@@ -40,7 +40,7 @@ public:
 	const std::string _segmentName;
 
 	// Loads a segment from an fbx file
-	Segment(std::string fileName, std::string startConnection, std::string endConnection);
+	Segment(std::string path, std::string fileName, std::string startConnection, std::string endConnection);
 
 	// Tests a ray collision against all collision surfaces of the segment. Returns collision information
 	const Intersection rayIntersectionTest(glm::vec3 origin, glm::vec3 direction) const;

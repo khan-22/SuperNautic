@@ -8,6 +8,7 @@
 #include "Input.hpp"
 #include "Ship.hpp"
 #include "HUD.hpp"
+#include "PlayerAudio.hpp"
 
 class Player
 {
@@ -21,10 +22,12 @@ public:
 	void renderHUD(sf::RenderTarget & target, sf::RenderStates states);
 
 private:
-	Input _input;
 	int _playerId;
+	Input _input;
 	Ship _ship;
 	HUD _hud;
+	PlayerAudio _audio;
+
 };
 
 #endif // !PLAYER_HPP
