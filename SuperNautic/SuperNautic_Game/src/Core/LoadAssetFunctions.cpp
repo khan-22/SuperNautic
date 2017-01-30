@@ -7,6 +7,7 @@
 
 #include "../GFX/VertexDataImporter.hpp"
 #include "../GFX/ShaderLoader.hpp"
+#include "../GFX/ModelLoader.hpp"
 
 
 struct Mesh
@@ -45,3 +46,12 @@ std::shared_ptr<sf::Font> loadAsset<sf::Font>(std::string key)
 		return nullptr;
 	}
 }
+
+// Load models
+template<>
+std::shared_ptr<GFX::Model> loadAsset<GFX::Model>(std::string key)
+{
+	GFX::ModelLoader loader;
+	return std::shared_ptr<GFX::Model>(loader.loadModel(key));
+}
+

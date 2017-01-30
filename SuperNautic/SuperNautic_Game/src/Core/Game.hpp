@@ -11,6 +11,8 @@
 
 #include "Player.hpp"
 
+#include "LoadAssetFunctions.hpp"
+
 class Game
 {
 public:
@@ -37,6 +39,10 @@ private:
 	std::list<Player>		_players;
 
 	float					_quitTimer;
+
+	ShaderAsset	_shader;
+	ModelAsset	_model;
+
 };
 
 #endif //GAME_HPP

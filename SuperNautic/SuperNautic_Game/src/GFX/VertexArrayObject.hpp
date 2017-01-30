@@ -23,7 +23,7 @@ namespace GFX
 		~VertexArrayObject();
 
 		void addVertexBuffer(GLsizei sizeInBytes, GLenum usage);
-		void sendDataToBuffer(GLubyte index, GLuint offset, GLsizei size, GLvoid* data, GLubyte count, GLenum type);
+		void sendDataToBuffer(GLubyte bufferIndex, GLubyte attributeIndex, GLuint offset, GLsizei size, GLvoid* data, GLubyte count, GLenum type);
 
 		void bind() const;
 		static void unbind();

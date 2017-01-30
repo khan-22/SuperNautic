@@ -8,7 +8,7 @@
 #include "../GFX/VertexDataImporter.hpp"
 #include "MainMenuApplicationState.hpp"
 
-#include "AssetCache.hpp"
+#include "LoadAssetFunctions.hpp"
 
 #include "../GFX/ShaderLoader.hpp"
 
@@ -34,15 +34,15 @@ bool Game::bInitialize()
 	glEnable(GL_DEPTH_TEST);
 
 	// Cached asset loading **DEMO**
-	Asset<GFX::RawMeshCollection> testModel = AssetCache<GFX::RawMeshCollection, std::string>::get("test.fbx");
+	Asset<GFX::RawMeshCollection> testRawMesh = AssetCache<GFX::RawMeshCollection, std::string>::get("test.fbx");
 
-	if (testModel.get() == nullptr)
+	if (testRawMesh.get() == nullptr)
 	{
 		LOG("Failed to load model... Oopsie poopsie!");
 	}
 	else
 	{
-		LOG("The loaded mesh has: ", testModel.get()->meshes[0].vertices.size(), " vertices");
+		LOG("The loaded mesh has: ", testRawMesh.get()->meshes[0].vertices.size(), " vertices");
 	}
 
 	// Shader loading **DEMO**
@@ -60,9 +60,21 @@ bool Game::bInitialize()
 		LOG("The test shader has been loaded!");
 	}
 
+	// Model loading **DEMO**
+	ModelAsset testModel = ModelCache::get("test.fbx");
+
+	if (testModel.get() == nullptr)
+	{
+		LOG("Failed to load model to GPU... :,(((");
+	}
+	else
+	{
+		LOG("WOOOOOW!!");
+	}
 
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
+
 
 	return true;
 }

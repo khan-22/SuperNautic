@@ -21,14 +21,14 @@ void VertexArrayObject::addVertexBuffer(GLsizei sizeInBytes, GLenum usage)
 	unbind();
 }
 
-void GFX::VertexArrayObject::sendDataToBuffer(GLubyte index, GLuint offset, GLsizei size, GLvoid* data, GLubyte count, GLenum type)
+void GFX::VertexArrayObject::sendDataToBuffer(GLubyte bufferIndex, GLubyte attributeIndex, GLuint offset, GLsizei size, GLvoid* data, GLubyte count, GLenum type)
 {
 	bind();
 
-	glEnableVertexAttribArray(index);
-	glVertexAttribPointer(index, count, type, GL_FALSE, 0, nullptr);
+	glEnableVertexAttribArray(attributeIndex);
+	glVertexAttribPointer(attributeIndex, count, type, GL_FALSE, 0, nullptr);
 
-	_vertexBuffers[index].sendData(offset, size, data);
+	_vertexBuffers[bufferIndex].sendData(offset, size, data);
 	unbind();
 }
 
