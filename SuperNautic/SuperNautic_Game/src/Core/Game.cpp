@@ -6,7 +6,7 @@
 
 #include "../Log.hpp"
 #include "../GFX/VertexDataImporter.hpp"
-#include "PlayApplicationState.hpp"
+#include "MainMenuApplicationState.hpp"
 
 #include "AssetCache.hpp"
 
@@ -48,8 +48,9 @@ bool Game::bInitialize()
 	// Shader loading **DEMO**
 	//GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
 	//GFX::Shader* testShader = shaderLoader.loadShader("forward");
+
 	Asset<GFX::Shader> testShader = AssetCache<GFX::Shader, std::string>::get("forward");
-	
+
 	if (testShader.get() == 0)
 	{
 		LOG("Failed to load shader... Oopsie poopsie!");
@@ -58,10 +59,10 @@ bool Game::bInitialize()
 	{
 		LOG("The test shader has been loaded!");
 	}
-	
 
-	std::unique_ptr<ApplicationState> playState(new PlayApplicationState(_stateStack, _context));
-	_stateStack.push(playState);
+
+	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
+	_stateStack.push(mainMenu);
 
 	return true;
 }
@@ -76,6 +77,11 @@ void Game::run()
 		handleEvents();
 		update(deltaTime.asSeconds());
 		render();
+
+		if(_stateStack.bIsEmpty())
+        {
+            _window.close();
+        }
 
 		deltaTime = clock.restart();
 	}
@@ -124,7 +130,7 @@ void Game::update(float dt)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 	{
 		_quitTimer += dt;
-		
+
 		if (_quitTimer > 0.7f)
 		{
 			_window.close();
