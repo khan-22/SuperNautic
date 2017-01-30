@@ -8,25 +8,25 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_heat(0),
 	_speed(0),
 	_position(0),
-	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
+	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf")),
+	_texture(AssetCache<sf::Texture, std::string>::get("heatchart.png"))
 {
-	float widthStep = windowWidth / 10.f;
-	float heightStep = windowHeight / 10.f;
+	float widthStep = windowWidth / 100.f;
+	float heightStep = windowHeight / 100.f;
 
-	_tHeat.setFont(*_font.get());
-	_tHeat.setFillColor(sf::Color::Cyan);
-	_tHeat.setPosition(widthStep, heightStep);
-	_tHeat.setCharacterSize(windowWidth / 10);
+	_spriteHeat.setTexture(*_texture.get());
+	_spriteHeat.setPosition(widthStep * 2, heightStep * 10);
+	_spriteHeat.setScale(windowWidth / 50, windowHeight / 12);
 
 	_tSpeed.setFont(*_font.get());
-	_tSpeed.setFillColor(sf::Color::Cyan);
-	_tSpeed.setPosition(widthStep * 9, heightStep);
-	_tSpeed.setCharacterSize(windowWidth / 10);
+	_tSpeed.setFillColor(sf::Color::Red);
+	_tSpeed.setPosition(widthStep * 75, heightStep);
+	_tSpeed.setCharacterSize(windowWidth / 20);
 
 	_tPosition.setFont(*_font.get());
 	_tPosition.setFillColor(sf::Color::Cyan);
-	_tPosition.setPosition(widthStep * 5, heightStep);
-	_tPosition.setCharacterSize(windowWidth / 5);
+	_tPosition.setPosition(windowWidth / 2 - widthStep * 5, 0);
+	_tPosition.setCharacterSize(windowWidth / 10);
 }
 
 HUD::~HUD()
@@ -50,14 +50,13 @@ void HUD::setPosition(int position)
 
 void HUD::updateCurrent()
 {
-	_tSpeed.setString("Speed: " + std::to_string(_speed));
-	_tHeat.setString("Heat: " + std::to_string(_heat));
+	_tSpeed.setString("Speed: " + std::to_string((int)_speed));
 	_tPosition.setString("#" + std::to_string(_position));
 }
 
 void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) const
 {
+	target.draw(_spriteHeat);
 	target.draw(_tSpeed);
-	target.draw(_tHeat);
 	target.draw(_tPosition);
 }

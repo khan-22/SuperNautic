@@ -6,6 +6,8 @@
 #include <SFML\Graphics\Font.hpp>
 #include <SFML\Graphics\Text.hpp>
 #include <SFML\Graphics\RenderTarget.hpp>
+#include <SFML\Graphics\Sprite.hpp>
+#include <SFML\Graphics\Texture.hpp>
 
 #include "SceneNode.hpp"
 
@@ -30,7 +32,8 @@ private:
 	int _position;
 
 	Asset<sf::Font> _font;
-	sf::Text _tHeat;
+	Asset<sf::Texture> _texture;
+	sf::Sprite _spriteHeat;
 	sf::Text _tSpeed;
 	sf::Text _tPosition;
 
