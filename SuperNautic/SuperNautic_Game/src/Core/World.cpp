@@ -1,8 +1,12 @@
 #include "SFML/Window/Event.hpp"
+#include "SFML/Graphics/RenderWindow.hpp"
 
 #include "World.hpp"
+#include "ApplicationContext.hpp"
 
-World::World()
+
+World::World(ApplicationContext& context)
+: _context(context)
 {
     _players.emplace_back();
 }
@@ -26,5 +30,10 @@ void World::render()
     for(Player& player : _players)
     {
         player.render();
+    }
+
+    for(Player& player : _players)
+    {
+        player.renderHUD(_context.window, sf::RenderStates::Default);
     }
 }
