@@ -1,6 +1,12 @@
 
 #include <cassert>
 
+template<typename AssetT>
+Asset<AssetT>::Asset()
+: _parentAsset(nullptr)
+{
+
+}
 
 template<typename AssetT>
 Asset<AssetT>::Asset(std::shared_ptr<AssetT>& asset)
