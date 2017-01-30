@@ -4,7 +4,8 @@
 #define PLAYER_AUDIO_HPP
 
 #include <SFML\Audio.hpp>
-#include <string.h>
+
+#include "Asset.hpp"
 
 class PlayerAudio
 {
@@ -12,7 +13,7 @@ public:
 	PlayerAudio();
 	~PlayerAudio();
 
-	enum Sounds {cat};
+	enum Sounds {vag};
 
 	void playAudio(Sounds sound);
 
@@ -23,9 +24,8 @@ public:
 protected:
 
 private:
-	std::string _folder = "res/audio/", _fileSuffix = ".wav";
-	sf::Sound _sCat;
-	sf::SoundBuffer _sbCat;
+	sf::Sound _sVag;
+	Asset<sf::SoundBuffer> _sbVag;
 
 	void loadFromBuffers();
 

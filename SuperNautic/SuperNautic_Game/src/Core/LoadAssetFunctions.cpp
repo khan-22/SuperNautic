@@ -4,6 +4,7 @@
 #include "LoadAsset.hpp"
 
 #include <SFML/Graphics/Font.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 
 #include "../GFX/VertexDataImporter.hpp"
 #include "../GFX/ShaderLoader.hpp"
@@ -39,6 +40,22 @@ std::shared_ptr<sf::Font> loadAsset<sf::Font>(std::string key)
 	if (font->loadFromFile(key))
 	{
 		return font;
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+
+// Load WAV
+template<>
+std::shared_ptr<sf::SoundBuffer> loadAsset<sf::SoundBuffer>(std::string key)
+{
+	auto buffer = std::make_shared<sf::SoundBuffer>();
+	if (buffer->loadFromFile("res/audio/" + key + ".wav"))
+	{
+		return buffer;
 	}
 	else
 	{
