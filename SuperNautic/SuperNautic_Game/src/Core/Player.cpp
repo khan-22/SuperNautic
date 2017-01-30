@@ -31,9 +31,15 @@ void Player::renderHUD(sf::RenderTarget & target, sf::RenderStates states)
 
 void Player::update(float dt)
 {
-    _ship.steer(_input.getLeftStickXValue() * dt);
-    _ship.accelerate(_input.getTriggersValue() * dt);
+    if(_input.checkActive())
+    {
+        _ship.steer(_input.getLeftStickXValue() * dt);
+        _ship.accelerate(_input.getTriggersValue() * dt);
+    }
 
     _ship.update(dt);
+
+    _hud.setHeat(_ship.getEngineTemperature());
+    _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 }
