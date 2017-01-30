@@ -1,6 +1,12 @@
 
 #include <cassert>
 
+template<typename AssetT>
+Asset<AssetT>::Asset()
+: _parentAsset(nullptr)
+{
+
+}
 
 template<typename AssetT>
 Asset<AssetT>::Asset(std::shared_ptr<AssetT>& asset)
@@ -13,6 +19,11 @@ Asset<AssetT>::Asset(std::shared_ptr<AssetT>& asset)
 template<typename AssetT>
 Asset<AssetT>::~Asset()
 {
+    if(_parentAsset == nullptr)
+    {
+        return;
+    }
+
     if(_asset.use_count() == 2)
     {
         _parentAsset->reset();

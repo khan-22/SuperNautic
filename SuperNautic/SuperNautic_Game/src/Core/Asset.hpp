@@ -9,6 +9,7 @@ template<typename AssetT>
 class Asset
 {
 public:
+    Asset();
     Asset(std::shared_ptr<AssetT>& asset);
     ~Asset();
 
