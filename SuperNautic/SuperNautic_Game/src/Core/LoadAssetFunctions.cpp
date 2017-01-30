@@ -4,6 +4,7 @@
 #include "LoadAsset.hpp"
 
 #include <SFML/Graphics/Font.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 
 #include "../GFX/VertexDataImporter.hpp"
 #include "../GFX/ShaderLoader.hpp"
@@ -47,6 +48,22 @@ std::shared_ptr<sf::Font> loadAsset<sf::Font>(std::string key)
 	}
 }
 
+
+// Load WAV
+template<>
+std::shared_ptr<sf::SoundBuffer> loadAsset<sf::SoundBuffer>(std::string key)
+{
+	auto buffer = std::make_shared<sf::SoundBuffer>();
+	if (buffer->loadFromFile("res/audio/" + key + ".wav"))
+	{
+		return buffer;
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
 // Load models
 template<>
 std::shared_ptr<GFX::Model> loadAsset<GFX::Model>(std::string key)
@@ -54,4 +71,3 @@ std::shared_ptr<GFX::Model> loadAsset<GFX::Model>(std::string key)
 	GFX::ModelLoader loader;
 	return std::shared_ptr<GFX::Model>(loader.loadModel(key));
 }
-

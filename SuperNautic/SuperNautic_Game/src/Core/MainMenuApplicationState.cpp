@@ -68,30 +68,21 @@ bool MainMenuApplicationState::bHandleEvent(const sf::Event& event)
     if(_input.checkActive())
     {
         _input.update();
-        for(const InputEvent& e : _input.getEvent())
+        for(const sf::Event& e : _input.getEvents())
         {
-            sf::Event inputEvent;
-            inputEvent.type = sf::Event::KeyPressed;
-            switch(e)
-            {
-                case InputEvent::LEFTSTICK_UP:
-                    inputEvent.key.code = sf::Keyboard::Return;
-                    _guiContainer.handleEvent(inputEvent);
-                    break;
-
-                case InputEvent::LEFTSTICK_DOWN:
-                    inputEvent.key.code = sf::Keyboard::Down;
-                    _guiContainer.handleEvent(inputEvent);
-                    break;
-
-                case InputEvent::A_PRESSED:
-                    inputEvent.key.code = sf::Keyboard::Up;
-                    _guiContainer.handleEvent(inputEvent);
-                    break;
-
-                default:
-                    break;
-            }
+			if (e.type == sf::Event::KeyPressed)
+			{
+				switch (e.key.code)
+				{
+				case sf::Keyboard::Return:
+				case sf::Keyboard::Down:
+				case sf::Keyboard::Up:
+					_guiContainer.handleEvent(e);
+					break;
+				default:
+					break;
+				}
+			}
         }
     }
     return true;

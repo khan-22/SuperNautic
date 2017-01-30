@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef WORLDAUDIO_HPP
-#define WORLDAUDIO_HPP
+#ifndef WORLD_AUDIO_HPP
+#define WORLD_AUDIO_HPP
 
 #include <SFML\Audio.hpp>
 
@@ -14,8 +14,6 @@ public:
 protected:
 
 private:
-	std::string _folder = "res/audio/", _fileSuffix = ".wav";
-
 	sf::Sound _buttonClick;
 	sf::Music _music;
 
