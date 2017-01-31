@@ -36,6 +36,27 @@ void Player::update(float dt)
         _ship.steer(_input.getLeftStickXValue() * dt);
         _ship.accelerate(_input.getTriggersValue() * dt);
     }
+    else
+    {
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        {
+            _ship.steer(-1.f * dt);
+        }
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        {
+            _ship.steer(1.f * dt);
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        {
+            _ship.accelerate(1.f * dt);
+
+        }
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        {
+            _ship.accelerate(-1.f * dt);
+        }
+    }
 
     _ship.update(dt);
 
