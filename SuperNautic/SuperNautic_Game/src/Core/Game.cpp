@@ -130,10 +130,10 @@ void Game::update(float dt)
 {
     //_stateStack.update(dt);
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-	{
-		_window.close();
-	}
+//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+//	{
+//		_window.close();
+//	}
 }
 
 void Game::render()
