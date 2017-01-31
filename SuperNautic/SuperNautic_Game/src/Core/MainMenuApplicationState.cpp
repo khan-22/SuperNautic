@@ -70,19 +70,7 @@ bool MainMenuApplicationState::bHandleEvent(const sf::Event& event)
         _input.update();
         for(const sf::Event& e : _input.getEvents())
         {
-			if (e.type == sf::Event::KeyPressed)
-			{
-				switch (e.key.code)
-				{
-				case sf::Keyboard::Return:
-				case sf::Keyboard::Down:
-				case sf::Keyboard::Up:
-					_guiContainer.handleEvent(e);
-					break;
-				default:
-					break;
-				}
-			}
+            _guiContainer.handleEvent(e);
         }
     }
     return true;
