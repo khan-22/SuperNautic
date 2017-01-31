@@ -1,5 +1,7 @@
 ﻿#include "VertexArrayObject.hpp"
 
+#include "../Log.hpp"
+
 using namespace GFX;
 
 VertexArrayObject::VertexArrayObject()
@@ -25,7 +27,7 @@ void GFX::VertexArrayObject::addIndexBuffer(GLsizei sizeInBytes, GLenum usage)
 {
 	bind();
 
-	//_indexBuffer.reset(new IndexBuffer(sizeInBytes, usage));
+	_indexBuffer.reset(new IndexBuffer(sizeInBytes, usage));
 
 	unbind();
 }
@@ -45,7 +47,7 @@ void GFX::VertexArrayObject::sendDataToIndexBuffer(GLuint offset, GLsizei size, 
 {
 	bind();
 
-	//_indexBuffer->sendData(offset, size, data);
+	_indexBuffer->sendData(offset, size, data);
 
 	unbind();
 }
@@ -57,7 +59,7 @@ void VertexArrayObject::setDrawCount(GLuint drawCount)
 
 void VertexArrayObject::render()
 {
-	//glDrawElements(GL_TRIANGLES, _drawCount, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, _drawCount, GL_UNSIGNED_INT, 0);
 }
 
 void VertexArrayObject::bind() const
@@ -79,6 +81,8 @@ VertexArrayObject::VertexBuffer::VertexBuffer(GLsizei sizeInBytes, GLenum usage)
 	glGenBuffers(1, &_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeInBytes, nullptr, usage);
+
+	LOG_GL_ERRORS();
 }
 
 VertexArrayObject::VertexBuffer::~VertexBuffer()
@@ -91,6 +95,7 @@ void VertexArrayObject::VertexBuffer::sendData(GLuint offset, GLsizei size, GLvo
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 
+	LOG_GL_ERRORS();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -106,6 +111,8 @@ VertexArrayObject::IndexBuffer::IndexBuffer(GLsizei sizeInBytes, GLenum usage)
 	glGenBuffers(1, &_vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _vbo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeInBytes, nullptr, usage);
+
+	LOG_GL_ERRORS();
 }
 
 VertexArrayObject::IndexBuffer::~IndexBuffer()
@@ -117,4 +124,6 @@ void VertexArrayObject::IndexBuffer::sendData(GLuint offset, GLsizei size, GLvoi
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _vbo);
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, size, data);
+
+	LOG_GL_ERRORS();
 }

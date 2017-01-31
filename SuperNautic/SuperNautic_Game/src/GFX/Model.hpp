@@ -39,7 +39,7 @@ namespace GFX
 
 	protected:
 	private:
-		std::vector<Mesh> _meshes;
+		std::vector<std::unique_ptr<Mesh>> _meshes;
 
 		// This is explicitly for the ModelLoader to handle.
 		Mesh& addMesh();

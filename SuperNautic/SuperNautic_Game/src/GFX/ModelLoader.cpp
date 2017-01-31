@@ -19,11 +19,14 @@ ModelLoader::~ModelLoader()
 
 Model* GFX::ModelLoader::loadModel(std::string filePath)
 {
-	RawMeshCollection* rawModel = RawMeshCache::get(filePath).get();
-	if (rawModel == nullptr)
+	RawMeshAsset rawModel = RawMeshCache::get(filePath);
+	
+	if (rawModel.get() == nullptr)
 	{
 		return nullptr;
 	}
+
+	LOG("Beginning processing on model: ", filePath);
 
 	// To minimize the amount of drawcalls we can group all
 	// meshes with a similar texture into the same VertexBuffer.
@@ -31,20 +34,24 @@ Model* GFX::ModelLoader::loadModel(std::string filePath)
 	{
 		std::vector<int> indices;
 		int texture;
-		GLsizei totalSizeInBytes;
+		GLsizei totalSizeInBytes;		// Size of all vertex-data in bytes
+		GLsizei totalIndexSizeInBytes;	// Size of all index-data in bytes
 	};
 	std::vector<Grouping> groupings;
 
 	// First we must group all raw meshes into groupings that
 	// can be added to the same vertex buffer.
-	for (int i = 0; i < rawModel->meshes.size(); i++)
+	for (int i = 0; i < rawModel.get()->meshes.size(); i++)
 	{
-		RawVertexData& rawMesh = rawModel->meshes[i];
+		RawVertexData& rawMesh = rawModel.get()->meshes[i];
 
 		GLsizei sizeOfMesh = 0;
 		sizeOfMesh += rawMesh.vertices.size() * sizeof(rawMesh.vertices[0]);
 		sizeOfMesh += rawMesh.texCoords.size() * sizeof(rawMesh.texCoords[0]);
 		sizeOfMesh += rawMesh.normals.size() * sizeof(rawMesh.normals[0]);
+
+		GLsizei sizeOfIndices = 0;
+		sizeOfIndices += rawMesh.indices.size() * sizeof(rawMesh.indices[0]);
 
 		bool belongsToAGrouping = false;
 		for (auto& group : groupings)
@@ -53,7 +60,8 @@ Model* GFX::ModelLoader::loadModel(std::string filePath)
 			{
 				belongsToAGrouping = true;
 				group.indices.push_back(i);
-				group.totalSizeInBytes += sizeOfMesh;
+				group.totalSizeInBytes		+= sizeOfMesh;
+				group.totalIndexSizeInBytes	+= sizeOfIndices;
 			}
 		}
 
@@ -61,49 +69,76 @@ Model* GFX::ModelLoader::loadModel(std::string filePath)
 		{
 			Grouping newGroup;
 			newGroup.indices.push_back(i);
-			newGroup.texture = rawMesh.textureIndex;
-			newGroup.totalSizeInBytes = sizeOfMesh;
+			newGroup.texture				= rawMesh.textureIndex;
+			newGroup.totalSizeInBytes		= sizeOfMesh;
+			newGroup.totalIndexSizeInBytes	= sizeOfIndices;
 			groupings.push_back(newGroup);
 		}
 	}
+
+	LOG("Model was grouped into ", groupings.size(), " group(s).");
 
 	Model* model = new Model();
 	for (auto& group : groupings)
 	{
 		VertexArrayObject& newMesh = model->addMesh().getVertexArrayObject();
 		newMesh.addVertexBuffer(group.totalSizeInBytes, GL_STATIC_DRAW);
-		
+		newMesh.addIndexBuffer(group.totalIndexSizeInBytes, GL_STATIC_DRAW);
 
 		// Send all vertex data...
 		GLuint drawCount = 0U;
-		GLuint offset = 0U;
+		GLuint byteDataOffset = 0U;
+		GLuint byteIndexOffset = 0U;
+		GLuint indexOffset = 0U;
 		for (int index : group.indices)
 		{
-			RawVertexData& rawMesh = rawModel->meshes[index];
+			RawVertexData& rawMesh = rawModel.get()->meshes[index];
 			GLsizei sizeInBytes = rawMesh.vertices.size() * sizeof(rawMesh.vertices[0]);
-			newMesh.sendDataToBuffer(0, 0, offset, sizeInBytes, rawMesh.vertices.data(), 3, GL_FLOAT);
-			offset += sizeInBytes;
+			newMesh.sendDataToBuffer(0, 0, byteDataOffset, sizeInBytes, rawMesh.vertices.data(), 3, GL_FLOAT);
+			byteDataOffset += sizeInBytes;
 
-			drawCount += rawMesh.vertices.size();
+			LOG("Sent ", rawMesh.vertices.size(), " vertices to vertex buffer.");
+
+			std::vector<GLuint> indices = rawMesh.indices;
+			if (indexOffset != 0U)
+			{
+				for (GLuint& index : indices)
+				{
+					index += indexOffset;
+				}
+				
+			}
+			GLsizei sizeInBytesIndices = indices.size() * sizeof(rawMesh.indices[0]);
+			newMesh.sendDataToIndexBuffer(byteIndexOffset, sizeInBytesIndices, indices.data());
+			byteIndexOffset += sizeInBytesIndices;
+			indexOffset += rawMesh.largestIndex + 1;
+			
+			LOG("Sent ", indices.size(), " indices to vertex buffer.");
+
+			drawCount += indices.size();
 		}
 		newMesh.setDrawCount(drawCount);
 
 		// Send all texCoord data...
 		for (int index : group.indices)
 		{
-			RawVertexData& rawMesh = rawModel->meshes[index];
+			RawVertexData& rawMesh = rawModel.get()->meshes[index];
 			GLsizei sizeInBytes = rawMesh.texCoords.size() * sizeof(rawMesh.texCoords[0]);
-			newMesh.sendDataToBuffer(0, 1, offset, sizeInBytes, rawMesh.texCoords.data(), 3, GL_FLOAT);
-			offset += sizeInBytes;
+			newMesh.sendDataToBuffer(0, 1, byteDataOffset, sizeInBytes, rawMesh.texCoords.data(), 3, GL_FLOAT);
+			byteDataOffset += sizeInBytes;
+
+			LOG("Sent ", rawMesh.texCoords.size(), " texCoords to vertex buffer.");
 		}
 
 		// Send all normal data...
 		for (int index : group.indices)
 		{
-			RawVertexData& rawMesh = rawModel->meshes[index];
+			RawVertexData& rawMesh = rawModel.get()->meshes[index];
 			GLsizei sizeInBytes = rawMesh.normals.size() * sizeof(rawMesh.normals[0]);
-			newMesh.sendDataToBuffer(0, 2, offset, sizeInBytes, rawMesh.normals.data(), 3, GL_FLOAT);
-			offset += sizeInBytes;
+			newMesh.sendDataToBuffer(0, 2, byteDataOffset, sizeInBytes, rawMesh.normals.data(), 3, GL_FLOAT);
+			byteDataOffset += sizeInBytes;
+
+			LOG("Sent ", rawMesh.normals.size(), " normals to vertex buffer.");
 		}
 	}
 	

@@ -16,14 +16,14 @@ void GFX::Model::render()
 {
 	for (auto& mesh : _meshes)
 	{
-		mesh.render();
+		mesh->render();
 	}
 }
 
 Model::Mesh& GFX::Model::addMesh()
 {
-	_meshes.emplace_back();
-	return _meshes.back();
+	_meshes.emplace_back(new Mesh());
+	return *_meshes.back();
 }
 
 

@@ -4,14 +4,20 @@ out vec4 OutColor;
 
 uniform vec4 uColor;
 
-//in VS_OUT
-//{
-//	vec2 uv;
-//	vec3 normal;
-//} fs_in;
+in VS_OUT
+{
+	vec2 uv;
+	vec3 normal;
+} fs_in;
+
+vec3 lightDir = vec3(-0.2, -0.2, -0.2);
 
 void main()
 {
 	//Just output a basic color
-	OutColor = uColor; 
+	lightDir = normalize(lightDir);
+
+	float factor = max(dot(fs_in.normal, -lightDir), 0.1);
+
+	OutColor = (uColor + fs_in.uv.xyxy) * factor; 
 }

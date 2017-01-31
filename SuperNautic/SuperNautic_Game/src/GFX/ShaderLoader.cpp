@@ -25,13 +25,14 @@ Shader* ShaderLoader::loadShader(std::string shaderName)
 	// Will throw if not present...
 	std::string vertexSource = loadSource(_rootPath + shaderName + "_vs.glsl");
 	vertexShader = compileShader(vertexSource.c_str(), GL_VERTEX_SHADER);
-	
+
 	// Will be caught if not present since geometry shaders are
 	// non-essential.
 	try
 	{
 		std::string geometrySource = loadSource(_rootPath + shaderName + "_gs.glsl");
 		geometryShader = compileShader(geometrySource.c_str(), GL_GEOMETRY_SHADER);
+
 	}
 	catch (const std::exception&) {}
 
@@ -78,6 +79,8 @@ GLuint GFX::ShaderLoader::compileShader(const char * source, GLenum type) const
 		LOG_ERROR("Shader compilation failed:\n", shaderError);
 	}
 
+	LOG_GL_ERRORS();
+
 	return shader;
 }
 
@@ -86,13 +89,19 @@ GLuint GFX::ShaderLoader::linkProgram(GLuint vs, GLuint gs, GLuint fs) const
 	GLuint shaderProgram = glCreateProgram();
 
 	glAttachShader(shaderProgram, vs);
-	glAttachShader(shaderProgram, gs);
+	if (gs != 0)
+	{
+		glAttachShader(shaderProgram, gs);
+	}
 	glAttachShader(shaderProgram, fs);
 
 	glLinkProgram(shaderProgram);
 
 	glDeleteShader(vs);
-	glDeleteShader(gs);
+	if (gs != 0)
+	{
+		glDeleteShader(gs);
+	}
 	glDeleteShader(fs);
 
 	GLint	success = 0;
@@ -104,6 +113,8 @@ GLuint GFX::ShaderLoader::linkProgram(GLuint vs, GLuint gs, GLuint fs) const
 		glGetShaderInfoLog(shaderProgram, sizeof(programError), nullptr, programError);
 		LOG_ERROR("Shader program linking failed:\n", programError);
 	}
+
+	LOG_GL_ERRORS();
 
 	return shaderProgram;
 }

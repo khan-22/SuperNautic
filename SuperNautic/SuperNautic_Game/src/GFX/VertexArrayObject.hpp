@@ -64,11 +64,9 @@ namespace GFX
 		GLuint	_vao;
 		GLuint	_drawCount;
 
-		// INDEX BUFFER UNIQUE POINTER FÅR INTE KOPIERAS.
-		// Kopieras det någonstans??
 
 		std::vector<VertexBuffer>	 _vertexBuffers;
-		//std::unique_ptr<IndexBuffer> _indexBuffer;
+		std::unique_ptr<IndexBuffer> _indexBuffer;
 
 	};
 
