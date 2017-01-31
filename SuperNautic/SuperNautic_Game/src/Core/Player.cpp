@@ -31,6 +31,8 @@ void Player::renderHUD(sf::RenderTarget & target, sf::RenderStates states)
 
 void Player::update(float dt)
 {
+	_input.update();
+
     if(_input.checkActive())
     {
         _ship.steer(_input.getLeftStickXValue() * dt);
