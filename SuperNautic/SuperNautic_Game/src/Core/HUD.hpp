@@ -8,6 +8,7 @@
 #include <SFML\Graphics\RenderTarget.hpp>
 #include <SFML\Graphics\Sprite.hpp>
 #include <SFML\Graphics\Texture.hpp>
+#include <SFML\Graphics\RectangleShape.hpp>
 
 #include "SceneNode.hpp"
 
@@ -20,6 +21,7 @@ public:
 	~HUD();
 
 	void setHeat(float heat);
+	void changeHeat(float change);
 	void setSpeed(float speed);
 	void setPosition(int position);
 
@@ -27,15 +29,25 @@ public:
 	void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
-	float _heat;
-	float _speed;
-	int _position;
+	float				_widthStep;
+	float				_heightStep;
+	float				_heat;
+	float				_speed;
+	int					_position;
 
-	Asset<sf::Font> _font;
-	Asset<sf::Texture> _texture;
-	sf::Sprite _spriteHeat;
-	sf::Text _tSpeed;
-	sf::Text _tPosition;
+	Asset<sf::Font>		_font;
+	Asset<sf::Texture>	_texture;
+	sf::RectangleShape	_badRect;
+	sf::RectangleShape	_warningRect;
+	sf::RectangleShape	_closeRect;
+	sf::RectangleShape	_safeRect;
+
+	sf::RectangleShape	_heatOutline;
+	sf::RectangleShape	_heatMeter;
+
+	sf::Sprite			_spriteHeat;
+	sf::Text			_tSpeed;
+	sf::Text			_tPosition;
 
 };
 
