@@ -79,7 +79,6 @@ std::shared_ptr<sf::Texture> loadAsset<sf::Texture>(std::string key)
 		return nullptr;
 	}
 }
-}
 
 // Load models
 template<>
