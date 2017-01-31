@@ -113,7 +113,7 @@ Model* GFX::ModelLoader::loadModel(std::string filePath)
 			byteIndexOffset += sizeInBytesIndices;
 			indexOffset += rawMesh.largestIndex + 1;
 			
-			LOG("Sent ", indices.size(), " indices to vertex buffer.");
+			LOG("Sent ", indices.size(), " indices to index buffer.");
 
 			drawCount += indices.size();
 		}
