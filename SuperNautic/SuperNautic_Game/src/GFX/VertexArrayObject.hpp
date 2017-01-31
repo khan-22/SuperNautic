@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 #include <vector>
 #include <glm/vec3.hpp>
+#include <memory>
 
 namespace GFX
 {
@@ -23,7 +24,9 @@ namespace GFX
 		~VertexArrayObject();
 
 		void addVertexBuffer(GLsizei sizeInBytes, GLenum usage);
+		void addIndexBuffer(GLsizei sizeInBytes, GLenum usage);
 		void sendDataToBuffer(GLubyte bufferIndex, GLubyte attributeIndex, GLuint offset, GLsizei size, GLvoid* data, GLubyte count, GLenum type);
+		void sendDataToIndexBuffer(GLuint offset, GLsizei size, GLvoid* data);
 		void setDrawCount(GLuint drawCount);
 
 		void render();
@@ -45,9 +48,27 @@ namespace GFX
 			GLuint	_vbo;
 		};
 		
+		class IndexBuffer
+		{
+		public:
+			IndexBuffer();
+			IndexBuffer(GLsizei sizeInBytes, GLenum usage);
+			~IndexBuffer();
+
+			void sendData(GLuint offset, GLsizei size, GLvoid* data);
+		protected:
+		private:
+			GLuint	_vbo;
+		};
+
 		GLuint	_vao;
 		GLuint	_drawCount;
-		std::vector<VertexBuffer>	_vertexBuffers;
+
+		// INDEX BUFFER UNIQUE POINTER FÅR INTE KOPIERAS.
+		// Kopieras det någonstans??
+
+		std::vector<VertexBuffer>	 _vertexBuffers;
+		//std::unique_ptr<IndexBuffer> _indexBuffer;
 
 	};
 

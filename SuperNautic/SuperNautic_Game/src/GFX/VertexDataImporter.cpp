@@ -44,6 +44,7 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		data.texCoords.resize(mesh->mNumVertices);
 		data.normals.resize(mesh->mNumVertices);
 		data.faces.resize(mesh->mNumFaces);
+		data.indices.resize(mesh->mNumFaces * 3);
 
 		memcpy(&data.vertices[0], &mesh->mVertices[0], sizeof(mesh->mVertices[0]) * mesh->mNumVertices);
 		memcpy(&data.texCoords[0], &mesh->mTextureCoords[0], sizeof(mesh->mTextureCoords[0]) * mesh->mNumVertices);
@@ -51,10 +52,19 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		//memcpy(&data.faces[0], &mesh->mFaces[0], sizeof(mesh->mFaces[0].mIndices[0]) * 3 * mesh->mNumFaces);
 
 		// Faces must be copied manually
+		data.largestIndex = 0U;
 		for (int i = 0; i < mesh->mNumFaces; i++)
 		{
 			aiFace currentFace = mesh->mFaces[i];
 			data.faces[i] = glm::uvec3(currentFace.mIndices[0], currentFace.mIndices[1], currentFace.mIndices[2]);
+			data.indices.push_back(data.faces[i].x);
+			data.indices.push_back(data.faces[i].y);
+			data.indices.push_back(data.faces[i].z);
+			GLuint largest = std::max(data.faces[i].x, std::max(data.faces[i].y, data.faces[i].z));
+			if (largest > data.largestIndex)
+			{
+				data.largestIndex = largest;
+			}
 		}
 
 		data.textureIndex = mesh->mMaterialIndex;

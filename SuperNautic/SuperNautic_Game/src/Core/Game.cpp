@@ -36,7 +36,7 @@ bool Game::bInitialize()
 	glEnable(GL_DEPTH_TEST);
 
 	// Cached asset loading **DEMO**
-	RawMeshAsset testRawMesh = RawMeshCache::get("test.fbx");
+	RawMeshAsset testRawMesh = RawMeshCache::get("Segments/s01_straight_aa_blender.fbx");
 
 	if (testRawMesh.get() == nullptr)
 	{
@@ -152,30 +152,30 @@ void Game::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-	GFX::Shader* shader = _shader.get();
-	_shader.get()->bind();
-	
-	static float time = 0.f;
-	time += 0.0001f;
+	//GFX::Shader* shader = _shader.get();
+	//_shader.get()->bind();
+	//
+	//static float time = 0.f;
+	//time += 0.0001f;
 
-	glm::mat4 model(1.f);
-	glm::mat4 view = glm::lookAt(glm::vec3{ 3.f * sinf(time), 0.f, 3.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
-	glm::mat4 projection = glm::perspective(90.f, 1.f, 0.1f, 100.f);
+	//glm::mat4 model(1.f);
+	//glm::mat4 view = glm::lookAt(glm::vec3{ 3.f * sinf(time), 0.f, 3.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
+	//glm::mat4 projection = glm::perspective(90.f, 1.f, 0.1f, 100.f);
 
-	glm::vec4 color(1.f, 0.f, 0.f, 1.f);
+	//glm::vec4 color(1.f, 0.f, 0.f, 1.f);
 
-	_shader.get()->setUniform("uModel", model);
-	_shader.get()->setUniform("uView", view);
-	_shader.get()->setUniform("uProjection", projection);
+	//_shader.get()->setUniform("uModel", model);
+	//_shader.get()->setUniform("uView", view);
+	//_shader.get()->setUniform("uProjection", projection);
 
-	_shader.get()->setUniform("uColor", color);
+	//_shader.get()->setUniform("uColor", color);
 
-	_model.get()->render();
-	
+	//_model.get()->render();
+	//
 
 
 	_window.pushGLStates();
-    //_stateStack.render();
+    _stateStack.render();
 	_window.popGLStates();
 
 	_window.display();
