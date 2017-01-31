@@ -16,7 +16,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 
 	_spriteHeat.setTexture(*_texture.get());
 	_spriteHeat.setPosition(widthStep * 2, heightStep * 10);
-	_spriteHeat.setScale(windowWidth / 50, windowHeight / 12);
+	_spriteHeat.setScale(windowWidth / 50, windowHeight / 12.5);
 
 	_tSpeed.setFont(*_font.get());
 	_tSpeed.setFillColor(sf::Color::Red);

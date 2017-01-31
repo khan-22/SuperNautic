@@ -98,15 +98,6 @@ void Game::handleEvents()
 		case sf::Event::Closed:
 			_window.close();
 			break;
-		case sf::Event::KeyPressed:
-            LOG("Keep holding to shutdown...");
-            _stateStack.handleEvent(event);
-			break;
-		case sf::Event::KeyReleased:
-			if (event.key.code == sf::Keyboard::Escape)
-			{
-				_quitTimer = 0.f;
-			}
 
         default:
             _stateStack.handleEvent(event);
@@ -122,12 +113,7 @@ void Game::update(float dt)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 	{
-		_quitTimer += dt;
-
-		if (_quitTimer > 0.7f)
-		{
-			_window.close();
-		}
+		_window.close();
 	}
 }
 
