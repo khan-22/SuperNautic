@@ -3,14 +3,14 @@
 Player::Player() :
 	_playerId(0),
 	_input(0),
-	_hud(1920, 1080)
+	_hud(1280, 720)
 {
 }
 
 Player::Player(int id) :
 	_playerId(id),
 	_input(id),
-	_hud(1920, 1080)
+	_hud(1280, 720)
 {
 }
 
