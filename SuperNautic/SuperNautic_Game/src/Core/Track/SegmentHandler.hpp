@@ -28,7 +28,7 @@ class SegmentHandler
 {
 public:
 	// Loads SegmentInfos from file with name fileName in path
-	SegmentHandler(std::string fileName, std::string path);
+	SegmentHandler(std::string path, std::string fileName);
 
 
 	// Returns reference to segment infos

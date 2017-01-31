@@ -24,10 +24,11 @@ bool Segment::mappingsCreated { false };
 
 // Loads a segment from an fbx file
 Segment::Segment(std::string path, std::string fileName, std::string startConnection, std::string endConnection)
-	: _segmentName {path + fileName}, _startConnection {startConnection}, _endConnection {endConnection}
+	: _segmentName {fileName}, _startConnection {startConnection}, _endConnection {endConnection}
 {
 	// Load the scene from an fbx file
-	_scene = _importer.ReadFile(fileName.c_str(), 0);
+	_scene = _importer.ReadFile((path + fileName).c_str(), 0);
+	std::string str = _importer.GetErrorString();
 
 	if (_scene->mNumCameras < 1)
 	{

@@ -5,6 +5,7 @@
 
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 #include "../GFX/VertexDataImporter.hpp"
 #include "../GFX/ShaderLoader.hpp"
@@ -62,6 +63,22 @@ std::shared_ptr<sf::SoundBuffer> loadAsset<sf::SoundBuffer>(std::string key)
 	{
 		return nullptr;
 	}
+}
+
+// Load texture
+template<>
+std::shared_ptr<sf::Texture> loadAsset<sf::Texture>(std::string key)
+{
+	auto texture = std::make_shared<sf::Texture>();
+	if (texture->loadFromFile("res/textures/" + key))
+	{
+		return texture;
+	}
+	else
+	{
+		return nullptr;
+	}
+}
 }
 
 // Load models

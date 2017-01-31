@@ -11,6 +11,7 @@
 
 PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
+, _world(context)
 {
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
 }

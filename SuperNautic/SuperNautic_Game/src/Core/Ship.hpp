@@ -18,15 +18,22 @@ public:
 	void accelerate(float magnitude); // magnitude = [-1, 1]
 	void jump();
 
+	float getEngineTemperature() const; // [0, 1]
+	float getSpeed() const;
+
 private:
     float _steerVelocity;
     float _forwardVelocity;
     float _maxSteerAcceleration;
     float _maxForwardAcceleration;
+    float _maxSteerVelocity;
+    float _maxForwardVelocity;
+    float _minForwardVelocity;
     float _engineTemperature; // [0, 1]
     bool _bIsJumping;
 
     void updateEngineTemperature(float dt);
+    void updateVelocities(float dt);
 
 
 };

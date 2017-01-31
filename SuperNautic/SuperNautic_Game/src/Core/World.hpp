@@ -12,11 +12,12 @@ namespace sf
 
 
 #include "Player.hpp"
+class ApplicationContext;
 
 class World
 {
 public:
-    World();
+    World(ApplicationContext& context);
 
 	void handleEvent(const sf::Event& e);
 	void update(float dt);
@@ -24,6 +25,7 @@ public:
 
 private:
     std::list<Player> _players;
+    ApplicationContext& _context;
 };
 
 #endif //WORLD_HPP
