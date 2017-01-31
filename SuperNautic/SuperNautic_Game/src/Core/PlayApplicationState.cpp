@@ -4,7 +4,7 @@
 #include "SFML/Graphics/Text.hpp"
 
 #include "PlayApplicationState.hpp"
-#include "MainMenuApplicationState.hpp"
+#include "PauseMenuApplicationState.hpp"
 #include "ApplicationStateStack.hpp"
 #include "ApplicationContext.hpp"
 
@@ -36,9 +36,8 @@ bool PlayApplicationState::bHandleEvent(const sf::Event& event)
         {
         case sf::Keyboard::Escape:
         {
-            _stack.pop();
-            auto mainMenu = std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context));
-            _stack.push(mainMenu);
+            auto pauseMenu = std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context));
+            _stack.push(pauseMenu);
             return true;
             break;
 
