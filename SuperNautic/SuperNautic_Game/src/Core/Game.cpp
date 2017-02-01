@@ -14,25 +14,40 @@
 
 #include "../GFX/ShaderLoader.hpp"
 
+
+
 Game::Game()
 	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
 	, _context(_window)
+    , _deviceContext3d(GetDC(_window.getSystemHandle()))
+	, _glContext3d(wglCreateContext(_deviceContext3d))
 	, _quitTimer(0.f)
+	, _fps(60.f)
 {
+//    if(_glContext3d == NULL)
+//    {
+//        LOG_ERROR("Failed to create 3D GL context. Error: ", GetLastError());
+//    }
 	LOG("Game is being constructed...");
 
+	activateGlContext3d(false);
 	_players.emplace_back();
+
 }
 
 Game::~Game()
 {
 	LOG("Game is being destructed...");
 
+    CloseHandle(_glContext3d);
+    CloseHandle(_deviceContext3d);
 	CLOSE_LOG();
 }
 
 bool Game::bInitialize()
 {
+    activateGlContext3d(true);
+
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 
@@ -75,14 +90,16 @@ bool Game::bInitialize()
 		LOG("WOOOOOW!!");
 	}
 
-	//std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
-	//_stateStack.push(mainMenu);
 
 	_model = ModelCache::get("test2.fbx");
 	_shader = ShaderCache::get("forward");
 
 	LOG_GL_ERRORS();
 
+
+    activateGlContext3d(false);
+	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
+	_stateStack.push(mainMenu);
 	return true;
 }
 
@@ -97,10 +114,10 @@ void Game::run()
 		update(deltaTime.asSeconds());
 		render();
 
-		//if(_stateStack.bIsEmpty())
-        //{
-        //    _window.close();
-        //}
+		if(_stateStack.bIsEmpty())
+        {
+            _window.close();
+        }
 
 		deltaTime = clock.restart();
 	}
@@ -128,7 +145,10 @@ void Game::handleEvents()
 
 void Game::update(float dt)
 {
-    //_stateStack.update(dt);
+    _fps = _fps * 0.9f + 0.1f / dt;
+
+    activateGlContext3d(false);
+    _stateStack.update(dt);
 
 //	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 //	{
@@ -138,12 +158,13 @@ void Game::update(float dt)
 
 void Game::render()
 {
+    activateGlContext3d(true);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 	GFX::Shader* shader = _shader.get();
 	_shader.get()->bind();
-	
+
 	static float time = 0.f;
 	time += 0.0001f;
 
@@ -160,12 +181,32 @@ void Game::render()
 	_shader.get()->setUniform("uColor", color);
 
 	_model.get()->render();
-	
 
 
-	_window.pushGLStates();
-    //_stateStack.render();
-	_window.popGLStates();
+	activateGlContext3d(false);
 
+    _stateStack.render();
+    static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
+    sf::Text fps;
+    fps.setFont(*font.get());
+    fps.setString("FPS: " + std::to_string(_fps));
+    _window.draw(fps);
+//
 	_window.display();
+}
+
+void Game::activateGlContext3d(bool bDoActivate)
+{
+    if(bDoActivate)
+    {
+        _window.setActive(false);
+        if(wglMakeCurrent(_deviceContext3d, _glContext3d) == FALSE)
+        {
+            LOG_ERROR("Failed to make 3D GL context current. Error:", GetLastError());
+        }
+    }
+    else
+    {
+        _window.setActive();
+    }
 }
