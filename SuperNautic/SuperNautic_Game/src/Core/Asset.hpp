@@ -9,14 +9,15 @@ template<typename AssetT>
 class Asset
 {
 public:
+    Asset();
     Asset(std::shared_ptr<AssetT>& asset);
     ~Asset();
 
     AssetT* get() const;
 
 private:
-    const std::shared_ptr<AssetT> _asset;
-    std::shared_ptr<AssetT>& _parentAsset;
+    std::shared_ptr<AssetT> _asset;
+    std::shared_ptr<AssetT>* _parentAsset;
 };
 
 #include "Asset.inl"

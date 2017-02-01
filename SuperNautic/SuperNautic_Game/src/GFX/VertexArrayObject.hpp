@@ -6,65 +6,77 @@
 #include <GL/glew.h>
 #include <vector>
 #include <glm/vec3.hpp>
+#include <memory>
 
 namespace GFX
 {
-	struct Vertex
-	{
-		glm::vec3 position;
-		glm::vec3 texCoord;
-		glm::vec3 normal;
-	};
-
-	//class VertexArrayObject
+	//struct Vertex
 	//{
-	//public:
-	//	VertexArrayObject();
-	//	~VertexArrayObject();
-
-	//	template <typename dataT>
-	//	bool addVertexBuffer();
-
-	//	void bind() const;
-	//	static void unbind();
-
-	//protected:
-	//private:
-	//	template <typename dataT>
-	//	class VertexBuffer
-	//	{
-	//	public:
-	//		VertexBuffer(std::vector<dataT>& data);
-	//		~VertexBuffer();
-	//	protected:
-	//	private:
-	//		GLuint	_vbo;
-	//	};
-	//	
-	//	GLuint	_vao;
-	//	std::vector<VertexBuffer>	_vertexBuffers;
-
+	//	glm::vec3 position;
+	//	glm::vec3 texCoord;
+	//	glm::vec3 normal;
 	//};
 
-	//template <typename dataT>
-	//bool VertexArrayObject::addVertexBuffer()
-	//{
-	//	bind();
+	class VertexArrayObject
+	{
+	public:
+		VertexArrayObject();
+		~VertexArrayObject();
 
-	//	_vertexBuffers.emplace_back();
-	//	VertexBuffer& vertexBuffer = _vertexBuffers.back();
+		void addVertexBuffer(GLsizei sizeInBytes, GLenum usage);
+		void addIndexBuffer(GLsizei sizeInBytes, GLenum usage);
+		void sendDataToBuffer(GLubyte bufferIndex, GLubyte attributeIndex, GLuint offset, GLsizei size, GLvoid* data, GLubyte count, GLenum type);
+		void sendDataToIndexBuffer(GLuint offset, GLsizei size, GLvoid* data);
+		void setDrawCount(GLuint drawCount);
 
-	//}
+		void render();
 
-	//template <typename dataT>
-	//VertexArrayObject::VertexBuffer<dataT>::VertexBuffer(std::vector<dataT>& data)
-	//{
-	//	glGenBuffers(1, &_vbo);
-	//	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-	//	glBufferData(GL_ARRAY_BUFFER, )
+		void bind() const;
+		static void unbind();
+
+	protected:
+	private:
+		class VertexBuffer
+		{
+		public:
+			VertexBuffer();
+			~VertexBuffer();
+
+			void allocate(GLsizei sizeInBytes, GLenum usage);
+			void bind();
+			void unbind();
+
+			void sendData(GLuint offset, GLsizei size, GLvoid* data);
+		protected:
+		private:
+			GLuint	_vbo;
+		};
+
+		class IndexBuffer
+		{
+		public:
+			IndexBuffer();
+			~IndexBuffer();
+
+			void allocate(GLsizei sizeInBytes, GLenum usage);
+			void bind();
+			void unbind();
+
+			void sendData(GLuint offset, GLsizei size, GLvoid* data);
+		protected:
+		private:
+			GLuint	_vbo;
+		};
+
+		GLuint	_vao;
+		GLuint	_drawCount;
 
 
-	//}
+		std::vector<VertexBuffer>	 _vertexBuffers;
+		std::unique_ptr<IndexBuffer> _indexBuffer;
+
+	};
+
 }
 
 #endif //VERTEX_ARRAY_OBJECT

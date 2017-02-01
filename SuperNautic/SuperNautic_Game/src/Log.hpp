@@ -34,6 +34,7 @@ namespace detail
 		template <typename ...TArgs>
 		void print(TArgs... mArgs);
 
+		std::string printGlErrors();
 	protected:
 
 	private:
@@ -75,10 +76,17 @@ namespace detail
 	#define LOG_ERROR(...) detail::Log::getInstance()->print((strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__), " - Line: ", __LINE__, " - ", __VA_ARGS__)
 	#define CLOSE_LOG() detail::Log::close();
 
+	#define LOG_GL_ERRORS() { std::string _e_ = detail::Log::getInstance()->printGlErrors();\
+			if (_e_ != "")\
+			{\
+				LOG_ERROR(_e_);\
+			}}
 #else
 	#define LOG(...)
 	#define LOG_ERROR(...)
 	#define CLOSE_LOG()
+
+	#define LOG_GL_ERRORS()
 #endif
 
 

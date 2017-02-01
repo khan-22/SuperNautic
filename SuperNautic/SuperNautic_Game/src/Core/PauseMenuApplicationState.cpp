@@ -4,6 +4,7 @@
 #include "SFML/Graphics/Text.hpp"
 #include "SFML/Window/Event.hpp"
 
+#include "PauseMenuApplicationState.hpp"
 #include "MainMenuApplicationState.hpp"
 #include "ApplicationStateStack.hpp"
 #include "ApplicationContext.hpp"
@@ -14,55 +15,54 @@
 #include "PlayApplicationState.hpp"
 
 
-MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
+PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _input()
 {
-    std::cout << "Welcome to MainMenu state." << std::endl;
+    std::cout << "Welcome to PauseMenu state." << std::endl;
 
     _guiContainer.setBackground(sf::Color::Magenta);
     sf::Text text;
     text.setFont(*_font.get());
     text.setFillColor(sf::Color::White);
 
-    text.setString("Play");
-    auto button1 = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
+    text.setString("Resume");
+    auto resume = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.pop();
-        auto playState = std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context));
-        _stack.push(playState);
     }));
 
-    text.setString("Quit");
-    auto button2 = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
+    text.setString("Quit race");
+    auto quit = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.clear();
+        auto mainMenu = std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context));
+        _stack.push(mainMenu);
     }));
 
-    button2->move(0.f, button1->getBoundingRect().height * 1.5f);
-    _guiContainer.insert(button1);
-    _guiContainer.insert(button2);
+    quit->move(0.f, resume->getBoundingRect().height * 1.5f);
+    _guiContainer.insert(resume);
+    _guiContainer.insert(quit);
 
     sf::Vector2u windowSize = _context.window.getSize();
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
 }
 
-bool MainMenuApplicationState::bRender()
+bool PauseMenuApplicationState::bRender()
 {
     GFX::SfmlRenderer renderer;
     renderer.render(_guiContainer);
     renderer.display(_context.window);
-//    _context.window.draw(_guiContainer);
     return true;
 }
 
-bool MainMenuApplicationState::bUpdate(float dtSeconds)
+bool PauseMenuApplicationState::bUpdate(float dtSeconds)
 {
-    return true;
+    return false;
 }
 
-bool MainMenuApplicationState::bHandleEvent(const sf::Event& event)
+bool PauseMenuApplicationState::bHandleEvent(const sf::Event& event)
 {
     _guiContainer.handleEvent(event);
     if(_input.checkActive())
@@ -73,5 +73,5 @@ bool MainMenuApplicationState::bHandleEvent(const sf::Event& event)
             _guiContainer.handleEvent(e);
         }
     }
-    return true;
+    return false;
 }

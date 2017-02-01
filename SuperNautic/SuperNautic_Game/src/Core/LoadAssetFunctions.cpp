@@ -4,9 +4,12 @@
 #include "LoadAsset.hpp"
 
 #include <SFML/Graphics/Font.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 #include "../GFX/VertexDataImporter.hpp"
 #include "../GFX/ShaderLoader.hpp"
+#include "../GFX/ModelLoader.hpp"
 
 
 struct Mesh
@@ -44,4 +47,43 @@ std::shared_ptr<sf::Font> loadAsset<sf::Font>(std::string key)
 	{
 		return nullptr;
 	}
+}
+
+
+// Load WAV
+template<>
+std::shared_ptr<sf::SoundBuffer> loadAsset<sf::SoundBuffer>(std::string key)
+{
+	auto buffer = std::make_shared<sf::SoundBuffer>();
+	if (buffer->loadFromFile("res/audio/" + key + ".wav"))
+	{
+		return buffer;
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+// Load texture
+template<>
+std::shared_ptr<sf::Texture> loadAsset<sf::Texture>(std::string key)
+{
+	auto texture = std::make_shared<sf::Texture>();
+	if (texture->loadFromFile("res/textures/" + key))
+	{
+		return texture;
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+// Load models
+template<>
+std::shared_ptr<GFX::Model> loadAsset<GFX::Model>(std::string key)
+{
+	GFX::ModelLoader loader;
+	return std::shared_ptr<GFX::Model>(loader.loadModel(key));
 }
