@@ -1,5 +1,7 @@
 #include "Model.hpp"
 
+#include <glm/gtx/transform.hpp>
+
 using namespace GFX;
 
 
@@ -12,15 +14,32 @@ Model::~Model()
 {
 }
 
-void GFX::Model::render()
+void Model::render(RenderStates& states)
 {
+	// TEMP
+	static float time = 0.f;
+	time += 0.0007f;
+
+	glm::mat4 model			= glm::rotate(time, glm::vec3(0.f, 1.f, 0.f));
+	glm::mat4 view			= states.camera->getView();
+	glm::mat4 perspective	= states.camera->getPerspective();
+
+	Shader* shader = states.shader;
+	shader->setUniform("uModel", model);
+	shader->setUniform("uView",	view);
+	shader->setUniform("uProjection", perspective);
+
+	// TEMP
+	glm::vec4 color(1.f, 0.f, 0.f, 1.f);
+	shader->setUniform("uColor", color);
+
 	for (auto& mesh : _meshes)
 	{
 		mesh->render();
 	}
 }
 
-Model::Mesh& GFX::Model::addMesh()
+Model::Mesh& Model::addMesh()
 {
 	_meshes.emplace_back(new Mesh());
 	return *_meshes.back();
@@ -41,12 +60,10 @@ Model::Mesh::~Mesh()
 
 void Model::Mesh::render()
 {
-	_vao.bind();
 	_vao.render();
-	_vao.unbind();
 }
 
-VertexArrayObject& GFX::Model::Mesh::getVertexArrayObject()
+VertexArrayObject& Model::Mesh::getVertexArrayObject()
 {
 	return _vao;
 }

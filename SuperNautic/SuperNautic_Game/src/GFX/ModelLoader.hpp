@@ -15,7 +15,7 @@ namespace GFX {
 	class ModelLoader
 	{
 	public:
-		ModelLoader(/*const std::string& rootPath*/);
+		ModelLoader();
 		~ModelLoader();
 
 		Model* loadModel(std::string filePath);

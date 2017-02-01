@@ -6,13 +6,13 @@
 #include <vector>
 
 #include "VertexArrayObject.hpp"
-
+#include "Renderable3D.hpp"
 
 namespace GFX
 {
 
 
-	class Model
+	class Model : public Renderable3D
 	{
 	public:
 		class Mesh
@@ -35,9 +35,9 @@ namespace GFX
 		Model();
 		~Model();
 
-		void render();
-
 	protected:
+		void render(RenderStates& states) override;
+
 	private:
 		std::vector<std::unique_ptr<Mesh>> _meshes;
 

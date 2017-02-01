@@ -72,8 +72,8 @@ namespace GFX
 		GLuint	_drawCount;
 
 
-		std::vector<VertexBuffer>	 _vertexBuffers;
-		std::unique_ptr<IndexBuffer> _indexBuffer;
+		std::vector<std::unique_ptr<VertexBuffer>>	_vertexBuffers;
+		std::unique_ptr<IndexBuffer>				_indexBuffer;
 
 	};
 

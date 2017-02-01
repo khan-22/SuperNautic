@@ -17,12 +17,13 @@ VertexArrayObject::~VertexArrayObject()
 void VertexArrayObject::addVertexBuffer(GLsizei sizeInBytes, GLenum usage)
 {
 	bind();
-
-	_vertexBuffers.emplace_back();
-    _vertexBuffers.back().bind();
-    _vertexBuffers.back().allocate(sizeInBytes, usage);
+	_vertexBuffers.emplace_back(new VertexBuffer());
+	VertexBuffer& buffer = *_vertexBuffers.back();
+    
+	buffer.bind();
+    buffer.allocate(sizeInBytes, usage);
 	unbind();
-    _vertexBuffers.back().unbind();
+    buffer.unbind();
 
 }
 
@@ -40,7 +41,7 @@ void GFX::VertexArrayObject::addIndexBuffer(GLsizei sizeInBytes, GLenum usage)
 void GFX::VertexArrayObject::sendDataToBuffer(GLubyte bufferIndex, GLubyte attributeIndex, GLuint offset, GLsizei size, GLvoid* data, GLubyte count, GLenum type)
 {
 	bind();
-	VertexBuffer& buffer = _vertexBuffers[bufferIndex];
+	VertexBuffer& buffer = *_vertexBuffers[bufferIndex].get();
 	buffer.bind();
 
 
@@ -69,7 +70,9 @@ void VertexArrayObject::setDrawCount(GLuint drawCount)
 
 void VertexArrayObject::render()
 {
+	bind();
 	glDrawElements(GL_TRIANGLES, _drawCount, GL_UNSIGNED_INT, 0);
+	unbind();
 }
 
 void VertexArrayObject::bind() const
