@@ -11,7 +11,7 @@ void SfmlRenderer::render(const sf::Drawable& draw)
     _drawCalls.push_back(&draw);
 }
 
-void SfmlRenderer::display(sf::RenderTarget& target, const Camera& camera)
+void SfmlRenderer::display(sf::RenderTarget& target)
 {
     target.pushGLStates();
     for(const sf::Drawable* drawCall : _drawCalls)
@@ -19,4 +19,6 @@ void SfmlRenderer::display(sf::RenderTarget& target, const Camera& camera)
         target.draw(*drawCall);
     }
     target.popGLStates();
+
+    _drawCalls.clear();
 }
