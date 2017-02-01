@@ -24,9 +24,9 @@ void Player::render()
     // ...
 }
 
-void Player::renderHUD(sf::RenderTarget & target, sf::RenderStates states)
+const sf::Drawable& Player::getHud() const
 {
-	target.draw(_hud);
+    return _hud;
 }
 
 void Player::update(float dt)
