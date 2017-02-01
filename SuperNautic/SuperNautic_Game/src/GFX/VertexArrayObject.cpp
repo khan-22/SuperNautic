@@ -81,7 +81,7 @@ VertexArrayObject::VertexBuffer::VertexBuffer(GLsizei sizeInBytes, GLenum usage)
 	glGenBuffers(1, &_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeInBytes, nullptr, usage);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	LOG_GL_ERRORS();
 }
 
