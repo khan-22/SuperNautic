@@ -87,15 +87,15 @@ void HUD::setPosition(int position)
 
 void HUD::updateCurrent()
 {
-	if (_speed < 40)
+	if (_heat < .40)
 	{
 		_heatMeter.setFillColor(sf::Color::Green);
 	}
-	else if (_speed < 60)
+	else if (_heat < .60)
 	{
 		_heatMeter.setFillColor(sf::Color::Blue);
 	}
-	else if (_speed < 80)
+	else if (_heat < .80)
 	{
 		_heatMeter.setFillColor(sf::Color::Yellow);
 	}
@@ -107,7 +107,7 @@ void HUD::updateCurrent()
 	_heatMeter.setSize(sf::Vector2f(_widthStep * 2, size));
 	_heatMeter.setPosition(_widthStep * 3, _heightStep * 90 - size);
 
-	_tSpeed.setString("Speed: " + std::to_string(_heat));
+	_tSpeed.setString("Speed: " + std::to_string(_speed));
 	_tPosition.setString("#" + std::to_string(_position));
 }
 
