@@ -3,6 +3,7 @@
 
 #include "World.hpp"
 #include "ApplicationContext.hpp"
+#include "../GFX/SfmlRenderer.hpp"
 
 
 World::World(ApplicationContext& context)
@@ -32,8 +33,11 @@ void World::render()
         player.render();
     }
 
+    GFX::SfmlRenderer sfml;
     for(Player& player : _players)
     {
-        player.renderHUD(_context.window, sf::RenderStates::Default);
+        sfml.render(player.getHud());
     }
+
+    sfml.display(_context.window);
 }
