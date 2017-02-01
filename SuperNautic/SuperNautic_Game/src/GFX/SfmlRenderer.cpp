@@ -3,22 +3,20 @@
 #include "SFML/Graphics/RenderTarget.hpp"
 
 #include "SfmlRenderer.hpp"
+using namespace GFX;
 
-namespace GFX
+
+void SfmlRenderer::render(const sf::Drawable& draw)
 {
+    _drawCalls.push_back(&draw);
+}
 
-    template<>
-    void SfmlRenderer::render(const sf::Drawable& draw)
+void SfmlRenderer::display(sf::RenderTarget& target, const Camera& camera)
+{
+    target.pushGLStates();
+    for(const sf::Drawable* drawCall : _drawCalls)
     {
-        _drawCalls.push_back(&draw);
+        target.draw(*drawCall);
     }
-
-    template<>
-    void SfmlRenderer::display(sf::RenderTarget& target, const Camera& camera)
-    {
-        for(const sf::Drawable* drawCall : _drawCalls)
-        {
-            target.draw(*drawCall);
-        }
-    }
+    target.popGLStates();
 }
