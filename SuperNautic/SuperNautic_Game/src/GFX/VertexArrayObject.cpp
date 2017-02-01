@@ -117,7 +117,7 @@ VertexArrayObject::IndexBuffer::IndexBuffer(GLsizei sizeInBytes, GLenum usage)
 
 VertexArrayObject::IndexBuffer::~IndexBuffer()
 {
-	glDeleteBuffers(GL_ELEMENT_ARRAY_BUFFER, &_vbo);
+	glDeleteBuffers(1, &_vbo);
 }
 
 void VertexArrayObject::IndexBuffer::sendData(GLuint offset, GLsizei size, GLvoid* data)
