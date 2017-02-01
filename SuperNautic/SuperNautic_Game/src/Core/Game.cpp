@@ -170,11 +170,11 @@ void Game::render()
 	_shader.get()->bind();
 
 	static float time = 0.f;
-	time += 0.004f;
+	time += 0.001f;
 
 	glm::mat4 model(1.f);
-	glm::mat4 view = glm::lookAt(glm::vec3{ 3.f * sinf(time), 0.f, 3.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
-	glm::mat4 projection = glm::perspective(90.f, (float)_window.getSize().x / (float)_window.getSize().y, 0.3f, 100.f);
+	glm::mat4 view = glm::lookAt(glm::vec3{ 20.f * sinf(time), 0.f, 20.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
+	glm::mat4 projection = glm::perspective(70.f, (float)_window.getSize().x / (float)_window.getSize().y, 0.3f, 100.f);
 
 	glm::vec4 color(1.f, 0.f, 0.f, 1.f);
 
