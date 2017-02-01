@@ -104,7 +104,7 @@ float Input::getLeftStickYValue()
 
 float Input::getTriggersValue()
 {
-	return _triggers / 100;
+	return -_triggers / 100;
 }
 
 std::list<sf::Event> Input::getEvents()

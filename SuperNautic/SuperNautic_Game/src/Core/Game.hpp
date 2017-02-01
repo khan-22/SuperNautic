@@ -13,7 +13,6 @@
 
 #include "LoadAssetFunctions.hpp"
 
-#include <windows.h>
 
 class Game
 {
@@ -38,17 +37,11 @@ private:
 	ApplicationStateStack	_stateStack;
 	ApplicationContext		_context;
 
-	std::list<Player>		_players;
-
 	float					_quitTimer;
 	float _fps;
 
 	ShaderAsset	_shader;
 	ModelAsset	_model;
-	HDC _deviceContext3d;
-	HGLRC _glContext3d;
-
-	void activateGlContext3d(bool bDoActivate);
 
 };
 
