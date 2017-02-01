@@ -53,7 +53,7 @@ bool PauseMenuApplicationState::bRender()
 {
     GFX::SfmlRenderer renderer;
     renderer.render(_guiContainer);
-    renderer.display(_context.window, Camera(90, 5, 5));
+    renderer.display(_context.window);
     return true;
 }
 

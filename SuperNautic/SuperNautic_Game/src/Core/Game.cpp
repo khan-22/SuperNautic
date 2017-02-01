@@ -165,8 +165,8 @@ void Game::render()
     fps.setFont(*font.get());
     fps.setString("FPS: " + std::to_string(_fps));
 
-    _window.pushGLStates();
     _stateStack.render();
+    _window.pushGLStates();
     _window.draw(fps);
     _window.popGLStates();
 
