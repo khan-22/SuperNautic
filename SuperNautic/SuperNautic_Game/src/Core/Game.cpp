@@ -21,6 +21,7 @@ Game::Game()
 	, _context(_window)
 	, _quitTimer(0.f)
 	, _fps(60.f)
+	, _camera(70.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
 {
 	LOG("Game is being constructed...");
 }
@@ -75,10 +76,12 @@ bool Game::bInitialize()
 		LOG("WOOOOOW!!");
 	}
 
+
+
 	_model = ModelCache::get("test2.fbx");
 	_shader = ShaderCache::get("forward");
 
-
+	_forwardRenderer.initialize();
 
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
@@ -138,12 +141,12 @@ void Game::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
+	
 
-	GFX::Shader* shader = _shader.get();
+	/*GFX::Shader* shader = _shader.get();
 	_shader.get()->bind();
 
-	static float time = 0.f;
-	time += 0.001f;
+	
 
 	glm::mat4 model(1.f);
 	glm::mat4 view = glm::lookAt(glm::vec3{ 20.f * sinf(time), 0.f, 20.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
@@ -157,7 +160,13 @@ void Game::render()
 
 	_shader.get()->setUniform("uColor", color);
 
-	_model.get()->render();
+	_model.get()->render();*/
+
+	static float time = 0.f;
+	time += 0.009f;
+	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
+	_forwardRenderer.render(*_model.get());
+	_forwardRenderer.display(_camera);
 
 
     static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");

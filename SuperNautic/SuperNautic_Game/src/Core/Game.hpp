@@ -12,7 +12,7 @@
 #include "Player.hpp"
 
 #include "LoadAssetFunctions.hpp"
-
+#include "../GFX/ForwardRenderer.hpp"
 
 class Game
 {
@@ -42,6 +42,9 @@ private:
 
 	ShaderAsset	_shader;
 	ModelAsset	_model;
+
+	GFX::ForwardRenderer	_forwardRenderer;
+	Camera		_camera;
 
 };
 

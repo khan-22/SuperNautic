@@ -16,6 +16,7 @@ Camera::Camera(float fov, int viewWidth, int viewHeight, const glm::vec3 & pos
 	, _fov(fov)
 	, _viewWidth(viewWidth)
 	, _viewHeight(viewHeight)
+	, _viewDir(viewDirection)
 {
 	_perspective = glm::perspective(glm::radians(_fov), (float)_viewWidth / _viewHeight, 0.1f, 1000.f);
 }
@@ -54,6 +55,7 @@ glm::mat4 Camera::getVP() const
 void Camera::setPos(const glm::vec3 & newPos)
 {
 	_pos = newPos;
+	updateView();
 }
 
 //Sets the camera position with aging
