@@ -39,8 +39,11 @@ Game::~Game()
 {
 	LOG("Game is being destructed...");
 
-    CloseHandle(_glContext3d);
-    CloseHandle(_deviceContext3d);
+    if(_window.isOpen())
+    {
+        CloseHandle(_glContext3d);
+        CloseHandle(_deviceContext3d);
+    }
 	CLOSE_LOG();
 }
 
