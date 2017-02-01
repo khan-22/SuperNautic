@@ -97,10 +97,10 @@ void Game::run()
 		update(deltaTime.asSeconds());
 		render();
 
-//		if(_stateStack.bIsEmpty())
-//        {
-//            _window.close();
-//        }
+		if(_stateStack.bIsEmpty())
+        {
+            _window.close();
+        }
 
 		deltaTime = clock.restart();
 	}
