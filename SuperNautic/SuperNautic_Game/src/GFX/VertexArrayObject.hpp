@@ -39,21 +39,28 @@ namespace GFX
 		class VertexBuffer
 		{
 		public:
-			VertexBuffer(GLsizei sizeInBytes, GLenum usage);
+			VertexBuffer();
 			~VertexBuffer();
+
+			void allocate(GLsizei sizeInBytes, GLenum usage);
+			void bind();
+			void unbind();
 
 			void sendData(GLuint offset, GLsizei size, GLvoid* data);
 		protected:
 		private:
 			GLuint	_vbo;
 		};
-		
+
 		class IndexBuffer
 		{
 		public:
 			IndexBuffer();
-			IndexBuffer(GLsizei sizeInBytes, GLenum usage);
 			~IndexBuffer();
+
+			void allocate(GLsizei sizeInBytes, GLenum usage);
+			void bind();
+			void unbind();
 
 			void sendData(GLuint offset, GLsizei size, GLvoid* data);
 		protected:
