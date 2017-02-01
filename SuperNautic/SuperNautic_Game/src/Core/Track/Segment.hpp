@@ -8,8 +8,7 @@
 #include <unordered_map>
 
 #include "glm/glm.hpp"
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
+#include "../LoadAssetFunctions.hpp"
 
 enum class SurfaceType : char { normal, hot, cold };
 
@@ -23,6 +22,10 @@ struct BoundingBox
 
 	// x, y, z halflengths
 	std::array<float, 3>	halfLengths;
+
+	BoundingBox() : center{ glm::vec3{} },
+		halfLengths{ -1.0f, -1.0f, -1.0f }
+	{ }
 };
 
 // Holds information about a detected collision
@@ -40,7 +43,7 @@ public:
 	const std::string _segmentName;
 
 	// Loads a segment from an fbx file
-	Segment(std::string path, std::string fileName, std::string startConnection, std::string endConnection);
+	Segment::Segment(std::string dataFilePath, std::string visualFilePath, std::string startConnection, std::string endConnection);
 
 	// Tests a ray collision against all collision surfaces of the segment. Returns collision information
 	const Intersection rayIntersectionTest(glm::vec3 origin, glm::vec3 direction) const;
@@ -75,22 +78,23 @@ public:
 
 	const glm::mat4x4& getEndMatrix() const
 	{
-		return _endMatrix;
+		return _scene.get()->cameras[0];
 	}
 	 
 private:
-	Assimp::Importer _importer;
+	// The loaded scene data
+	RawMeshAsset _scene;
 
-	// Pointer to the loaded scene
-	const aiScene* _scene;
+	// The visual geometry for this segment
+	ModelAsset _visual;
 
-	// Pointers to the required meshes
-	aiMesh*					_baseVisual;
-	aiMesh*					_baseCollision;
-	std::vector<aiMesh*>	_temperatureZoneVisuals;
-	std::vector<aiMesh*>	_temperatureZoneCollisions;
-	std::vector<aiMesh*>	_boundingBoxMeshes;
-	std::vector<aiMesh*>	_waypointMeshes;
+	// Indices in _scene.get()->meshes to the required meshes
+	unsigned				_baseVisual;
+	unsigned				_baseCollision;
+	std::vector<unsigned>	_temperatureZoneVisuals;
+	std::vector<unsigned>	_temperatureZoneCollisions;
+	std::vector<unsigned>	_boundingBoxMeshes;
+	std::vector<unsigned>	_waypointMeshes;
 
 	// Bounding boxes read from mesh
 	std::vector<BoundingBox> _boundingBoxes;
@@ -101,9 +105,6 @@ private:
 	// Names of start and end connections
 	std::string _startConnection;
 	std::string _endConnection;
-
-	// Matrix for transforming to end point
-	glm::mat4x4 _endMatrix;
 
 	// Approximate length of segment, obtained from waypoints
 	float _length;
@@ -118,29 +119,29 @@ private:
 	static const std::string endName;
 
 	// Mappings from mesh name to aiMesh* or vector<aiMesh*>
-	static std::unordered_map<std::string, aiMesh* Segment::*> nameToPtr;
-	static std::unordered_map<std::string, std::vector<aiMesh*> Segment::*> nameToVecPtr;
+	static std::unordered_map<std::string, unsigned Segment::*> nameToIndex;
+	static std::unordered_map<std::string, std::vector<unsigned> Segment::*> nameToVecIndex;
 
-	// True if nameToPtr and nameToVecPtr are initialized
+	// True if nameToIndex and nameToVecIndex are initialized
 	static bool mappingsCreated;
 
-	// Initializes nameToPtr and nameToVecPtr
+	// Initializes nameToIndex and nameToVecIndex
 	void initializeMappings();
 
 	// Iterate through meshes in scene and assign to proper pointers
 	void assignMeshPointers();
 
 	// Create bounding boxes from _boundingBoxMeshes
-	std::vector<BoundingBox>&& createBoundingBoxes();
+	void createBoundingBoxes();
 
 	// Create waypoints from _waypointMeshes
-	std::vector<glm::vec3>&& createWaypoints();
+	void createWaypoints();
 
-	// Create a vector with average positions of a vector of meshes, insert (0, 0, 0) at index 0
-	std::vector<glm::vec3>&& createAverageWaypoints(std::vector<aiMesh*>& meshes);
+	// Create a vector with average positions of a vector of mesh indices, insert (0, 0, 0) at index 0
+	void createAverageWaypoints(std::vector<unsigned>& meshIndices);
 
-	// Find the center of a mesh
-	glm::vec3 findMeshCenter(aiMesh* mesh) const;
+	// Find the center of mesh _scene->meshes[meshIndex]
+	glm::vec3 findMeshCenter(unsigned meshIndex) const;
 
 	// True if two vectors are almost equal
 	bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2) const
@@ -151,10 +152,10 @@ private:
 	}
 
 	// Helper function for createBoundingBoxes(). Finds the third half-distance of a box
-	float findThirdHalfDistance(const aiMesh* boundingBoxMesh, const BoundingBox& box) const;
+	float findThirdHalfDistance(unsigned boundingBoxMeshIndex, const BoundingBox& box) const;
 
 	// Helper function for createBoundingBoxes(). Finds three directions and two half-lengths of a box using the first face of the box mesh
-	void findTwoDirections(const aiMesh* boundingBoxMesh, BoundingBox& box) const;
+	void findTwoDirections(unsigned boundingBoxMeshIndex, BoundingBox& box) const;
 };
 
 // Get squared distance between two vectors

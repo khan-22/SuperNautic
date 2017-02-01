@@ -1,49 +1,42 @@
 #include <unordered_map>
 #include <algorithm>
+#include <limits>
 
 #include "../Segment.hpp"
 #include "../../../Log.hpp"
 
-
 // Static constants declared in Segment.hpp
-const std::string Segment::baseVisualName					{ "baseVisual" };
-const std::string Segment::baseCollisionName				{ "baseCollision" };
+const std::string Segment::baseVisualName					{ "VM" };
+const std::string Segment::baseCollisionName				{ "CM" };
 const std::string Segment::temperatureZoneVisualName		{ "zoneVisual" };
 const std::string Segment::temperatureZoneCollisionName		{ "zoneCollision" };
-const std::string Segment::boundingBoxName					{ "boundingBox" };
-const std::string Segment::waypointsName					{ "waypoint" };
+const std::string Segment::boundingBoxName					{ "BB" };
+const std::string Segment::waypointsName					{ "WP" };
 const std::string Segment::endName							{ "end" };
 
 // Static maps declared in Segment.hpp
-std::unordered_map<std::string, aiMesh* Segment::*> Segment::nameToPtr;
-std::unordered_map<std::string, std::vector<aiMesh*> Segment::*> Segment::nameToVecPtr;
+std::unordered_map<std::string, unsigned Segment::*> Segment::nameToIndex;
+std::unordered_map<std::string, std::vector<unsigned> Segment::*> Segment::nameToVecIndex;
 
 // Mappings are by default not created
 bool Segment::mappingsCreated { false };
 
 
 // Loads a segment from an fbx file
-Segment::Segment(std::string path, std::string fileName, std::string startConnection, std::string endConnection)
-	: _segmentName {fileName}, _startConnection {startConnection}, _endConnection {endConnection}
+Segment::Segment(std::string dataFilePath, std::string visualFilePath, std::string startConnection, std::string endConnection)
+	: _segmentName { dataFilePath }, _startConnection { startConnection }, _endConnection { endConnection }
 {
-	// Load the scene from an fbx file
-	_scene = _importer.ReadFile((path + fileName).c_str(), 0);
-	std::string str = _importer.GetErrorString();
+	// Get the scene data asset
+	_scene = RawMeshCache::get(std::string{ "Segments\\" } + dataFilePath);
 
-	if (_scene->mNumCameras < 1)
+	// Get visual model asset 
+	_visual = ModelCache::get(std::string{ "Segments\\" } + visualFilePath);
+
+	if (_scene.get()->cameras.size() < 1)
 	{
 		LOG_ERROR("No camera found in scene. A camera representing the end point is required");
 		return;
 	}
-
-	// Construct end matrix
-	aiMatrix4x4 aiEndMatrix; 
-	_scene->mCameras[0]->GetCameraMatrix(aiEndMatrix);
-
-	_endMatrix = { aiEndMatrix.a1, aiEndMatrix.a2, aiEndMatrix.a3, aiEndMatrix.a4,
-				   aiEndMatrix.b1, aiEndMatrix.b2, aiEndMatrix.b3, aiEndMatrix.b4, 
-				   aiEndMatrix.c1, aiEndMatrix.c2, aiEndMatrix.c3, aiEndMatrix.c4,
-				   aiEndMatrix.d1, aiEndMatrix.d2, aiEndMatrix.d3, aiEndMatrix.d4 };
 
 	// Create mappings, if required
 	if (!mappingsCreated)
@@ -52,21 +45,21 @@ Segment::Segment(std::string path, std::string fileName, std::string startConnec
 	}
 
 	// Load mesh pointers into appropriate member variables
-	if (_scene->mNumMeshes > 0)
+	if (_scene.get()->meshes.size() > 0)
 	{
 		assignMeshPointers();
 	}
 	else
 	{
-		LOG_ERROR("No meshes in file ", fileName);
+		LOG_ERROR("No meshes in file ", dataFilePath);
 		return;
 	}
 
 	// Create bounding boxes from meshes
-	_boundingBoxes = createBoundingBoxes();
+	createBoundingBoxes();
 
 	// Create waypoints from meshes
-	_waypoints = createWaypoints();
+	createWaypoints();
 }
 
 // Tests a ray collision against all collision surfaces of the segment. Returns collision information
@@ -127,16 +120,16 @@ std::pair<glm::vec3, glm::vec3> Segment::findClosestWaypoints(const glm::vec3& p
 // Renders the segment at the position of an instance
 // TODO
 
-// Initializes nameToPtr and nameToVecPtr
+// Initializes nameToIndex and nameToVecIndex
 void Segment::initializeMappings()
 {
-	nameToPtr[baseVisualName] =		&Segment::_baseVisual;
-	nameToPtr[baseCollisionName] =	&Segment::_baseCollision;
+	nameToIndex[baseVisualName] =		&Segment::_baseVisual;
+	nameToIndex[baseCollisionName] =	&Segment::_baseCollision;
 
-	nameToVecPtr[waypointsName] =					&Segment::_waypointMeshes;
-	nameToVecPtr[temperatureZoneVisualName] =		&Segment::_temperatureZoneVisuals;
-	nameToVecPtr[temperatureZoneCollisionName] =	&Segment::_temperatureZoneCollisions;
-	nameToVecPtr[boundingBoxName] =					&Segment::_boundingBoxMeshes;
+	nameToVecIndex[waypointsName] =					&Segment::_waypointMeshes;
+	nameToVecIndex[temperatureZoneVisualName] =		&Segment::_temperatureZoneVisuals;
+	nameToVecIndex[temperatureZoneCollisionName] =	&Segment::_temperatureZoneCollisions;
+	nameToVecIndex[boundingBoxName] =				&Segment::_boundingBoxMeshes;
 
 	mappingsCreated = true;
 }
@@ -145,11 +138,11 @@ void Segment::initializeMappings()
 void Segment::assignMeshPointers()
 {
 	std::string currentName;
-	for (unsigned i = 0; i < _scene->mNumMeshes; ++i)
+	for (unsigned i = 0; i < _scene.get()->meshes.size(); ++i)
 	{
 		// currentName contains name of current mesh
 		// readName will not have trailing digits removed, used for error logging
-		std::string readName = currentName = _scene->mMeshes[i]->mName.C_Str();
+		std::string readName = currentName = _scene.get()->meshes[i].name;
 
 		// Will hold the number at the end of the mesh name
 		std::string trailingNumberString;
@@ -158,7 +151,7 @@ void Segment::assignMeshPointers()
 		// Remove any numbers at end of name
 		while (isdigit(currentName[currentName.length() - 1]))
 		{
-			trailingNumberString.push_back(currentName[currentName.length() - 1]);
+			trailingNumberString.insert(trailingNumberString.begin(), currentName[currentName.length() - 1]);
 			currentName.pop_back();
 		}
 
@@ -167,26 +160,31 @@ void Segment::assignMeshPointers()
 			trailingNumber = atoi(trailingNumberString.data());
 		}
 
-		// If currentName is equal to a name mapped to an aiMesh*, 
-		// set the current mesh to appropriate class member pointer
-		if (nameToPtr.find(currentName) != nameToPtr.end())
+		// If currentName is equal to a name mapped to a mesh index, 
+		// set the current mesh to appropriate class member
+		if (nameToIndex.find(currentName) != nameToIndex.end())
 		{
-			this->*nameToPtr[currentName] = _scene->mMeshes[i];
+			this->*nameToIndex[currentName] = i;
 		}
 		// If currentName is equal to a name mapped to a vector<aiMesh*>, 
 		// add the current mesh to the appropriate class member vector
-		else if (nameToVecPtr.find(currentName) != nameToVecPtr.end())
+		else if (nameToVecIndex.find(currentName) != nameToVecIndex.end())
 		{
 			// If mesh is numbered, place meshes in order
 			if (trailingNumber >= 0)
 			{
-				(this->*nameToVecPtr[currentName]).reserve(trailingNumber);
-				(this->*nameToVecPtr[currentName])[trailingNumber] = _scene->mMeshes[i];
+				// Resize to fit
+				if ((this->*nameToVecIndex[currentName]).size() < (trailingNumber + 1))
+				{
+																					// Max value represents unassigned
+					(this->*nameToVecIndex[currentName]).resize(trailingNumber + 1, std::numeric_limits<unsigned>::max());
+				}
+				(this->*nameToVecIndex[currentName])[trailingNumber] = i;
 			}
 			// Else, place in read order
 			else
 			{
-				(this->*nameToVecPtr[currentName]).push_back(_scene->mMeshes[i]);
+				(this->*nameToVecIndex[currentName]).push_back(i);
 			}
 		}
 		else
@@ -203,21 +201,26 @@ void Segment::assignMeshPointers()
 }
 
 // Create bounding boxes from _boundingBoxMeshes
-std::vector<BoundingBox>&& Segment::createBoundingBoxes()
+void Segment::createBoundingBoxes()
 {
-	std::vector<BoundingBox> boxes;
-
 	// Create a bounding box for every mesh in _boundingBoxMeshes
 	for (unsigned i = 0; i < _boundingBoxMeshes.size(); ++i)
 	{
+		// Max value represents unassigned
+		if (_boundingBoxMeshes[i] == std::numeric_limits<unsigned>::max())
+		{
+			LOG_ERROR("_boundingBoxMeshes[", i, "] was not assigned (not zero-based indexing?)");
+			continue;
+		}
+
 		// Check for correct number of faces
-		if (_boundingBoxMeshes[i]->mNumFaces != 12)
+		if (_scene.get()->meshes[_boundingBoxMeshes[i]].faces.size() != 12)
 		{
 			LOG_ERROR("A bounding box mesh was not a box");
 			continue;
 		}
 		
-		BoundingBox box{};
+		BoundingBox box {};
 
 		// Get middle of box
 		box.center = findMeshCenter(_boundingBoxMeshes[i]);
@@ -226,33 +229,28 @@ std::vector<BoundingBox>&& Segment::createBoundingBoxes()
 		findTwoDirections(_boundingBoxMeshes[i], box);
 
 		box.halfLengths[2] = findThirdHalfDistance(_boundingBoxMeshes[i], box);
-		if (box.halfLengths[2] < 0.0f)
+		if (box.halfLengths[2] <= 0.0f)
 		{
 			LOG_ERROR("Could not find the third half-length of a bounding box");
 		}
 		else
 		{
 			// Box created successfully
-			boxes.push_back(box);
+			_boundingBoxes.push_back(box);
 		}
 	}
-
-	// Clear _boundingBoxMeshes to save memory
-	_boundingBoxMeshes.clear();
-
-	return std::move(boxes);
 }
 
 // Create waypoints from _waypointMeshes
-std::vector<glm::vec3>&& Segment::createWaypoints()
+void Segment::createWaypoints()
 {
 	// Create vector of average positions, middle[0] is always (0, 0, 0)
-	std::vector<glm::vec3> middles = createAverageWaypoints(_waypointMeshes);
+	createAverageWaypoints(_waypointMeshes);
 
-	if (middles.size() < 2)
+	if (_waypoints.size() < 2)
 	{
 		LOG_ERROR("Segment ", _segmentName, " has fewer than 2 waypoints. Not good :(");
-		return move(std::vector<glm::vec3>{});
+		return;
 	}
 
 	// Will accumulate the length between waypoints
@@ -260,17 +258,17 @@ std::vector<glm::vec3>&& Segment::createWaypoints()
 
 	// Set middle[i] to the waypoint closest to middle[i - 1]
 	// middle[0] is always (0, 0, 0)
-	for (unsigned i = 1; i < middles.size(); ++i)
+	for (unsigned i = 1; i < _waypoints.size(); ++i)
 	{
 		// Index of closest, initialize to first position tested
 		unsigned closest = i;
 
 		// Squared distance from middles[i] to middles[i - 1], will hold distance from closest waypoint to middles[i - 1]
-		float lowestDistance = squaredDistance(middles[i], middles[i - 1]);
+		float lowestDistance = squaredDistance(_waypoints[i], _waypoints[i - 1]);
 
-		for (unsigned j = i + 1; j < middles.size(); ++j)
+		for (unsigned j = i + 1; j < _waypoints.size(); ++j)
 		{
-			float testDistance = squaredDistance(middles[j], middles[i]);
+			float testDistance = squaredDistance(_waypoints[j], _waypoints[i]);
 
 			if (testDistance < lowestDistance)
 			{
@@ -282,7 +280,7 @@ std::vector<glm::vec3>&& Segment::createWaypoints()
 		// Move closest point to position 0 in vector
 		if (closest != i)
 		{
-			std::swap(middles[i], middles[closest]);
+			std::swap(_waypoints[i], _waypoints[closest]);
 		}
 
 		length += sqrtf(lowestDistance);
@@ -290,73 +288,72 @@ std::vector<glm::vec3>&& Segment::createWaypoints()
 
 	// Initialize _length
 	_length = length;
-
-	// Clear _waypointMeshes to save memory
-	_waypointMeshes.clear();
-
-	return std::move(middles);
 }
 
-// Create a vector with average positions of a vector of meshes, insert (0, 0, 0) at index 0
-std::vector<glm::vec3>&& Segment::createAverageWaypoints(std::vector<aiMesh*>& meshes)
+// Create a vector with average positions of a vector of mesh indices, insert (0, 0, 0) at index 0
+void Segment::createAverageWaypoints(std::vector<unsigned>& meshIndices)
 {
 	// Create a vector containing the average position of all vertices in corresponding mesh in meshes
 	// First waypoint is always (0, 0, 0)
-	std::vector<glm::vec3> middles{ glm::vec3{0, 0, 0} };
+	_waypoints.push_back( glm::vec3{0, 0, 0} );
 
-	for (unsigned i = 0; i < meshes.size(); ++i)
+	for (unsigned i = 0; i < meshIndices.size(); ++i)
 	{
+		if (meshIndices[i] == std::numeric_limits<unsigned>::max())
+		{
+			LOG_ERROR("_waypointMeshes[", i, "] was not assigned (not zero-based indexing?)");
+			continue;
+		}
+
 		// Initialize average position
-		middles.push_back(glm::vec3{ 0, 0, 0 });
-		const size_t index = middles.size() - 1;
+		_waypoints.push_back(glm::vec3{ 0, 0, 0 });
+		const size_t index = _waypoints.size() - 1;
 
 		// Add the position of every vertex in the model
-		for (unsigned j = 0; j < meshes[i]->mNumVertices; ++j)
+		for (unsigned j = 0; j < _scene.get()->meshes[meshIndices[i]].vertices.size(); ++j)
 		{
-			middles[index].x += meshes[i]->mVertices[j].x;
-			middles[index].y += meshes[i]->mVertices[j].y;
-			middles[index].z += meshes[i]->mVertices[j].z;
+			_waypoints[index].x += _scene.get()->meshes[meshIndices[i]].vertices[j].x;
+			_waypoints[index].y += _scene.get()->meshes[meshIndices[i]].vertices[j].y;
+			_waypoints[index].z += _scene.get()->meshes[meshIndices[i]].vertices[j].z;
 		}
 
 		// Divide by number of vertices to obtain average
-		middles[index] /= meshes[i]->mNumVertices;
+		_waypoints[index] /= _scene.get()->meshes[meshIndices[i]].vertices.size();
 	}
-
-	return std::move(middles);
 }
 
-// Find the center of a mesh
-glm::vec3 Segment::findMeshCenter(aiMesh* mesh) const
+// Find the center of mesh _scene->meshes[meshIndex]
+glm::vec3 Segment::findMeshCenter(unsigned meshIndex) const
 {
 	glm::vec3 center {0, 0, 0};
 
 	// Add position of every vertex
-	for (unsigned i = 0; i < mesh->mNumVertices; ++i)
+	for (unsigned i = 0; i < _scene.get()->meshes[meshIndex].vertices.size(); ++i)
 	{
-		center.x += mesh->mVertices[i].x;
-		center.y += mesh->mVertices[i].y;
-		center.z += mesh->mVertices[i].z;
+		center.x += _scene.get()->meshes[meshIndex].vertices[i].x;
+		center.y += _scene.get()->meshes[meshIndex].vertices[i].y;
+		center.z += _scene.get()->meshes[meshIndex].vertices[i].z;
 	}
 
 	// Divide by number of vertices and return
-	return (center /= mesh->mNumVertices);
+	return (center /= _scene.get()->meshes[meshIndex].vertices.size());
 }
 
 // Helper function for createBoundingBoxes(). Finds the third half-distance of a box
-float Segment::findThirdHalfDistance(const aiMesh* boundingBoxMesh, const BoundingBox& box) const
+float Segment::findThirdHalfDistance(unsigned boundingBoxMeshIndex, const BoundingBox& box) const
 {
 	// Reduce initializer length
-	aiVector3D* vertices = boundingBoxMesh->mVertices;
-	aiFace* faces = boundingBoxMesh->mFaces;
+	std::vector<glm::vec3>& vertices = _scene.get()->meshes[boundingBoxMeshIndex].vertices;
+	std::vector<glm::uvec3>& faces = _scene.get()->meshes[boundingBoxMeshIndex].faces;
 
 	// Loop through faces to find an edge along the third direction. This will be used to find the third half-length
-	for (unsigned j = 1; j < boundingBoxMesh->mNumFaces; ++j)
+	for (unsigned j = 1; j < faces.size(); ++j)
 	{
 		// Construct vertices for this face
 		std::array<glm::vec3, 3> faceVertices{
-			glm::vec3{ vertices[faces[j].mIndices[0]].x, vertices[faces[j].mIndices[0]].y, vertices[faces[j].mIndices[0]].z },
-			glm::vec3{ vertices[faces[j].mIndices[1]].x, vertices[faces[j].mIndices[1]].y, vertices[faces[j].mIndices[1]].z },
-			glm::vec3{ vertices[faces[j].mIndices[2]].x, vertices[faces[j].mIndices[2]].y, vertices[faces[j].mIndices[2]].z }
+			glm::vec3{ vertices[faces[j].x] },
+			glm::vec3{ vertices[faces[j].y] },
+			glm::vec3{ vertices[faces[j].z] }
 		};
 
 		// Construct vectors between vertices of this face
@@ -380,17 +377,17 @@ float Segment::findThirdHalfDistance(const aiMesh* boundingBoxMesh, const Boundi
 }
 
 // Helper function for createBoundingBoxes(). Finds three directions and two half-lengths of a box using the first face of the box mesh
-void Segment::findTwoDirections(const aiMesh* boundingBoxMesh, BoundingBox& box) const
+void Segment::findTwoDirections(unsigned boundingBoxMeshIndex, BoundingBox& box) const
 {
-	// Use to reduce firstFaceVertices initializer length
-	aiFace* faces = boundingBoxMesh->mFaces;
-	aiVector3D* vertices = boundingBoxMesh->mVertices;
+	// Reduce initializer length
+	std::vector<glm::vec3>& vertices = _scene.get()->meshes[boundingBoxMeshIndex].vertices;
+	std::vector<glm::uvec3>& faces = _scene.get()->meshes[boundingBoxMeshIndex].faces;
 
 	// Vertices of first face in bounding box, will be used to construct two direction vectors
 	std::array<glm::vec3, 3> firstFaceVertices{
-		glm::vec3{ vertices[faces[0].mIndices[0]].x, vertices[faces[0].mIndices[0]].y, vertices[faces[0].mIndices[0]].z },
-		glm::vec3{ vertices[faces[0].mIndices[1]].x, vertices[faces[0].mIndices[1]].y, vertices[faces[0].mIndices[1]].z },
-		glm::vec3{ vertices[faces[0].mIndices[2]].x, vertices[faces[0].mIndices[2]].y, vertices[faces[0].mIndices[2]].z }
+		glm::vec3{ vertices[faces[0].x] },
+		glm::vec3{ vertices[faces[0].y] },
+		glm::vec3{ vertices[faces[0].z] }
 	};
 
 	// Initialize three vectors, only two will be kept (the longest is not part of a box edge)
