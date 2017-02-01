@@ -3,13 +3,19 @@
 #ifndef SFML_RENDERER_HPP
 #define SFML_RENDERER_HPP
 
-#include "Renderer.hpp"
-
-#include "SFML/Graphics/Drawable.hpp"
+namespace sf
+{
+    class Drawable;
+}
 
 namespace GFX
 {
-    using SfmlRenderer = Renderer<sf::Drawable>;
+    class SfmlRenderer
+    {
+        public:
+            void render(const sf::Drawable& draw);
+            void display(sf::RenderTarget& target, const Camera& camera);
+    };
 }
 
 
