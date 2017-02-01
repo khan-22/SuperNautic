@@ -17,7 +17,7 @@
 
 
 Game::Game()
-	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
+	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Default, sf::ContextSettings(24U, 0U, 0U, 4U, 0U))
 	, _context(_window)
 	, _quitTimer(0.f)
 	, _fps(60.f)
@@ -49,8 +49,8 @@ bool Game::bInitialize()
 	}
 
 	// Shader loading **DEMO**
-	//GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
-	//GFX::Shader* testShader = shaderLoader.loadShader("forward");
+	/*GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
+	GFX::Shader* testShader = shaderLoader.loadShader("forward");*/
 
 	Asset<GFX::Shader> testShader = ShaderCache::get("forward");
 
@@ -138,15 +138,16 @@ void Game::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
+
 	GFX::Shader* shader = _shader.get();
 	_shader.get()->bind();
 
 	static float time = 0.f;
-	time += 0.0001f;
+	time += 0.004f;
 
 	glm::mat4 model(1.f);
 	glm::mat4 view = glm::lookAt(glm::vec3{ 3.f * sinf(time), 0.f, 3.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
-	glm::mat4 projection = glm::perspective(90.f, 1.f, 0.1f, 100.f);
+	glm::mat4 projection = glm::perspective(90.f, (float)_window.getSize().x / (float)_window.getSize().y, 0.3f, 100.f);
 
 	glm::vec4 color(1.f, 0.f, 0.f, 1.f);
 

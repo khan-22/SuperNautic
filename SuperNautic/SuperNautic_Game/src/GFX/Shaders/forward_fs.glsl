@@ -17,7 +17,7 @@ void main()
 	//Just output a basic color
 	lightDir = normalize(lightDir);
 
-	float factor = max(dot(fs_in.normal, -lightDir), 0.1);
+	float factor = max(dot(normalize(fs_in.normal), -lightDir), 0.01);
 
 	OutColor = (uColor + fs_in.uv.xyxy) * factor; 
 }
