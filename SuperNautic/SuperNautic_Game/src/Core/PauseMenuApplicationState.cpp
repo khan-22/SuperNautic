@@ -64,6 +64,14 @@ bool PauseMenuApplicationState::bUpdate(float dtSeconds)
 
 bool PauseMenuApplicationState::bHandleEvent(const sf::Event& event)
 {
+    if(event.type == sf::Event::KeyPressed)
+    {
+        if(event.key.code == sf::Keyboard::Escape)
+        {
+            _stack.pop();
+            return false;
+        }
+    }
     _guiContainer.handleEvent(event);
     if(_input.checkActive())
     {
