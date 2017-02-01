@@ -13,6 +13,13 @@
 #include "Core\Game.hpp"
 
 
+
+
+
+#include "Core\Track\SegmentHandler.hpp"
+#include "Core\Track\Segment.hpp"
+
+
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -26,6 +33,9 @@ int main()
 	}
 	else
 	{
+		SegmentHandler testSH{ "Segments\\segmentinfos.txt" };
+		const Segment* mySegment = testSH.loadSegment(0);
+
 		game.bInitialize();
 		game.run();
 	}

@@ -4,7 +4,7 @@
 #define PLAY_APPLICATION_STATE_HPP
 
 #include "ApplicationState.hpp"
-#include "GuiContainer.hpp"
+#include "World.hpp"
 
 class PlayApplicationState : public ApplicationState
 {
@@ -16,7 +16,7 @@ public:
     bool bHandleEvent(const sf::Event& event) override;
 
 private:
-    GuiContainer _guiContainer;
+    World _world;
 };
 
 

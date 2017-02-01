@@ -11,6 +11,9 @@
 
 #include "Player.hpp"
 
+#include "LoadAssetFunctions.hpp"
+
+
 class Game
 {
 public:
@@ -30,11 +33,16 @@ protected:
 
 private:
 	//sf::Window	_window;
-	sf::RenderWindow _window;
-	ApplicationStateStack _stateStack;
-	ApplicationContext _context;
+	sf::RenderWindow		_window;
+	ApplicationStateStack	_stateStack;
+	ApplicationContext		_context;
 
-	std::list<Player> _players;
+	float					_quitTimer;
+	float _fps;
+
+	ShaderAsset	_shader;
+	ModelAsset	_model;
+
 };
 
 #endif //GAME_HPP
