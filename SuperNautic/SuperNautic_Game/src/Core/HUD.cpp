@@ -41,7 +41,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 
 
 	_heatOutline.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 80));
-	_heatOutline.setOutlineColor(sf::Color::Color(0, 50, 100, 100));
+	_heatOutline.setOutlineColor(sf::Color(0, 50, 100, 100));
 	_heatOutline.setFillColor(sf::Color::Transparent);
 	_heatOutline.setOutlineThickness(_heightStep);
 	_heatOutline.setPosition(_widthStep * 2, _heightStep * 9);
