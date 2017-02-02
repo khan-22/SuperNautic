@@ -30,8 +30,8 @@ public:
 	
 	void changeIntensity(GLfloat intensity);
 
-	void transitionTo(GLfloat newIntensity, GLfloat transitionTime);
 	void update(GLfloat dt);
+	void transitionTo(GLfloat newIntensity, GLfloat transitionTime);
 
 	void toggleLight(bool bLightActive);
 

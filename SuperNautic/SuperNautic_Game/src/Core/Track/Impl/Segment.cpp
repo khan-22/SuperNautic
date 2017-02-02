@@ -12,7 +12,6 @@ const std::string Segment::temperatureZoneVisualName		{ "zoneVisual" };
 const std::string Segment::temperatureZoneCollisionName		{ "zoneCollision" };
 const std::string Segment::boundingBoxName					{ "BB" };
 const std::string Segment::waypointsName					{ "WP" };
-const std::string Segment::endName							{ "end" };
 
 // Static maps declared in Segment.hpp
 std::unordered_map<std::string, unsigned Segment::*> Segment::nameToIndex;
@@ -23,14 +22,15 @@ bool Segment::mappingsCreated { false };
 
 
 // Loads a segment from an fbx file
-Segment::Segment(std::string dataFilePath, std::string visualFilePath, std::string startConnection, std::string endConnection)
-	: _segmentName { dataFilePath }, _startConnection { startConnection }, _endConnection { endConnection }
+Segment::Segment(const SegmentInfo* segmentInfo)
 {
+	_segmentInfo = segmentInfo;
+
 	// Get the scene data asset
-	_scene = RawMeshCache::get(std::string{ "Segments\\" } + dataFilePath);
+	_scene = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_dataFileName);
 
 	// Get visual model asset 
-	_visual = ModelCache::get(std::string{ "Segments\\" } + visualFilePath);
+	_visual = ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_visualFileName);
 
 	if (_scene.get()->cameras.size() < 1)
 	{
@@ -51,7 +51,7 @@ Segment::Segment(std::string dataFilePath, std::string visualFilePath, std::stri
 	}
 	else
 	{
-		LOG_ERROR("No meshes in file ", dataFilePath);
+		LOG_ERROR("No meshes in file ", _segmentInfo->_dataFileName);
 		return;
 	}
 
@@ -60,13 +60,16 @@ Segment::Segment(std::string dataFilePath, std::string visualFilePath, std::stri
 
 	// Create waypoints from meshes
 	createWaypoints();
+
+	// Create oct-tree
+	createOctTree(20, 2);
 }
 
 // Tests a ray collision against all collision surfaces of the segment. Returns collision information
-const Intersection Segment::rayIntersectionTest(glm::vec3 origin, glm::vec3 direction) const
+const RayIntersection Segment::rayIntersectionTest(Ray& ray) const
 {
 	// incomplete
-	return Intersection{};
+	return RayIntersection {};
 }
 
 // Finds the two waypoints closest to a position (position is relative to segment's local origin)
@@ -137,6 +140,7 @@ void Segment::initializeMappings()
 // Iterate through meshes in scene and assign to proper pointers
 void Segment::assignMeshPointers()
 {
+	// Data file
 	std::string currentName;
 	for (unsigned i = 0; i < _scene.get()->meshes.size(); ++i)
 	{
@@ -420,4 +424,306 @@ void Segment::findTwoDirections(unsigned boundingBoxMeshIndex, BoundingBox& box)
 	// length0 and length1 are halved to find halfLengths of x and y
 	box.halfLengths[0] = length0 / 2.0f;
 	box.halfLengths[1] = length1 / 2.0f;
+}
+
+// Divides the collision geometry of this segment into an oct-tree
+void Segment::createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions)
+{
+	// Find the largest and smallest vertex position in each axis
+	// and use as starting values for box
+
+	// Initialize min and max
+	glm::vec3 min = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max() };
+	glm::vec3 max = { std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min() };
+
+	// Look through base model
+	findMinMaxValues(min, max, _baseCollision);
+
+	// Look through zones
+	for (unsigned i = 0; i < _temperatureZoneCollisions.size(); ++i)
+	{
+		findMinMaxValues(min, max, _temperatureZoneCollisions[i]);
+	}
+
+	// Set values to corners of oct-tree root
+	octTree._minCorner = min;
+	octTree._maxCorner = max;
+
+	// Will contain indices into vertices/faces vectors of models
+	// [0]..[_temperatureZoneCollisions.size()] is zone collisions, [_temperatureZoneCollisions.size()] is base collision 
+	std::vector<std::vector<unsigned>> vertexIndices;
+	std::vector<std::vector<unsigned>> faceIndices;
+	
+	// Fill indices
+	for (size_t i = 0; i <= _temperatureZoneCollisions.size(); ++i)
+	{
+		// Create subvectors
+		vertexIndices.emplace_back();
+		faceIndices.emplace_back();
+
+		// Number of vertices of current model
+		size_t vertsToFill;
+
+		// Number of faces of current model
+		size_t facesToFill;
+
+		// If filling zone collision
+		if (i < _temperatureZoneCollisions.size())
+		{
+			vertsToFill = _scene.get()->meshes[_temperatureZoneCollisions[i]].vertices.size();
+			facesToFill = _scene.get()->meshes[_temperatureZoneCollisions[i]].faces.size();
+		}
+		// Else, filling base collision
+		else
+		{
+			vertsToFill = _scene.get()->meshes[_baseCollision].vertices.size();
+			facesToFill = _scene.get()->meshes[_baseCollision].faces.size();
+		}
+
+		// Fill vertex indices
+		for (unsigned j = 0; j < vertsToFill; ++j)
+		{
+			vertexIndices[i].push_back(j);
+		}
+
+		// Fill face indices
+		for (unsigned j = 0; j < facesToFill; ++j)
+		{
+			faceIndices[i].push_back(j);
+		}
+	}
+	
+	// Subdivide
+	subdivideOctTree(octTree, maxFacesPerBox, maxSubdivisions, std::move(vertexIndices), std::move(faceIndices));
+}
+
+// Find smallest and largest vertex position in each axis for a model, using min and max for comparison
+void Segment::findMinMaxValues(glm::vec3& min, glm::vec3& max, unsigned modelIndex)
+{
+	size_t numVerts = _scene.get()->meshes[modelIndex].vertices.size();
+	for (size_t i = 0; i < numVerts; ++i)
+	{
+		// X
+		if (_scene.get()->meshes[modelIndex].vertices[i].x < min.x)
+		{
+			min.x = _scene.get()->meshes[modelIndex].vertices[i].x;
+		}
+		if (_scene.get()->meshes[modelIndex].vertices[i].x > max.x)
+		{
+			max.x = _scene.get()->meshes[modelIndex].vertices[i].x;
+		}
+
+		// Y
+		if (_scene.get()->meshes[modelIndex].vertices[i].y < min.y)
+		{
+			min.y = _scene.get()->meshes[modelIndex].vertices[i].y;
+		}
+		if (_scene.get()->meshes[modelIndex].vertices[i].y > max.y)
+		{
+			max.y = _scene.get()->meshes[modelIndex].vertices[i].y;
+		}
+
+
+		// Z
+		if (_scene.get()->meshes[modelIndex].vertices[i].z < min.z)
+		{
+			min.z = _scene.get()->meshes[modelIndex].vertices[i].z;
+		}
+		if (_scene.get()->meshes[modelIndex].vertices[i].z > max.z)
+		{
+			max.z = _scene.get()->meshes[modelIndex].vertices[i].z;
+		}
+	}
+}
+
+// Recursively subdivides an AABB until every box touches <= maxFacesPerBox or maxSubdivisions == 0
+void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxSubdivisions, std::vector<std::vector<unsigned>>&& vertexIndices, std::vector<std::vector<unsigned>>&& faceIndices)
+{
+	bool stopSubdividing = false;
+
+	// If maxSubdivisions == 0, stop subdividing, enter faces into this AABB, return
+	if (maxSubdivisions == 0)
+	{
+		stopSubdividing = true;
+	}
+	// Check if total number of faces is less than max. If so, stop subdividing
+	else
+	{
+		// Total number of faces
+		size_t sumFaces = 0;
+
+		for (size_t i = 0; i < faceIndices.size(); ++i)
+		{
+			sumFaces += faceIndices[i].size();
+		}
+
+		// If total faces <= maxFacesPerBox, stop subdividing
+		if (sumFaces <= maxFacesPerBox)
+		{
+			stopSubdividing = true;
+		}
+	}
+
+	if (stopSubdividing)
+	{
+		// Enter faces into box and return
+		box.faceIndices = std::move(faceIndices);
+		return;
+	}
+
+	// Create 8 new boxes, vertex/face index vector for them, and vertex index movement vector
+	std::vector<AABB> possibleChildren = createChildren(box._minCorner, box._maxCorner);
+
+	// Vectors corresponding to vertexIndices and faceIndices for every child
+	std::vector<std::vector<std::vector<unsigned>>> childrenVertexIndices(8);
+	std::vector<std::vector<std::vector<unsigned>>> childrenFaceIndices(8);
+
+	// Initialize subvectors
+	for (unsigned i = 0; i < 8; ++i)
+	{
+		for (unsigned j = 0; j < _temperatureZoneCollisions.size() + 1; ++j)  // +1 to include _baseCollison
+		{
+			childrenVertexIndices[i].emplace_back();
+			childrenFaceIndices[i].emplace_back();
+		}
+	}
+
+	// For every vertex, this vector contains an index representing which child the index occupies
+	std::vector<std::vector<unsigned>> vertexMovement(vertexIndices.size());
+
+
+	// For every vertex, check which child it belongs to, copy to corresponding vertex index, indicate move in vertex index movement vector
+
+	// Middle of box, used to compare vertices
+	glm::vec3 boxMiddle { (box._minCorner + box._maxCorner) * 0.5f };
+
+	// For every model
+	for (size_t i = 0; i < vertexIndices.size(); ++i)
+	{
+		size_t currentModel;
+
+		if (i < vertexIndices.size() - 1)
+		{
+			currentModel = _temperatureZoneCollisions[i]; 
+		}
+		else
+		{
+			currentModel = _baseCollision;
+		}
+
+		// For every vertex in model
+		for (size_t j = 0; j < vertexIndices[i].size(); ++j)
+		{
+			// Index into possibleChildren
+			unsigned targetChild = findChildIndex(currentModel, vertexIndices[i][j], boxMiddle);
+
+			// Pass index to correct child
+			childrenVertexIndices[targetChild][i].push_back(vertexIndices[i][j]);
+
+			// Log movement
+			vertexMovement[i].push_back(targetChild);
+		}
+
+		// For every face, copy to all children containing a vertex
+		for (size_t j = 0; j < faceIndices[i].size(); ++j)
+		{
+			// Indicates the children this face has been copied to (prevents multiple copies)
+			int placedIn1 = -1;
+			int placedIn2 = -1;
+
+			// For every vertex in face
+			for (unsigned k = 0; k < 3; ++k)
+			{
+				// The index of the vertex that needs to be found
+				size_t indexToFind = _scene.get()->meshes[currentModel].faces[j][k];
+
+				// Find the vertex index in array and calculate its index
+				auto foundAt = std::lower_bound(vertexIndices[i].begin(), vertexIndices[i].end(), indexToFind);
+				ptrdiff_t indexInMovementVector = foundAt - vertexIndices[i].begin();
+
+				unsigned targetChild = vertexMovement[i][indexInMovementVector];
+
+				// Copy face to child if not already copied
+				if (placedIn1 < 0)
+				{
+					placedIn1 = targetChild;
+					childrenFaceIndices[targetChild][i].push_back(faceIndices[i][j]);
+				}
+				else if (placedIn1 != targetChild)
+				{
+					if (placedIn2 != targetChild)
+					{
+						placedIn2 = targetChild;
+						childrenFaceIndices[targetChild][i].push_back(faceIndices[i][j]);
+					}
+				}
+			}
+		}
+	}
+
+	// For every child with nonempty index vectors, copy into AABB children vector and call this function with corresponding vertexIndices and faceIndices
+	for (unsigned i = 0; i < possibleChildren.size(); ++i)
+	{
+		// A child will only be kept if it contains geometry
+		bool childContainsData = false;
+
+		// Check for geometry from every mesh
+		for (unsigned j = 0; j < childrenFaceIndices[i].size(); ++j)
+		{
+			if (childrenFaceIndices[i][j].size() > 0)
+			{
+				childContainsData = true;
+				break;
+			}
+		}
+
+		// Add child to box and possibly subdivide it if it contains data
+		if (childContainsData)
+		{
+			box._children.push_back(possibleChildren[i]);
+			subdivideOctTree(box._children[box._children.size() - 1], maxFacesPerBox, maxSubdivisions - 1, std::move(childrenVertexIndices[i]), std::move(childrenFaceIndices[i]));
+		}
+	}
+}
+
+// Helper for subdivideOctTree, creates child boxes from a parent
+// Copy corners by value to reduce cost of constantly referencing
+std::vector<AABB> Segment::createChildren(glm::vec3 min, glm::vec3 max)
+{
+	std::vector<AABB> possibleChildren{
+			AABB{ glm::vec3{ min }, glm::vec3{ (min + max) * 0.5f } },	// nX nY nZ
+			AABB{ glm::vec3{ min.x, min.y, (min.z + max.z) * 0.5f }, glm::vec3{ (min.x + max.x) * 0.5f, (min.y + max.y) * 0.5f, max.z } },	// nX nY pZ
+			AABB{ glm::vec3{ min.x, (min.y + max.y) * 0.5f, min.z }, glm::vec3{ (min.x + max.x) * 0.5f, max.y, (min.z + max.z) * 0.5f } },	// nX pY nZ
+			AABB{ glm::vec3{ min.x, (min.y + max.y) * 0.5f, (min.z + max.z) * 0.5f }, glm::vec3{ (min.x + max.x) * 0.5f, max.y, max.z } },	// nX pY pZ
+			AABB{ glm::vec3{ (min.x + max.x) * 0.5f, min.y, min.z }, glm::vec3{ max.x, (min.y + max.y) * 0.5f, (min.z + max.z) * 0.5f } },	// pX nY nZ
+			AABB{ glm::vec3{ (min.x + max.x) * 0.5f, min.y, (min.z + max.z) * 0.5f }, glm::vec3{ max.x, (min.y + max.y) * 0.5f, max.z } },	// pX nY pZ
+			AABB{ glm::vec3{ (min.x + max.x) * 0.5f, (min.y + max.y) * 0.5f, min.z }, glm::vec3{ max.x, max.y, (min.z + max.z) * 0.5f } },	// pX pY nZ
+			AABB{ glm::vec3{ (min + max) * 0.5f }, glm::vec3{ max } }	// pX pY pZ
+	};
+
+	return possibleChildren;
+}
+
+// Helper for subdivideOctTree, finds index of child to copy a vertex to
+unsigned Segment::findChildIndex(size_t currentModel, unsigned index, glm::vec3 boxMiddle)
+{
+	unsigned targetChild = 0;
+
+	// Find correct index
+	if (_scene.get()->meshes[currentModel].vertices[index].x > boxMiddle.x)
+	{
+		targetChild += 4;
+	}
+
+	if (_scene.get()->meshes[currentModel].vertices[index].y > boxMiddle.y)
+	{
+		targetChild += 2;
+	}
+
+	if (_scene.get()->meshes[currentModel].vertices[index].z > boxMiddle.z)
+	{
+		targetChild += 1;
+	}
+
+	return targetChild;
 }

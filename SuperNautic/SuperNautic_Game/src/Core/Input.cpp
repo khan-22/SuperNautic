@@ -32,53 +32,53 @@ void Input::update()
 		_leftStickX = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::X);
 		_leftStickY = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Y);
 		_triggers = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Z);
-	}
 
-	_events.clear();
+		_events.clear();
 
-	sf::Event event;
-	if (_bButtonA)
-	{
-		event.type = sf::Event::KeyPressed;
-		event.key.code = sf::Keyboard::A;
-		_events.push_back(event);
-		LOG("A pressed");
-	}
-	if (_leftStickY < -thresh && _bLeftStickDormant)
-	{
-		event.type = sf::Event::KeyPressed;
-		event.key.code = sf::Keyboard::Up;
-		_events.push_back(event);
-		_bLeftStickDormant = false;
-		LOG("Stick up ", _leftStickY);
-	}
-	else if (_leftStickY > thresh && _bLeftStickDormant)
-	{
-		event.type = sf::Event::KeyPressed;
-		event.key.code = sf::Keyboard::Down;
-		_events.push_back(event);
-		_bLeftStickDormant = false;
-		LOG("Stick downs ", _leftStickY);
-	}
-	else if (_leftStickX > thresh && _bLeftStickDormant)
-	{
-		event.type = sf::Event::KeyPressed;
-		event.key.code = sf::Keyboard::Right;
-		_events.push_back(event);
-		_bLeftStickDormant = false;
-		LOG("Stick right ", _leftStickX);
-	}
-	else if (_leftStickX < -thresh && _bLeftStickDormant)
-	{
-		event.type = sf::Event::KeyPressed;
-		event.key.code = sf::Keyboard::Left;
-		_events.push_back(event);
-		_bLeftStickDormant = false;
-		LOG("Stick left ", _leftStickX);
-	}
-	else if (_leftStickX > -thresh && _leftStickX < thresh && _leftStickY > -thresh && _leftStickY < thresh)
-	{
-		_bLeftStickDormant = true;
+		sf::Event event;
+		if (_bButtonA)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::A;
+			_events.push_back(event);
+			LOG("A pressed");
+		}
+		if (_leftStickY < -thresh && _bLeftStickDormant)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::Up;
+			_events.push_back(event);
+			_bLeftStickDormant = false;
+			LOG("Stick up ", _leftStickY);
+		}
+		else if (_leftStickY > thresh && _bLeftStickDormant)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::Down;
+			_events.push_back(event);
+			_bLeftStickDormant = false;
+			LOG("Stick downs ", _leftStickY);
+		}
+		else if (_leftStickX > thresh && _bLeftStickDormant)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::Right;
+			_events.push_back(event);
+			_bLeftStickDormant = false;
+			LOG("Stick right ", _leftStickX);
+		}
+		else if (_leftStickX < -thresh && _bLeftStickDormant)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::Left;
+			_events.push_back(event);
+			_bLeftStickDormant = false;
+			LOG("Stick left ", _leftStickX);
+		}
+		else if (_leftStickX > -thresh && _leftStickX < thresh && _leftStickY > -thresh && _leftStickY < thresh)
+		{
+			_bLeftStickDormant = true;
+		}
 	}
 }
 

@@ -28,6 +28,18 @@ void PointLight::changeIntensity(GLfloat intensity)
 	_currentIntensity = intensity;
 }
 
+void PointLight::update(GLfloat dt)
+{
+	if (_bLightActive)
+	{
+		if (_transitionTimer < 1.0f)
+		{
+			_transitionTimer += dt / _transitionTotalTime;
+			_currentIntensity = _transitionTimer * _newIntensity + (1 - _transitionTimer) * _previousIntensity;
+		}
+	}
+}
+
 void PointLight::transitionTo(GLfloat newIntensity, GLfloat transitionTime)
 {
 	_previousIntensity = _currentIntensity;
@@ -35,18 +47,6 @@ void PointLight::transitionTo(GLfloat newIntensity, GLfloat transitionTime)
 	_transitionTotalTime = transitionTime;
 	_transitionTimer = 0.0f;
 }
-
-void PointLight::update(GLfloat dt)
-{
-	if (_transitionTimer < 1.0f)
-	{
-		_transitionTimer += dt / _transitionTotalTime;
-		_currentIntensity = _transitionTimer * _newIntensity + (1 - _transitionTimer) * _previousIntensity;
-	}
-	
-	LOG("Current intensity: ", _currentIntensity);
-}
-
 
 void PointLight::toggleLight(bool bLightActive)
 {

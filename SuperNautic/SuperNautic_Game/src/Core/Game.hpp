@@ -43,6 +43,7 @@ private:
 
 	ShaderAsset	_shader;
 	ModelAsset	_model;
+	TextureAsset _texture;
 
 	GFX::DeferredRenderer	_deferredRenderer1;
 	GFX::DeferredRenderer	_deferredRenderer2;

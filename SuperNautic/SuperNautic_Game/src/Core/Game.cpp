@@ -76,10 +76,22 @@ bool Game::bInitialize()
 		LOG("WOOOOOW!!");
 	}
 
+    TextureAsset textureTest = TextureCache::get("heatchart.png");
+    if(textureTest.get() == nullptr)
+    {
+        LOG("Failed to load texture.");
+    }
+
+    MaterialAsset materialTest = MaterialCache::get("test.mat");
+    if(materialTest.get() == nullptr)
+    {
+        LOG("Failed to load material.");
+    }
 
 
 	_model = ModelCache::get("test2.fbx");
 	_shader = ShaderCache::get("forward");
+	_texture = TextureCache::get("heatchart.png");
 
 	_deferredRenderer1.initialize(&_window, 0.0f, 0.0f, 0.5f, 0.5f);
 	_deferredRenderer2.initialize(&_window, 0.5f, 0.0f, 0.5f, 0.5f);
@@ -167,10 +179,30 @@ void Game::render()
 	//_deferredRenderer4.display(_camera);
 
 
-    //static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
-    //sf::Text fps;
-    //fps.setFont(*font.get());
-    //fps.setString("FPS: " + std::to_string(_fps));
+	_shader.get()->setUniform("uModel", model);
+	_shader.get()->setUniform("uView", view);
+	_shader.get()->setUniform("uProjection", projection);
+
+	_shader.get()->setUniform("uColor", color);
+
+	_model.get()->render();*/
+
+	static float time = 0.f;
+	time += 0.009f;
+	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
+	_forwardRenderer.render(*_model.get());
+	_shader.get()->bind();
+    _shader.get()->setSampler("uTexColor", 0);
+	_texture.get()->bind(0);
+	_forwardRenderer.display(_camera);
+	_texture.get()->unbind(0);
+	LOG_GL_ERRORS();
+
+
+    static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
+    sf::Text fps;
+    fps.setFont(*font.get());
+    fps.setString("FPS: " + std::to_string(_fps));
 
     //_stateStack.render();
     //_window.pushGLStates();
