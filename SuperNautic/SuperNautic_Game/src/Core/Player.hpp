@@ -19,7 +19,7 @@ public:
 
 	void update(float dt);
 	void render();
-	void renderHUD(sf::RenderTarget & target, sf::RenderStates states);
+    const sf::Drawable& getHud() const;
 
 private:
 	int _playerId;

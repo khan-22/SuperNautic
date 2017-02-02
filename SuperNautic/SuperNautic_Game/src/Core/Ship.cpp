@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "Ship.hpp"
 
 
@@ -6,7 +8,7 @@ Ship::Ship()
 , _forwardVelocity(0.f)
 , _bIsJumping(false)
 , _maxSteerAcceleration(2.f)
-, _maxForwardAcceleration(10.f)
+, _maxForwardAcceleration(50.f)
 , _engineTemperature(0.f)
 , _maxSteerVelocity(10.f)
 , _maxForwardVelocity(100.f)
@@ -29,7 +31,7 @@ void Ship::updateEngineTemperature(float dt)
     static const float M = K * BREAK_EVEN_SPEED;
     static const float K_NORMALIZED = K / 100.f;
     static const float M_NORMALIZED = M / 100.f;
-    _engineTemperature += (_forwardVelocity * K_NORMALIZED - M_NORMALIZED) * dt;
+	_engineTemperature = (_forwardVelocity) / _maxForwardVelocity;
 
     if(_engineTemperature > 1.f)
     {
@@ -44,7 +46,7 @@ void Ship::updateEngineTemperature(float dt)
 void Ship::updateVelocities(float dt)
 {
     _steerVelocity -= _steerVelocity * 0.1f * dt;
-    _forwardVelocity -= _forwardVelocity * 0.1f * dt;
+    //_forwardVelocity -= _forwardVelocity * 0.1f * dt;
     if(_steerVelocity > _maxSteerVelocity)
     {
         _steerVelocity = _maxSteerVelocity;

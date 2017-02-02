@@ -14,20 +14,21 @@
 
 #include "../GFX/ShaderLoader.hpp"
 
+
+
 Game::Game()
-	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Default, sf::ContextSettings(0U, 0U, 0U, 4U, 0U))
+	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Default, sf::ContextSettings(24U, 0U, 0U, 4U, 0U))
 	, _context(_window)
 	, _quitTimer(0.f)
+	, _fps(60.f)
+	, _camera(70.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
 {
 	LOG("Game is being constructed...");
-
-	_players.emplace_back();
 }
 
 Game::~Game()
 {
 	LOG("Game is being destructed...");
-
 	CLOSE_LOG();
 }
 
@@ -35,8 +36,8 @@ bool Game::bInitialize()
 {
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
-
-	// Cached asset loading **DEMO**
+//
+//	// Cached asset loading **DEMO**
 	RawMeshAsset testRawMesh = RawMeshCache::get("Segments/s01_straight_aa.fbx");
 
 	if (testRawMesh.get() == nullptr)
@@ -49,8 +50,8 @@ bool Game::bInitialize()
 	}
 
 	// Shader loading **DEMO**
-	//GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
-	//GFX::Shader* testShader = shaderLoader.loadShader("forward");
+	/*GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
+	GFX::Shader* testShader = shaderLoader.loadShader("forward");*/
 
 	Asset<GFX::Shader> testShader = ShaderCache::get("forward");
 
@@ -75,13 +76,21 @@ bool Game::bInitialize()
 		LOG("WOOOOOW!!");
 	}
 
-	//std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
-	//_stateStack.push(mainMenu);
+    TextureAsset textureTest = TextureCache::get("heatchart.png");
+    if(textureTest.get() == nullptr)
+    {
+        LOG("Failed to load texture.");
+    }
+
 
 	_model = ModelCache::get("test2.fbx");
 	_shader = ShaderCache::get("forward");
+	_texture = TextureCache::get("heatchart.png");
 
-	LOG_GL_ERRORS();
+	_forwardRenderer.initialize();
+
+	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
+	_stateStack.push(mainMenu);
 
 	return true;
 }
@@ -97,10 +106,10 @@ void Game::run()
 		update(deltaTime.asSeconds());
 		render();
 
-		//if(_stateStack.bIsEmpty())
-        //{
-        //    _window.close();
-        //}
+		if(_stateStack.bIsEmpty())
+        {
+            _window.close();
+        }
 
 		deltaTime = clock.restart();
 	}
@@ -128,12 +137,9 @@ void Game::handleEvents()
 
 void Game::update(float dt)
 {
-    //_stateStack.update(dt);
+    _fps = _fps * 0.9f + 0.1f / dt;
 
-//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-//	{
-//		_window.close();
-//	}
+    _stateStack.update(dt);
 }
 
 void Game::render()
@@ -141,15 +147,16 @@ void Game::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-	GFX::Shader* shader = _shader.get();
+
+
+	/*GFX::Shader* shader = _shader.get();
 	_shader.get()->bind();
-	
-	static float time = 0.f;
-	time += 0.0001f;
+
+
 
 	glm::mat4 model(1.f);
-	glm::mat4 view = glm::lookAt(glm::vec3{ 3.f * sinf(time), 0.f, 3.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
-	glm::mat4 projection = glm::perspective(90.f, 1.f, 0.1f, 100.f);
+	glm::mat4 view = glm::lookAt(glm::vec3{ 20.f * sinf(time), 0.f, 20.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
+	glm::mat4 projection = glm::perspective(70.f, (float)_window.getSize().x / (float)_window.getSize().y, 0.3f, 100.f);
 
 	glm::vec4 color(1.f, 0.f, 0.f, 1.f);
 
@@ -159,13 +166,29 @@ void Game::render()
 
 	_shader.get()->setUniform("uColor", color);
 
-	_model.get()->render();
-	
+	_model.get()->render();*/
+
+	static float time = 0.f;
+	time += 0.009f;
+	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
+	_forwardRenderer.render(*_model.get());
+	_shader.get()->bind();
+    _shader.get()->setSampler("uTexColor", 0);
+	_texture.get()->bind(0);
+	_forwardRenderer.display(_camera);
+	_texture.get()->unbind(0);
+	LOG_GL_ERRORS();
 
 
-	_window.pushGLStates();
-    //_stateStack.render();
-	_window.popGLStates();
+    static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
+    sf::Text fps;
+    fps.setFont(*font.get());
+    fps.setString("FPS: " + std::to_string(_fps));
+
+    _stateStack.render();
+    _window.pushGLStates();
+    _window.draw(fps);
+    _window.popGLStates();
 
 	_window.display();
 }

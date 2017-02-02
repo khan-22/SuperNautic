@@ -4,6 +4,8 @@ out vec4 OutColor;
 
 uniform vec4 uColor;
 
+uniform sampler2D uTexColor;
+
 in VS_OUT
 {
 	vec2 uv;
@@ -17,7 +19,7 @@ void main()
 	//Just output a basic color
 	lightDir = normalize(lightDir);
 
-	float factor = max(dot(fs_in.normal, -lightDir), 0.1);
+	float factor = max(dot(normalize(fs_in.normal), -lightDir), 0.01);
 
-	OutColor = (uColor + fs_in.uv.xyxy) * factor; 
+	OutColor = texture(uTexColor, fs_in.uv) * factor;
 }

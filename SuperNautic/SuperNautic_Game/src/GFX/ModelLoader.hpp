@@ -7,14 +7,15 @@
 
 #include "Model.hpp"
 
-namespace GFX {
 
-	// Temporary holding place
+namespace GFX {
 	
+	struct RawMeshCollection; // Forward-decl
+
 	class ModelLoader
 	{
 	public:
-		ModelLoader(/*const std::string& rootPath*/);
+		ModelLoader();
 		~ModelLoader();
 
 		Model* loadModel(std::string filePath);
@@ -27,7 +28,10 @@ namespace GFX {
 	private:
 		//std::string	_rootPath;
 
+		struct Grouping;
+		std::vector<Grouping> generateGroupings(RawMeshCollection* rawModel);
 	};
+
 
 
 }

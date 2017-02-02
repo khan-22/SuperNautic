@@ -69,7 +69,7 @@ public:
 	const std::string _segmentName;
 
 	// Loads a segment from an fbx file
-	Segment::Segment(std::string dataFilePath, std::string visualFilePath, std::string startConnection, std::string endConnection);
+	Segment(std::string dataFilePath, std::string visualFilePath, std::string startConnection, std::string endConnection);
 
 	// Tests a ray collision against all collision surfaces of the segment. Returns collision information
 	const Intersection rayIntersectionTest(glm::vec3 origin, glm::vec3 direction) const;
@@ -106,7 +106,7 @@ public:
 	{
 		return _scene.get()->cameras[0];
 	}
-	 
+
 private:
 	// The loaded scene data
 	RawMeshAsset _scene;
@@ -212,3 +212,4 @@ inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2)
 }
 
 #endif // SEGMENT_H
+

@@ -12,6 +12,7 @@
 #include "Player.hpp"
 
 #include "LoadAssetFunctions.hpp"
+#include "../GFX/ForwardRenderer.hpp"
 
 class Game
 {
@@ -35,13 +36,16 @@ private:
 	sf::RenderWindow		_window;
 	ApplicationStateStack	_stateStack;
 	ApplicationContext		_context;
-	
-	std::list<Player>		_players;
 
 	float					_quitTimer;
+	float _fps;
 
 	ShaderAsset	_shader;
 	ModelAsset	_model;
+	TextureAsset _texture;
+
+	GFX::ForwardRenderer	_forwardRenderer;
+	Camera		_camera;
 
 };
 

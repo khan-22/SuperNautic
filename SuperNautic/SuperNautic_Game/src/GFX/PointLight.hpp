@@ -9,7 +9,6 @@
 struct PointLightProperties
 {
 	glm::vec3	position;
-	glm::vec3	ambientColor;
 	glm::vec3	diffuseColor;
 	GLfloat		intensity;
 
@@ -23,27 +22,28 @@ struct PointLightProperties
 class PointLight
 {
 public:
-	PointLight(glm::vec3 position, glm::vec3 ambientColor, glm::vec3 diffuseColor, GLfloat intensity);
+	PointLight(glm::vec3 position, glm::vec3 diffuseColor, GLfloat intensity);
 
 	void setPosition(glm::vec3 position);
 	const glm::vec3 getPosition();
-	void updateColor(glm::vec3 ambientColor, glm::vec3 diffuseColor);
+	void updateColor(glm::vec3 diffuseColor);
 	
 	void changeIntensity(GLfloat intensity);
 
-	void transitionTo(GLfloat newIntensity, GLfloat transitionTime);
 	void update(GLfloat dt);
+	void transitionTo(GLfloat newIntensity, GLfloat transitionTime);
 
 	void toggleLight(bool bLightActive);
-
 
 	//Returns a struct with all of the light's properties
 	const PointLightProperties getLightProperties();
 
+	//Calculates the bounding sphere for the light
+	const GLfloat calculatePLBoundSize();
+
 	~PointLight();
 private:
 	glm::vec3	_position;
-	glm::vec3	_ambientColor;
 	glm::vec3	_diffuseColor;
 
 	GLfloat		_currentIntensity;

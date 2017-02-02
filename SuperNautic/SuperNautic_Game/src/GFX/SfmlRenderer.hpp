@@ -3,13 +3,24 @@
 #ifndef SFML_RENDERER_HPP
 #define SFML_RENDERER_HPP
 
-#include "Renderer.hpp"
+namespace sf
+{
+    class Drawable;
+}
 
-#include "SFML/Graphics/Drawable.hpp"
+#include <list>
 
 namespace GFX
 {
-    using SfmlRenderer = Renderer<sf::Drawable>;
+    class SfmlRenderer
+    {
+        public:
+            void render(const sf::Drawable& draw);
+            void display(sf::RenderTarget& target);
+
+        private:
+            std::list<const sf::Drawable*> _drawCalls;
+    };
 }
 
 
