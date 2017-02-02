@@ -65,10 +65,10 @@ Segment::Segment(std::string dataFilePath, std::string visualFilePath, std::stri
 }
 
 // Tests a ray collision against all collision surfaces of the segment. Returns collision information
-const Intersection Segment::rayIntersectionTest(glm::vec3 origin, glm::vec3 direction) const
+const RayIntersection Segment::rayIntersectionTest(Ray& ray) const
 {
 	// incomplete
-	return Intersection{};
+	return RayIntersection {};
 }
 
 // Finds the two waypoints closest to a position (position is relative to segment's local origin)

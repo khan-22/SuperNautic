@@ -10,57 +10,11 @@
 
 #include "glm/glm.hpp"
 #include "../LoadAssetFunctions.hpp"
+#include "../Geometric Primitives/AABB.hpp"
+#include "../Geometric Primitives/BoundingBox.hpp"
+#include "../Geometric Primitives/RayIntersection.hpp"
+#include "../Geometric Primitives/Ray.hpp"
 
-enum class SurfaceType : char { normal, hot, cold };
-
-// Bounding box enclosing the segment
-struct BoundingBox
-{
-	glm::vec3				center;
-
-	// x, y, z directions
-	std::array<glm::vec3, 3>	directions;
-
-	// x, y, z halflengths
-	std::array<float, 3>	halfLengths;
-
-	BoundingBox() : center{ glm::vec3{} },
-		halfLengths{ -1.0f, -1.0f, -1.0f }
-	{ }
-};
-
-// Holds information about a detected collision
-struct Intersection
-{
-	glm::vec3 position;
-	glm::vec3 normal;
-	SurfaceType surface;
-};
-
-// Axis aligned bounding box used for oct-tree
-struct AABB
-{
-	// The children of this box
-	std::vector<AABB>					_children;
-
-	// Will contain indices into face vectors of models
-	// [0]..[_temperatureZoneCollisions.size()] is zone collisions, [_temperatureZoneCollisions.size()] is base collision 
-	std::vector<std::vector<unsigned>> faceIndices;
-
-	// Positions of max and min corners of this box
-	glm::vec3							_minCorner;
-	glm::vec3							_maxCorner;
-
-	// Test if a ray intersects this box
-	// TODO
-
-	AABB(glm::vec3 min, glm::vec3 max)
-		: _minCorner{ min }, _maxCorner{ max }
-	{ }
-
-	AABB()
-	{ }
-};
 
 // Uninstantiated version of a track segment
 class Segment
@@ -72,7 +26,7 @@ public:
 	Segment(std::string dataFilePath, std::string visualFilePath, std::string startConnection, std::string endConnection);
 
 	// Tests a ray collision against all collision surfaces of the segment. Returns collision information
-	const Intersection rayIntersectionTest(glm::vec3 origin, glm::vec3 direction) const;
+	const RayIntersection rayIntersectionTest(Ray& ray) const;
 
 	// Finds the two waypoints closest to a position (position is relative to segment's local origin)
 	std::pair<glm::vec3, glm::vec3> findClosestWaypoints(const glm::vec3& position) const;
@@ -96,7 +50,7 @@ public:
 		return _endConnection;
 	}
 
-	// Returns approximate sement length
+	// Returns approximate segment length
 	float getLength() const
 	{
 		return _length;
