@@ -19,21 +19,22 @@ private:
 	float		_length;
 
 public:
-	Ray(glm::vec3 origin, glm::vec3 direction, float length) : _origin{ origin }, _direction{ direction }, _length{ length }
+	Ray(glm::vec3 origin, glm::vec3 direction, float length) : _origin{ origin }, _direction{ glm::normalize(direction) }, _length{ length }
 	{
-		_invDirection = { 1.0f / direction.x, 1.0f / direction.y, 1.0f / direction.z };
+		_invDirection = { 1.0f / _direction.x, 1.0f / _direction.y, 1.0f / _direction.z };
 	}
 
 	const glm::vec3& origin() const { return _origin; }
 	const glm::vec3& direction() const { return _direction; }
+	const glm::vec3& invDirection() const { return _invDirection; }
 	float length() const { return _length; }
 
 	void origin(const glm::vec3& origin) { _origin = origin; }
 
 	void direction(const glm::vec3& direction) 
 	{ 
-		_direction = direction;
-		_invDirection = { 1.0f / direction.x, 1.0f / direction.y, 1.0f / direction.z }; 
+		_direction = glm::normalize(direction);
+		_invDirection = { 1.0f / _direction.x, 1.0f / _direction.y, 1.0f / _direction.z }; 
 	}
 
 	void length(float length) { _length = length; }

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "glm\vec3.hpp"
+#include "Ray.hpp"
 
 // Axis aligned bounding box used for oct-tree
 struct AABB
@@ -21,8 +22,30 @@ struct AABB
 	glm::vec3							_minCorner;
 	glm::vec3							_maxCorner;
 
-	// Test if a ray intersects this box, returns intersection position along ray
-	
+	// Test if a ray intersects this box, returns intersection position along ray, -1.0 if no hit
+	float rayIntersection(const Ray& ray)
+	{
+		float tmin = 0;
+		float tmax = ray.length();
+
+		for (unsigned i = 0; i < 3; ++i)
+		{
+			float t0 = (_minCorner[i] - ray.origin()[i]) * ray.invDirection()[i];
+			float t1 = (_maxCorner[i] - ray.origin()[i]) * ray.invDirection()[i];
+
+			if (ray.invDirection()[i] < 0.0f)
+			{
+				std::swap(t0, t1);
+			}
+
+			tmin = t0 > tmin ? t0 : tmin;
+			tmax = t1 < tmax ? t1 : tmax;
+
+			if (tmax <= tmin)
+				return -1.0f;
+		}
+		return (tmin < ray.length()) ? tmin : -1.0f;
+	}
 
 	AABB(glm::vec3 min, glm::vec3 max)
 		: _minCorner{ min }, _maxCorner{ max }
