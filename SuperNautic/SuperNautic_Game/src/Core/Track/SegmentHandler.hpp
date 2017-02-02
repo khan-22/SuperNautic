@@ -7,19 +7,8 @@
 
 #include "Segment.hpp"
 
-// Holds basic information about an uninstantiated track segment 
-struct SegmentInfo
-{
-	std::string		_dataFileName;
-	std::string		_visualFileName;
-	char			_startConnection;
-	char			_endConnection;
-	int loadedIndex { -1 }; // Index of loaded segment in _segments, -1 if not loaded
 
-	SegmentInfo(std::string&& dataFileName, std::string&& visualFileName, char startConnection, char endConnection)
-		: _dataFileName{ dataFileName }, _visualFileName{ visualFileName }, _startConnection{ startConnection }, _endConnection{ endConnection }
-	{ }
-};
+
 
 // Holds uninstantiated versions of track segments
 class SegmentHandler

@@ -23,6 +23,10 @@ SegmentHandler::SegmentHandler(std::string filePath)
 	std::string segmentVisualName;
 	char startConnection;
 	char endConnection;
+	int probability;
+	int minInRow;
+	int maxInRow;
+	int rotationOffset;
 
 	// Read SegmentInfos
 	while (infoFile >> segmentDataName) // Read data file name
@@ -34,8 +38,14 @@ SegmentHandler::SegmentHandler(std::string filePath)
 		startConnection = segmentDataName[segmentDataName.size() - 6];
 		endConnection = segmentDataName[segmentDataName.size() - 5];
 
+		infoFile >> probability;
+		infoFile >> minInRow;
+		infoFile >> maxInRow;
+		infoFile >> rotationOffset;
+
 		// Add read SegmentInfo to vector
-		_segmentInfos.push_back(SegmentInfo{ std::move(segmentDataName), std::move(segmentVisualName), std::move(startConnection), std::move(endConnection) });
+		_segmentInfos.push_back(SegmentInfo{ std::move(segmentDataName), std::move(segmentVisualName)
+			, startConnection, endConnection, probability, minInRow, maxInRow, rotationOffset });
 
 		// Skip rest of line
 		infoFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -55,11 +65,7 @@ const Segment* SegmentHandler::loadSegment(unsigned i)
 	else
 	{
 		// Load Segment from file
-		_segments.push_back(Segment{
-			_segmentInfos[i]._dataFileName,
-			_segmentInfos[i]._visualFileName,
-			_segmentInfos[i]._startConnection, 
-			_segmentInfos[i]._endConnection		});
+		_segments.push_back(Segment(&_segmentInfos[i]));
 
 		// Set index in corresponding SegmentInfo
 		_segmentInfos[i].loadedIndex = static_cast<int>(_segments.size()) - 1;

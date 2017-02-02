@@ -22,14 +22,15 @@ bool Segment::mappingsCreated { false };
 
 
 // Loads a segment from an fbx file
-Segment::Segment(std::string dataFilePath, std::string visualFilePath, char startConnection, char endConnection)
-	: _segmentName { dataFilePath }, _startConnection { startConnection }, _endConnection { endConnection }
+Segment::Segment(const SegmentInfo* segmentInfo)
 {
+	_segmentInfo = segmentInfo;
+
 	// Get the scene data asset
-	_scene = RawMeshCache::get(std::string{ "Segments/" } + dataFilePath);
+	_scene = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_dataFileName);
 
 	// Get visual model asset 
-	_visual = ModelCache::get(std::string{ "Segments/" } + visualFilePath);
+	_visual = ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_visualFileName);
 
 	if (_scene.get()->cameras.size() < 1)
 	{
@@ -50,7 +51,7 @@ Segment::Segment(std::string dataFilePath, std::string visualFilePath, char star
 	}
 	else
 	{
-		LOG_ERROR("No meshes in file ", dataFilePath);
+		LOG_ERROR("No meshes in file ", _segmentInfo->_dataFileName);
 		return;
 	}
 

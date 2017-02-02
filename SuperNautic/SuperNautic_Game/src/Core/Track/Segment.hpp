@@ -14,16 +14,17 @@
 #include "../Geometric Primitives/BoundingBox.hpp"
 #include "../Geometric Primitives/RayIntersection.hpp"
 #include "../Geometric Primitives/Ray.hpp"
-
+#include "SegmentInfo.hpp"
 
 // Uninstantiated version of a track segment
 class Segment
 {
 public:
-	const std::string _segmentName;
+	const std::string	_segmentName;
+	const SegmentInfo*	_segmentInfo;
 
 	// Loads a segment from an fbx file
-	Segment(std::string dataFilePath, std::string visualFilePath, char startConnection, char endConnection);
+	Segment(const SegmentInfo* segmentInfo);
 
 	// Tests a ray collision against all collision surfaces of the segment. Returns collision information
 	const RayIntersection rayIntersectionTest(Ray& ray) const;
@@ -43,11 +44,11 @@ public:
 	// Returns connection names
 	char getStart() const
 	{
-		return _startConnection;
+		return _segmentInfo->_startConnection;
 	}
 	char getEnd() const
 	{
-		return _endConnection;
+		return _segmentInfo->_endConnection;
 	}
 
 	// Returns approximate segment length
@@ -81,10 +82,6 @@ private:
 
 	// Waypoints, read from mesh and sorted to the correct order
 	std::vector<glm::vec3> _waypoints;
-
-	// Names of start and end connections
-	char _startConnection;
-	char _endConnection;
 
 	// Approximate length of segment, obtained from waypoints
 	float _length;
