@@ -42,6 +42,7 @@ private:
 
 	ShaderAsset	_shader;
 	ModelAsset	_model;
+	TextureAsset _texture;
 
 	GFX::ForwardRenderer	_forwardRenderer;
 	Camera		_camera;
