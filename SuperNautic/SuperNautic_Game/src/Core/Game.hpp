@@ -13,6 +13,7 @@
 
 #include "LoadAssetFunctions.hpp"
 #include "../GFX/ForwardRenderer.hpp"
+#include "../GFX/DeferredRenderer.hpp"
 
 class Game
 {
@@ -43,7 +44,10 @@ private:
 	ShaderAsset	_shader;
 	ModelAsset	_model;
 
-	GFX::ForwardRenderer	_forwardRenderer;
+	GFX::DeferredRenderer	_deferredRenderer1;
+	GFX::DeferredRenderer	_deferredRenderer2;
+	GFX::DeferredRenderer	_deferredRenderer3;
+	GFX::DeferredRenderer	_deferredRenderer4;
 	Camera		_camera;
 
 };
