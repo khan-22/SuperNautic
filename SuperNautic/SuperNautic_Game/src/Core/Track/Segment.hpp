@@ -6,6 +6,7 @@
 #include <array>
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 #include "glm/glm.hpp"
 #include "../LoadAssetFunctions.hpp"
@@ -34,6 +35,31 @@ struct Intersection
 	glm::vec3 position;
 	glm::vec3 normal;
 	SurfaceType surface;
+};
+
+// Axis aligned bounding box used for oct-tree
+struct AABB
+{
+	// The children of this box
+	std::vector<AABB>					_children;
+
+	// Will contain indices into face vectors of models
+	// [0]..[_temperatureZoneCollisions.size()] is zone collisions, [_temperatureZoneCollisions.size()] is base collision 
+	std::vector<std::vector<unsigned>> faceIndices;
+
+	// Positions of max and min corners of this box
+	glm::vec3							_minCorner;
+	glm::vec3							_maxCorner;
+
+	// Test if a ray intersects this box
+	// TODO
+
+	AABB(glm::vec3 min, glm::vec3 max)
+		: _minCorner{ min }, _maxCorner{ max }
+	{ }
+
+	AABB()
+	{ }
 };
 
 // Uninstantiated version of a track segment
@@ -109,6 +135,9 @@ private:
 	// Approximate length of segment, obtained from waypoints
 	float _length;
 
+	// Root of oct-tree for collision geometry
+	AABB octTree;
+
 	// Names of meshes expected in fbx file (defined in Segment.cpp)
 	static const std::string baseVisualName;
 	static const std::string baseCollisionName;
@@ -143,19 +172,26 @@ private:
 	// Find the center of mesh _scene->meshes[meshIndex]
 	glm::vec3 findMeshCenter(unsigned meshIndex) const;
 
-	// True if two vectors are almost equal
-	bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2) const
-	{
-		return (0.0001f > abs(vector1.x - vector2.x)) &&
-			   (0.0001f > abs(vector1.y - vector2.y)) &&
-			   (0.0001f > abs(vector1.z - vector2.z));
-	}
-
 	// Helper function for createBoundingBoxes(). Finds the third half-distance of a box
 	float findThirdHalfDistance(unsigned boundingBoxMeshIndex, const BoundingBox& box) const;
 
 	// Helper function for createBoundingBoxes(). Finds three directions and two half-lengths of a box using the first face of the box mesh
 	void findTwoDirections(unsigned boundingBoxMeshIndex, BoundingBox& box) const;
+
+	// Divides the collision geometry of this segment into an oct-tree
+	void createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions);
+
+	// Find smallest and largest vertex position in each axis for a model, using min and max for comparison
+	void findMinMaxValues(glm::vec3& min, glm::vec3& max, unsigned modelIndex);
+
+	// Recursively subdivides an AABB until every box touches <= maxFacesPerBox or maxSubdivisions == 0
+	void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxSubdivisions, std::vector<std::vector<unsigned>>&& vertexIndices, std::vector<std::vector<unsigned>>&& faceIndices);
+
+	// Helper for subdivideOctTree, creates child boxes from a parent
+	std::vector<AABB> createChildren(glm::vec3 min, glm::vec3 max);
+
+	// Helper for subdivideOctTree, finds index of child to copy a vertex to
+	unsigned findChildIndex(size_t currentModel, unsigned index, glm::vec3 boxMiddle);
 };
 
 // Get squared distance between two vectors
@@ -165,6 +201,14 @@ inline float squaredDistance(const glm::vec3& vector1, const glm::vec3& vector2)
 	float dY = vector1.y - vector2.y;
 	float dZ = vector1.z - vector2.z;
 	return dX * dX + dY * dY + dZ * dZ;
+}
+
+// True if two vectors are almost equal
+inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2)
+{
+	return (0.0001f > abs(vector1.x - vector2.x)) &&
+		(0.0001f > abs(vector1.y - vector2.y)) &&
+		(0.0001f > abs(vector1.z - vector2.z));
 }
 
 #endif // SEGMENT_H

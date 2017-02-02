@@ -33,7 +33,7 @@ int main()
 	}
 	else
 	{
-		SegmentHandler testSH{ "Segments\\segmentinfos.txt" };
+		SegmentHandler testSH{ "Segments/segmentinfos.txt" };
 		const Segment* mySegment = testSH.loadSegment(0);
 
 		game.bInitialize();
