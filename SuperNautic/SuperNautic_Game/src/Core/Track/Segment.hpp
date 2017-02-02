@@ -136,7 +136,7 @@ private:
 	void findMinMaxValues(glm::vec3& min, glm::vec3& max, unsigned modelIndex);
 
 	// Recursively subdivides an AABB until every box touches <= maxFacesPerBox or maxSubdivisions == 0
-	void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxSubdivisions, std::vector<std::vector<unsigned>>&& vertexIndices, std::vector<std::vector<unsigned>>&& faceIndices);
+	void subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxSubdivisions, std::vector<std::vector<unsigned>>&& vertexIndices, std::vector<std::vector<unsigned>>&& faceIndices);
 
 	// Helper for subdivideOctTree, creates child boxes from a parent
 	std::vector<AABB> createChildren(glm::vec3 min, glm::vec3 max);
