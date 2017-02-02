@@ -22,7 +22,7 @@ bool Segment::mappingsCreated { false };
 
 
 // Loads a segment from an fbx file
-Segment::Segment(std::string dataFilePath, std::string visualFilePath, std::string startConnection, std::string endConnection)
+Segment::Segment(std::string dataFilePath, std::string visualFilePath, char startConnection, char endConnection)
 	: _segmentName { dataFilePath }, _startConnection { startConnection }, _endConnection { endConnection }
 {
 	// Get the scene data asset

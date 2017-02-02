@@ -21,8 +21,8 @@ SegmentHandler::SegmentHandler(std::string filePath)
 
 	std::string segmentDataName;
 	std::string segmentVisualName;
-	std::string startConnection;
-	std::string endConnection;
+	char startConnection;
+	char endConnection;
 
 	// Read SegmentInfos
 	while (infoFile >> segmentDataName) // Read data file name

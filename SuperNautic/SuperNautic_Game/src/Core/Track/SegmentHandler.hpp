@@ -12,11 +12,11 @@ struct SegmentInfo
 {
 	std::string		_dataFileName;
 	std::string		_visualFileName;
-	std::string		_startConnection;
-	std::string		_endConnection;
+	char			_startConnection;
+	char			_endConnection;
 	int loadedIndex { -1 }; // Index of loaded segment in _segments, -1 if not loaded
 
-	SegmentInfo(std::string&& dataFileName, std::string&& visualFileName, std::string&& startConnection, std::string&& endConnection)
+	SegmentInfo(std::string&& dataFileName, std::string&& visualFileName, char startConnection, char endConnection)
 		: _dataFileName{ dataFileName }, _visualFileName{ visualFileName }, _startConnection{ startConnection }, _endConnection{ endConnection }
 	{ }
 };

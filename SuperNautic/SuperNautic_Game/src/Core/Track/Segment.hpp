@@ -69,7 +69,7 @@ public:
 	const std::string _segmentName;
 
 	// Loads a segment from an fbx file
-	Segment(std::string dataFilePath, std::string visualFilePath, std::string startConnection, std::string endConnection);
+	Segment(std::string dataFilePath, std::string visualFilePath, char startConnection, char endConnection);
 
 	// Tests a ray collision against all collision surfaces of the segment. Returns collision information
 	const Intersection rayIntersectionTest(glm::vec3 origin, glm::vec3 direction) const;
@@ -87,11 +87,11 @@ public:
 	}
 
 	// Returns connection names
-	const std::string& getStart() const
+	char getStart() const
 	{
 		return _startConnection;
 	}
-	const std::string& getEnd() const
+	char getEnd() const
 	{
 		return _endConnection;
 	}
@@ -129,8 +129,8 @@ private:
 	std::vector<glm::vec3> _waypoints;
 
 	// Names of start and end connections
-	std::string _startConnection;
-	std::string _endConnection;
+	char _startConnection;
+	char _endConnection;
 
 	// Approximate length of segment, obtained from waypoints
 	float _length;
