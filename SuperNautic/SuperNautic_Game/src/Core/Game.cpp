@@ -76,10 +76,16 @@ bool Game::bInitialize()
 		LOG("WOOOOOW!!");
 	}
 
+    TextureAsset textureTest = TextureCache::get("heatchart.png");
+    if(textureTest.get() == nullptr)
+    {
+        LOG("Failed to load texture.");
+    }
 
 
 	_model = ModelCache::get("test2.fbx");
 	_shader = ShaderCache::get("forward");
+	_texture = TextureCache::get("heatchart.png");
 
 	_forwardRenderer.initialize();
 
@@ -141,12 +147,12 @@ void Game::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-	
+
 
 	/*GFX::Shader* shader = _shader.get();
 	_shader.get()->bind();
 
-	
+
 
 	glm::mat4 model(1.f);
 	glm::mat4 view = glm::lookAt(glm::vec3{ 20.f * sinf(time), 0.f, 20.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
@@ -166,7 +172,12 @@ void Game::render()
 	time += 0.009f;
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
 	_forwardRenderer.render(*_model.get());
+	_shader.get()->bind();
+    _shader.get()->setSampler("uTexColor", 0);
+	_texture.get()->bind(0);
 	_forwardRenderer.display(_camera);
+	_texture.get()->unbind(0);
+	LOG_GL_ERRORS();
 
 
     static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
