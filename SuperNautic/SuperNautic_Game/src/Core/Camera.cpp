@@ -27,12 +27,6 @@ Camera::~Camera()
 	//Nothing
 }
 
-//Updates view
-void Camera::updateView()
-{
-	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
-}
-
 //Returns the view matrix
 glm::mat4 Camera::getView() const
 {
@@ -55,40 +49,42 @@ glm::mat4 Camera::getVP() const
 void Camera::setPos(const glm::vec3 & newPos)
 {
 	_pos = newPos;
-	updateView();
+	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
 }
 
 //Sets the camera position with aging
 void Camera::setPosAged(const glm::vec3 & newPos)
 {
 	_pos = (_pos + newPos) * 0.5f;
+	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
 }
 
 //Moves the camera from its current position
 void Camera::move(const glm::vec3 & moveVec)
 {
 	_pos += moveVec;
-	updateView();
+	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
 }
 
 //Sets the up vector
 void Camera::setUp(const glm::vec3 & newUp)
 {
 	_up = newUp;
-	updateView();
+	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
 }
 
 //Sets the view direction
 void Camera::setViewDir(const glm::vec3 & newDir)
 {
 	_viewDir = newDir;
-	updateView();
+	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
 }
 
 //Sets the view dir with aging
 void Camera::setViewDirAged(const glm::vec3 & newDir)
 {
 	_viewDir = (_viewDir + newDir) * 0.5f;
+	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
 }
 
 //Sets the field of view

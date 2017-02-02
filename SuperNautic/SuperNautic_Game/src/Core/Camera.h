@@ -11,7 +11,7 @@ public:
 		, const glm::vec3 & pos = glm::vec3(0.0, 0.0, 0.0)
 		, const glm::vec3 & viewDirection = glm::vec3(0.0, 0.0, 0.0)
 		, const glm::vec3 & up = glm::vec3(0.0, 0.0, 0.0));
-	~Camera();
+	virtual ~Camera();
 	glm::mat4 getView() const;
 	glm::mat4 getPerspective() const;
 	glm::mat4 getVP() const;
@@ -24,9 +24,8 @@ public:
 	void setFOV(float newFOV);
 	void changeFOV(float deltaFOV);
 
-private:
+protected:
 	Camera();
-	inline void updateView();
 
 	glm::mat4 _perspective;
 	glm::mat4 _view;
@@ -37,6 +36,7 @@ private:
 	float _fov;
 	int _viewWidth;
 	int _viewHeight;
+
 };
 
 #endif // !CAMERA_H
