@@ -34,6 +34,11 @@ void Player::update(float dt)
 {
 	_input.update();
 
+	if (_input.bGetAValue())
+	{
+		_audio.playAudio(PlayerAudio::Sounds::vag);
+	}
+
     if(_input.checkActive())
     {
         _ship.steer(_input.getLeftStickXValue() * dt);
@@ -67,5 +72,5 @@ void Player::update(float dt)
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 
-	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() + .5);
+	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 2 + 1);
 }
