@@ -6,10 +6,12 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Image.hpp>
 
 #include "../GFX/VertexDataImporter.hpp"
 #include "../GFX/ShaderLoader.hpp"
 #include "../GFX/ModelLoader.hpp"
+#include "../GFX/Texture.hpp"
 
 
 struct Mesh
@@ -65,7 +67,7 @@ std::shared_ptr<sf::SoundBuffer> loadAsset<sf::SoundBuffer>(std::string key)
 	}
 }
 
-// Load texture
+// Load SFML Texture
 template<>
 std::shared_ptr<sf::Texture> loadAsset<sf::Texture>(std::string key)
 {
@@ -86,4 +88,19 @@ std::shared_ptr<GFX::Model> loadAsset<GFX::Model>(std::string key)
 {
 	GFX::ModelLoader loader;
 	return std::shared_ptr<GFX::Model>(loader.loadModel(key));
+}
+
+
+// Load Texture from file.
+template<>
+std::shared_ptr<GFX::Texture> loadAsset<GFX::Texture>(std::string key)
+{
+	sf::Image img;
+	if(!img.loadFromFile("res/textures/" + key))
+    {
+        return nullptr;
+    }
+
+	sf::Vector2u size = img.getSize();
+	return std::make_shared<GFX::Texture>(img.getPixelsPtr(), size.x, size.y, GL_TEXTURE_2D);
 }
