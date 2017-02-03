@@ -91,12 +91,17 @@ bool Game::bInitialize()
     }
 
 
-	_model = ModelCache::get("ship.fbx");
-	_segmentModel = ModelCache::get("segments/s01_straight_aa.fbx");
+	/*We can create a loop here (or where relevant) that loops through a list
+	of all the things we want to render and add them to the model array, such as
+	segments, ships etc.*/
+	ModelArray.push_back(ModelCache::get("ship.fbx"));
+	ModelArray.push_back(ModelCache::get("segments/s01_straight_aa.fbx"));
+
+
 	_shader = ShaderCache::get("forward");
 	_texture = TextureCache::get("heatchart.png");
 
-	_texturedModel.setModelAndMaterial(_model, materialTest);
+	_texturedModel.setModelAndMaterial(ModelArray[0], materialTest);
 
 	_forwardRenderer.initialize();
 
@@ -193,8 +198,11 @@ void Game::render()
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
 	
 	//SEND TEST MODELS TO RENDERER
-	_forwardRenderer.render(*_model.get());
-	_forwardRenderer.render(*_segmentModel.get());
+	for (int i = 0; i < ModelArray.size(); i++)
+	{
+		_forwardRenderer.render(*ModelArray[i].get());
+	}
+	/////////////////////////////
 
 	_shader.get()->bind();
     _shader.get()->setSampler("uTexColor", 0);

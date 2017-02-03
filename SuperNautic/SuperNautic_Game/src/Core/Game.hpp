@@ -17,6 +17,8 @@
 
 #include "DebugCamera.hpp"
 
+#include <vector>
+
 class Game
 {
 public:
@@ -44,9 +46,10 @@ private:
 	float _fps;
 
 	ShaderAsset	_shader;
-	//TEST MODELS
-	ModelAsset	_model;
-	ModelAsset	_segmentModel;
+
+	//TEST MODELS are put in this array for rendering
+	//MAKE SURE NOT TO PUSH THIS TO MASTER, at least not without discussing
+	std::vector<ModelAsset> ModelArray;
 	//////////////////////
 
 	TextureAsset _texture;
