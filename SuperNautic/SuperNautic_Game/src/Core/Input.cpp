@@ -33,6 +33,7 @@ void Input::update()
 	if (checkActive())
 	{
 		_bButtonA = sf::Joystick::isButtonPressed(_controllerId, 0);
+		_bButtonBack = sf::Joystick::isButtonPressed(_controllerId, 6);
 		_leftStickX = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::X);
 		_leftStickY = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Y);
 		_triggers = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Z);
@@ -52,6 +53,19 @@ void Input::update()
 		if (!_bButtonA)
 		{
 			_bAWasDormant = true;
+		}
+		if (_bButtonBack && _bBackWasDormant)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::Escape;
+			_events.push_back(event);
+			_bButtonBack = true;
+			_bBackWasDormant = false;
+			LOG("Back pressed");
+		}
+		if (!_bButtonBack)
+		{
+			_bBackWasDormant = true;
 		}
 		if (_leftStickY < -thresh && _bLeftStickDormant)
 		{

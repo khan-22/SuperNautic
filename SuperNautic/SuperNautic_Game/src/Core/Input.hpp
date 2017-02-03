@@ -31,8 +31,10 @@ private:
 	float _leftStickY;
 	float _triggers;
 	bool _bButtonA;
+	bool _bButtonBack;
 	bool _bLeftStickDormant;
 	bool _bAWasDormant;
+	bool _bBackWasDormant;
 
 	int _controllerId;
 
