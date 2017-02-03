@@ -32,6 +32,7 @@ private:
 	float _triggers;
 	bool _bButtonA;
 	bool _bLeftStickDormant;
+	bool _bAWasDormant;
 
 	int _controllerId;
 
