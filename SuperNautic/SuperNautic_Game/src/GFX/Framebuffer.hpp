@@ -14,8 +14,7 @@ namespace GFX
 		static Framebuffer DEFAULT;
 
 		enum DepthType
-		{
-			NO_DEPTH	= 0,
+		{	
 			INT16		= GL_DEPTH_COMPONENT16,
 			INT24		= GL_DEPTH_COMPONENT24,
 			INT32		= GL_DEPTH_COMPONENT32,
@@ -23,15 +22,19 @@ namespace GFX
 		};
 
 
-		Framebuffer(unsigned int width, unsigned int height, unsigned int numColorAttachments, DepthType depthType = FLOAT32);
+		Framebuffer();
 		~Framebuffer();
 		
+		void initialize(GLuint width, GLuint height, GLuint numColorAttachments, DepthType depthType = FLOAT32);
+
 		void bindWrite() const;
 		void bindRead() const;
 		void bindBoth() const;
 
 		void setReadBuffer(GLuint attachment) const;
 		void setViewport() const;
+
+		void bindColorTextures() const;
 
 	protected:
 
@@ -44,19 +47,16 @@ namespace GFX
 		//float		_normalizedWidth;
 		//float		_normalizedHeight;
 
-		unsigned int	_width;
-		unsigned int	_height;
+		GLuint	_width;
+		GLuint	_height;
 
-		GLuint			_fbo;
-		unsigned int	_numColorAttachments;
-		bool			_bHasDepthAttachment;;
+		GLuint	_fbo;
+		GLuint  _numColorAttachments;
 
 		// Artifical limit placed for now. May be increased when needed up to max 15.
 		static const unsigned int MAX_COLOR_ATTACHMENTS = 8;
 		GLuint		_textures[MAX_COLOR_ATTACHMENTS];
 		GLuint		_depthTexture;
-
-		Framebuffer();
 
 		Framebuffer(const Framebuffer& other) {};
 		void operator=(const Framebuffer& other) const {};

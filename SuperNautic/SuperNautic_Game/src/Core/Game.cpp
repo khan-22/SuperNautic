@@ -103,7 +103,11 @@ bool Game::bInitialize()
 
 	_texturedModel.setModelAndMaterial(ModelArray[0], materialTest);
 
-	_forwardRenderer.initialize();
+	_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
+	_deferredRenderer1.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
+	//_deferredRenderer2.initialize(&_window, 0.5f, 0.0f, 0.5f, 0.5f);
+	//_deferredRenderer3.initialize(&_window, 0.0f, 0.5f, 0.5f, 0.5f);
+	//_deferredRenderer4.initialize(&_window, 0.5f, 0.5f, 0.5f, 0.5f);
 
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
@@ -170,14 +174,22 @@ void Game::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
+	static float time = 0.f;
+	time += 0.009f;
+
+	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
+	_camera.setViewDir(glm::vec3(0.f, 0.f, -1.f));
+
+	//_deferredRenderer1.render(_texturedModel);
+	//_deferredRenderer1.display(_debugCamera);
+
+	//_deferredRenderer2.render(*_model.get());
+	//_deferredRenderer3.render(*_model.get());
+	//_deferredRenderer4.render(*_model.get());
 
 
-	/*GFX::Shader* shader = _shader.get();
-	_shader.get()->bind();
 
-
-
-	glm::mat4 model(1.f);
+	/*glm::mat4 model(1.f);
 	glm::mat4 view = glm::lookAt(glm::vec3{ 20.f * sinf(time), 0.f, 20.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
 	glm::mat4 projection = glm::perspective(70.f, (float)_window.getSize().x / (float)_window.getSize().y, 0.3f, 100.f);
 
@@ -193,8 +205,6 @@ void Game::render()
 
 	_shader.get()->bind();
 
-	static float time = 0.f;
-	time += 0.009f;
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
 	
 	//SEND TEST MODELS TO RENDERER
@@ -216,10 +226,10 @@ void Game::render()
     fps.setFont(*font.get());
     fps.setString("FPS: " + std::to_string(_fps));
 
-    _stateStack.render();
-    _window.pushGLStates();
-    _window.draw(fps);
-    _window.popGLStates();
+    //_stateStack.render();
+    //_window.pushGLStates();
+    //_window.draw(fps);
+    //_window.popGLStates();
 
 	_window.display();
 }

@@ -74,6 +74,7 @@ namespace GFX
 
 		std::vector<std::unique_ptr<VertexBuffer>>	_vertexBuffers;
 		std::unique_ptr<IndexBuffer>				_indexBuffer;
+		GLsizei										_attributeOffsets[16];
 
 	};
 

@@ -43,7 +43,7 @@ namespace GFX
 
 		private:
 			GLuint							_shaderProgram;
-			std::map<std::string, GLuint>	_uniformMap;
+			std::map<std::string, GLint>	_uniformMap;
 
 			GLuint getUniform(const std::string& name);
 	};

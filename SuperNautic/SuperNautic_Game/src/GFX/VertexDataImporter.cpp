@@ -48,7 +48,7 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		data.indices.reserve(mesh->mNumFaces * 3);
 
 		memcpy(&data.vertices[0], &mesh->mVertices[0], sizeof(mesh->mVertices[0]) * mesh->mNumVertices);
-		memcpy(&data.texCoords[0], &mesh->mTextureCoords[0], sizeof(mesh->mTextureCoords[0]) * mesh->mNumVertices);
+		memcpy(&data.texCoords[0], &mesh->mTextureCoords[0][0], sizeof(mesh->mTextureCoords[0][0]) * mesh->mNumVertices);
 		memcpy(&data.normals[0], &mesh->mNormals[0], sizeof(mesh->mNormals[0]) * mesh->mNumVertices);
 		//memcpy(&data.faces[0], &mesh->mFaces[0], sizeof(mesh->mFaces[0].mIndices[0]) * 3 * mesh->mNumFaces);
 

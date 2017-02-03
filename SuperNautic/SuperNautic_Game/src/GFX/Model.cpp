@@ -35,7 +35,7 @@ void Model::setAttributes(RenderStates& states) const
 {
 	// TEMP
 	static float time = 0.f;
-	time += 0.0007f;
+	time += 0.0014f;
 
 	//glm::mat4 model			= glm::rotate(time, glm::vec3(0.f, 1.f, 0.f));
 
@@ -43,13 +43,16 @@ void Model::setAttributes(RenderStates& states) const
 	glm::mat4 perspective	= states.camera->getPerspective();
 
 	Shader* shader = states.shader;
+	//shader->setUniform("uView",	view);
 	shader->setUniform("uModel", _tempModelMat);
-	shader->setUniform("uView",	view);
-	shader->setUniform("uProjection", perspective);
+	//shader->setUniform("uProjection", perspective);
+
+	glm::mat4 MVP			= perspective * view * _tempModelMat;
+	shader->setUniform("uMVP", MVP);
 
 	// TEMP
-	glm::vec4 color(1.f, 0.f, 0.f, 1.f);
-	shader->setUniform("uColor", color);
+	//glm::vec4 color(1.f, 0.f, 0.f, 1.f);
+	//shader->setUniform("uColor", color);
 
 }
 
