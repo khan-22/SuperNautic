@@ -1,9 +1,6 @@
 #include "Model.hpp"
 
-#include <glm/gtx/transform.hpp>
-
 using namespace GFX;
-
 
 Model::Model()
 {
@@ -17,6 +14,11 @@ Model::~Model()
 size_t Model::getNumMeshes() const
 {
     return _meshes.size();
+}
+
+void GFX::Model::setModelMatrix(glm::mat4 ModelMatrix)
+{
+	_tempModelMat = ModelMatrix;
 }
 
 
@@ -36,13 +38,12 @@ void Model::setAttributes(RenderStates& states) const
 	time += 0.0007f;
 
 	//glm::mat4 model			= glm::rotate(time, glm::vec3(0.f, 1.f, 0.f));
-	glm::mat4 model = glm::mat4();
 
 	glm::mat4 view			= states.camera->getView();
 	glm::mat4 perspective	= states.camera->getPerspective();
 
 	Shader* shader = states.shader;
-	shader->setUniform("uModel", model);
+	shader->setUniform("uModel", _tempModelMat);
 	shader->setUniform("uView",	view);
 	shader->setUniform("uProjection", perspective);
 
