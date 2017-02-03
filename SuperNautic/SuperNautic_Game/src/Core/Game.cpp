@@ -9,6 +9,7 @@
 #include "../Log.hpp"
 #include "../GFX/VertexDataImporter.hpp"
 #include "MainMenuApplicationState.hpp"
+#include "../GFX/TexturedModel.hpp"
 
 #include "LoadAssetFunctions.hpp"
 
@@ -93,11 +94,18 @@ bool Game::bInitialize()
 	_shader = ShaderCache::get("forward");
 	_texture = TextureCache::get("heatchart.png");
 
+	_texturedModel.setModelAndMaterial(_model, materialTest);
+
 	_forwardRenderer.initialize();
 
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
 
+
+	_shader.get()->bind();
+    _shader.get()->setSampler("uDiffuse", 0);
+    _shader.get()->setSampler("uSpecular", 1);
+    _shader.get()->setSampler("uNormal", 2);
 	return true;
 }
 
@@ -174,15 +182,14 @@ void Game::render()
 
 	_model.get()->render();*/
 
+	_shader.get()->bind();
+
 	static float time = 0.f;
 	time += 0.009f;
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
-	_forwardRenderer.render(*_model.get());
-	_shader.get()->bind();
-    _shader.get()->setSampler("uTexColor", 0);
-	_texture.get()->bind(0);
+//	_forwardRenderer.render(*_model.get());
+	_forwardRenderer.render(_texturedModel);
 	_forwardRenderer.display(_camera);
-	_texture.get()->unbind(0);
 	LOG_GL_ERRORS();
 
 
