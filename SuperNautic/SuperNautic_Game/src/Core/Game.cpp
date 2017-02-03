@@ -190,12 +190,9 @@ void Game::render()
 	static float time = 0.f;
 	time += 0.009f;
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
-	_forwardRenderer.render(*_model.get());
-	_shader.get()->bind();
-    _shader.get()->setSampler("uTexColor", 0);
-	_texture.get()->bind(0);
+    //_forwardRenderer.render(*_model.get());
+	_forwardRenderer.render(_texturedModel);
 	_forwardRenderer.display(_debugCamera);
-	_texture.get()->unbind(0);
 	LOG_GL_ERRORS();
 
 
