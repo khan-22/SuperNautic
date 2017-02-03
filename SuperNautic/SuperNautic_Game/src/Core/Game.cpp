@@ -204,7 +204,6 @@ void Game::render()
 	//_forwardRenderer.display(_debugCamera);
 	LOG_GL_ERRORS();
 
-	//Test
     static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
     sf::Text fps;
     fps.setFont(*font.get());
