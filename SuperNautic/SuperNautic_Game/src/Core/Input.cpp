@@ -7,13 +7,17 @@
 
 Input::Input() : 
 	_controllerId(0),
-	_bLeftStickDormant(true)
+	_bLeftStickDormant(true),
+	_bAWasDormant(true),
+	_bButtonA(false)
 {
 }
 
 Input::Input(int id) :
 	_controllerId(id),
-	_bLeftStickDormant(true)
+	_bLeftStickDormant(true),
+	_bAWasDormant(true),
+	_bButtonA(false)
 {
 }
 
@@ -36,12 +40,18 @@ void Input::update()
 		_events.clear();
 
 		sf::Event event;
-		if (_bButtonA)
+		if (_bButtonA && _bAWasDormant)
 		{
 			event.type = sf::Event::KeyPressed;
 			event.key.code = sf::Keyboard::A;
 			_events.push_back(event);
+			_bButtonA = true;
+			_bAWasDormant = false;
 			LOG("A pressed");
+		}
+		if (!_bButtonA)
+		{
+			_bAWasDormant = true;
 		}
 		if (_leftStickY < -thresh && _bLeftStickDormant)
 		{

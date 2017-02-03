@@ -22,6 +22,8 @@ public:
 
 private:
 	Track();
+	int getIndex(char connectionType) const;
+	int getInRow(int index) const;
 	
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance>	_track;
