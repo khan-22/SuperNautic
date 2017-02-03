@@ -2,12 +2,14 @@
 #ifndef DEBUGCAMERA_HPP
 #define DEBUGCAMERA_HPP
 
+#include <SFML\Window.hpp>
+
 #include "Camera.h"
 
 class DebugCamera : public Camera
 {
 public:
-	DebugCamera(float fov, float viewX, float viewY, int viewWidth, int viewHeight
+	DebugCamera(float fov, int viewWidth, int viewHeight
 		, const glm::vec3 & pos = glm::vec3(0.0, 0.0, 0.0)
 		, const glm::vec3 & viewDirection = glm::vec3(0.0, 0.0, 0.0));
 	virtual ~DebugCamera();
