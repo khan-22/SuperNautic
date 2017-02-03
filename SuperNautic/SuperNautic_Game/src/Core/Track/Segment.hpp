@@ -20,7 +20,6 @@
 class Segment
 {
 public:
-	const std::string	_segmentName;
 	const SegmentInfo*	_segmentInfo;
 
 	// Loads a segment from an fbx file
@@ -49,6 +48,27 @@ public:
 	char getEnd() const
 	{
 		return _segmentInfo->_endConnection;
+	}
+
+	// Returns "probability"
+	int getProbability() const
+	{
+		return _segmentInfo->_probability;
+	}
+
+	int getMinInRow() const
+	{
+		return _segmentInfo->_minInRow;
+	}
+
+	int getMaxInRow() const
+	{
+		return _segmentInfo->_maxInRow;
+	}
+
+	int getRotationOffset() const
+	{
+		return _segmentInfo->_rotationOffset;
 	}
 
 	// Returns approximate segment length
@@ -87,7 +107,7 @@ private:
 	float _length;
 
 	// Root of oct-tree for collision geometry
-	AABB octTree;
+	AABB _octTree;
 
 	// Names of meshes expected in fbx file (defined in Segment.cpp)
 	static const std::string baseVisualName;
