@@ -14,6 +14,12 @@ Model::~Model()
 {
 }
 
+size_t Model::getNumMeshes() const
+{
+    return _meshes.size();
+}
+
+
 void Model::render(RenderStates& states)
 {
     setAttributes(states);
