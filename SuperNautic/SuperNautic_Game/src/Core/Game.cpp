@@ -82,6 +82,12 @@ bool Game::bInitialize()
         LOG("Failed to load texture.");
     }
 
+    MaterialAsset materialTest = MaterialCache::get("test.mat");
+    if(materialTest.get() == nullptr)
+    {
+        LOG("Failed to load material.");
+    }
+
 
 	_model = ModelCache::get("test2.fbx");
 	_shader = ShaderCache::get("forward");

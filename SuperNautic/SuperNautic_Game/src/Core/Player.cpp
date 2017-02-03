@@ -5,6 +5,7 @@ Player::Player() :
 	_input(0),
 	_hud(1280, 720)
 {
+	_audio.playAudio(PlayerAudio::Sounds::engine);
 }
 
 Player::Player(int id) :
@@ -32,6 +33,11 @@ const sf::Drawable& Player::getHud() const
 void Player::update(float dt)
 {
 	_input.update();
+
+	if (_input.bGetAValue())
+	{
+		_audio.playAudio(PlayerAudio::Sounds::vag);
+	}
 
     if(_input.checkActive())
     {
@@ -65,4 +71,6 @@ void Player::update(float dt)
     _hud.setHeat(_ship.getEngineTemperature());
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
+
+	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 2 + 1);
 }

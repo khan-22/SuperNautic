@@ -12,6 +12,7 @@
 #include "../GFX/ShaderLoader.hpp"
 #include "../GFX/ModelLoader.hpp"
 #include "../GFX/Texture.hpp"
+#include "../GFX/MaterialLoader.hpp"
 
 
 struct Mesh
@@ -103,4 +104,11 @@ std::shared_ptr<GFX::Texture> loadAsset<GFX::Texture>(std::string key)
 
 	sf::Vector2u size = img.getSize();
 	return std::make_shared<GFX::Texture>(img.getPixelsPtr(), size.x, size.y, GL_TEXTURE_2D);
+}
+
+// Load Material from file.
+template<>
+std::shared_ptr<GFX::Material> loadAsset<GFX::Material>(std::string key)
+{
+	return GFX::MaterialLoader::load("res/materials/" + key);
 }
