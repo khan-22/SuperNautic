@@ -17,6 +17,16 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	_geometryPassShader = ShaderCache::get("geometry_deferred");
 	_lightPassShader = ShaderCache::get("light_deferred");
 
+	_geometryPassShader.get()->bind();
+	_geometryPassShader.get()->setSampler("uDiffuse", 0);
+	_geometryPassShader.get()->setSampler("uSpecular", 1);
+	_geometryPassShader.get()->setSampler("uNormal", 2);
+
+	_lightPassShader.get()->bind();
+	_lightPassShader.get()->setSampler("uPosition", 0);
+	_lightPassShader.get()->setSampler("uDiffuse", 1);
+	_lightPassShader.get()->setSampler("uNormal", 2);
+
 	_window = window;
 	_x = x;
 	_y = y;
@@ -130,9 +140,9 @@ void DeferredRenderer::lightPass(GLsizei width, GLsizei height)
 	
 	Shader* lpShader = _lightPassShader.get();
 	lpShader->bind();
-	lpShader->setSampler("uPosition", 0);
-	lpShader->setSampler("uDiffuse", 1);
-	lpShader->setSampler("uNormal", 2);
+	//lpShader->setSampler("uPosition", 0);
+	//lpShader->setSampler("uDiffuse", 1);
+	//lpShader->setSampler("uNormal", 2);
 
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);

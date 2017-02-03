@@ -40,7 +40,7 @@ void Model::setAttributes(RenderStates& states) const
 	glm::mat4 perspective	= states.camera->getPerspective();
 
 	Shader* shader = states.shader;
-	shader->setUniform("uView",	view);
+	//shader->setUniform("uView",	view);
 	shader->setUniform("uModel", model);
 	//shader->setUniform("uProjection", perspective);
 
@@ -48,8 +48,8 @@ void Model::setAttributes(RenderStates& states) const
 	shader->setUniform("uMVP", MVP);
 
 	// TEMP
-	glm::vec4 color(1.f, 0.f, 0.f, 1.f);
-	shader->setUniform("uColor", color);
+	//glm::vec4 color(1.f, 0.f, 0.f, 1.f);
+	//shader->setUniform("uColor", color);
 
 }
 

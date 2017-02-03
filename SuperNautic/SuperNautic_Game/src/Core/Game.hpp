@@ -49,6 +49,7 @@ private:
 	TextureAsset _texture;
 	GFX::TexturedModel _texturedModel;
 
+	GFX::ForwardRenderer	_forwardRenderer;
 	GFX::DeferredRenderer	_deferredRenderer1;
 	//GFX::DeferredRenderer	_deferredRenderer2;
 	//GFX::DeferredRenderer	_deferredRenderer3;

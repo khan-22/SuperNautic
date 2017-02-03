@@ -174,8 +174,8 @@ void Game::render()
 	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
 	_camera.setViewDir(glm::vec3(0.f, 0.f, -1.f));
 
-	_deferredRenderer1.render(*_model.get());
-	_deferredRenderer1.display(_camera);
+	_deferredRenderer1.render(_texturedModel);
+	_deferredRenderer1.display(_debugCamera);
 
 	//_deferredRenderer2.render(*_model.get());
 	//_deferredRenderer3.render(*_model.get());
@@ -204,8 +204,6 @@ void Game::render()
 
 	_shader.get()->bind();
 
-	static float time = 0.f;
-	time += 0.009f;
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
     //_forwardRenderer.render(*_model.get());
 	_forwardRenderer.render(_texturedModel);

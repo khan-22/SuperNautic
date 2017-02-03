@@ -8,9 +8,11 @@ layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 uv; //Supports 3D textures
 layout (location = 2) in vec3 normal;
 
-uniform mat4 uProjection;
-uniform mat4 uView;
+//uniform mat4 uProjection;
+//uniform mat4 uView;
 uniform mat4 uModel;
+
+uniform mat4 uMVP;
 
 out VS_OUT
 {
@@ -24,6 +26,10 @@ void main()
 	vs_out.uv	  = uv.xy; 
 	vs_out.normal = normal;
 
-	gl_Position = uProjection * uView * uModel * vec4(pos, 1.0f);
+	//mat4 boop1 = uProjection;
+	//mat4 boop2 = uView;
+	mat4 boop3 = uModel;
+
+	gl_Position = uMVP * vec4(pos, 1.0f);
 	
 }
