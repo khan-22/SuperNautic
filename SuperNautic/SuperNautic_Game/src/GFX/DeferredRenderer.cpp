@@ -87,41 +87,24 @@ void DeferredRenderer::display(Camera& camera)
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//geometryPass(camera);
-	//glViewport(0, 0, windowWidth, windowHeight);
-	lightPass();
-
-	//_frameBuffer.bindRead();
-	//_frameBuffer.setReadBuffer(0);
-	//glBlitFramebuffer(
-	//	0, 0, _width * windowWidth, _height * windowHeight,
-	//	0, 0, _width * windowWidth * 0.5f, _height * windowHeight * 0.5f,
-	//	GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-
-	//Framebuffer::DEFAULT.bindBoth();
-	//_frameBuffer.bindRead(); 
-	//_frameBuffer.setReadBuffer(0);
-
-	//glBlitFramebuffer(
-	//	0,					 0,					 _width * windowWidth,	 _height * windowHeight, 
-	//	_x * windowWidth,	 _y * windowHeight, (_x + _width) * windowWidth, (_y + _height) * windowHeight,
-	//	GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	geometryPass(camera, windowWidth, windowHeight);
+	lightPass(windowWidth, windowHeight);
 
 	Framebuffer::DEFAULT.bindBoth();
 }
 
-void DeferredRenderer::geometryPass(Camera & camera)
+void DeferredRenderer::geometryPass(Camera & camera, GLsizei width, GLsizei height)
 {
+	//*************************************************//
+	//*************** GEOMETRY PASS *******************//
+	//*************************************************//
+
 	_frameBuffer.bindWrite();
 
-	GLsizei windowWidth = _window->getSize().x;
-	GLsizei windowHeight = _window->getSize().y;
-
 	//glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
-	glViewport(0, 0, _width * windowWidth, _height * windowHeight);
+	glViewport(0, 0, _width * width, _height * height);
 
-	//glDisable(GL_BLEND);
+	glDisable(GL_BLEND);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	_geometryPassShader.get()->bind();
@@ -135,16 +118,30 @@ void DeferredRenderer::geometryPass(Camera & camera)
 	_drawCalls.clear();
 }
 
-void DeferredRenderer::lightPass()
+void DeferredRenderer::lightPass(GLsizei width, GLsizei height)
 {
-	//Framebuffer::DEFAULT.bindWrite();
-	Framebuffer::DEFAULT.bindBoth();
-	//_frameBuffer.bindRead();
+	//**********************************************//
+	//*************** LIGHT PASS *******************//
+	//**********************************************//
+
+	Framebuffer::DEFAULT.bindWrite();
+	_frameBuffer.bindRead();
+	_frameBuffer.bindColorTextures();
 	
+	Shader* lpShader = _lightPassShader.get();
+	lpShader->bind();
+	lpShader->setSampler("uPosition", 0);
+	lpShader->setSampler("uDiffuse", 1);
+	lpShader->setSampler("uNormal", 2);
+
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
+	glDepthMask(GL_FALSE);
+	//glDisable(GL_CULL_FACE);
 
-	_lightPassShader.get()->bind();
-
+	glViewport(0, 0, width, height);
 	_screenQuad->render();
+
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+
 }

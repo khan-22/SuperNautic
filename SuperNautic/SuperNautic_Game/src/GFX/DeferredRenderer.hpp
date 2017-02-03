@@ -41,8 +41,8 @@ namespace GFX
 
 		std::unique_ptr<VertexArrayObject> _screenQuad;
 
-		void geometryPass(Camera& camera);
-		void lightPass();
+		void geometryPass(Camera& camera, GLsizei width, GLsizei height);
+		void lightPass(GLsizei width, GLsizei height);
 
 	};
 }

@@ -20,8 +20,9 @@ vec3 lightDir = vec3(-0.2, -0.2, -0.2);
 void main()
 {
 	positionOut = fs_in.position;
-	diffuseOut	= fs_in.uv.xyx;
+	diffuseOut	= uColor.rgb;
 	normalOut	= normalize(fs_in.normal);
+
 
 	//Just output a basic color
 	//lightDir = normalize(lightDir);

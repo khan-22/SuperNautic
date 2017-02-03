@@ -89,14 +89,14 @@ bool Game::bInitialize()
     }
 
 
-	_model = ModelCache::get("test2.fbx");
+	_model = ModelCache::get("ship.fbx");
 	_shader = ShaderCache::get("forward");
 	_texture = TextureCache::get("heatchart.png");
 
-	_deferredRenderer1.initialize(&_window, 0.0f, 0.0f, 0.5f, 0.5f);
-	_deferredRenderer2.initialize(&_window, 0.5f, 0.0f, 0.5f, 0.5f);
-	_deferredRenderer3.initialize(&_window, 0.0f, 0.5f, 0.5f, 0.5f);
-	_deferredRenderer4.initialize(&_window, 0.5f, 0.5f, 0.5f, 0.5f);
+	_deferredRenderer1.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
+	//_deferredRenderer2.initialize(&_window, 0.5f, 0.0f, 0.5f, 0.5f);
+	//_deferredRenderer3.initialize(&_window, 0.0f, 0.5f, 0.5f, 0.5f);
+	//_deferredRenderer4.initialize(&_window, 0.5f, 0.5f, 0.5f, 0.5f);
 
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
@@ -158,7 +158,10 @@ void Game::render()
 
 	static float time = 0.f;
 	time += 0.009f;
-	
+
+	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
+	_camera.setViewDir(glm::vec3(0.f, 0.f, -1.f));
+
 	_deferredRenderer1.render(*_model.get());
 	_deferredRenderer1.display(_camera);
 
@@ -179,7 +182,7 @@ void Game::render()
 	//_deferredRenderer4.display(_camera);
 
 
-	_shader.get()->setUniform("uModel", model);
+	/*_shader.get()->setUniform("uModel", model);
 	_shader.get()->setUniform("uView", view);
 	_shader.get()->setUniform("uProjection", projection);
 
@@ -187,16 +190,16 @@ void Game::render()
 
 	_model.get()->render();*/
 
-	static float time = 0.f;
-	time += 0.009f;
-	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
-	_forwardRenderer.render(*_model.get());
-	_shader.get()->bind();
-    _shader.get()->setSampler("uTexColor", 0);
-	_texture.get()->bind(0);
-	_forwardRenderer.display(_camera);
-	_texture.get()->unbind(0);
-	LOG_GL_ERRORS();
+	//static float time = 0.f;
+	//time += 0.009f;
+	//_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
+	//_forwardRenderer.render(*_model.get());
+	//_shader.get()->bind();
+ //   _shader.get()->setSampler("uTexColor", 0);
+	//_texture.get()->bind(0);
+	//_forwardRenderer.display(_camera);
+	//_texture.get()->unbind(0);
+	//LOG_GL_ERRORS();
 
 
     static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");

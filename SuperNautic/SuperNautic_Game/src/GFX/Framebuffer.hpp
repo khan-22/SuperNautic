@@ -34,6 +34,8 @@ namespace GFX
 		void setReadBuffer(GLuint attachment) const;
 		void setViewport() const;
 
+		void bindColorTextures() const;
+
 	protected:
 
 

@@ -105,3 +105,12 @@ void Framebuffer::setViewport() const
 	glViewport(0, 0, _width, _height);
 }
 
+void Framebuffer::bindColorTextures() const
+{
+	for (int i = 0; i < _numColorAttachments; i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, _textures[i]);
+	}
+}
+

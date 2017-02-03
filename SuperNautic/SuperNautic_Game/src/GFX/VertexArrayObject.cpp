@@ -51,14 +51,22 @@ void GFX::VertexArrayObject::sendDataToBuffer(GLubyte bufferIndex, GLubyte attri
 
 	glEnableVertexAttribArray(attributeIndex);
 
-	if (attributeIndex == 0)
+	GLsizei accumulatedOffset = 0U;
+	for (int i = 0; i < attributeIndex; i++)
 	{
-		glVertexAttribPointer(attributeIndex, count, type, GL_FALSE, 0, nullptr);
+		accumulatedOffset += _attributeOffsets[i];
 	}
-	else 
-	{
-		glVertexAttribPointer(attributeIndex, count, type, GL_FALSE, 0, (GLvoid*)_attributeOffsets[attributeIndex-1]);
-	}
+
+	glVertexAttribPointer(attributeIndex, count, type, GL_FALSE, 0, (GLvoid*)(accumulatedOffset));
+
+	//if (attributeIndex == 0)
+	//{
+	//	glVertexAttribPointer(attributeIndex, count, type, GL_FALSE, 0, nullptr);
+	//}
+	//else 
+	//{
+	//	glVertexAttribPointer(attributeIndex, count, type, GL_FALSE, 0, (GLvoid*)(_attributeOffsets[attributeIndex-1]));
+	//}
 
 	_attributeOffsets[attributeIndex] += size;
 

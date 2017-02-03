@@ -46,9 +46,9 @@ private:
 	TextureAsset _texture;
 
 	GFX::DeferredRenderer	_deferredRenderer1;
-	GFX::DeferredRenderer	_deferredRenderer2;
-	GFX::DeferredRenderer	_deferredRenderer3;
-	GFX::DeferredRenderer	_deferredRenderer4;
+	//GFX::DeferredRenderer	_deferredRenderer2;
+	//GFX::DeferredRenderer	_deferredRenderer3;
+	//GFX::DeferredRenderer	_deferredRenderer4;
 	Camera		_camera;
 
 };
