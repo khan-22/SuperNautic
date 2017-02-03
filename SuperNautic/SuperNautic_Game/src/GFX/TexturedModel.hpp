@@ -14,14 +14,23 @@ namespace GFX
 	{
     public:
         TexturedModel();
-        TexturedModel(ModelAsset& model, MaterialAsset& material);
+        TexturedModel(const ModelAsset& model, const MaterialAsset& material);
 
         virtual void render(RenderStates& states) override;
-        void setModelAndMaterial(ModelAsset& model, MaterialAsset& material);
+
+        void setModel(const ModelAsset& model);
+        void setMaterial(const MaterialAsset& material);
+        void setModelAndMaterial(const ModelAsset& model, const MaterialAsset& material);
 
     private:
         ModelAsset _model;
         MaterialAsset _material;
+        void (TexturedModel::*_renderFunc)(RenderStates&) = nullptr;
+
+
+        void renderStandard(RenderStates& states);
+        void renderModelless(RenderStates& states);
+        void renderTextureless(RenderStates& states);
 	};
 
 }

@@ -35,6 +35,8 @@ namespace GFX
 		Model();
 		~Model();
 
+		size_t getNumMeshes() const;
+
 	protected:
 		void render(RenderStates& states) override;
 
