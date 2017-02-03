@@ -35,6 +35,12 @@ void Material::unbind(unsigned int groupId) const
     group.diffuse.get()->unbind(0);
 }
 
+size_t Material::getNumGroups() const
+{
+    return _groups.size();
+}
+
+
 /////////////////////////
 // Material::Group
 /////////////////////////
