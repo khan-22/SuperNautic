@@ -20,7 +20,6 @@
 class Segment
 {
 public:
-	const std::string	_segmentName;
 	const SegmentInfo*	_segmentInfo;
 
 	// Loads a segment from an fbx file
@@ -108,7 +107,7 @@ private:
 	float _length;
 
 	// Root of oct-tree for collision geometry
-	AABB octTree;
+	AABB _octTree;
 
 	// Names of meshes expected in fbx file (defined in Segment.cpp)
 	static const std::string baseVisualName;

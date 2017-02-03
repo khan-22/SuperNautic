@@ -25,13 +25,13 @@ Texture::~Texture()
 
 
 
-void Texture::bind(unsigned int unit)
+void Texture::bind(unsigned int unit) const
 {
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(_target, _textureId);
 }
 
-void Texture::unbind(unsigned int unit)
+void Texture::unbind(unsigned int unit) const
 {
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(_target, 0);
@@ -47,7 +47,7 @@ unsigned int Texture::getHeight() const
     return _height;
 }
 
-void Texture::initialize(const unsigned char* data)
+void Texture::initialize(const unsigned char* data) const
 {
     switch(_target)
     {
@@ -64,7 +64,7 @@ void Texture::initialize(const unsigned char* data)
     }
 }
 
-void Texture::initialize2d(const unsigned char* data)
+void Texture::initialize2d(const unsigned char* data) const
 {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -74,7 +74,7 @@ void Texture::initialize2d(const unsigned char* data)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 }
 
-void Texture::initializeCubeMap(const unsigned char* data)
+void Texture::initializeCubeMap(const unsigned char* data) const
 {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

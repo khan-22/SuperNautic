@@ -9,6 +9,7 @@
 #include "../Log.hpp"
 #include "../GFX/VertexDataImporter.hpp"
 #include "MainMenuApplicationState.hpp"
+#include "../GFX/TexturedModel.hpp"
 
 #include "LoadAssetFunctions.hpp"
 
@@ -94,11 +95,18 @@ bool Game::bInitialize()
 	_shader = ShaderCache::get("forward");
 	_texture = TextureCache::get("heatchart.png");
 
+	_texturedModel.setModelAndMaterial(_model, materialTest);
+
 	_forwardRenderer.initialize();
 
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
 
+
+	_shader.get()->bind();
+    _shader.get()->setSampler("uDiffuse", 0);
+    _shader.get()->setSampler("uSpecular", 1);
+    _shader.get()->setSampler("uNormal", 2);
 	return true;
 }
 
@@ -176,6 +184,8 @@ void Game::render()
 	_shader.get()->setUniform("uColor", color);
 
 	_model.get()->render();*/
+
+	_shader.get()->bind();
 
 	static float time = 0.f;
 	time += 0.009f;

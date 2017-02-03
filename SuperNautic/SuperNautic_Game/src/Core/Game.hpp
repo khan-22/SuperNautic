@@ -13,6 +13,7 @@
 
 #include "LoadAssetFunctions.hpp"
 #include "../GFX/ForwardRenderer.hpp"
+#include "../GFX/TexturedModel.hpp"
 
 #include "DebugCamera.hpp"
 
@@ -45,6 +46,7 @@ private:
 	ShaderAsset	_shader;
 	ModelAsset	_model;
 	TextureAsset _texture;
+	GFX::TexturedModel _texturedModel;
 
 	GFX::ForwardRenderer	_forwardRenderer;
 	Camera		_camera;
