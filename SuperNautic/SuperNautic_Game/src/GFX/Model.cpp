@@ -29,7 +29,9 @@ void Model::setAttributes(RenderStates& states) const
 	static float time = 0.f;
 	time += 0.0007f;
 
-	glm::mat4 model			= glm::rotate(time, glm::vec3(0.f, 1.f, 0.f));
+	//glm::mat4 model			= glm::rotate(time, glm::vec3(0.f, 1.f, 0.f));
+	glm::mat4 model = glm::mat4();
+
 	glm::mat4 view			= states.camera->getView();
 	glm::mat4 perspective	= states.camera->getPerspective();
 

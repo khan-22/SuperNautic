@@ -91,7 +91,8 @@ bool Game::bInitialize()
     }
 
 
-	_model = ModelCache::get("test2.fbx");
+	_model = ModelCache::get("ship.fbx");
+	_segmentModel = ModelCache::get("segments/s01_straight_aa.fbx");
 	_shader = ShaderCache::get("forward");
 	_texture = TextureCache::get("heatchart.png");
 
@@ -190,7 +191,11 @@ void Game::render()
 	static float time = 0.f;
 	time += 0.009f;
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
+	
+	//SEND TEST MODELS TO RENDERER
 	_forwardRenderer.render(*_model.get());
+	_forwardRenderer.render(*_segmentModel.get());
+
 	_shader.get()->bind();
     _shader.get()->setSampler("uTexColor", 0);
 	_texture.get()->bind(0);
