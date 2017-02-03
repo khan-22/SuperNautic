@@ -33,6 +33,8 @@ void main()
 	//fs_in.position / 2 + vec3(1.0)
 	//outColor = vec4(diffuse * factor, 1.0);
 
+	//outColor = vec4(texture(uDiffuse, uv).rgb, 1.0);
+
 	if (uv.s < 0.5 && uv.t < 0.5)
 	{
 		showPosition();
@@ -86,6 +88,6 @@ void showAll()
 	vec3 diffuse = texture(uDiffuse, uv).rgb;
 	vec3 normal = texture(uNormal, uv).rgb;
 
-	float factor = max(dot(normal, -normalize(lightDir)), 0.1);
+	float factor = max(dot(normal, -normalize(lightDir)), 0.3);
 	outColor = vec4(diffuse * factor, 1.0);
 }

@@ -206,8 +206,8 @@ void Game::render()
 
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
     //_forwardRenderer.render(*_model.get());
-	_forwardRenderer.render(_texturedModel);
-	_forwardRenderer.display(_debugCamera);
+	//_forwardRenderer.render(_texturedModel);
+	//_forwardRenderer.display(_debugCamera);
 	LOG_GL_ERRORS();
 
 
@@ -216,10 +216,10 @@ void Game::render()
     fps.setFont(*font.get());
     fps.setString("FPS: " + std::to_string(_fps));
 
-    //_stateStack.render();
-    //_window.pushGLStates();
-    //_window.draw(fps);
-    //_window.popGLStates();
+ /*   _window.pushGLStates();
+    _stateStack.render();
+    _window.draw(fps);
+    _window.popGLStates();*/
 
 	_window.display();
 }
