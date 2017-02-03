@@ -7,9 +7,6 @@
 
 #include "Segment.hpp"
 
-
-
-
 // Holds uninstantiated versions of track segments
 class SegmentHandler
 {

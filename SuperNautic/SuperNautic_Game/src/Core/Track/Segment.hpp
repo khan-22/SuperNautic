@@ -51,6 +51,27 @@ public:
 		return _segmentInfo->_endConnection;
 	}
 
+	// Returns "probability"
+	int getProbability() const
+	{
+		return _segmentInfo->_probability;
+	}
+
+	int getMinInRow() const
+	{
+		return _segmentInfo->_minInRow;
+	}
+
+	int getMaxInRow() const
+	{
+		return _segmentInfo->_maxInRow;
+	}
+
+	int getRotationOffset() const
+	{
+		return _segmentInfo->_rotationOffset;
+	}
+
 	// Returns approximate segment length
 	float getLength() const
 	{
