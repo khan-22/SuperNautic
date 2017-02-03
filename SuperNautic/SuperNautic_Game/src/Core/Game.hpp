@@ -13,6 +13,7 @@
 
 #include "LoadAssetFunctions.hpp"
 #include "../GFX/ForwardRenderer.hpp"
+#include "../GFX/TexturedModel.hpp"
 
 class Game
 {
@@ -43,6 +44,7 @@ private:
 	ShaderAsset	_shader;
 	ModelAsset	_model;
 	TextureAsset _texture;
+	GFX::TexturedModel _texturedModel;
 
 	GFX::ForwardRenderer	_forwardRenderer;
 	Camera		_camera;
