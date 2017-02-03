@@ -43,7 +43,9 @@ namespace GFX
 
 		// This is explicitly for the ModelLoader to handle.
 		Mesh& addMesh();
+		void setAttributes(RenderStates& states) const;
 		friend class ModelLoader;
+		friend class TexturedModel;
 	};
 
 }
