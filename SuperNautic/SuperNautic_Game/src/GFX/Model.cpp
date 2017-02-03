@@ -16,6 +16,15 @@ Model::~Model()
 
 void Model::render(RenderStates& states)
 {
+    setAttributes(states);
+	for (auto& mesh : _meshes)
+	{
+		mesh->render();
+	}
+}
+
+void Model::setAttributes(RenderStates& states) const
+{
 	// TEMP
 	static float time = 0.f;
 	time += 0.0007f;
@@ -33,10 +42,6 @@ void Model::render(RenderStates& states)
 	glm::vec4 color(1.f, 0.f, 0.f, 1.f);
 	shader->setUniform("uColor", color);
 
-	for (auto& mesh : _meshes)
-	{
-		mesh->render();
-	}
 }
 
 Model::Mesh& Model::addMesh()

@@ -16,8 +16,8 @@ namespace GFX
         Texture(const unsigned char* data, unsigned int width, unsigned int height, GLenum target);
         ~Texture();
 
-        void bind(unsigned int unit);
-        void unbind(unsigned int unit);
+        void bind(unsigned int unit) const;
+        void unbind(unsigned int unit) const;
 
         unsigned int getWidth() const;
         unsigned int getHeight() const;
@@ -28,9 +28,9 @@ namespace GFX
         GLenum _target;
         GLuint _textureId;
 
-        void initialize(const unsigned char* data);
-        void initialize2d(const unsigned char* data);
-        void initializeCubeMap(const unsigned char* data);
+        void initialize(const unsigned char* data) const;
+        void initialize2d(const unsigned char* data) const;
+        void initializeCubeMap(const unsigned char* data) const;
     };
 }
 
