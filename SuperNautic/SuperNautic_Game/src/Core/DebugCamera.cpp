@@ -1,4 +1,3 @@
-#include <SFML\Graphics.hpp>
 #include <glm\gtx\transform.hpp>
 
 #include "DebugCamera.hpp"
@@ -10,12 +9,12 @@ DebugCamera::DebugCamera() : Camera()
 }
 
 //Real constructor
-DebugCamera::DebugCamera(float fov, float top, float left, int viewWidth, int viewHeight
+DebugCamera::DebugCamera(float fov, int viewWidth, int viewHeight
 	, const glm::vec3 & pos, const glm::vec3 & viewDirection)
 	: Camera(fov, viewWidth, viewHeight, pos, viewDirection)
 	, _anglePitch(0.f)
 	, _angleYaw(0.f)
-	, _moveSpeed(4.f)
+	, _moveSpeed(10.f)
 	, _bActive(false)
 {
 	
@@ -30,13 +29,13 @@ DebugCamera::~DebugCamera()
 //Update
 void DebugCamera::update(const float dt, sf::Window& window)
 {
-	//Updating pitch and yaw
 	if (_bActive)
 	{
+		//Updating pitch and yaw
 		sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 		const float mouseSpeed = 0.3f;
-		_angleYaw -= ((float)(mousePos.x - _viewHeight / 2.0f)) * mouseSpeed;
-		_anglePitch -= ((float)(mousePos.y - _viewWidth / 2.0f)) * mouseSpeed;
+		_angleYaw -= ((float)(mousePos.x - _viewWidth / 2.0f)) * mouseSpeed;
+		_anglePitch -= ((float)(mousePos.y - _viewHeight / 2.0f)) * mouseSpeed;
 		//Preventing gimbal lock
 		if (_anglePitch > 89)
 		{
@@ -47,7 +46,7 @@ void DebugCamera::update(const float dt, sf::Window& window)
 			_anglePitch = -89;
 		}
 
-		_angleYaw = fmod(_angleYaw, 360);
+		_angleYaw = fmod(_angleYaw, 360.f);
 		sf::Mouse::setPosition(sf::Vector2i(_viewWidth / 2, _viewHeight / 2), window);
 		//Calculating sin and cos
 		float cosPitch = cosf(glm::radians(_anglePitch));
@@ -92,19 +91,23 @@ void DebugCamera::update(const float dt, sf::Window& window)
 		//Speed
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
 		{
-			_moveSpeed = 1.0f;
+			_moveSpeed = 2.0f;
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
 		{
-			_moveSpeed = 4.0f;
+			_moveSpeed = 10.0f;
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
 		{
-			_moveSpeed = 10.0f;
+			_moveSpeed = 50.0f;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
+		{
+			_moveSpeed = 200.0f;
 		}
 	}
 	//Checking if mouse should be used
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus())
 	{
 		_bActive = true;
 		window.setMouseCursorVisible(false);

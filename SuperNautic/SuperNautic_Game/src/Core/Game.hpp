@@ -14,6 +14,9 @@
 #include "LoadAssetFunctions.hpp"
 #include "../GFX/ForwardRenderer.hpp"
 #include "../GFX/DeferredRenderer.hpp"
+#include "../GFX/TexturedModel.hpp"
+
+#include "DebugCamera.hpp"
 
 class Game
 {
@@ -44,13 +47,14 @@ private:
 	ShaderAsset	_shader;
 	ModelAsset	_model;
 	TextureAsset _texture;
+	GFX::TexturedModel _texturedModel;
 
 	GFX::DeferredRenderer	_deferredRenderer1;
 	//GFX::DeferredRenderer	_deferredRenderer2;
 	//GFX::DeferredRenderer	_deferredRenderer3;
 	//GFX::DeferredRenderer	_deferredRenderer4;
 	Camera		_camera;
-
+	DebugCamera _debugCamera;
 };
 
 #endif //GAME_HPP

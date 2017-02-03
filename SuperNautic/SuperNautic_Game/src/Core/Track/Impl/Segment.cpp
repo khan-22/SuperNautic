@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <limits>
+#include <map>
 
 #include "../Segment.hpp"
 #include "../../../Log.hpp"
@@ -68,8 +69,64 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 // Tests a ray collision against all collision surfaces of the segment. Returns collision information
 const RayIntersection Segment::rayIntersectionTest(Ray& ray) const
 {
-	// incomplete
-	return RayIntersection {};
+	// Get distance to largest box
+	float firstBoxDistance = _octTree.rayIntersection(ray);
+
+	// If missed, return with miss
+	if (firstBoxDistance < 0.0f)
+	{
+		return RayIntersection{ false };
+	}
+	else
+	{
+		// Keep relevant boxes in map ordered by distance to ensure that the first hit is always the closest
+		std::multimap<float, const AABB*> boxesToTest;
+
+		// Insert first box
+		boxesToTest.insert(std::pair<float, const AABB*>(firstBoxDistance, &_octTree));
+
+		// Search until a hit is found or all relevant boxes are checked
+		while (boxesToTest.size() > 0)
+		{
+			// If box has children it contains no geometry, add children hit by ray to map
+			if (boxesToTest.begin()->second->_children.size() > 0)
+			{
+				// For every child
+				for (unsigned i = 0; i < boxesToTest.begin()->second->_children.size(); ++i)
+				{
+					// Check if child intersects ray
+					float hitValue = boxesToTest.begin()->second->_children[i].rayIntersection(ray);
+
+					// If hit, add child to map
+					if (hitValue >= 0.0f)
+					{
+						boxesToTest.insert(std::pair<float, const AABB*>(hitValue, &(boxesToTest.begin()->second->_children[i])));
+					}
+				}
+			}
+			// Else the box contains geometry, check for triangle collision
+			else
+			{
+				// Construct vector of indices of models
+				std::vector<unsigned> modelIndices{ _temperatureZoneCollisions };
+				modelIndices.push_back(_baseCollision);
+
+				// Test intersection with geometry
+				RayIntersection intersection = boxesToTest.begin()->second->triangleRayIntersection(ray, modelIndices, _scene);
+
+				if (intersection)
+				{
+					return intersection;
+				}
+			}
+			
+			// Remove checked box from map
+			boxesToTest.erase(boxesToTest.begin());
+		}
+
+		// If no hit was found, return with miss
+		return RayIntersection{ false };
+	}
 }
 
 // Finds the two waypoints closest to a position (position is relative to segment's local origin)
@@ -200,7 +257,7 @@ void Segment::assignMeshPointers()
 
 	if (_temperatureZoneCollisions.size() != _temperatureZoneVisuals.size())
 	{
-		LOG_ERROR("Mismatch: number of visual temperature models not equal to number of collision models in segment ", _segmentName);
+		LOG_ERROR("Mismatch: number of visual temperature models not equal to number of collision models in segment ", _segmentInfo->_visualFileName);
 	}
 }
 
@@ -253,7 +310,7 @@ void Segment::createWaypoints()
 
 	if (_waypoints.size() < 2)
 	{
-		LOG_ERROR("Segment ", _segmentName, " has fewer than 2 waypoints. Not good :(");
+		LOG_ERROR("Segment ", _segmentInfo->_visualFileName, " has fewer than 2 waypoints. Not good :(");
 		return;
 	}
 
@@ -446,8 +503,8 @@ void Segment::createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions)
 	}
 
 	// Set values to corners of oct-tree root
-	octTree._minCorner = min;
-	octTree._maxCorner = max;
+	_octTree._minCorner = min;
+	_octTree._maxCorner = max;
 
 	// Will contain indices into vertices/faces vectors of models
 	// [0]..[_temperatureZoneCollisions.size()] is zone collisions, [_temperatureZoneCollisions.size()] is base collision 
@@ -494,7 +551,7 @@ void Segment::createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions)
 	}
 	
 	// Subdivide
-	subdivideOctTree(octTree, maxFacesPerBox, maxSubdivisions, std::move(vertexIndices), std::move(faceIndices));
+	subdivideOctTree(_octTree, maxFacesPerBox, maxSubdivisions, std::move(vertexIndices), std::move(faceIndices));
 }
 
 // Find smallest and largest vertex position in each axis for a model, using min and max for comparison

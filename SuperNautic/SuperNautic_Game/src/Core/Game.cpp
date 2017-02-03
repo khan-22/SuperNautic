@@ -9,6 +9,7 @@
 #include "../Log.hpp"
 #include "../GFX/VertexDataImporter.hpp"
 #include "MainMenuApplicationState.hpp"
+#include "../GFX/TexturedModel.hpp"
 
 #include "LoadAssetFunctions.hpp"
 
@@ -21,7 +22,8 @@ Game::Game()
 	, _context(_window)
 	, _quitTimer(0.f)
 	, _fps(60.f)
-	, _camera(70.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
+	, _camera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
+	, _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f))
 {
 	LOG("Game is being constructed...");
 }
@@ -93,6 +95,9 @@ bool Game::bInitialize()
 	_shader = ShaderCache::get("forward");
 	_texture = TextureCache::get("heatchart.png");
 
+	_texturedModel.setModelAndMaterial(_model, materialTest);
+
+	_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 	_deferredRenderer1.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 	//_deferredRenderer2.initialize(&_window, 0.5f, 0.0f, 0.5f, 0.5f);
 	//_deferredRenderer3.initialize(&_window, 0.0f, 0.5f, 0.5f, 0.5f);
@@ -101,6 +106,11 @@ bool Game::bInitialize()
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
 
+
+	_shader.get()->bind();
+    _shader.get()->setSampler("uDiffuse", 0);
+    _shader.get()->setSampler("uSpecular", 1);
+    _shader.get()->setSampler("uNormal", 2);
 	return true;
 }
 
@@ -148,6 +158,8 @@ void Game::update(float dt)
 {
     _fps = _fps * 0.9f + 0.1f / dt;
 
+	_debugCamera.update(dt, _window);
+
     _stateStack.update(dt);
 }
 
@@ -190,16 +202,15 @@ void Game::render()
 
 	_model.get()->render();*/
 
-	//static float time = 0.f;
-	//time += 0.009f;
-	//_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
-	//_forwardRenderer.render(*_model.get());
-	//_shader.get()->bind();
- //   _shader.get()->setSampler("uTexColor", 0);
-	//_texture.get()->bind(0);
-	//_forwardRenderer.display(_camera);
-	//_texture.get()->unbind(0);
-	//LOG_GL_ERRORS();
+	_shader.get()->bind();
+
+	static float time = 0.f;
+	time += 0.009f;
+	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
+    //_forwardRenderer.render(*_model.get());
+	_forwardRenderer.render(_texturedModel);
+	_forwardRenderer.display(_debugCamera);
+	LOG_GL_ERRORS();
 
 
     static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");

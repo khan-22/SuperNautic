@@ -5,7 +5,7 @@
 #include "../../../Log.hpp"
 
 // Path to res\models
-std::string SegmentHandler::basePath = "res\\models\\";
+std::string SegmentHandler::basePath = "res/models/";
 
 // Loads SegmentInfos from file with name filePath (relative to res/models)
 SegmentHandler::SegmentHandler(std::string filePath)

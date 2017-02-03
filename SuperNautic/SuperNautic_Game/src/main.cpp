@@ -12,10 +12,9 @@
 #include "Log.hpp"
 #include "Core\Game.hpp"
 
-
-
-
-
+// For ray intersection testing
+#include "Core\Geometric Primitives\RayIntersection.hpp"
+#include "Core\Geometric Primitives\Ray.hpp"
 #include "Core\Track\SegmentHandler.hpp"
 #include "Core\Track\Segment.hpp"
 
@@ -33,8 +32,11 @@ int main()
 	}
 	else
 	{
-		SegmentHandler testSH{ "Segments/segmentinfos.txt" };
-		const Segment* mySegment = testSH.loadSegment(0);
+		// Test ray intersection
+		SegmentHandler sh{ "Segments/segmentinfos.txt" };
+		const Segment* s{ sh.loadSegment(0) };
+		Ray r{ glm::vec3{0,0,-2}, glm::vec3{-1,0,-0.5}, 10000.0f };
+		RayIntersection i = s->rayIntersectionTest(r);
 
 		game.bInitialize();
 		game.run();
