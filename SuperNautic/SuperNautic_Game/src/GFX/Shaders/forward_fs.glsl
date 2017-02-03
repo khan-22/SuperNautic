@@ -26,6 +26,8 @@ void main()
 	vec4 diffuse = texture(uDiffuse, fs_in.uv);
 	vec4 specular = texture(uSpecular, fs_in.uv);
 	vec4 normal = texture(uNormal, fs_in.uv);
-	OutColor = (diffuse + specular + normal) * factor / 3.0;
-	//OutColor = texture(uTexColor, fs_in.uv) * factor;
+	//OutColor = (diffuse + specular + normal) * factor / 3.0;
+	OutColor = (diffuse + specular + normal);
+
+	//OutColor = texture(uTexColor, fs_in.uv);
 }

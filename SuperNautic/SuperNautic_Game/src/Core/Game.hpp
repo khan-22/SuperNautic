@@ -44,7 +44,11 @@ private:
 	float _fps;
 
 	ShaderAsset	_shader;
+	//TEST MODELS
 	ModelAsset	_model;
+	ModelAsset	_segmentModel;
+	//////////////////////
+
 	TextureAsset _texture;
 	GFX::TexturedModel _texturedModel;
 
