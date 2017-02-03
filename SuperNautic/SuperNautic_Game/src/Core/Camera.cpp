@@ -19,6 +19,7 @@ Camera::Camera(float fov, int viewWidth, int viewHeight, const glm::vec3 & pos
 	, _viewDir(viewDirection)
 {
 	_perspective = glm::perspective(glm::radians(_fov), (float)_viewWidth / _viewHeight, 0.1f, 1000.f);
+	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
 }
 
 //Destructor

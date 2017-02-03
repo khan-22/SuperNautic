@@ -22,7 +22,8 @@ Game::Game()
 	, _context(_window)
 	, _quitTimer(0.f)
 	, _fps(60.f)
-	, _camera(70.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
+	, _camera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
+	, _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f))
 {
 	LOG("Game is being constructed...");
 }
@@ -153,6 +154,8 @@ void Game::update(float dt)
 {
     _fps = _fps * 0.9f + 0.1f / dt;
 
+	_debugCamera.update(dt, _window);
+
     _stateStack.update(dt);
 }
 
@@ -187,9 +190,12 @@ void Game::render()
 	static float time = 0.f;
 	time += 0.009f;
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
-//	_forwardRenderer.render(*_model.get());
-	_forwardRenderer.render(_texturedModel);
-	_forwardRenderer.display(_camera);
+	_forwardRenderer.render(*_model.get());
+	_shader.get()->bind();
+    _shader.get()->setSampler("uTexColor", 0);
+	_texture.get()->bind(0);
+	_forwardRenderer.display(_debugCamera);
+	_texture.get()->unbind(0);
 	LOG_GL_ERRORS();
 
 

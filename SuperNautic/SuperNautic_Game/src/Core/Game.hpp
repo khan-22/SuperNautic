@@ -15,6 +15,8 @@
 #include "../GFX/ForwardRenderer.hpp"
 #include "../GFX/TexturedModel.hpp"
 
+#include "DebugCamera.hpp"
+
 class Game
 {
 public:
@@ -48,7 +50,7 @@ private:
 
 	GFX::ForwardRenderer	_forwardRenderer;
 	Camera		_camera;
-
+	DebugCamera _debugCamera;
 };
 
 #endif //GAME_HPP
