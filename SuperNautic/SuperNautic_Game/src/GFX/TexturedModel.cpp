@@ -65,21 +65,21 @@ void TexturedModel::setModelAndMaterial(const ModelAsset& model, const MaterialA
 
     if(model.get() == nullptr)
     {
-        _renderFunc = &renderModelless;
+        _renderFunc = &TexturedModel::renderModelless;
         return;
     }
 
     if(material.get() == nullptr)
     {
-        _renderFunc = &renderTextureless;
+        _renderFunc = &TexturedModel::renderTextureless;
         return;
     }
 
     if(material.get()->getNumGroups() < model.get()->getNumMeshes())
     {
-        _renderFunc = &renderTextureless;
+        _renderFunc = &TexturedModel::renderTextureless;
         return;
     }
 
-    _renderFunc = &renderStandard;
+    _renderFunc = &TexturedModel::renderStandard;
 }
