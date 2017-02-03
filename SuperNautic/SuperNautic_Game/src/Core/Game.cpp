@@ -215,7 +215,7 @@ void Game::render()
 	/////////////////////////////
 
 	_shader.get()->bind();
-    _shader.get()->setSampler("uTexColor", 0);
+    //_shader.get()->setSampler("uTexColor", 0);
 	_texture.get()->bind(0);
 	_forwardRenderer.display(_debugCamera);
 	LOG_GL_ERRORS();
