@@ -18,6 +18,8 @@
 #include "Core\Track\SegmentHandler.hpp"
 #include "Core\Track\Segment.hpp"
 
+#include "GFX\Transformable3D.hpp"
+
 
 int main()
 {
