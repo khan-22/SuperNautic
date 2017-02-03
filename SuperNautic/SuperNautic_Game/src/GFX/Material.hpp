@@ -25,6 +25,9 @@ namespace GFX
 
         Material(const std::vector<Group>& groups);
 
+        void bind(unsigned int groupId) const;
+        void unbind(unsigned int groupId) const;
+
     private:
         std::vector<Group> _groups;
 	};
