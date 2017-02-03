@@ -16,6 +16,7 @@ uniform mat4 uMVP;
 
 out VS_OUT
 {
+	vec3 position;
 	vec2 uv;
 	vec3 normal;
 } vs_out;
@@ -26,10 +27,7 @@ void main()
 	vs_out.uv	  = uv.xy; 
 	vs_out.normal = normal;
 
-	//mat4 boop1 = uProjection;
-	//mat4 boop2 = uView;
-	mat4 boop3 = uModel;
-
+	vs_out.position = (uModel * vec4(pos, 1.0f)).xyz;
 	gl_Position = uMVP * vec4(pos, 1.0f);
 	
 }
