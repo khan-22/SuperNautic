@@ -24,7 +24,7 @@ out VS_OUT
 void main()
 {
 	//We do not use the W component of the UVs, can be changed
-	vs_out.uv	  = uv.xy; 
+	vs_out.uv	  = vec2(uv.x, 1.0 - uv.y); 
 	vs_out.normal = normal;
 
 	vs_out.position = (uModel * vec4(pos, 1.0f)).xyz;
