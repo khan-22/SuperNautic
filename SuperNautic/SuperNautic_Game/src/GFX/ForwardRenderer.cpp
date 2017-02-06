@@ -6,6 +6,7 @@
 using namespace GFX;
 
 ForwardRenderer::ForwardRenderer()
+	: _window(nullptr)
 {
 }
 
@@ -13,9 +14,15 @@ ForwardRenderer::~ForwardRenderer()
 {
 }
 
-void GFX::ForwardRenderer::initialize()
+void ForwardRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
 {
 	_shader = ShaderCache::get("forward");
+
+	_window = window;
+	_x		= x;
+	_y		= y;
+	_width	= width;
+	_height = height;
 }
 
 void ForwardRenderer::render(Renderable3D& renderable)
@@ -25,6 +32,13 @@ void ForwardRenderer::render(Renderable3D& renderable)
 
 void ForwardRenderer::display(Camera& camera)
 {
+	assert(_window != nullptr);
+
+	GLsizei windowWidth = _window->getSize().x;
+	GLsizei windowHeight = _window->getSize().y;
+
+	glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
+
 	_shader.get()->bind();
 	for (auto drawCall : _drawCalls)
 	{
@@ -34,4 +48,5 @@ void ForwardRenderer::display(Camera& camera)
 	}
 
 	_drawCalls.clear();
+	glViewport(0, 0, windowWidth, windowHeight);
 }

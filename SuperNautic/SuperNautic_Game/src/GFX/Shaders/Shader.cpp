@@ -1,5 +1,7 @@
 #include "Shader.hpp"
 
+#include "../../Log.hpp"
+
 using namespace GFX;
 
 GFX::Shader::Shader(GLuint shaderProgram)
@@ -115,5 +117,16 @@ GLuint GFX::Shader::getUniform(const std::string& name)
 		return found->second;
 	}
 
-	return _uniformMap[name] = glGetUniformLocation(_shaderProgram, name.c_str());
+	GLint location = glGetUniformLocation(_shaderProgram, name.c_str());
+
+	if (location == -1)
+	{
+		LOG_ERROR("Failed to get the uniform location for: ", name);
+	}
+	else
+	{
+		_uniformMap[name] = location;
+	}
+
+	return location;
 }

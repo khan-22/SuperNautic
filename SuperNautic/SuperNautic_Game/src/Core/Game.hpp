@@ -13,9 +13,12 @@
 
 #include "LoadAssetFunctions.hpp"
 #include "../GFX/ForwardRenderer.hpp"
+#include "../GFX/DeferredRenderer.hpp"
 #include "../GFX/TexturedModel.hpp"
 
 #include "DebugCamera.hpp"
+
+#include <vector>
 
 class Game
 {
@@ -44,9 +47,10 @@ private:
 	float _fps;
 
 	ShaderAsset	_shader;
-	//TEST MODELS
-	ModelAsset	_model;
-	ModelAsset	_segmentModel;
+
+	//TEST MODELS are put in this array for rendering
+	//MAKE SURE NOT TO PUSH THIS TO MASTER, at least not without discussing
+	std::vector<ModelAsset> ModelArray;
 	//////////////////////
 
 	// SHIP TESTING
@@ -59,6 +63,10 @@ private:
 	GFX::TexturedModel _texturedModel;
 
 	GFX::ForwardRenderer	_forwardRenderer;
+	GFX::DeferredRenderer	_deferredRenderer1;
+	//GFX::DeferredRenderer	_deferredRenderer2;
+	//GFX::DeferredRenderer	_deferredRenderer3;
+	//GFX::DeferredRenderer	_deferredRenderer4;
 	Camera		_camera;
 	DebugCamera _debugCamera;
 };

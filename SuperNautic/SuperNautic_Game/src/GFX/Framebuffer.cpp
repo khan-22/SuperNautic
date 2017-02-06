@@ -8,12 +8,33 @@ using namespace GFX;
 
 Framebuffer Framebuffer::DEFAULT;
 
-Framebuffer::Framebuffer(unsigned int width, unsigned int height, unsigned int numColorAttachments, DepthType depthType)
-	: _width(width), _height(height)
-	, _numColorAttachments(numColorAttachments), _bHasDepthAttachment(depthType != NO_DEPTH)
-	, _depthTexture(0)
+Framebuffer::Framebuffer()
+	: _width(0), _height(0)
+	, _numColorAttachments(0U)
+	, _depthTexture(0U)
+	, _fbo(0U)
+{
+
+}
+
+
+
+Framebuffer::~Framebuffer()
+{
+	glDeleteTextures(_numColorAttachments, _textures);
+	glDeleteTextures(1, &_depthTexture);
+
+	glDeleteFramebuffers(1, &_fbo);
+}
+
+void GFX::Framebuffer::initialize(GLuint width, GLuint height, GLuint numColorAttachments, DepthType depthType)
 {
 	assert(numColorAttachments <= MAX_COLOR_ATTACHMENTS);
+
+	_width  = width;
+	_height = height;
+
+	_numColorAttachments = numColorAttachments;
 
 	glGenFramebuffers(1, &_fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
@@ -27,23 +48,24 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height, unsigned int n
 	{
 		glBindTexture(GL_TEXTURE_2D, _textures[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _width, _height, 0, GL_RGB, GL_FLOAT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, _textures[i], 0);
 	}
 
-	if (_bHasDepthAttachment)
-	{
-		glGenTextures(1, &_depthTexture);
-		
-		glBindTexture(GL_TEXTURE_2D, _depthTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, depthType, _width, _height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexture, 0);
-	}
+	glGenTextures(1, &_depthTexture);
+
+	glBindTexture(GL_TEXTURE_2D, _depthTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, depthType, _width, _height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexture, 0);
 
 	// Defines which attachments will be seen as outputs in the fragment shader.
 	// Here I define an amount of MAX_COLOR_ATTACHMENTS, but note that in the next gl call I am only sending the amount 
 	// of actual color attachments that are present!
-	GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, 
-							 GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6, GL_COLOR_ATTACHMENT7 };
+	GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
+		GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6, GL_COLOR_ATTACHMENT7 };
 	glDrawBuffers(numColorAttachments, drawBuffers);
 
 	// Now we must check if something went wrong
@@ -55,21 +77,6 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height, unsigned int n
 
 	// Rebinds the default for both reading and writing
 	DEFAULT.bindBoth();
-}
-
-Framebuffer::Framebuffer()
-{
-	// For the DEFAULT framebuffer
-	_fbo = 0;
-}
-
-
-Framebuffer::~Framebuffer()
-{
-	glDeleteTextures(_numColorAttachments, _textures);
-	glDeleteTextures(1, &_depthTexture);
-
-	glDeleteFramebuffers(1, &_fbo);
 }
 
 void Framebuffer::bindWrite() const
@@ -89,7 +96,7 @@ void Framebuffer::bindBoth() const
 
 void Framebuffer::setReadBuffer(GLuint attachment) const
 {
-	assert(attachment <= MAX_COLOR_ATTACHMENTS);
+	assert(attachment <= _numColorAttachments);
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment);
 }
 
@@ -97,3 +104,13 @@ void Framebuffer::setViewport() const
 {
 	glViewport(0, 0, _width, _height);
 }
+
+void Framebuffer::bindColorTextures() const
+{
+	for (int i = 0; i < _numColorAttachments; i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, _textures[i]);
+	}
+}
+
