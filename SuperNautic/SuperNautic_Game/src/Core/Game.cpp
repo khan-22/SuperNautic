@@ -15,6 +15,14 @@
 
 #include "../GFX/ShaderLoader.hpp"
 
+// For ray intersection testing
+#include "Geometric Primitives\RayIntersection.hpp"
+#include "Geometric Primitives\Ray.hpp"
+#include "Track\SegmentHandler.hpp"
+#include "Track\Segment.hpp"
+
+#include "..\GFX\Transformable3D.hpp"
+
 
 
 Game::Game()
@@ -116,6 +124,14 @@ void Game::run()
 	sf::Clock clock;
 	sf::Time deltaTime = clock.restart();
 
+	// SHIP TESTING
+	sh = { "Segments/segmentinfos.txt" };
+	s = { sh.loadSegment(0) };
+
+	Ray r{ glm::vec3{ 0,0,-2 }, glm::vec3{ -1,0,-0.5 }, 10000.0f };
+	RayIntersection i = s->rayIntersectionTest(r);
+	//////////////
+
 	while (_window.isOpen())
 	{
 		handleEvents();
@@ -156,6 +172,10 @@ void Game::update(float dt)
     _fps = _fps * 0.9f + 0.1f / dt;
 
 	_debugCamera.update(dt, _window);
+
+	// SHIP TESTING
+	ship.update(dt);
+	///////////////
 
     _stateStack.update(dt);
 }

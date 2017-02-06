@@ -49,6 +49,12 @@ private:
 	ModelAsset	_segmentModel;
 	//////////////////////
 
+	// SHIP TESTING
+	SegmentHandler sh;
+	const Segment* s;
+	Ship ship;
+	///////////////
+
 	TextureAsset _texture;
 	GFX::TexturedModel _texturedModel;
 
