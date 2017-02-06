@@ -36,7 +36,7 @@ void Player::update(float dt)
 
 	if (_input.bGetAValue())
 	{
-		_audio.playAudio(PlayerAudio::Sounds::vag);
+		_audio.playAudio(PlayerAudio::Sounds::hit);
 	}
 
     if(_input.checkActive())
@@ -72,5 +72,5 @@ void Player::update(float dt)
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 
-	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() + 1);
+	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() + 1.5);
 }
