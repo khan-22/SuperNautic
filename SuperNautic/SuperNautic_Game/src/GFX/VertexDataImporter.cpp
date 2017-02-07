@@ -26,6 +26,8 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 
 	filepath = _rootPath + filepath;
 
+	LOG("Started loading file: " + filepath);
+
 	const aiScene* importedData = aiImportFile(filepath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
 	if (importedData == nullptr)
 	{

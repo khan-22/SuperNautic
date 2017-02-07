@@ -46,9 +46,9 @@ private:
 	ApplicationContext		_context;
 
 	float					_quitTimer;
-	float _fps;
+	float					_fps;
 
-	ShaderAsset	_shader;
+	ShaderAsset				_shader;
 
 	//TEST MODELS are put in this array for rendering
 	//MAKE SURE NOT TO PUSH THIS TO MASTER, at least not without discussing
@@ -63,8 +63,7 @@ private:
 	//GFX::DeferredRenderer	_deferredRenderer2;
 	//GFX::DeferredRenderer	_deferredRenderer3;
 	//GFX::DeferredRenderer	_deferredRenderer4;
-	Camera		_camera;
-	DebugCamera _debugCamera;
+
 	Camera					_camera;
 	DebugCamera				_debugCamera;
 

@@ -71,7 +71,7 @@ bool Track::generate()
 	int totalLength = 0;
 	for (unsigned int i = 0; i < 10; i++)
 	{
-		for (unsigned int i = 0; i < 5; i++)
+		for (unsigned int i = 0; i < 0; i++)
 		{
 			const Segment * segment = _segmentHandler->loadSegment(0);
 			_track.push_back(new SegmentInstance(segment, _endMatrix, true));
