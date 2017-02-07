@@ -12,6 +12,7 @@ public:
 		, const glm::vec3 & viewDirection = glm::vec3(0.0, 0.0, 0.0)
 		, const glm::vec3 & up = glm::vec3(0.0, 0.0, 0.0));
 	virtual ~Camera();
+	glm::vec3 getPosition() const;
 	glm::mat4 getView() const;
 	glm::mat4 getPerspective() const;
 	glm::mat4 getVP() const;

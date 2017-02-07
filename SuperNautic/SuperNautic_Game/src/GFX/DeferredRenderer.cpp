@@ -83,6 +83,15 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	_screenQuad->setDrawCount(6);
 }
 
+void DeferredRenderer::pushPointLight(PointLight & pointLight)
+{
+	_pointLights.push_back(&pointLight);
+	if (_pointLights.size() > 32)
+	{
+		LOG_ERROR("Cannot draw more than 32 lights in a scene");
+	}
+}
+
 void DeferredRenderer::render(Renderable3D& renderable)
 {
 	_drawCalls.push_back(&renderable);
@@ -98,12 +107,12 @@ void DeferredRenderer::display(Camera& camera)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	geometryPass(camera, windowWidth, windowHeight);
-	lightPass(windowWidth, windowHeight);
+	lightPass(camera, windowWidth, windowHeight);
 
 	Framebuffer::DEFAULT.bindBoth();
 }
 
-void DeferredRenderer::geometryPass(Camera & camera, GLsizei width, GLsizei height)
+void DeferredRenderer::geometryPass(Camera& camera, GLsizei width, GLsizei height)
 {
 	//*************************************************//
 	//*************** GEOMETRY PASS *******************//
@@ -128,7 +137,7 @@ void DeferredRenderer::geometryPass(Camera & camera, GLsizei width, GLsizei heig
 	_drawCalls.clear();
 }
 
-void DeferredRenderer::lightPass(GLsizei width, GLsizei height)
+void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 {
 	//**********************************************//
 	//*************** LIGHT PASS *******************//
@@ -143,6 +152,21 @@ void DeferredRenderer::lightPass(GLsizei width, GLsizei height)
 	//lpShader->setSampler("uPosition", 0);
 	//lpShader->setSampler("uDiffuse", 1);
 	//lpShader->setSampler("uNormal", 2);
+
+	lpShader->setUniform("uViewPos", camera.getPosition());
+
+	// Send all point light data as a uniform array struct
+	int lightCount = std::min((int)_pointLights.size(), 32);
+	for (int i = 0; i < lightCount; i++)
+	{
+		std::string uName = "pointLights[" + std::to_string(i) + "]";
+		lpShader->setUniform(uName + ".pos",		_pointLights[i]->getPosition());
+		lpShader->setUniform(uName + ".color",		_pointLights[i]->getLightProperties().diffuseColor);
+		lpShader->setUniform(uName + ".constant",	_pointLights[i]->getLightProperties().constant);
+		lpShader->setUniform(uName + ".linear",		_pointLights[i]->getLightProperties().linear);
+		lpShader->setUniform(uName + ".quadratic",	_pointLights[i]->getLightProperties().quadratic);
+	}
+	_pointLights.clear();
 
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);

@@ -6,7 +6,7 @@ uniform sampler2D uPosition;
 uniform sampler2D uDiffuse;
 uniform sampler2D uNormal;
 
-uniform vec3 viewPos;
+uniform vec3 uViewPos;
 
 in VS_OUT
 {
@@ -44,7 +44,7 @@ void main()
 	vec3 fragPos = texture(uPosition, fs_in.uv).rgb;
 	vec3 diffuse = texture(uDiffuse, fs_in.uv).rgb;
 	vec3 normal = texture(uNormal, fs_in.uv).rgb;
-	vec3 viewDir = normalize(viewPos - fragPos);
+	vec3 viewDir = normalize(uViewPos - fragPos);
 
 	vec4 lightingResult = vec4(0, 0, 0, 1);
 

@@ -106,6 +106,11 @@ bool Game::bInitialize()
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
 
+	
+	_pointLights.push_back(PointLight({ 0.f,2.f,0.f }, { 1.f, 1.f, 1.f }, 0.5f));
+	_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 1.f, 0.f, 1.f }, 1.f));
+	_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 1.f, 1.f }, 1.f));
+
 	return true;
 }
 
@@ -168,6 +173,11 @@ void Game::render()
 
 	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
 	_camera.setViewDir(glm::vec3(0.f, 0.f, -1.f));
+
+	for (auto& pointLight : _pointLights)
+	{
+		_deferredRenderer1.pushPointLight(pointLight);
+	}
 
 	_deferredRenderer1.render(_texturedModel);
 	_deferredRenderer1.display(_debugCamera);

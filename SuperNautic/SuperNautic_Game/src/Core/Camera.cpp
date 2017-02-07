@@ -28,6 +28,11 @@ Camera::~Camera()
 	//Nothing
 }
 
+glm::vec3 Camera::getPosition() const
+{
+	return _pos;
+}
+
 //Returns the view matrix
 glm::mat4 Camera::getView() const
 {

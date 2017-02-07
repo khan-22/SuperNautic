@@ -56,6 +56,8 @@ private:
 	//GFX::DeferredRenderer	_deferredRenderer4;
 	Camera		_camera;
 	DebugCamera _debugCamera;
+
+	std::vector<PointLight>	_pointLights;
 };
 
 #endif //GAME_HPP
