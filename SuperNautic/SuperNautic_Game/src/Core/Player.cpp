@@ -66,7 +66,7 @@ void Player::update(float dt)
         }
     }
 
-    _ship.update(dt);
+    //_ship.update(dt);
 
     _hud.setHeat(_ship.getEngineTemperature());
     _hud.setSpeed(_ship.getSpeed());

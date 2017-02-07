@@ -756,7 +756,8 @@ void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxS
 // Copy corners by value to reduce cost of constantly referencing
 std::vector<AABB> Segment::createChildren(glm::vec3 min, glm::vec3 max)
 {
-	std::vector<AABB> possibleChildren{
+	std::vector<AABB> possibleChildren
+	{
 			AABB{ glm::vec3{ min }, glm::vec3{ (min + max) * 0.5f } },	// nX nY nZ
 			AABB{ glm::vec3{ min.x, min.y, (min.z + max.z) * 0.5f }, glm::vec3{ (min.x + max.x) * 0.5f, (min.y + max.y) * 0.5f, max.z } },	// nX nY pZ
 			AABB{ glm::vec3{ min.x, (min.y + max.y) * 0.5f, min.z }, glm::vec3{ (min.x + max.x) * 0.5f, max.y, (min.z + max.z) * 0.5f } },	// nX pY nZ
