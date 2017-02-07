@@ -32,6 +32,8 @@ Game::Game()
 	, _fps(60.f)
 	, _camera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
 	, _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -10.f), glm::vec3(0.f, 0.f, 1.f))
+	, _segmentHandler("Segments/segmentinfos.txt")
+	, _track(&_segmentHandler)
 {
 	LOG("Game is being constructed...");
 }
@@ -53,7 +55,7 @@ bool Game::bInitialize()
 	glCullFace(GL_BACK);
 //
 //	// Cached asset loading **DEMO**
-	RawMeshAsset testRawMesh = RawMeshCache::get("Segments/s01_straight_aa.fbx");
+	/*RawMeshAsset testRawMesh = RawMeshCache::get("Segments/s01_straight_aa.fbx");
 
 	if (testRawMesh.get() == nullptr)
 	{
@@ -62,7 +64,7 @@ bool Game::bInitialize()
 	else
 	{
 		LOG("The loaded mesh has: ", testRawMesh.get()->meshes[0].vertices.size(), " vertices");
-	}
+	}*/
 
 	// Shader loading **DEMO**
 	/*GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
@@ -103,12 +105,19 @@ bool Game::bInitialize()
         LOG("Failed to load material.");
     }
 
+	_track.setLength(300);
+	_track.setSeed(1);
+	_track.generate();
 
 	/*We can create a loop here (or where relevant) that loops through a list
 	of all the things we want to render and add them to the model array, such as
 	segments, ships etc.*/
 	ModelArray.push_back(ModelCache::get("ship.fbx"));
-	ModelArray.push_back(ModelCache::get("segments/s01_straight_aa.fbx"));
+	////ModelArray.push_back(ModelCache::get("segments/s01_straight_aa.fbx"));
+	//for (unsigned int i = 0; i < _track.getNrOfSegments(); i++)
+	//{
+	//	ModelArray.push_back(_track.getMeshBySegmentIndex(i));
+	//}
 
 
 	_shader = ShaderCache::get("forward");
@@ -193,7 +202,7 @@ void Game::update(float dt)
 
 	// SHIP TESTING
 	ship->setTurning(-1.0f);
-	ship->update(dt * 0.3f);
+	ship->update(dt);
 	///////////////
 
     _stateStack.update(dt);
@@ -245,6 +254,10 @@ void Game::render()
 		// SHIP TESTING
 		_forwardRenderer.render(*ship->_shipModel.get());
 		///////////////
+	}
+	for (unsigned int i = 0; i < _track.getNrOfSegments(); i++)
+	{
+		_forwardRenderer.render(_track.getInstance(i));
 	}
 	/////////////////////////////
 

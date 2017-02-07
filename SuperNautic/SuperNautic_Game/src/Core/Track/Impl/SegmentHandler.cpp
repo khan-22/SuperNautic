@@ -32,9 +32,9 @@ SegmentHandler::SegmentHandler(std::string filePath)
 	while (infoFile >> segmentDataName) // Read data file name
 	{
 		infoFile >> segmentVisualName;
-		// blah_aa.fbx
+		// blah_aa.blend
 		//      ^^
-		// size - 6, size - 5 contains connection info
+		// size - 8, size - 7 contains connection info
 		startConnection = segmentDataName[segmentDataName.size() - 6];
 		endConnection = segmentDataName[segmentDataName.size() - 5];
 
@@ -52,6 +52,15 @@ SegmentHandler::SegmentHandler(std::string filePath)
 	}
 }
 
+// Destructor
+SegmentHandler::~SegmentHandler()
+{
+	for (unsigned int i = 0; i < _segments.size(); i++)
+	{
+		delete _segments[i];
+	}
+}
+
 // Load segment from fbx file using info from _segments[i], returns reference to loaded segment
 // Just returns reference if already loaded
 const Segment* SegmentHandler::loadSegment(unsigned i)
@@ -59,17 +68,17 @@ const Segment* SegmentHandler::loadSegment(unsigned i)
 	// If already loaded, just return reference
 	if (_segmentInfos[i].loadedIndex != -1)
 	{
-		return &_segments[_segmentInfos[i].loadedIndex];
+		return _segments[_segmentInfos[i].loadedIndex];
 	}
 	// Else load Segment, then return
 	else
 	{
 		// Load Segment from file
-		_segments.push_back(Segment(&_segmentInfos[i]));
+		_segments.push_back(new Segment(&_segmentInfos[i]));
 
 		// Set index in corresponding SegmentInfo
 		_segmentInfos[i].loadedIndex = static_cast<int>(_segments.size()) - 1;
 
-		return &_segments[_segmentInfos[i].loadedIndex];
+		return _segments[_segmentInfos[i].loadedIndex];
 	}
 }

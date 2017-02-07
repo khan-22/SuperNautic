@@ -19,6 +19,8 @@ public:
 	bool setLength(const int length);
 	void setSeed(const unsigned int seed);
 	bool generate();
+	int getNrOfSegments() const;
+	SegmentInstance& getInstance(int index);
 
 private:
 	Track();
@@ -26,7 +28,7 @@ private:
 	int getInRow(int index) const;
 	
 	SegmentHandler *				_segmentHandler;
-	std::vector<SegmentInstance>	_track;
+	std::vector<SegmentInstance*>	_track;
 	int								_targetLength;
 	int								_generatedLength;
 	unsigned int					_seed;

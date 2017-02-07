@@ -43,8 +43,6 @@ namespace GFX
 		glm::mat4 _tempModelMat = glm::mat4();
 		void setModelMatrix(glm::mat4 ModelMatrix);
 		///////////////////////////////////////////
-
-	protected:
 		void render(RenderStates& states) override;
 
 	private:

@@ -17,7 +17,7 @@ DebugCamera::DebugCamera(float fov, int viewWidth, int viewHeight
 	, _moveSpeed(10.f)
 	, _bActive(false)
 {
-	
+	_perspective = glm::perspective(glm::radians(_fov), (float)_viewWidth / _viewHeight, 0.1f, 2000.f);
 }
 
 //Destructor
@@ -103,7 +103,15 @@ void DebugCamera::update(const float dt, sf::Window& window)
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
 		{
-			_moveSpeed = 200.0f;
+			_moveSpeed = 300.0f;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5))
+		{
+			_moveSpeed = 1000.0f;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num6))
+		{
+			_moveSpeed = 2000.0f;
 		}
 	}
 	//Checking if mouse should be used

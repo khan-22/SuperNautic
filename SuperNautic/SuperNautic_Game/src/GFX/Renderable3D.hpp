@@ -20,8 +20,6 @@ namespace GFX
 	{
 	public:
 		virtual ~Renderable3D();
-
-	protected:
 		virtual void render(RenderStates& states) = 0;
 
 	private:

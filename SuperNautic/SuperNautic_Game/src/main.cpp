@@ -35,10 +35,10 @@ int main()
 	else
 	{
 		// Test ray intersection
-		SegmentHandler sh{ "Segments/segmentinfos.txt" };
+		/*SegmentHandler sh{ "Segments/segmentinfos.txt" };
 		const Segment* s{ sh.loadSegment(0) };
 		Ray r{ glm::vec3{0,0,-2}, glm::vec3{-1,0,-0.5}, 10000.0f };
-		RayIntersection i = s->rayIntersectionTest(r);
+		RayIntersection i = s->rayIntersectionTest(r);*/
 
 		game.bInitialize();
 		game.run();

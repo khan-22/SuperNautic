@@ -17,6 +17,8 @@
 #include "../GFX/TexturedModel.hpp"
 
 #include "DebugCamera.hpp"
+#include "Track\Track.hpp"
+#include "Track\SegmentHandler.hpp"
 
 #include "Track/SegmentHandler.hpp"
 #include "Track/Segment.hpp"
@@ -47,9 +49,9 @@ private:
 	ApplicationContext		_context;
 
 	float					_quitTimer;
-	float _fps;
+	float					_fps;
 
-	ShaderAsset	_shader;
+	ShaderAsset				_shader;
 
 	//TEST MODELS are put in this array for rendering
 	//MAKE SURE NOT TO PUSH THIS TO MASTER, at least not without discussing
@@ -62,16 +64,20 @@ private:
 	Ship* ship;
 	///////////////
 
-	TextureAsset _texture;
-	GFX::TexturedModel _texturedModel;
+	TextureAsset			_texture;
+	GFX::TexturedModel		_texturedModel;
 
 	GFX::ForwardRenderer	_forwardRenderer;
 	GFX::DeferredRenderer	_deferredRenderer1;
 	//GFX::DeferredRenderer	_deferredRenderer2;
 	//GFX::DeferredRenderer	_deferredRenderer3;
 	//GFX::DeferredRenderer	_deferredRenderer4;
-	Camera		_camera;
-	DebugCamera _debugCamera;
+
+	Camera					_camera;
+	DebugCamera				_debugCamera;
+
+	SegmentHandler			_segmentHandler;
+	Track					_track;
 };
 
 #endif //GAME_HPP

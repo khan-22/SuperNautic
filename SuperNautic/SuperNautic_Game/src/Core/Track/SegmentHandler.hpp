@@ -14,6 +14,9 @@ public:
 	// Loads SegmentInfos from file with name fileName in path
 	SegmentHandler(std::string filePath);
 
+	// Destructor
+	virtual ~SegmentHandler();
+
 
 	// Returns reference to segment infos
 	const std::vector<SegmentInfo>& infos() const
@@ -27,7 +30,7 @@ public:
 
 private:
 	// Segments that have been loaded from an fbx file
-	std::vector<Segment>		_segments;
+	std::vector<Segment*>		_segments;
 
 	// Basic info about all possible segments, loaded from a txt file
 	std::vector<SegmentInfo>	_segmentInfos;

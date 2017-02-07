@@ -4,6 +4,8 @@
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 
+#include <glm/gtx/transform.hpp>
+
 #include "../Log.hpp"
 
 namespace GFX {
@@ -23,6 +25,8 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 	RawMeshCollection* collection = nullptr;
 
 	filepath = _rootPath + filepath;
+
+	LOG("Started loading file: " + filepath);
 
 	const aiScene* importedData = aiImportFile(filepath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
 	if (importedData == nullptr)
@@ -80,14 +84,35 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 	// Import cameras...
 	for (int i = 0; i < importedData->mNumCameras; i++)
 	{
-		glm::mat4 endMatrix;
 		aiMatrix4x4 cameraMatrix;
-		importedData->mCameras[i]->GetCameraMatrix(cameraMatrix);
-		
-		endMatrix = { cameraMatrix.a1, cameraMatrix.a2, cameraMatrix.a3, cameraMatrix.a4,
-					  cameraMatrix.b1, cameraMatrix.b2, cameraMatrix.b3, cameraMatrix.b4,
-					  cameraMatrix.c1, cameraMatrix.c2, cameraMatrix.c3, cameraMatrix.c4,
-					  cameraMatrix.d1, cameraMatrix.d2, cameraMatrix.d3, cameraMatrix.d4 };
+
+		//importedData->mCameras[i]->
+		aiCamera* cam = importedData->mCameras[i];
+		glm::vec4 pos({ cam->mPosition.x, cam->mPosition.y, cam->mPosition.z, 1.f });
+		glm::vec4 dir({ cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z, 1.f });
+		glm::vec4 up({ cam->mUp.x, cam->mUp.y, cam->mUp.z, 0.f });
+
+		aiNode* rootNode = importedData->mRootNode;
+		aiNode* cameraNode = rootNode->FindNode(cam->mName);
+		aiMatrix4x4 aiCamTrans = cameraNode->mTransformation;
+
+		glm::mat4 transMat = { aiCamTrans.a1, aiCamTrans.b1, aiCamTrans.c1, aiCamTrans.d1,
+							aiCamTrans.a2, aiCamTrans.b2, aiCamTrans.c2, aiCamTrans.d2,
+							aiCamTrans.a3, aiCamTrans.b3, aiCamTrans.c3, aiCamTrans.d3,
+							aiCamTrans.a4, aiCamTrans.b4, aiCamTrans.c4, aiCamTrans.d4 };
+
+		//transMat = glm::transpose(transMat);
+
+		pos = transMat * pos;
+		dir = transMat * dir;
+		up = transMat * up;
+
+		glm::vec3 realPos = glm::vec3(pos.x, pos.z, -pos.y);
+		glm::vec3 realDir = glm::vec3(dir.x, dir.z, -dir.y);
+		glm::vec3 realUp = glm::vec3(up.x, up.z, -up.y);
+
+		glm::mat4 endMatrix = glm::inverse(glm::lookAt(realPos, realDir, realUp));
+
 
 		collection->cameras.push_back(endMatrix);
 	}

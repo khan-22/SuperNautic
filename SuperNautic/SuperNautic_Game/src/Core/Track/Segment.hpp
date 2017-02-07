@@ -89,6 +89,11 @@ public:
 	// First in pair is before second
 	std::pair<WaypointInfo, WaypointInfo> findClosestWaypoints(const glm::vec3& position) const;
 
+	ModelAsset getVisualModel() const
+	{
+		return _visual;
+	}
+
 private:
 	// The loaded scene data
 	RawMeshAsset _scene;
