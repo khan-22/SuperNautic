@@ -32,9 +32,19 @@ vec4 calculatePointLight(PointLightData pLight, vec3 fragPos, vec3 diffuse, vec3
 {
 	//DO COOL LIGHT SHIT
 
+	float d = length(pLight.pos - fragPos); //Distance to the light source
+	//float attenuation  = 1.0 / (pLight.constant + (pLight.linear * d) + (pLight.quadratic * d * d));
+	//float attenuation  = 1.0 / (1.0 + (0.045 * d) + (0.0075 * d * d));
+	//float c = pLight.constant;
+	//float l = pLight.linear;
+	//float q = pLight.quadratic;
+
+	float attenuation  = 1.0 / (1.0 + (pLight.linear * d) + (pLight.quadratic * d * d));
+
 	float factor = dot(normalize(pLight.pos- fragPos), normal);
 
-	vec4 result = vec4(diffuse * pLight.color * factor, 1.0);
+	//vec4 result = vec4(diffuse * pLight.color * factor * attenuation, 1.0);
+	vec4 result = vec4(diffuse * pLight.color * factor * attenuation, 1.0);
 
 	return result;
 }
@@ -54,8 +64,6 @@ void main()
 	}
 
 	lightingResult += diffuse * 0.1;
-
-	
 
 	outColor = lightingResult;
 }
