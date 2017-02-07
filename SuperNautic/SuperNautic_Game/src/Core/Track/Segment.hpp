@@ -82,6 +82,11 @@ public:
 		return _scene.get()->cameras[0];
 	}
 
+	ModelAsset getVisualModel() const
+	{
+		return _visual;
+	}
+
 private:
 	// The loaded scene data
 	RawMeshAsset _scene;

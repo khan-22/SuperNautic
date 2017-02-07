@@ -4,6 +4,7 @@
 #include "Track.hpp"
 #include "../../Log.hpp"
 #include "SegmentInfo.hpp"
+#include "../../GFX/Model.hpp"
 
 //Default constructor (private)
 Track::Track()
@@ -15,13 +16,16 @@ Track::Track()
 Track::Track(SegmentHandler * segmentHandler)
 {
 	_segmentHandler = segmentHandler;
-	_endMatrix = glm::rotate(180.f, glm::vec3(0.0, 1.0, 0.0));
+	_endMatrix = glm::mat4();
 }
 
 //Destructor
 Track::~Track()
 {
-	//Nothing
+	for (unsigned int i = 0; i < _track.size(); i++)
+	{
+		delete _track[i];
+	}
 }
 
 //Gets the targeted track length in whole meters
@@ -65,44 +69,67 @@ void Track::setSeed(const unsigned int seed)
 bool Track::generate()
 {
 	int totalLength = 0;
-	//Create initial straight path
-	const Segment * segment = _segmentHandler->loadSegment(0);
-	for (unsigned int i = 0; i < 3; i++)
+	for (unsigned int i = 0; i < 10; i++)
 	{
-		_track.push_back(SegmentInstance(segment, _endMatrix, true));
-		_endMatrix = segment->getEndMatrix() * _endMatrix;
-		totalLength += segment->getLength();
+		for (unsigned int i = 0; i < 5; i++)
+		{
+			const Segment * segment = _segmentHandler->loadSegment(0);
+			_track.push_back(new SegmentInstance(segment, _endMatrix, true));
+			glm::mat4 temp = segment->getEndMatrix();
+			glm::mat4 rot = glm::rotate(0.f, glm::vec3(0, 0, 1));
+			_endMatrix = _endMatrix * temp * rot;
+			totalLength += segment->getLength();
+		}
+		for (unsigned int i = 0; i < 5; i++)
+		{
+			const Segment * segment = _segmentHandler->loadSegment(2);
+			_track.push_back(new SegmentInstance(segment, _endMatrix, true));
+			glm::mat4 temp = segment->getEndMatrix();
+			glm::mat4 rot = glm::rotate(0.5f, glm::vec3(0, 0, 1));
+			_endMatrix = _endMatrix * temp * rot;
+			totalLength += segment->getLength();
+		}
 	}
 	char end = 'a';
 	bool lighting = true;
 	int prevIndex = -1;
 	//Create random path
-	while (totalLength < _targetLength)
-	{
-		//Randomize segment index
-		int index;
-		int inRow;
-		do
-		{
-			index = getIndex(end);
-		} while (index != prevIndex);
-		prevIndex = index;
-		//Randomize nr of same segment type in row
-		inRow = getInRow(index);
-		//Instanciate the segment(s)
-		for (unsigned int i = 0; i < inRow; i++)
-		{
-			const Segment * segment = _segmentHandler->loadSegment(index);
-			_endMatrix = segment->getEndMatrix() * _endMatrix;
-			SegmentInstance temp = SegmentInstance(segment, _endMatrix, lighting);
-			_track.push_back(temp);
-			totalLength += segment->getLength();
-		}
-	}
+	//while (totalLength < _targetLength)
+	//{
+	//	//Randomize segment index
+	//	int index;
+	//	int inRow;
+	//	do
+	//	{
+	//		index = getIndex(end);
+	//	} while (index != prevIndex);
+	//	prevIndex = index;
+	//	//Randomize nr of same segment type in row
+	//	inRow = getInRow(index);
+	//	//Instanciate the segment(s)
+	//	for (unsigned int i = 0; i < inRow; i++)
+	//	{
+	//		const Segment * segment = _segmentHandler->loadSegment(index);
+	//		_endMatrix = segment->getEndMatrix() * _endMatrix;
+	//		SegmentInstance temp = SegmentInstance(segment, _endMatrix, lighting);
+	//		_track.push_back(temp);
+	//		totalLength += segment->getLength();
+	//	}
+	//}
 	_generatedLength = totalLength;
 
-	LOG("Track generated. Length: " + std::to_string(_generatedLength));
+	LOG("Track generated. Length: " + std::to_string(_generatedLength) + " meters.");
 	return true;
+}
+
+int Track::getNrOfSegments() const
+{
+	return _track.size();
+}
+
+SegmentInstance& Track::getInstance(int index)
+{
+	return *_track[index];
 }
 
 int Track::getIndex(char connectionType) const

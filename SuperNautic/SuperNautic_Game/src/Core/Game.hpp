@@ -16,6 +16,8 @@
 #include "../GFX/TexturedModel.hpp"
 
 #include "DebugCamera.hpp"
+#include "Track\Track.hpp"
+#include "Track\SegmentHandler.hpp"
 
 #include <vector>
 
@@ -52,12 +54,15 @@ private:
 	std::vector<ModelAsset> ModelArray;
 	//////////////////////
 
-	TextureAsset _texture;
-	GFX::TexturedModel _texturedModel;
+	TextureAsset			_texture;
+	GFX::TexturedModel		_texturedModel;
 
 	GFX::ForwardRenderer	_forwardRenderer;
-	Camera		_camera;
-	DebugCamera _debugCamera;
+	Camera					_camera;
+	DebugCamera				_debugCamera;
+
+	SegmentHandler			_segmentHandler;
+	Track					_track;
 };
 
 #endif //GAME_HPP
