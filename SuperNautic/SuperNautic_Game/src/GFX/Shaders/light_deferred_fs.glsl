@@ -32,9 +32,9 @@ vec4 calculatePointLight(PointLightData pLight, vec3 fragPos, vec3 diffuse, vec3
 {
 	//DO COOL LIGHT SHIT
 
-	float factor = dot(pLight.pos - fragPos, normal);
+	float factor = dot(normalize(pLight.pos- fragPos), normal);
 
-	vec4 result = vec4(diffuse, 1.0) * factor;
+	vec4 result = vec4(diffuse * pLight.color * factor, 1.0);
 
 	return result;
 }
@@ -48,7 +48,7 @@ void main()
 
 	vec4 lightingResult = vec4(0, 0, 0, 1);
 
-	for(int i = 0; i < NUM_LIGHTS; i++)
+	for(int i = 0; i < 32; i++)
 	{
 		lightingResult += calculatePointLight(pointLights[i], fragPos, diffuse, normal, viewDir);
 	}

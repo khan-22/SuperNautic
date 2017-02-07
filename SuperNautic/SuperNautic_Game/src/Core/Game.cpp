@@ -107,9 +107,9 @@ bool Game::bInitialize()
 	_stateStack.push(mainMenu);
 
 	
-	_pointLights.push_back(PointLight({ 0.f,2.f,0.f }, { 1.f, 1.f, 1.f }, 0.5f));
-	_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 1.f, 0.f, 1.f }, 1.f));
-	_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 1.f, 1.f }, 1.f));
+	_pointLights.push_back(PointLight({ 0.f,2.f,0.f }, { 1.f, 0.f, 0.f }, 1.0f));
+	_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f }, 1.f));
+	_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 0.f, 1.f }, 1.f));
 
 	return true;
 }
