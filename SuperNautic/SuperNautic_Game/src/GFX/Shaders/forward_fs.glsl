@@ -2,8 +2,6 @@
 
 out vec4 OutColor;
 
-uniform vec4 uColor;
-
 uniform sampler2D uDiffuse;
 uniform sampler2D uSpecular;
 uniform sampler2D uNormal;

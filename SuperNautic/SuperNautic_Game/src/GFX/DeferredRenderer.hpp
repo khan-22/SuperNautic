@@ -1,42 +1,50 @@
 #pragma once
 
-#ifndef FORWARD_RENDERER_HPP
-#define FORWARD_RENDERER_HPP
+#ifndef DEFERRED_RENDERER_HPP
+#define DEFERRED_RENDERER_HPP
 
 #include <vector>
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "../Core/LoadAssetFunctions.hpp"
 
-class Camera;		// Forward-decl
+#include "Framebuffer.hpp"
 
 namespace GFX
 {
 	class Renderable3D; // Forward-decl
 
-	class ForwardRenderer
+	class DeferredRenderer
 	{
 	public:
-		ForwardRenderer();
-		~ForwardRenderer();
+		DeferredRenderer();
+		~DeferredRenderer();
 
 		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
 
 		void render(Renderable3D& renderable);
 		void display(Camera& camera);
-
 	protected:
 
 	private:
 		std::vector<Renderable3D*> _drawCalls;
-		ShaderAsset	_shader;
+		ShaderAsset	_geometryPassShader;
+		ShaderAsset	_lightPassShader;
+
+		Framebuffer _frameBuffer;
 
 		sf::RenderWindow* _window;
 		GLfloat _x;
 		GLfloat _y;
 		GLfloat _width;
 		GLfloat _height;
+
+		std::unique_ptr<VertexArrayObject> _screenQuad;
+
+		void geometryPass(Camera& camera, GLsizei width, GLsizei height);
+		void lightPass(GLsizei width, GLsizei height);
+
 	};
 }
 
-#endif // FORWARD_RENDERER_HPP
+#endif //DEFERRED_RENDERER_HPP

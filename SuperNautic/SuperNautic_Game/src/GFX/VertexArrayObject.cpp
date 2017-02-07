@@ -7,6 +7,11 @@ using namespace GFX;
 VertexArrayObject::VertexArrayObject()
 {
 	glGenVertexArrays(1, &_vao);
+
+	for (int i = 0; i < 16; i++)
+	{
+		_attributeOffsets[i] = 0U;
+	}
 }
 
 VertexArrayObject::~VertexArrayObject()
@@ -44,9 +49,26 @@ void GFX::VertexArrayObject::sendDataToBuffer(GLubyte bufferIndex, GLubyte attri
 	VertexBuffer& buffer = *_vertexBuffers[bufferIndex].get();
 	buffer.bind();
 
-
 	glEnableVertexAttribArray(attributeIndex);
-	glVertexAttribPointer(attributeIndex, count, type, GL_FALSE, 0, nullptr);
+
+	GLsizei accumulatedOffset = 0U;
+	for (int i = 0; i < attributeIndex; i++)
+	{
+		accumulatedOffset += _attributeOffsets[i];
+	}
+
+	glVertexAttribPointer(attributeIndex, count, type, GL_FALSE, 0, (GLvoid*)(accumulatedOffset));
+
+	//if (attributeIndex == 0)
+	//{
+	//	glVertexAttribPointer(attributeIndex, count, type, GL_FALSE, 0, nullptr);
+	//}
+	//else 
+	//{
+	//	glVertexAttribPointer(attributeIndex, count, type, GL_FALSE, 0, (GLvoid*)(_attributeOffsets[attributeIndex-1]));
+	//}
+
+	_attributeOffsets[attributeIndex] += size;
 
 	buffer.sendData(offset, size, data);
 	unbind();
