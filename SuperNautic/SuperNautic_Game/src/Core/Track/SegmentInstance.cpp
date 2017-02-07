@@ -30,6 +30,27 @@ glm::mat4 SegmentInstance::getModelMatrix() const
 	return _model;
 }
 
+std::vector<BoundingBox> SegmentInstance::getGlobalBounds() const
+{
+    std::vector<BoundingBox> boxes;
+    for(const BoundingBox& localBox : _parent->getBoundingBoxes())
+    {
+        boxes.emplace_back();
+        BoundingBox& globalBox = boxes.back();
+
+
+        globalBox.center = glm::vec4(localBox.center, 1.f) * _model;
+        for(size_t i = 0; i < localBox.directions.size(); i++)
+        {
+            globalBox.directions[i] = glm::vec4(localBox.directions[i], 0.f) * _model;
+        }
+        globalBox.halfLengths = localBox.halfLengths;
+    }
+
+    return boxes;
+}
+
+
 void SegmentInstance::render(GFX::RenderStates & states)
 {
 	_parent->getVisualModel().get()->setModelMatrix(_model);
