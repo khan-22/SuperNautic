@@ -6,7 +6,7 @@
 #include "../../Log.hpp"
 
 template<typename T>
-inline T& clamp(T& value, const T& low, const T& high)
+inline T clamp(T value, T low, T high)
 {
 	if (low > high)
 	{

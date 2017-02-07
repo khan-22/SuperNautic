@@ -41,28 +41,28 @@ void Player::update(float dt)
 
     if(_input.checkActive())
     {
-        _ship.steer(_input.getLeftStickXValue() * dt);
-        _ship.accelerate(_input.getTriggersValue() * dt);
+        _ship.setTurning(_input.getLeftStickXValue());
+        _ship.setAcceleration(_input.getTriggersValue());
     }
     else
     {
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         {
-            _ship.steer(-1.f * dt);
+            _ship.setTurning(-1.f);
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         {
-            _ship.steer(1.f * dt);
+            _ship.setTurning(1.f);
         }
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         {
-            _ship.accelerate(1.f * dt);
+            _ship.setAcceleration(1.f);
 
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         {
-            _ship.accelerate(-1.f * dt);
+            _ship.setAcceleration(-1.f);
         }
     }
 

@@ -108,15 +108,15 @@ struct AABB
 				float t = glm::dot(e1, qvec) * inv_det;
 
 				// If no previous hit or this hit is closer and within range, record hit
-				if ((!intersection || t < intersection._length) && t < ray.length())
+				if ((!intersection || t < intersection._length) && t < ray.length() && t >= 0.0f)
 				{
 					intersection._length = t;
 					intersection._hit = true;
 					intersection._surface = SurfaceType::normal;
-					intersection._position = v0 * u + v1 * v + v2 * (1.0f - u - v);
-					intersection._normal = scene.get()->meshes[currentModel].normals[faces[j].x] * u +
-										   scene.get()->meshes[currentModel].normals[faces[j].y] * v +
-										   scene.get()->meshes[currentModel].normals[faces[j].y] * (1.0f - u - v);
+					intersection._position = v0 * (1.0f - u - v) + v1 * u + v2 * v;
+					intersection._normal = scene.get()->meshes[currentModel].normals[faces[j].x] * (1.0f - u - v) +
+										   scene.get()->meshes[currentModel].normals[faces[j].y] * u +
+										   scene.get()->meshes[currentModel].normals[faces[j].z] * v;
 				}
 			}
 		}

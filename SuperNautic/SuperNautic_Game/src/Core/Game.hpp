@@ -18,6 +18,9 @@
 
 #include "DebugCamera.hpp"
 
+#include "Track/SegmentHandler.hpp"
+#include "Track/Segment.hpp"
+
 #include <vector>
 
 class Game
@@ -54,9 +57,9 @@ private:
 	//////////////////////
 
 	// SHIP TESTING
-	SegmentHandler sh;
+	SegmentHandler* sh;
 	const Segment* s;
-	Ship ship;
+	Ship* ship;
 	///////////////
 
 	TextureAsset _texture;

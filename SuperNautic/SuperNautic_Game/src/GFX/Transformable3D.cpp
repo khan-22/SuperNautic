@@ -6,6 +6,7 @@ using namespace GFX;
 
 Transformable3D::Transformable3D() : _bTransformNeedsUpdate{false}, _bInverseTransformNeedsUpdate{false}
 {
+	setScale(1.0f);
 }
 
 
@@ -16,6 +17,12 @@ Transformable3D::~Transformable3D()
 void GFX::Transformable3D::setPosition(const glm::vec3 & position)
 {
 	_position = position;
+	_bTransformNeedsUpdate = true;
+}
+
+void GFX::Transformable3D::setPosition(const float x, const float y, const float z)
+{
+	_position = glm::vec3{ x, y, z };
 	_bTransformNeedsUpdate = true;
 }
 
@@ -57,7 +64,12 @@ void GFX::Transformable3D::setLookAt(const glm::vec3& forwardDirection, const gl
 	glm::vec3 forward = forwardDirection - glm::dot(forwardDirection, upDirection) * upDirection;
 	forward = glm::normalize(forward);
 
-	_lookAt = glm::lookAtRH(glm::vec3{ 0,0,0 }, forward, upDirection);
+	glm::vec3 right = glm::cross(upDirection, forward);
+
+	_rotationMatrix = glm::mat4(glm::vec4{ right, 0 },
+		glm::vec4{ upDirection, 0 },
+		glm::vec4{ forward, 0 },
+		glm::vec4{ 0,0,0,1 });
 
 	_bTransformNeedsUpdate = true;
 }
@@ -70,11 +82,6 @@ const glm::vec3 & GFX::Transformable3D::getPosition() const
 const glm::mat4& GFX::Transformable3D::getRotation() const
 {
 	return _rotationMatrix;
-}
-
-const glm::mat4& GFX::Transformable3D::getLookAt() const
-{
-	return _lookAt;
 }
 
 const glm::vec3 & GFX::Transformable3D::getScale() const
@@ -90,6 +97,12 @@ const glm::vec3 & GFX::Transformable3D::getOrigin() const
 void GFX::Transformable3D::move(const glm::vec3 & offset)
 {
 	_position += offset;
+	_bTransformNeedsUpdate = true;
+}
+
+void GFX::Transformable3D::move(float x, float y, float z)
+{
+	_position += glm::vec3{ x, y, z };
 	_bTransformNeedsUpdate = true;
 }
 
@@ -125,7 +138,7 @@ const glm::mat4 & GFX::Transformable3D::getTransformMatrix()
 {
 	if (_bTransformNeedsUpdate)
 	{
-		_transform = glm::translate(_position) * _lookAt * _rotationMatrix * glm::scale(_scale) * glm::translate(-_origin);
+		_transform = glm::translate(_position) /** _lookAt*/ * _rotationMatrix * glm::scale(_scale) * glm::translate(-_origin) * glm::mat4{};
 		_bInverseTransformNeedsUpdate = true;
 		_bTransformNeedsUpdate = false;
 	}

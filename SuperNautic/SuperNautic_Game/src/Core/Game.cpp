@@ -38,6 +38,11 @@ Game::Game()
 
 Game::~Game()
 {
+	// SHIP TESTING
+	delete ship;
+	delete sh;
+	///////////////
+
 	LOG("Game is being destructed...");
 	CLOSE_LOG();
 }
@@ -134,8 +139,11 @@ void Game::run()
 	sf::Time deltaTime = clock.restart();
 
 	// SHIP TESTING
-	sh = { "Segments/segmentinfos.txt" };
-	s = { sh.loadSegment(0) };
+	sh = new SegmentHandler{ "Segments/segmentinfos.txt" };
+	s = { sh->loadSegment(0) };
+
+	ship = new Ship{ s };
+	ship->setPosition(0, -5, 5);
 
 	Ray r{ glm::vec3{ 0,0,-2 }, glm::vec3{ -1,0,-0.5 }, 10000.0f };
 	RayIntersection i = s->rayIntersectionTest(r);
@@ -183,7 +191,8 @@ void Game::update(float dt)
 	_debugCamera.update(dt, _window);
 
 	// SHIP TESTING
-	ship.update(dt);
+	ship->setTurning(-1.0f);
+	ship->update(dt);
 	///////////////
 
     _stateStack.update(dt);
@@ -231,6 +240,10 @@ void Game::render()
 	for (int i = 0; i < ModelArray.size(); i++)
 	{
 		_forwardRenderer.render(*ModelArray[i].get());
+
+		// SHIP TESTING
+		_forwardRenderer.render(*ship->_shipModel.get());
+		///////////////
 	}
 	/////////////////////////////
 

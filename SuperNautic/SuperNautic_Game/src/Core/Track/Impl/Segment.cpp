@@ -63,7 +63,7 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 	createWaypoints();
 
 	// Create oct-tree
-	createOctTree(20, 2);
+	createOctTree(20, 1);
 }
 
 // Tests a ray collision against all collision surfaces of the segment. Returns collision information
@@ -116,6 +116,8 @@ const RayIntersection Segment::rayIntersectionTest(Ray& ray) const
 
 				if (intersection)
 				{
+					intersection._normal = glm::normalize(intersection._normal);
+
 					return intersection;
 				}
 			}
@@ -129,15 +131,15 @@ const RayIntersection Segment::rayIntersectionTest(Ray& ray) const
 	}
 }
 
-// Finds the two waypoints closest to a position (position is relative to segment's local origin)
-std::pair<glm::vec3, glm::vec3> Segment::findClosestWaypoints(const glm::vec3& position) const
+// Finds indices of the two waypoints closest to a position (position is relative to segment's local origin)
+std::pair<WaypointInfo, WaypointInfo> Segment::findClosestWaypoints(const glm::vec3& position) const
 {
 	// Will hold the closest two vectors, initialize to first two waypoints
 	// First is closer than second
-	std::pair<glm::vec3, glm::vec3> closest { glm::vec3{_waypoints[0]}, glm::vec3{_waypoints[1]} };
+	std::pair<unsigned, unsigned> closest { 0, 1 };
 
-	float firstDistance = squaredDistance(closest.first, position);
-	float secondDistance = squaredDistance(closest.second, position);
+	float firstDistance = glm::distance(_waypoints[closest.first], position);
+	float secondDistance = glm::distance(_waypoints[closest.second], position);
 
 	// Swap if second is closer than first
 	if (secondDistance < firstDistance)
@@ -149,7 +151,7 @@ std::pair<glm::vec3, glm::vec3> Segment::findClosestWaypoints(const glm::vec3& p
 	// Check rest of waypoints
 	for (unsigned i = 2; i < _waypoints.size(); ++i)
 	{
-		float testDistance = squaredDistance(_waypoints[i], position);
+		float testDistance = glm::distance(_waypoints[i], position);
 
 		if (testDistance < secondDistance)
 		{
@@ -161,20 +163,27 @@ std::pair<glm::vec3, glm::vec3> Segment::findClosestWaypoints(const glm::vec3& p
 				secondDistance = firstDistance;
 
 				// Set test to first
-				closest.first = _waypoints[i];
+				closest.first = i;
 				firstDistance = testDistance;
 			}
 			// Second closest so far
 			else
 			{
 				// Set test to second
-				closest.second = _waypoints[i];
+				closest.second = i;
 				secondDistance = testDistance;
 			}
 		}
 	}
 
-	return closest;
+	// Make sure that first < second
+	if (closest.first > closest.second)
+	{
+		std::swap(closest.first, closest.second);
+		std::swap(firstDistance, secondDistance);
+	}
+
+	return std::make_pair(WaypointInfo{ _waypoints[closest.first], firstDistance }, WaypointInfo{ _waypoints[closest.second], secondDistance });
 }
 
 // Renders the segment at the position of an instance
@@ -325,11 +334,11 @@ void Segment::createWaypoints()
 		unsigned closest = i;
 
 		// Squared distance from middles[i] to middles[i - 1], will hold distance from closest waypoint to middles[i - 1]
-		float lowestDistance = squaredDistance(_waypoints[i], _waypoints[i - 1]);
+		float lowestDistance = glm::distance(_waypoints[i], _waypoints[i - 1]);
 
 		for (unsigned j = i + 1; j < _waypoints.size(); ++j)
 		{
-			float testDistance = squaredDistance(_waypoints[j], _waypoints[i]);
+			float testDistance = glm::distance(_waypoints[j], _waypoints[i]);
 
 			if (testDistance < lowestDistance)
 			{
@@ -344,7 +353,7 @@ void Segment::createWaypoints()
 			std::swap(_waypoints[i], _waypoints[closest]);
 		}
 
-		length += sqrtf(lowestDistance);
+		length += lowestDistance;
 	}
 
 	// Initialize _length

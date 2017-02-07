@@ -16,6 +16,12 @@
 #include "../Geometric Primitives/Ray.hpp"
 #include "SegmentInfo.hpp"
 
+struct WaypointInfo
+{
+	glm::vec3 position;
+	float distance;
+};
+
 // Uninstantiated version of a track segment
 class Segment
 {
@@ -27,9 +33,6 @@ public:
 
 	// Tests a ray collision against all collision surfaces of the segment. Returns collision information
 	const RayIntersection rayIntersectionTest(Ray& ray) const;
-
-	// Finds the two waypoints closest to a position (position is relative to segment's local origin)
-	std::pair<glm::vec3, glm::vec3> findClosestWaypoints(const glm::vec3& position) const;
 
 	// Renders the segment at the position of an instance
 	// TODO
@@ -81,6 +84,10 @@ public:
 	{
 		return _scene.get()->cameras[0];
 	}
+
+	// Finds positions of and distance to the two waypoints closest to a position (position is relative to segment's local origin)
+	// First in pair is before second
+	std::pair<WaypointInfo, WaypointInfo> findClosestWaypoints(const glm::vec3& position) const;
 
 private:
 	// The loaded scene data
@@ -164,15 +171,6 @@ private:
 	// Helper for subdivideOctTree, finds index of child to copy a vertex to
 	unsigned findChildIndex(size_t currentModel, unsigned index, glm::vec3 boxMiddle);
 };
-
-// Get squared distance between two vectors
-inline float squaredDistance(const glm::vec3& vector1, const glm::vec3& vector2)
-{
-	float dX = vector1.x - vector2.x;
-	float dY = vector1.y - vector2.y;
-	float dZ = vector1.z - vector2.z;
-	return dX * dX + dY * dY + dZ * dZ;
-}
 
 // True if two vectors are almost equal
 inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2)
