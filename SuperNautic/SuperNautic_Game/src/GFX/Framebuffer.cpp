@@ -56,13 +56,13 @@ void GFX::Framebuffer::initialize(GLuint width, GLuint height, GLuint numColorAt
 	glGenTextures(1, &_depthTexture);
 
 	glBindTexture(GL_TEXTURE_2D, _depthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, depthType, _width, _height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr); 
+	glTexImage2D(GL_TEXTURE_2D, 0, depthType, _width, _height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexture, 0);
 
 	// Defines which attachments will be seen as outputs in the fragment shader.
-	// Here I define an amount of MAX_COLOR_ATTACHMENTS, but note that in the next gl call I am only sending the amount 
+	// Here I define an amount of MAX_COLOR_ATTACHMENTS, but note that in the next gl call I am only sending the amount
 	// of actual color attachments that are present!
 	GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
 		GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6, GL_COLOR_ATTACHMENT7 };
@@ -107,7 +107,7 @@ void Framebuffer::setViewport() const
 
 void Framebuffer::bindColorTextures() const
 {
-	for (int i = 0; i < _numColorAttachments; i++)
+	for (int i = _numColorAttachments - 1; i >= 0; i--)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, _textures[i]);
