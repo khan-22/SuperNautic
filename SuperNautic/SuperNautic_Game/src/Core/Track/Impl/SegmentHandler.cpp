@@ -32,9 +32,9 @@ SegmentHandler::SegmentHandler(std::string filePath)
 	while (infoFile >> segmentDataName) // Read data file name
 	{
 		infoFile >> segmentVisualName;
-		// blah_aa.fbx
+		// blah_aa.blend
 		//      ^^
-		// size - 6, size - 5 contains connection info
+		// size - 8, size - 7 contains connection info
 		startConnection = segmentDataName[segmentDataName.size() - 6];
 		endConnection = segmentDataName[segmentDataName.size() - 5];
 
