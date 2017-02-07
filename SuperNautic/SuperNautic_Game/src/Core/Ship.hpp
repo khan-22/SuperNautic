@@ -49,6 +49,8 @@ public:
 		_trackForward = forwardDirection;
 	}
 
+	void jump();
+
 	ModelAsset _shipModel;
 
 private:
@@ -67,6 +69,7 @@ private:
 	glm::vec3	_trackForward{ 0.0f, 0.0f, 1.0f };		// Forward direction of track
 	glm::vec3	_facingDirection{ 0.0f, 0.0f, 1.0f };	// Current facing direction
 	glm::vec3	_upDirection{ 0.0f, 1.0f, 0.0f };		// Current up direction
+	glm::vec3	_meshUpDirection{ 0.0f, 1.0f, 0.0f };	// Up direction of ship mesh
 
 	const float _minAcceleration{ 50.0f };
 	const float _maxAcceleration{ 150.0f };

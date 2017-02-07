@@ -31,7 +31,7 @@ Game::Game()
 	, _quitTimer(0.f)
 	, _fps(60.f)
 	, _camera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
-	, _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f))
+	, _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -10.f), glm::vec3(0.f, 0.f, 1.f))
 {
 	LOG("Game is being constructed...");
 }
@@ -144,6 +144,7 @@ void Game::run()
 
 	ship = new Ship{ s };
 	ship->setPosition(0, -5, 5);
+	ship->jump();
 
 	Ray r{ glm::vec3{ 0,0,-2 }, glm::vec3{ -1,0,-0.5 }, 10000.0f };
 	RayIntersection i = s->rayIntersectionTest(r);
@@ -192,7 +193,7 @@ void Game::update(float dt)
 
 	// SHIP TESTING
 	ship->setTurning(-1.0f);
-	ship->update(dt);
+	ship->update(dt * 0.3f);
 	///////////////
 
     _stateStack.update(dt);

@@ -2,6 +2,8 @@
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
+#include "glm/gtx/vector_angle.hpp"
+#include "glm/gtx/norm.hpp"
 #include "Ship.hpp"
 #include "Geometric Primitives/Ray.hpp"
 #include "Geometric Primitives/RayIntersection.hpp"
@@ -29,10 +31,8 @@ void Ship::render()
 
 void Ship::update(float dt)
 {
-	//dt = clamp(dt, 0.0f, 0.1f);
-
-	// Update turning angle
-	_currentTurningAngle += _turningFactor * _maxTurningSpeed * dt;
+	// Update turning angle										reduce maneuverability at high acceleration
+	_currentTurningAngle += _turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.7f) * dt;
 																		 // abs to preserve sign of _currentTurningAngle
 	_currentTurningAngle -= _straighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
 
@@ -49,40 +49,60 @@ void Ship::update(float dt)
 
 	if (ri)
 	{
+		// How much influence the surface normal will have on the rotation of the ship, decreases as distance from surface increases
+		float normalWeight;
+
+		if (ri._length <= _preferredHeight)
+		{
+			normalWeight = 1.0f;
+		}
+		else
+		{
+			normalWeight = (_preferredHeight / ri._length) * (_preferredHeight / ri._length);
+		}
+
 		// Update local directions
-		_upDirection = glm::normalize(_upDirection * 0.0f + ri._normal * 1.0f);
+		_upDirection = glm::normalize(_upDirection * (1.0f - normalWeight) + ri._normal * normalWeight);
 		_facingDirection = glm::normalize(_trackForward - glm::dot(_trackForward, ri._normal) * ri._normal);
 
 		// Set rotation matrix
 		setLookAt(_facingDirection, _upDirection);
 
-		if (ri._length > _preferredHeight)
-		{
-			_upAcceleration = -_levitationForce;
-		}
-		else
-		{
-			_upAcceleration = _levitationForce;
-		}
+		// Set up/down velocity, for now linear to distance
+		_upVelocity = _preferredHeight - ri._length;
 	}
 
-	_upVelocity = _upVelocity * 0.8f + _upAcceleration * 0.2f;
-	
+	// 'Rotate' mesh up direction towards 'correct' up direction
+	_meshUpDirection = glm::normalize(_meshUpDirection * 0.8f + _upDirection * 0.2f);
+		
 	// Ship always faces straight forward, only movement direction and mesh rotates
-	glm::mat4 meshAndVelocityMatrix = glm::rotate(getRotation(), _currentTurningAngle, glm::vec3{ 0.0f, 1.0f, 0.0f });
+	glm::mat4 velocityMatrix = glm::rotate(getRotation(), _currentTurningAngle, glm::vec3{ 0.0f, 1.0f, 0.0f });
+
+	// Create from mesh up direction
+	glm::mat4 meshMatrix{ glm::vec4{ glm::cross(_meshUpDirection, _facingDirection), 0.0f },
+						  glm::vec4{ _meshUpDirection - glm::dot(_meshUpDirection, _facingDirection) * _facingDirection, 0.0f },	// The part of _meshUpDirection that is orthogonal to _facingDirection
+						  glm::vec4{ _facingDirection, 0.0f },
+						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+	// Rotate to display turning
+	meshMatrix = glm::rotate(meshMatrix, _currentTurningAngle, glm::vec3{ 0.0f, 1.0f, 0.0f });
 
 	// Move forward
-	move((meshAndVelocityMatrix * glm::vec4{ _facingDirection, 0.0f }) * _velocity * dt);
+	move((velocityMatrix * glm::vec4{ _facingDirection, 0.0f }) * _velocity * dt);
 
 	// Move up/down
 	move(_upDirection * _upVelocity * dt);
 
 	// Update model's matrix
-	_shipModel.get()->setModelMatrix(glm::translate(getPosition()) * meshAndVelocityMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
-	//_shipModel.get()->setModelMatrix(getTransformMatrix());
-
+	_shipModel.get()->setModelMatrix(glm::translate(getPosition()) * meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
 	
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
 	_accelerationFactor = 0.0f;
+}
+
+void Ship::jump()
+{
+	glm::mat4 rotation = glm::rotate(glm::pi<float>(), _facingDirection);
+
+	_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
 }
