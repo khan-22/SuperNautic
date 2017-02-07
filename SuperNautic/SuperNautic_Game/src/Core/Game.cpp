@@ -134,11 +134,6 @@ bool Game::bInitialize()
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
 
-
-	_shader.get()->bind();
-    _shader.get()->setSampler("uDiffuse", 0);
-    _shader.get()->setSampler("uSpecular", 1);
-    _shader.get()->setSampler("uNormal", 2);
 	return true;
 }
 
@@ -242,7 +237,6 @@ void Game::render()
 
 	_model.get()->render();*/
 
-	_shader.get()->bind();
 
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
 	
@@ -267,16 +261,15 @@ void Game::render()
 	_forwardRenderer.display(_debugCamera);
 	LOG_GL_ERRORS();
 
-
     static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
     sf::Text fps;
     fps.setFont(*font.get());
     fps.setString("FPS: " + std::to_string(_fps));
 
-    //_stateStack.render();
-    //_window.pushGLStates();
-    //_window.draw(fps);
-    //_window.popGLStates();
+    _window.pushGLStates();
+    _stateStack.render();
+    _window.draw(fps);
+    _window.popGLStates();
 
 	_window.display();
 }

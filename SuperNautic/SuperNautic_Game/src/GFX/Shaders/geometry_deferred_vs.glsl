@@ -21,7 +21,7 @@ void main()
 {
 	//We do not use the W component of the UVs, can be changed
 	vs_out.position = vec3(uModel * vec4(pos, 1.0f));
-	vs_out.uv		= uv.xy; 
+	vs_out.uv		= vec2(uv.x, 1.0 - uv.y); // UV needs to be flipped.
 	vs_out.normal	= vec3(uModel * vec4(normalize(normal), 0.0f));
 
 	//mat4 poop = uView;

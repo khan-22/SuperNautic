@@ -55,6 +55,7 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
                 switch(event.key.code)
                 {
                     case sf::Keyboard::Return:
+					case sf::Keyboard::A:
                         activate();
                         break;
                     case sf::Keyboard::Down:

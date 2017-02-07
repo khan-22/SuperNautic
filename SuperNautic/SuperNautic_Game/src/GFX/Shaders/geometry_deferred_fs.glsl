@@ -13,7 +13,7 @@ layout(location = 0) out vec3 positionOut;
 layout(location = 1) out vec3 diffuseOut;
 layout(location = 2) out vec3 normalOut;
 
-vec3 lightDir = vec3(-0.2, -0.2, -0.2);
+//vec3 lightDir = vec3(-0.2, -0.2, -0.2);
 
 uniform sampler2D uDiffuse;
 uniform sampler2D uSpecular;
@@ -25,12 +25,12 @@ void main()
 	//diffuseOut	= uColor.rgb;
 	normalOut	= normalize(fs_in.normal);
 	
-	float factor = max(dot(normalize(fs_in.normal), -lightDir), 0.01);
+	//float factor = max(dot(normalize(fs_in.normal), -lightDir), 0.01);
 
 	vec4 diffuse = texture(uDiffuse, fs_in.uv);
 	vec4 specular = texture(uSpecular, fs_in.uv);
 	vec4 normal = texture(uNormal, fs_in.uv);
-	diffuseOut = (diffuse + specular + normal).rgb * factor / 3.0;
+	diffuseOut = (diffuse/* + specular + normal*/).rgb /** factor*/ / 1.0;
 
 	//Just output a basic color
 	//lightDir = normalize(lightDir);
