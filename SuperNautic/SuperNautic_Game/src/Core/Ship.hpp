@@ -16,12 +16,15 @@ public:
 
 	void steer(float magnitude); // magnitude = [-1, 1]
 	void accelerate(float magnitude); // magnitude = [-1, 1]
+	void updatePower(float magnitude); // magnitude = [-1, 1]
 	void jump();
 
 	float getEngineTemperature() const; // [0, 1]
 	float getSpeed() const;
 
 private:
+	float _enginePower;
+	float _maxEnginePower;
     float _steerVelocity;
     float _forwardVelocity;
     float _maxSteerAcceleration;

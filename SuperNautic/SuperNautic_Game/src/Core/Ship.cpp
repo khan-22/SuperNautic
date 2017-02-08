@@ -7,6 +7,7 @@ Ship::Ship()
 : _steerVelocity(0.f)
 , _forwardVelocity(0.f)
 , _bIsJumping(false)
+, _maxEnginePower(50.f)
 , _maxSteerAcceleration(2.f)
 , _maxForwardAcceleration(50.f)
 , _engineTemperature(0.f)
@@ -31,7 +32,8 @@ void Ship::updateEngineTemperature(float dt)
     static const float M = K * BREAK_EVEN_SPEED;
     static const float K_NORMALIZED = K / 100.f;
     static const float M_NORMALIZED = M / 100.f;
-	_engineTemperature = (_forwardVelocity) / _maxForwardVelocity;
+	float power = (_enginePower) / _maxEnginePower;
+	_engineTemperature += (power - _engineTemperature) * dt;
 
     if(_engineTemperature > 1.f)
     {
@@ -46,7 +48,8 @@ void Ship::updateEngineTemperature(float dt)
 void Ship::updateVelocities(float dt)
 {
     _steerVelocity -= _steerVelocity * 0.1f * dt;
-    //_forwardVelocity -= _forwardVelocity * 0.1f * dt;
+    //_forwardVelocity -= _forwardVelocity * 0.5f * dt;
+	_forwardVelocity += (_enginePower - _forwardVelocity) * dt * 5;
     if(_steerVelocity > _maxSteerVelocity)
     {
         _steerVelocity = _maxSteerVelocity;
@@ -91,6 +94,20 @@ void Ship::steer(float magnitude)
 void Ship::accelerate(float magnitude)
 {
     _forwardVelocity += magnitude * _maxForwardAcceleration;
+}
+
+void Ship::updatePower(float magnitude)
+{
+	_enginePower += magnitude * _maxEnginePower;
+
+	if (_enginePower > _maxEnginePower)
+	{
+		_enginePower = _maxEnginePower;
+	}
+	else if (_enginePower < 0)
+	{
+		_enginePower = 0;
+	}
 }
 
 void Ship::jump()
