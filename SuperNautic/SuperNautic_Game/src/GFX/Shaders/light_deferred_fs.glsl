@@ -28,7 +28,6 @@ uniform PointLightData pointLights;
 
 vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3 viewDir)
 {
-	//DO COOL LIGHT SHIT
 	//Ambient
 	vec3 ambientColor	= pointLights.color[i] * 0.1;
 
@@ -38,10 +37,10 @@ vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3
 	vec3 diffuseColor	= angle * pointLights.color[i];
 
 	//Specular
-	float specularStrength = 0.5; //Should be sent in on a per object basis, possibly with specular map in the future
-	vec3 reflectionDir = reflect(-lightDir, normal);
-	float specular = pow(max(dot(viewDir, reflectionDir), 0.0), 32); //32 defines shininess and should also be sent in as a uniform most likely
-	vec3 specularVec = specularStrength * specular * pointLights.color[i];
+	float specularStrength	= 0.5; //Should be sent in on a per object basis, possibly with specular map in the future
+	vec3 reflectionDir		= reflect(-lightDir, normal);
+	float specular			= pow(max(dot(viewDir, reflectionDir), 0.0), 32); //32 defines shininess and should also be sent in as a uniform most likely
+	vec3 specularVec		= specularStrength * specular * pointLights.color[i];
 
 	//Attenuation
 	float d				= length(pointLights.pos[i] - fragPos); //Distance to the light source
@@ -66,8 +65,6 @@ void main()
 	{
 		lightingResult += calculatePointLight(i, fragPos, diffuseTex, normal, viewDir);
 	}
-
-	//lightingResult += diffuseTex * 0.1;
 
 	outColor = lightingResult;
 }
