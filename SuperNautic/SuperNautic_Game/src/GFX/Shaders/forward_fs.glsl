@@ -35,5 +35,5 @@ void main()
 
 	
 	//OutColor = (diffuse + specular + normal) * factor / 3.0;
-	OutColor = diffuse * factor + specular * 0.f;
+	OutColor = diffuse; // * factor + specular * 0.f;
 }

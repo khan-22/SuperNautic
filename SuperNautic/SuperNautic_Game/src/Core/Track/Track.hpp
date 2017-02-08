@@ -20,12 +20,13 @@ public:
 	void setSeed(const unsigned int seed);
 	bool generate();
 	int getNrOfSegments() const;
-	SegmentInstance& getInstance(int index);
+	SegmentInstance& getInstance(const int index);
 
 private:
 	Track();
-	int getIndex(char connectionType) const;
-	int getInRow(int index) const;
+	int getIndex(char & connectionType) const;
+	int getInRow(const int index) const;
+	int insertSegment(const int index);
 	
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance*>	_track;
