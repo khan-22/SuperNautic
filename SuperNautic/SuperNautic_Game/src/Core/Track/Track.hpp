@@ -3,7 +3,7 @@
 #define TRACK_HPP
 
 #include <vector>
-#include <glm\glm.hpp>
+#include <glm\mat4x4.hpp>
 
 #include "SegmentHandler.hpp"
 #include "Segment.hpp"
@@ -26,7 +26,7 @@ private:
 	Track();
 	int getIndex(char & connectionType) const;
 	int getInRow(const int index) const;
-	int insertSegment(const int index);
+	int insertSegment(const int index, const char connection);
 	
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance*>	_track;

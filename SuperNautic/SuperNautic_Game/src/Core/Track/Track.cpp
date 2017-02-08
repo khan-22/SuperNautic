@@ -72,7 +72,7 @@ bool Track::generate()
 	int totalLength = 0;
 	for (unsigned int i = 0; i < 10; i++)
 	{
-		totalLength += insertSegment(0);
+		totalLength += insertSegment(0, 'a');
 	}
 	char end = 'a';
 	bool lighting = true;
@@ -98,7 +98,7 @@ bool Track::generate()
 		// Instanciate the segment(s)
 		for (unsigned int i = 0; i < inRow; i++)
 		{
-			totalLength += insertSegment(index);
+			totalLength += insertSegment(index, end);
 		}
 	}
 	_generatedLength = totalLength;
@@ -167,14 +167,16 @@ int Track::getInRow(int index) const
 }
 
 // Inserts a segment with given index at the end of the track
-int Track::insertSegment(const int index)
+int Track::insertSegment(const int index, const char connection)
 {
 	const Segment * segment = _segmentHandler->loadSegment(index);
 	_track.push_back(new SegmentInstance(segment, _endMatrix, true));
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int rotOffset = segment->getRotationOffset();
-	int rotVal = rotOffset - (rand() % (2 * rotOffset));
-	glm::mat4 rotMat = glm::rotate((float)rotVal, glm::vec3(0, 0, 1));
+	int temp = 360.f / _segmentHandler->getConnectionRotation(connection);
+	int temp2 = rand() % (2 * rotOffset);
+	float rotVal = rotOffset - (temp2 - (temp2 % temp));
+	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
 	return segment->getLength();
 }
