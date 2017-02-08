@@ -32,7 +32,7 @@ Game::Game()
 	, _fps(60.f)
 	, _camera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
 	, _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -10.f), glm::vec3(0.f, 0.f, 1.f))
-	, _segmentHandler("Segments/segmentinfos.txt")
+	, _segmentHandler("Segments/segmentinfos.txt", "Segments/ConnectionTypes.txt")
 	, _track(&_segmentHandler)
 {
 	LOG("Game is being constructed...");
@@ -143,8 +143,8 @@ void Game::run()
 	sf::Time deltaTime = clock.restart();
 
 	// SHIP TESTING
-	sh = new SegmentHandler{ "Segments/segmentinfos.txt" };
-	s = { sh->loadSegment(0) };
+	//sh = new SegmentHandler{ "Segments/segmentinfos.txt" };
+	s = { _segmentHandler.loadSegment(0) };
 
 	ship = new Ship{ s };
 	ship->setPosition(0, -5, 5);

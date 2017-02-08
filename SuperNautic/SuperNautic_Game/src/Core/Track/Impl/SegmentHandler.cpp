@@ -7,15 +7,15 @@
 // Path to res\models
 std::string SegmentHandler::basePath = "res/models/";
 
-// Loads SegmentInfos from file with name filePath (relative to res/models)
-SegmentHandler::SegmentHandler(std::string filePath)
+// Loads SegmentInfos and connections from file (relative to res/models)
+SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connectionInfoPath)
 {
-	std::ifstream infoFile { basePath + filePath };
-
+	// Read SegmentInfos
+	std::ifstream infoFile { basePath + segmentInfoPath };
 	if (!infoFile.is_open())
 	{
 		// File could not be opened
-		LOG_ERROR("Could not open SegmentInfo file ", basePath + filePath);
+		LOG_ERROR("Could not open SegmentInfo file ", basePath + segmentInfoPath);
 		return;
 	}
 
@@ -28,7 +28,6 @@ SegmentHandler::SegmentHandler(std::string filePath)
 	int maxInRow;
 	int rotationOffset;
 
-	// Read SegmentInfos
 	while (infoFile >> segmentDataName) // Read data file name
 	{
 		infoFile >> segmentVisualName;
@@ -50,6 +49,28 @@ SegmentHandler::SegmentHandler(std::string filePath)
 		// Skip rest of line
 		infoFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
+	infoFile.close();
+
+	// Read connections
+	infoFile.open(basePath + connectionInfoPath);
+	if (!infoFile.is_open())
+	{
+		// File could not be opened
+		LOG_ERROR("Could not open SegmentInfo file ", basePath + connectionInfoPath);
+		return;
+	}
+
+	char type;
+	int amount, rotation;
+	infoFile >> amount;
+	for (unsigned int i = 0; i < amount; i++)
+	{
+		infoFile >> type;
+		infoFile >> rotation;
+		std::pair<char, int> temp(type, rotation);
+		_connections.insert(temp);
+	}
+	infoFile.close();
 }
 
 // Destructor
@@ -81,4 +102,10 @@ const Segment* SegmentHandler::loadSegment(unsigned i)
 
 		return _segments[_segmentInfos[i].loadedIndex];
 	}
+}
+
+// Returns rotation info about connection type 'type'
+int SegmentHandler::getConnectionRotation(const char type)
+{
+	return _connections[type];
 }

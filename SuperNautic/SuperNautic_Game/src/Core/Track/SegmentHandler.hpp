@@ -12,7 +12,7 @@ class SegmentHandler
 {
 public:
 	// Loads SegmentInfos from file with name fileName in path
-	SegmentHandler(std::string filePath);
+	SegmentHandler(std::string segmentInfoPath, std::string connectionInfoPath);
 
 	// Destructor
 	virtual ~SegmentHandler();
@@ -28,12 +28,18 @@ public:
 	// Just returns reference if already loaded
 	const Segment* loadSegment(unsigned i);
 
+	// Returns rotation info about connection type 'type'
+	int getConnectionRotation(const char type);
+
 private:
 	// Segments that have been loaded from an fbx file
 	std::vector<Segment*>		_segments;
 
 	// Basic info about all possible segments, loaded from a txt file
 	std::vector<SegmentInfo>	_segmentInfos;
+
+	// Keeps track of connection types
+	std::unordered_map<char, int>	_connections;
 
 	// Path to res\models
 	static std::string basePath;
