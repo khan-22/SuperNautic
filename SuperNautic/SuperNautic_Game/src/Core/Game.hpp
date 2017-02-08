@@ -17,6 +17,7 @@
 #include "../GFX/TexturedModel.hpp"
 
 #include "DebugCamera.hpp"
+#include "WorldAudio.hpp"
 
 class Game
 {
@@ -58,6 +59,8 @@ private:
 	DebugCamera _debugCamera;
 
 	std::vector<PointLight>	_pointLights;
+
+	WorldAudio _audio;
 };
 
 #endif //GAME_HPP
