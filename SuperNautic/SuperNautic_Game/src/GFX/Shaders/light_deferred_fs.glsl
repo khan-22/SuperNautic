@@ -30,29 +30,35 @@ vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3
 {
 	//DO COOL LIGHT SHIT
 	//Ambient
-	vec3 ambientColor = pointLights.color[i] * 0.1;
+	vec3 ambientColor	= pointLights.color[i] * 0.1;
 
 	//Diffuse color
-	vec3 lightDir = normalize(pointLights.pos[i] - fragPos);
-	float angle = max(dot(normal, lightDir), 0.0);
-	vec3 diffuseColor = angle * pointLights.color[i];
+	vec3 lightDir		= normalize(pointLights.pos[i] - fragPos);
+	float angle			= max(dot(normal, lightDir), 0.0);
+	vec3 diffuseColor	= angle * pointLights.color[i];
+
+	//Specular
+	float specularStrength = 0.5; //Should be sent in on a per object basis, possibly with specular map in the future
+	vec3 reflectionDir = reflect(-lightDir, normal);
+	float specular = pow(max(dot(viewDir, reflectionDir), 0.0), 32); //32 defines shininess and should also be sent in as a uniform most likely
+	vec3 specularVec = specularStrength * specular * pointLights.color[i];
 
 	//Attenuation
-	float d = length(pointLights.pos[i] - fragPos); //Distance to the light source
-	vec3 dvec = vec3(1.0, d, d*d);
-	float attenuation  = 1.0 / (dot(pointLights.properties[i], dvec));
+	float d				= length(pointLights.pos[i] - fragPos); //Distance to the light source
+	vec3 dvec			= vec3(1.0, d, d*d);
+	float attenuation	= 1.0 / (dot(pointLights.properties[i], dvec));
 
-	vec3 result = max((diffuseColor + ambientColor) * diffuseTex * attenuation, vec3(0.0));
+	vec3 result	= max((diffuseColor + ambientColor + specularVec) * diffuseTex * attenuation, vec3(0.0));
 
 	return result;
 }
 
 void main()
 {
-	vec3 fragPos = texture(uPosition, fs_in.uv).rgb;
+	vec3 fragPos	= texture(uPosition, fs_in.uv).rgb;
 	vec3 diffuseTex = texture(uDiffuse, fs_in.uv).rgb;
-	vec3 normal = texture(uNormal, fs_in.uv).rgb;
-	vec3 viewDir = normalize(uViewPos - fragPos);
+	vec3 normal		= texture(uNormal, fs_in.uv).rgb;
+	vec3 viewDir	= normalize(uViewPos - fragPos);
 
 	vec4 lightingResult = vec4(0, 0, 0, 1);
 
