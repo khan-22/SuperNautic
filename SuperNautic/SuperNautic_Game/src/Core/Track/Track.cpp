@@ -1,6 +1,5 @@
 #include <glm\gtx\transform.hpp>
 #include <time.h>
-#include <fstream>
 
 #include "Track.hpp"
 #include "../../Log.hpp"
@@ -44,7 +43,7 @@ int Track::getGeneratedLength() const
 // Sets the track length in whole meters
 bool Track::setLength(const int length)
 {
-	if (length >= 300 && length <= 100000)
+	if (length >= 2000 && length <= 100000)
 	{
 		_targetLength = length;
 		return true;
@@ -70,7 +69,8 @@ void Track::setSeed(const unsigned int seed)
 bool Track::generate()
 {
 	int totalLength = 0;
-	for (unsigned int i = 0; i < 10; i++)
+	// Make the inital stretch straight
+	while (totalLength < 500)
 	{
 		totalLength += insertSegment(0, 'a');
 	}
@@ -78,7 +78,7 @@ bool Track::generate()
 	bool lighting = true;
 	int prevIndex = -1;
 	// Create random path
-	while (totalLength < _targetLength)
+	while (true)
 	{
 		// Randomize segment index
 		int index;
@@ -88,8 +88,7 @@ bool Track::generate()
 			index = getIndex(end);
 			if (index == -1)
 			{
-				LOG_ERROR("Aborting track generation! Not enough segments with same connection type!!!");
-				return false;
+				LOG_ERROR("WARNING! There are not enough segments with connection type '", end, "'.");
 			}
 		} while (index == prevIndex);
 		prevIndex = index;
@@ -100,6 +99,13 @@ bool Track::generate()
 		{
 			totalLength += insertSegment(index, end);
 		}
+		if (totalLength > _targetLength - 500 && end == 'a')
+			break;
+	}
+	// Make the final stretch straight
+	while (totalLength < _targetLength)
+	{
+		totalLength += insertSegment(0, 'a');
 	}
 	_generatedLength = totalLength;
 
