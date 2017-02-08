@@ -51,6 +51,7 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 	}
 	infoFile.close();
 
+
 	// Read connections
 	infoFile.open(basePath + connectionInfoPath);
 	if (!infoFile.is_open())

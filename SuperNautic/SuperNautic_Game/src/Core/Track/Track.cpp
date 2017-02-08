@@ -172,10 +172,9 @@ int Track::insertSegment(const int index, const char connection)
 	const Segment * segment = _segmentHandler->loadSegment(index);
 	_track.push_back(new SegmentInstance(segment, _endMatrix, true));
 	glm::mat4 modelEndMat = segment->getEndMatrix();
-	int rotOffset = segment->getRotationOffset();
-	int temp = 360.f / _segmentHandler->getConnectionRotation(connection);
-	int temp2 = rand() % (2 * rotOffset);
-	float rotVal = rotOffset - (temp2 - (temp2 % temp));
+	int angle = 360.f / _segmentHandler->getConnectionRotation(connection);
+	int maxRotOffset = segment->getRotationOffset() / angle;
+	float rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
 	return segment->getLength();

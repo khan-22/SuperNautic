@@ -105,7 +105,7 @@ bool Game::bInitialize()
         LOG("Failed to load material.");
     }
 
-	_track.setLength(3000);
+	_track.setLength(10000);
 	_track.setSeed(1);
 	_track.generate();
 
