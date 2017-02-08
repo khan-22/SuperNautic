@@ -14,37 +14,35 @@ in VS_OUT
 	vec2 uv;
 } fs_in;
 
+const int NUM_LIGHTS = 32;
 struct PointLightData
 {
-	vec3 pos;
-	vec3 color;
+	vec3 pos[NUM_LIGHTS];
+	vec3 color[NUM_LIGHTS];
 
 	//Attenuation properties
-	float constant;
-	float linear;
-	float quadratic;
+	vec3 properties[NUM_LIGHTS];
 };
 
-const int NUM_LIGHTS = 32;
-uniform PointLightData pointLights[NUM_LIGHTS];
+uniform PointLightData pointLights;
 
-vec4 calculatePointLight(PointLightData pLight, vec3 fragPos, vec3 diffuse, vec3 normal, vec3 viewDir)
+vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3 viewDir)
 {
 	//DO COOL LIGHT SHIT
+	//Ambient
+	vec3 ambientColor = pointLights.color[i] * 0.1;
 
-	float d = length(pLight.pos - fragPos); //Distance to the light source
-	//float attenuation  = 1.0 / (pLight.constant + (pLight.linear * d) + (pLight.quadratic * d * d));
-	//float attenuation  = 1.0 / (1.0 + (0.045 * d) + (0.0075 * d * d));
-	//float c = pLight.constant;
-	//float l = pLight.linear;
-	//float q = pLight.quadratic;
+	//Diffuse color
+	vec3 lightDir = normalize(pointLights.pos[i] - fragPos);
+	float angle = max(dot(normal, lightDir), 0.0);
+	vec3 diffuseColor = angle * pointLights.color[i];
 
-	float attenuation  = 1.0 / (1.0 + (pLight.linear * d) + (pLight.quadratic * d * d));
+	//Attenuation
+	float d = length(pointLights.pos[i] - fragPos); //Distance to the light source
+	vec3 dvec = vec3(1.0, d, d*d);
+	float attenuation  = 1.0 / (dot(pointLights.properties[i], dvec));
 
-	float factor = dot(normalize(pLight.pos- fragPos), normal);
-
-	//vec4 result = vec4(diffuse * pLight.color * factor * attenuation, 1.0);
-	vec4 result = vec4(diffuse * pLight.color * factor * attenuation, 1.0);
+	vec3 result = max((diffuseColor + ambientColor) * diffuseTex * attenuation, vec3(0.0));
 
 	return result;
 }
@@ -52,18 +50,18 @@ vec4 calculatePointLight(PointLightData pLight, vec3 fragPos, vec3 diffuse, vec3
 void main()
 {
 	vec3 fragPos = texture(uPosition, fs_in.uv).rgb;
-	vec3 diffuse = texture(uDiffuse, fs_in.uv).rgb;
+	vec3 diffuseTex = texture(uDiffuse, fs_in.uv).rgb;
 	vec3 normal = texture(uNormal, fs_in.uv).rgb;
 	vec3 viewDir = normalize(uViewPos - fragPos);
 
 	vec4 lightingResult = vec4(0, 0, 0, 1);
 
-	for(int i = 0; i < 32; i++)
+	for(int i = 0; i < NUM_LIGHTS; i++)
 	{
-		lightingResult += calculatePointLight(pointLights[i], fragPos, diffuse, normal, viewDir);
+		lightingResult += calculatePointLight(i, fragPos, diffuseTex, normal, viewDir);
 	}
 
-	lightingResult += diffuse * 0.1;
+	//lightingResult += diffuseTex * 0.1;
 
 	outColor = lightingResult;
 }
