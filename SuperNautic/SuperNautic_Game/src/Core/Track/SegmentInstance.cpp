@@ -1,4 +1,7 @@
+#include <algorithm>
+
 #include "SegmentInstance.hpp"
+#include "../CollisionUtility.hpp"
 
 //Default constructor (private)
 SegmentInstance::SegmentInstance()
@@ -11,6 +14,7 @@ SegmentInstance::SegmentInstance(const Segment * segment, glm::mat4 modelMatrix,
 {
 	_parent = segment;
 	_model = modelMatrix;
+	updateGlobalBounds();
 	_bHasLighting = lighting;
 }
 
@@ -30,13 +34,61 @@ glm::mat4 SegmentInstance::getModelMatrix() const
 	return _model;
 }
 
-std::vector<BoundingBox> SegmentInstance::getGlobalBounds() const
+bool SegmentInstance::bTestCollisionSphere(const SegmentInstance& other) const
 {
-    std::vector<BoundingBox> boxes;
+    for(const Sphere& a : _globalBoundingSpheres)
+    {
+        for(const Sphere& b : other._globalBoundingSpheres)
+        {
+            if(::bTestCollision(a, b))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool SegmentInstance::bTestCollisionBox(const SegmentInstance& other) const
+{
+    for(const BoundingBox& a : _globalBoundingBoxes)
+    {
+        for(const BoundingBox& b : other._globalBoundingBoxes)
+        {
+            if(::bTestCollision(a, b))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool SegmentInstance::bTestCollision(const SegmentInstance& other) const
+{
+    if(!bTestCollisionSphere(other))
+    {
+        return false;
+    }
+
+    if(!bTestCollisionBox(other))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+
+void SegmentInstance::updateGlobalBounds()
+{
+    _globalBoundingBoxes.clear();
     for(const BoundingBox& localBox : _parent->getBoundingBoxes())
     {
-        boxes.emplace_back();
-        BoundingBox& globalBox = boxes.back();
+        _globalBoundingBoxes.emplace_back();
+        BoundingBox& globalBox = _globalBoundingBoxes.back();
 
 
         globalBox.center = glm::vec4(localBox.center, 1.f) * _model;
@@ -47,7 +99,12 @@ std::vector<BoundingBox> SegmentInstance::getGlobalBounds() const
         globalBox.halfLengths = localBox.halfLengths;
     }
 
-    return boxes;
+    _globalBoundingSpheres.clear();
+    for(const BoundingBox& globalBox : _globalBoundingBoxes)
+    {
+        float maxHalfLength = *std::max_element(globalBox.halfLengths.begin(), globalBox.halfLengths.end());
+        _globalBoundingSpheres.emplace_back(globalBox.center, maxHalfLength);
+    }
 }
 
 
