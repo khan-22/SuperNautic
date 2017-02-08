@@ -49,16 +49,20 @@ void World::update(float dt)
 
 		_players[i].update(dt);
 	}
+
+	_debugCamera.update(dt, _context.window);
 }
 
 void World::render()
 {
 	for (Player& player : _players)
 	{
-		player.render(_renderer);
+		//player.render(_renderer);
+		_renderer.render(player.getShip());
 	}
 
 	_track.render(_renderer);
+	//_renderer.render(_track.);
 
 	_renderer.display(_debugCamera);
 

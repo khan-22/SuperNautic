@@ -9,6 +9,7 @@
 #include "Segment.hpp"
 #include "SegmentInstance.hpp"
 #include "../../GFX/DeferredRenderer.hpp"
+#include "../../GFX/ForwardRenderer.hpp"
 
 class Track
 {

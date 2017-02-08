@@ -13,6 +13,7 @@ namespace sf
 #include "Player.hpp"
 #include "Track/Track.hpp"
 #include "../GFX/DeferredRenderer.hpp"
+#include "../GFX/ForwardRenderer.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "DebugCamera.hpp"
 

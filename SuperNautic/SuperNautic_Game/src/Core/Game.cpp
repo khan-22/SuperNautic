@@ -214,23 +214,24 @@ void Game::render()
 	//SEND TEST MODELS TO RENDERER
 	for (int i = 0; i < ModelArray.size(); i++)
 	{
-		_forwardRenderer.render(*ModelArray[i].get());
+		//_forwardRenderer.render(*ModelArray[i].get());
 	}
 	/////////////////////////////
 
 	_shader.get()->bind();
     //_shader.get()->setSampler("uTexColor", 0);
 	_texture.get()->bind(0);
-	_forwardRenderer.display(_debugCamera);
-	LOG_GL_ERRORS();
+	//_forwardRenderer.display(_debugCamera);
+	//LOG_GL_ERRORS();
 
     static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
     sf::Text fps;
     fps.setFont(*font.get());
     fps.setString("FPS: " + std::to_string(_fps));
 
-    _window.pushGLStates();
     _stateStack.render();
+
+    _window.pushGLStates();
     _window.draw(fps);
     _window.popGLStates();
 
