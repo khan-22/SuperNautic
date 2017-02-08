@@ -157,15 +157,38 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 
 	// Send all point light data as a uniform array struct
 	int lightCount = std::min((int)_pointLights.size(), 32);
+
+	std::vector<glm::vec3> pointLightPos;
+	std::vector<glm::vec3> pointLightColor;
+	std::vector<glm::vec3> pointLightProperties;
+
+	pointLightPos.reserve(lightCount);
+	pointLightColor.reserve(lightCount);
+	pointLightProperties.reserve(lightCount);
+
 	for (int i = 0; i < lightCount; i++)
+	{
+		pointLightPos.push_back(_pointLights[i]->getPosition());
+		pointLightColor.push_back(_pointLights[i]->getLightProperties( ).diffuseColor);
+
+		glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
+		pointLightProperties.push_back(properties);
+	}
+
+	lpShader->setUniform("pointLights.pos", pointLightPos[0], lightCount);
+	lpShader->setUniform("pointLights.color", pointLightColor[0], lightCount);
+	lpShader->setUniform("pointLights.properties", pointLightProperties[0], lightCount);
+
+	/*for (int i = 0; i < lightCount; i++)
 	{
 		std::string uName = "pointLights[" + std::to_string(i) + "]";
 		lpShader->setUniform(uName + ".pos",		_pointLights[i]->getPosition());
 		lpShader->setUniform(uName + ".color",		_pointLights[i]->getLightProperties().diffuseColor);
-		lpShader->setUniform(uName + ".constant",	_pointLights[i]->getLightProperties().constant);
-		lpShader->setUniform(uName + ".linear",		_pointLights[i]->getLightProperties().linear);
-		lpShader->setUniform(uName + ".quadratic",	_pointLights[i]->getLightProperties().quadratic);
-	}
+
+		glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
+
+		lpShader->setUniform(uName + ".properties", properties);
+	}*/
 	_pointLights.clear();
 
 	glDisable(GL_DEPTH_TEST);

@@ -38,6 +38,16 @@ bool Game::bInitialize()
 {
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
+
+	GLint vertexUniCount = 0;
+	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &vertexUniCount);
+	GLint geoUniCount = 0;
+	glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &geoUniCount);
+	GLint fragUniCount = 0;
+	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &fragUniCount);
+	LOG("[VERTEX] There are ", vertexUniCount, " available uniform locations");
+	LOG("[GEOMETRY] There are ", geoUniCount, " available uniform locations");
+	LOG("[FRAGMENT] There are ", fragUniCount, " available uniform locations");
 //
 //	// Cached asset loading **DEMO**
 	RawMeshAsset testRawMesh = RawMeshCache::get("Segments/s01_straight_aa.fbx");
@@ -89,6 +99,8 @@ bool Game::bInitialize()
     {
         LOG("Failed to load material.");
     }
+
+
 
 
 	_model = ModelCache::get("ship.fbx");
@@ -159,6 +171,10 @@ void Game::update(float dt)
     _fps = _fps * 0.9f + 0.1f / dt;
 
 	_debugCamera.update(dt, _window);
+
+	static float t = 0.0;
+	t += dt;
+	_pointLights[0].setPosition(glm::vec3(2.f * sinf(t*4.f), 2.f, 2.f * cosf(t*4.f)));
 
     _stateStack.update(dt);
 }
