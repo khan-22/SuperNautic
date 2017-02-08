@@ -16,6 +16,7 @@ public:
 	virtual ~SegmentInstance();
 	glm::mat4 getEndMatrix() const;
 	glm::mat4 getModelMatrix() const;
+	const int getLength() const;
 
 	void render(GFX::RenderStates& states) override;
 

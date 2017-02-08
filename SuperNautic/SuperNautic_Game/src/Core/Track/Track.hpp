@@ -26,7 +26,8 @@ private:
 	Track();
 	int getIndex(char & connectionType) const;
 	int getInRow(const int index) const;
-	int insertSegment(const int index, const char connection);
+	bool insertSegment(const int index, const char connection, int & length, bool testCollision);
+	void deleteSegments(int & totalLength, const int lengthToDelete);
 	
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance*>	_track;

@@ -72,7 +72,7 @@ bool Track::generate()
 	// Make the inital stretch straight
 	while (totalLength < 500)
 	{
-		totalLength += insertSegment(0, 'a');
+		insertSegment(0, 'a', totalLength, false);
 	}
 	char end = 'a';
 	bool lighting = true;
@@ -91,13 +91,24 @@ bool Track::generate()
 				LOG_ERROR("WARNING! There are not enough segments with connection type '", end, "'.");
 			}
 		} while (index == prevIndex);
-		prevIndex = index;
 		// Randomize nr of same segment type in row
 		inRow = getInRow(index);
 		// Instanciate the segment(s)
+		bool collided = false;
 		for (unsigned int i = 0; i < inRow; i++)
 		{
-			totalLength += insertSegment(index, end);
+			insertSegment(index, end, totalLength, false);
+			/*if (!insertSegment(index, end, totalLength, true))
+			{
+				deleteSegments(totalLength, 200);
+				_endMatrix = _track[_track.size() - 1]->getEndMatrix();
+				collided = true;
+				break;
+			}*/
+		}
+		if (!collided)
+		{
+			prevIndex = index;
 		}
 		if (totalLength > _targetLength - 500 && end == 'a')
 			break;
@@ -105,7 +116,7 @@ bool Track::generate()
 	// Make the final stretch straight
 	while (totalLength < _targetLength)
 	{
-		totalLength += insertSegment(0, 'a');
+		insertSegment(0, 'a', totalLength, false);
 	}
 	_generatedLength = totalLength;
 
@@ -173,15 +184,41 @@ int Track::getInRow(int index) const
 }
 
 // Inserts a segment with given index at the end of the track
-int Track::insertSegment(const int index, const char connection)
+bool Track::insertSegment(const int index, const char connection, int & length, bool testCollision)
 {
 	const Segment * segment = _segmentHandler->loadSegment(index);
-	_track.push_back(new SegmentInstance(segment, _endMatrix, true));
+	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+	if (testCollision)
+	{
+		for (unsigned int i = 0; i < _track.size() - 2; i++)
+		{
+			if (tempInstance->bTestCollision(*_track[i]))
+			{
+				delete tempInstance;
+				return false;
+			}
+		}
+	}
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = 360.f / _segmentHandler->getConnectionRotation(connection);
 	int maxRotOffset = segment->getRotationOffset() / angle;
 	float rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
-	return segment->getLength();
+	length += segment->getLength();
+	_track.push_back(tempInstance);
+	return true;
+}
+
+void Track::deleteSegments(int & totalLength, const int lengthToDelete)
+{
+	int deletedLength = 0;
+	while (deletedLength <= lengthToDelete && totalLength > 300)
+	{
+		int segmentLength = _track[_track.size() - 1]->getLength();
+		deletedLength += segmentLength;
+		totalLength -= segmentLength;
+		delete _track[_track.size() - 1];
+		_track.erase(_track.begin() + _track.size() - 1);
+	}
 }

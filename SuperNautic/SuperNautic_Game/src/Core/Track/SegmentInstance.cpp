@@ -34,6 +34,11 @@ glm::mat4 SegmentInstance::getModelMatrix() const
 	return _model;
 }
 
+const int SegmentInstance::getLength() const
+{
+	return _parent->getLength();
+}
+
 bool SegmentInstance::bTestCollisionSphere(const SegmentInstance& other) const
 {
     for(const Sphere& a : _globalBoundingSpheres)
@@ -91,10 +96,10 @@ void SegmentInstance::updateGlobalBounds()
         BoundingBox& globalBox = _globalBoundingBoxes.back();
 
 
-        globalBox.center = glm::vec4(localBox.center, 1.f) * _model;
+        globalBox.center = _model * glm::vec4(localBox.center, 1.f);
         for(size_t i = 0; i < localBox.directions.size(); i++)
         {
-            globalBox.directions[i] = glm::vec4(localBox.directions[i], 0.f) * _model;
+            globalBox.directions[i] = _model * glm::vec4(localBox.directions[i], 0.f);
         }
         globalBox.halfLengths = localBox.halfLengths;
     }
