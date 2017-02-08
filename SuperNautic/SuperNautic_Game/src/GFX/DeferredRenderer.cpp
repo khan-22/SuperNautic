@@ -127,6 +127,9 @@ void DeferredRenderer::geometryPass(Camera& camera, GLsizei width, GLsizei heigh
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	_geometryPassShader.get()->bind();
+
+	_geometryPassShader.get()->setUniform("uViewPos", camera.getPosition());
+
 	for (auto drawCall : _drawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _geometryPassShader.get() };

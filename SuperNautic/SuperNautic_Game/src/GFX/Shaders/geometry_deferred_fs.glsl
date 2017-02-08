@@ -10,14 +10,14 @@ uniform sampler2D uNormal;
 
 in GS_OUT
 {
-	vec3 position;
+	vec3 fragPos;
 	vec2 uv;
 	vec3 normal;
 } fs_in;
 
 void main()
 {
-	positionOut		= fs_in.position;
+	positionOut		= fs_in.fragPos;
 	normalOut		= normalize(fs_in.normal);
 
 	vec4 diffuse	= texture(uDiffuse, fs_in.uv);
