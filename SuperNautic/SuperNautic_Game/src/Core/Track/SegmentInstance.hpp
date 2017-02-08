@@ -7,6 +7,8 @@
 #include "Segment.hpp"
 #include "../LoadAssetFunctions.hpp"
 #include "../../GFX/Renderable3D.hpp"
+#include "../Geometric Primitives/Ray.hpp"
+#include "../Geometric Primitives/RayIntersection.hpp"
 
 class SegmentInstance : public GFX::Renderable3D
 {
@@ -16,6 +18,12 @@ public:
 	glm::mat4 getEndMatrix() const;
 	glm::mat4 getModelMatrix() const;
 	void render(GFX::RenderStates& states) override;
+	const RayIntersection rayIntersectionTest(const Ray& ray) const;
+
+	const Segment* getParent()
+	{
+		return _parent;
+	}
 
 private:
 	SegmentInstance();

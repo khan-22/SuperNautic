@@ -10,8 +10,12 @@ namespace sf
 
 #include <list>
 
-
 #include "Player.hpp"
+#include "Track/Track.hpp"
+#include "../GFX/DeferredRenderer.hpp"
+#include "SFML/Graphics/RenderWindow.hpp"
+#include "DebugCamera.hpp"
+
 class ApplicationContext;
 
 class World
@@ -24,8 +28,18 @@ public:
 	void render();
 
 private:
-    std::list<Player> _players;
-    ApplicationContext& _context;
+	Track				_track;
+	SegmentHandler		_segmentHandler;
+	std::vector<Player>	_players;
+
+	const ApplicationContext& _context;
+
+	// Indices of current segment for players
+	std::vector<unsigned>	_playerSegmentIndices;
+
+	GFX::DeferredRenderer _renderer;
+
+	DebugCamera _debugCamera;
 };
 
 #endif //WORLD_HPP
