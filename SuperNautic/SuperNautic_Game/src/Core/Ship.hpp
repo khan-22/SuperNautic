@@ -26,6 +26,7 @@ public:
 
 	// [-1..1]
 	void setTurning(float turnFactor) { _turningFactor = clamp(turnFactor, -1.0f, 1.0f); }
+
 	// [0..1]
 	void setAcceleration(float accelerationFactor) 
 	{ 
@@ -54,31 +55,31 @@ public:
 	ModelAsset _shipModel;
 
 private:
-	bool		_destroyed{ false };
-	bool		_stopped{ false };
-	float		_turningFactor{ 0.0f };
-	float		_currentTurningAngle{ 0.0f };
-	float		_accelerationFactor{ 0.5f };	// How hard the engine is currently working
-	float		_upAcceleration{ 0.0f };		// Acceleration away/towards track
-	float		_jumpCooldown{ 2.0f };			// Cooldown when jump is activated
-	float		_currentJumpCooldown{ 0.0f };	// Current cooldown
-	float		_engineTemperature{ 0.0f };
-	float		_velocity{ 0.0f };				// Current forward velocity
-	float		_upVelocity{ 0.0f };			// Current up/down velocity
+	bool		_destroyed;
+	bool		_stopped;
+	float		_turningFactor;
+	float		_currentTurningAngle;
+	float		_accelerationFactor;	// How hard the engine is currently working
+	float		_upAcceleration;		// Acceleration away/towards track
+	float		_jumpCooldown;			// Cooldown when jump is activated
+	float		_currentJumpCooldown;	// Current cooldown
+	float		_engineTemperature;
+	float		_velocity;				// Current forward velocity
+	float		_upVelocity;			// Current up/down velocity
 
-	glm::vec3	_trackForward{ 0.0f, 0.0f, 1.0f };		// Forward direction of track
-	glm::vec3	_facingDirection{ 0.0f, 0.0f, 1.0f };	// Current facing direction
-	glm::vec3	_upDirection{ 0.0f, 1.0f, 0.0f };		// Current up direction
-	glm::vec3	_meshUpDirection{ 0.0f, 1.0f, 0.0f };	// Up direction of ship mesh
+	glm::vec3	_trackForward;			// Forward direction of track
+	glm::vec3	_facingDirection;		// Current facing direction
+	glm::vec3	_upDirection;			// Current up direction
+	glm::vec3	_meshUpDirection;		// Up direction of ship mesh
 
-	const float _minAcceleration{ 50.0f };
-	const float _maxAcceleration{ 150.0f };
-	const float _maxTurningSpeed{ 1.0f };
-	const float _straighteningForce{ 0.5f };	// How strongly the ship turns toward track's forward direction
-	const float _speedResistance{ 0.01f };		// 'Air resistance'
-	const float _preferredHeight{ 2.0f };		// Desired height above track
-	const float	_levitationForce{ 10.0f };		// How fast the ship accelerates toward preferred height
-	const float _upResistance{ 10.0f };			// 'Air resistance' for up/down motion
+	const float _minAcceleration;
+	const float _maxAcceleration;
+	const float _maxTurningSpeed;
+	const float _straighteningForce;	// How strongly the ship turns toward track's forward direction
+	const float _speedResistance;		// 'Air resistance'
+	const float _preferredHeight;		// Desired height above track
+	const float	_levitationForce;		// How fast the ship accelerates toward preferred height
+	const float _upResistance;			// 'Air resistance' for up/down motion
 
 	// SHIP TESTING
 	const Segment* _segment;

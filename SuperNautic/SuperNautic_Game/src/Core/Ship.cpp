@@ -10,6 +10,29 @@
 
 
 Ship::Ship()
+	:	_destroyed{ false },
+		_stopped{ false },
+		_turningFactor{ 0.0f },
+		_currentTurningAngle{ 0.0f },
+		_accelerationFactor{ 0.5f },
+		_upAcceleration{ 0.0f },
+		_jumpCooldown{ 2.0f },
+		_currentJumpCooldown{ 0.0f },
+		_engineTemperature{ 0.0f },
+		_velocity{ 0.0f },
+		_upVelocity{ 0.0f },
+		_trackForward{ 0.0f, 0.0f, 1.0f },
+		_facingDirection{ 0.0f, 0.0f, 1.0f },
+		_upDirection{ 0.0f, 1.0f, 0.0f },
+		_meshUpDirection{ 0.0f, 1.0f, 0.0f },
+		_minAcceleration{ 10.0f },
+		_maxAcceleration{ 100.0f },
+		_maxTurningSpeed{ 1.0f },
+		_straighteningForce{ 3.0f },
+		_speedResistance{ 0.01f },
+		_preferredHeight{ 2.0f },
+		_levitationForce{ 10.0f },
+		_upResistance{ 10.0f }
 {
 	_shipModel = ModelCache::get("ship.fbx");
 }
@@ -31,14 +54,29 @@ void Ship::render()
 
 void Ship::update(float dt)
 {
-	// Update turning angle										reduce maneuverability at high acceleration
-	_currentTurningAngle += _turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.7f) * dt;
-																		 // abs to preserve sign of _currentTurningAngle
-	_currentTurningAngle -= _straighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
+	if (!_stopped)
+	{
+		// Update turning angle										reduce maneuverability at high acceleration
+		_currentTurningAngle += _turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.7f) * dt;
+		// abs to preserve sign of _currentTurningAngle
+		_currentTurningAngle -= _straighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
 
-	// Update velocity
-	_velocity += (_minAcceleration + _accelerationFactor * (_maxAcceleration - _minAcceleration)) * dt;
-	_velocity -= (_velocity * _velocity * _speedResistance) * dt;
+		// Update velocity
+		_velocity += (_minAcceleration + _accelerationFactor * (_maxAcceleration - _minAcceleration)) * dt;
+		_velocity -= (_velocity * _velocity * _speedResistance) * dt;
+	}
+	else
+	{
+		// Break if stopped
+		_accelerationFactor = 0.0f;
+		_velocity *= 0.9f;
+	}
+
+	// Update jump cooldown
+	if (_currentJumpCooldown > 0.0f)
+	{
+		_currentJumpCooldown -= dt;
+	}
 
 	// Update engine temperature
 	_engineTemperature = _engineTemperature * 0.8f + _accelerationFactor * 0.2f;
@@ -102,7 +140,12 @@ void Ship::update(float dt)
 
 void Ship::jump()
 {
-	glm::mat4 rotation = glm::rotate(glm::pi<float>(), _facingDirection);
+	if (_currentJumpCooldown <= 0.0f)
+	{
+		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _facingDirection);
 
-	_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
+		_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
+
+		_currentJumpCooldown = _jumpCooldown;
+	}
 }
