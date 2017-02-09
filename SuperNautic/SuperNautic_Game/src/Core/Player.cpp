@@ -50,21 +50,21 @@ void Player::update(float dt)
     }
     else
     {
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
             _ship.setTurning(-1.f);
         }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
             _ship.setTurning(1.f);
         }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
             _ship.setAcceleration(1.f);
 
         }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
             _ship.setAcceleration(0.f);
         }
