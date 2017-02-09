@@ -29,10 +29,10 @@ public:
 	}
 
 private:
-	int _playerId;
-	Input _input;
-	Ship _ship;
-	HUD _hud;
+	int			_playerId;
+	Input		_input;
+	Ship		_ship;
+	HUD			_hud;
 	PlayerAudio _audio;
 
 };

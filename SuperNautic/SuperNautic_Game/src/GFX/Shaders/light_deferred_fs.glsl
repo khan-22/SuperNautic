@@ -65,7 +65,7 @@ void main()
 
 	for(int i = 0; i < NUM_LIGHTS; i++)
 	{
-		lightingResult += calculatePointLight(i, fragPos, diffuseTex, normal, viewDir);
+		lightingResult.rgb += calculatePointLight(i, fragPos, diffuseTex, normal, viewDir);
 	}
 
 	outColor = lightingResult;

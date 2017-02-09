@@ -47,27 +47,24 @@ void Player::update(float dt)
     {
         _ship.setTurning(_input.getLeftStickXValue());
         _ship.setAcceleration(_input.getTriggersValue());
-        //_ship.steer(_input.getLeftStickXValue() * dt);
-        //_ship.accelerate(_input.getTriggersValue() * dt);
-		_ship.updatePower(_input.getTriggersValue() * dt);
     }
     else
     {
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
             _ship.setTurning(-1.f);
         }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
             _ship.setTurning(1.f);
         }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
             _ship.setAcceleration(1.f);
 
         }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
             _ship.setAcceleration(0.f);
         }

@@ -104,7 +104,7 @@ bool Track::generate()
 			/*if (!insertNormalSegment(index, totalLength, true))
 			{
 				deleteSegments(totalLength, 200);
-				_endMatrix = _track[_track.size() - 1]->getEndMatrix();
+				_endMatrix = _track.back()->getModelMatrix() * _track[_track.size() - 1]->getEndMatrix();
 				collided = true;
 				break;
 			}*/
