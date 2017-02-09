@@ -28,11 +28,14 @@ public:
 	void update(float dt);
 	void render();
 
+	bool bHasWon();
+
 private:
 	Track					_track;
 	SegmentHandler			_segmentHandler;
 	std::vector<Player>		_players;
 	std::vector<PointLight>	_pointLights;
+	bool					_bHasWon;
 
 	const ApplicationContext& _context;
 
