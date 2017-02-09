@@ -8,6 +8,8 @@
 #include "SegmentHandler.hpp"
 #include "Segment.hpp"
 #include "SegmentInstance.hpp"
+#include "../../GFX/DeferredRenderer.hpp"
+#include "../../GFX/ForwardRenderer.hpp"
 
 class Track
 {
@@ -20,13 +22,19 @@ public:
 	void setSeed(const unsigned int seed);
 	bool generate();
 	int getNrOfSegments() const;
-	SegmentInstance& getInstance(const int index);
+	SegmentInstance* getInstance(int index);
+	void render(GFX::DeferredRenderer& renderer);
+
+	// Returns the forward vector for a given ship position and segment index (segment index may update)
+	glm::vec3 findForward(const glm::vec3 globalPosition, unsigned& segmentIndex);
+	//SegmentInstance& getInstance(const int index);
 
 private:
 	Track();
 	int getIndex(char & connectionType) const;
 	int getInRow(const int index) const;
-	bool insertSegment(const int index, const char connection, int & length, bool testCollision);
+	bool insertNormalSegment(const int index, int & length, bool testCollision);
+	void insertStructure(const int index, int & length);
 	void deleteSegments(int & totalLength, const int lengthToDelete);
 	
 	SegmentHandler *				_segmentHandler;

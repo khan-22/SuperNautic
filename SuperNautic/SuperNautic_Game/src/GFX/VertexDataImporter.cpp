@@ -101,8 +101,6 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 							aiCamTrans.a3, aiCamTrans.b3, aiCamTrans.c3, aiCamTrans.d3,
 							aiCamTrans.a4, aiCamTrans.b4, aiCamTrans.c4, aiCamTrans.d4 };
 
-		//transMat = glm::transpose(transMat);
-
 		pos = transMat * pos;
 		dir = transMat * dir;
 		up = transMat * up;
@@ -111,7 +109,7 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		glm::vec3 realDir = glm::vec3(dir.x, dir.z, -dir.y);
 		glm::vec3 realUp = glm::vec3(up.x, up.z, -up.y);
 
-		glm::mat4 endMatrix = glm::inverse(glm::lookAt(realPos, realDir, realUp));
+		glm::mat4 endMatrix = glm::inverse(glm::lookAt(realPos - glm::normalize(realDir) * 0.1f, realDir, realUp));
 
 
 		collection->cameras.push_back(endMatrix);

@@ -15,7 +15,6 @@
 
 #include "../GFX/ShaderLoader.hpp"
 
-// For ray intersection testing
 #include "Geometric Primitives\RayIntersection.hpp"
 #include "Geometric Primitives\Ray.hpp"
 #include "Track\SegmentHandler.hpp"
@@ -40,11 +39,6 @@ Game::Game()
 
 Game::~Game()
 {
-	// SHIP TESTING
-	delete ship;
-	delete sh;
-	///////////////
-
 	LOG("Game is being destructed...");
 	CLOSE_LOG();
 }
@@ -105,9 +99,9 @@ bool Game::bInitialize()
         LOG("Failed to load material.");
     }
 
-	_track.setLength(100000);
-	_track.setSeed(1);
-	_track.generate();
+	//_track.setLength(10000);
+	//_track.setSeed(1);
+	//_track.generate();
 
 	/*We can create a loop here (or where relevant) that loops through a list
 	of all the things we want to render and add them to the model array, such as
@@ -141,18 +135,6 @@ void Game::run()
 {
 	sf::Clock clock;
 	sf::Time deltaTime = clock.restart();
-
-	// SHIP TESTING
-	//sh = new SegmentHandler{ "Segments/segmentinfos.txt" };
-	s = { _segmentHandler.loadSegment(0) };
-
-	ship = new Ship{ s };
-	ship->setPosition(0, -5, 5);
-	ship->jump();
-
-	Ray r{ glm::vec3{ 0,0,-2 }, glm::vec3{ -1,0,-0.5 }, 10000.0f };
-	RayIntersection i = s->rayIntersectionTest(r);
-	//////////////
 
 	while (_window.isOpen())
 	{
@@ -193,12 +175,7 @@ void Game::update(float dt)
 {
     _fps = _fps * 0.9f + 0.1f / dt;
 
-	_debugCamera.update(dt, _window);
-
-	// SHIP TESTING
-	ship->setTurning(-1.0f);
-	ship->update(dt);
-	///////////////
+	//_debugCamera.update(dt, _window);
 
     _stateStack.update(dt);
 }
@@ -243,31 +220,24 @@ void Game::render()
 	//SEND TEST MODELS TO RENDERER
 	for (int i = 0; i < ModelArray.size(); i++)
 	{
-		_forwardRenderer.render(*ModelArray[i].get());
-
-		// SHIP TESTING
-		_forwardRenderer.render(*ship->_shipModel.get());
-		///////////////
-	}
-	for (unsigned int i = 0; i < _track.getNrOfSegments(); i++)
-	{
-		_forwardRenderer.render(_track.getInstance(i));
+		//_forwardRenderer.render(*ModelArray[i].get());
 	}
 	/////////////////////////////
 
 	_shader.get()->bind();
     //_shader.get()->setSampler("uTexColor", 0);
 	_texture.get()->bind(0);
-	_forwardRenderer.display(_debugCamera);
-	LOG_GL_ERRORS();
+	//_forwardRenderer.display(_debugCamera);
+	//LOG_GL_ERRORS();
 
     static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
     sf::Text fps;
     fps.setFont(*font.get());
     fps.setString("FPS: " + std::to_string(_fps));
 
-    _window.pushGLStates();
     _stateStack.render();
+
+    _window.pushGLStates();
     _window.draw(fps);
     _window.popGLStates();
 

@@ -10,8 +10,9 @@ std::string SegmentHandler::basePath = "res/models/";
 // Loads SegmentInfos and connections from file (relative to res/models)
 SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connectionInfoPath)
 {
+	segmentInfoPath = "segmentinfos.txt";
 	// Read SegmentInfos
-	std::ifstream infoFile { basePath + segmentInfoPath };
+	std::ifstream infoFile { segmentInfoPath };
 	if (!infoFile.is_open())
 	{
 		// File could not be opened
@@ -19,36 +20,59 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 		return;
 	}
 
-	std::string segmentDataName;
-	std::string segmentVisualName;
-	char startConnection;
-	char endConnection;
-	int probability;
-	int minInRow;
-	int maxInRow;
-	int rotationOffset;
-
-	while (infoFile >> segmentDataName) // Read data file name
+	// Load segments
+	int amount;
+	infoFile >> amount;
+	for (unsigned int i = 0; i < amount; i++)
 	{
+		// File names
+		std::string segmentDataName, segmentVisualName;
+		infoFile >> segmentDataName;
 		infoFile >> segmentVisualName;
+
+		// Connection types
+		char startConnection, endConnection;
 		// blah_aa.blend
 		//      ^^
 		// size - 8, size - 7 contains connection info
 		startConnection = segmentDataName[segmentDataName.size() - 8];
 		endConnection = segmentDataName[segmentDataName.size() - 7];
 
+		// Metadata about segment
+		int probability, minInRow, maxInRow, rotationOffset;
 		infoFile >> probability;
 		infoFile >> minInRow;
 		infoFile >> maxInRow;
 		infoFile >> rotationOffset;
 
-		// Add read SegmentInfo to vector
+		// Add SegmentInfo to vector
 		_segmentInfos.push_back(SegmentInfo{ std::move(segmentDataName), std::move(segmentVisualName)
 			, startConnection, endConnection, probability, minInRow, maxInRow, rotationOffset });
 
 		// Skip rest of line
 		infoFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
+
+	// Load structures
+	infoFile >> amount;
+	for (unsigned int i = 0; i < amount; i++)
+	{
+		int probability, minInRow, maxInRow, pieces;
+		infoFile >> probability;
+		infoFile >> minInRow;
+		infoFile >> maxInRow;
+		infoFile >> pieces;
+		_structures.push_back(Structure(probability, minInRow, maxInRow));
+		for (unsigned int j = 0; j < pieces; j++)
+		{
+			int index, minRotation, maxRotation;
+			infoFile >> index;
+			infoFile >> minRotation;
+			infoFile >> maxRotation;
+			_structures[i].addPiece(new StructurePiece(index, minRotation, maxRotation));
+		}
+	}
+
 	infoFile.close();
 
 
@@ -62,7 +86,7 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 	}
 
 	char type;
-	int amount, rotation;
+	int rotation;
 	infoFile >> amount;
 	for (unsigned int i = 0; i < amount; i++)
 	{
@@ -80,6 +104,13 @@ SegmentHandler::~SegmentHandler()
 	for (unsigned int i = 0; i < _segments.size(); i++)
 	{
 		delete _segments[i];
+	}
+	for (unsigned int i = 0; i < _structures.size(); i++)
+	{
+		for (unsigned int j = 0; j < _structures[i].pieces.size(); j++)
+		{
+			delete _structures[i].pieces[j];
+		}
 	}
 }
 
@@ -103,6 +134,11 @@ const Segment* SegmentHandler::loadSegment(unsigned i)
 
 		return _segments[_segmentInfos[i].loadedIndex];
 	}
+}
+
+const SegmentHandler::Structure * SegmentHandler::getStructure(const unsigned int index) const
+{
+	return &_structures[index];
 }
 
 // Returns rotation info about connection type 'type'

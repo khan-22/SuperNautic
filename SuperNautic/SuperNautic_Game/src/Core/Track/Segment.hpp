@@ -19,6 +19,7 @@
 struct WaypointInfo
 {
 	glm::vec3 position;
+	glm::vec3 direction;
 	float distance;
 };
 
@@ -32,7 +33,7 @@ public:
 	Segment(const SegmentInfo* segmentInfo);
 
 	// Tests a ray collision against all collision surfaces of the segment. Returns collision information
-	const RayIntersection rayIntersectionTest(Ray& ray) const;
+	const RayIntersection rayIntersectionTest(const Ray& ray) const;
 
 	// Renders the segment at the position of an instance
 	// TODO

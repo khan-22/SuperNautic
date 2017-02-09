@@ -25,8 +25,8 @@ Ship::Ship()
 		_facingDirection{ 0.0f, 0.0f, 1.0f },
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshUpDirection{ 0.0f, 1.0f, 0.0f },
-		_minAcceleration{ 10.0f },
-		_maxAcceleration{ 100.0f },
+		_minAcceleration{ 5.0f },
+		_maxAcceleration{ 10.0f },
 		_maxTurningSpeed{ 1.0f },
 		_straighteningForce{ 3.0f },
 		_speedResistance{ 0.01f },
@@ -37,19 +37,15 @@ Ship::Ship()
 	_shipModel = ModelCache::get("ship.fbx");
 }
 
-Ship::Ship(const Segment* segment) : Ship{}
-{
-	_segment = segment;
-}
 
 Ship::Ship(glm::vec3 position) : Ship{}
 {
 	setPosition(position);
 }
 
-void Ship::render()
+void Ship::render(GFX::RenderStates& states)
 {
-	
+	_shipModel.get()->render(states);
 }
 
 void Ship::update(float dt)
@@ -69,6 +65,7 @@ void Ship::update(float dt)
 	{
 		// Break if stopped
 		_accelerationFactor = 0.0f;
+		_currentTurningAngle *= 0.9f;
 		_velocity *= 0.9f;
 	}
 
@@ -83,7 +80,17 @@ void Ship::update(float dt)
 
 	// Create ray and test for intersection
 	Ray r{ getPosition(), -_upDirection, 1000.0f };
-	RayIntersection ri = _segment->rayIntersectionTest(r);
+	RayIntersection ri{ false }; 
+	
+	for (unsigned i = 0; i < _segmentsToTest.size(); ++i)
+	{
+		RayIntersection intersection = _segmentsToTest[i]->rayIntersectionTest(r);
+
+		if (intersection && (!ri || intersection._length < ri._length) )
+		{
+			ri = intersection;
+		}
+	}
 
 	if (ri)
 	{
