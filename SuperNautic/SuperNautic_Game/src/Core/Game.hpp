@@ -71,8 +71,8 @@ private:
 	Camera					_camera;
 	DebugCamera				_debugCamera;
 
-	SegmentHandler			_segmentHandler;
-	Track					_track;
+	//SegmentHandler			_segmentHandler;
+	//Track					_track;
 	//Camera		_camera;
 	//DebugCamera _debugCamera;
 

@@ -125,8 +125,8 @@ void SegmentInstance::updateGlobalBounds()
 
 void SegmentInstance::render(GFX::RenderStates & states)
 {
-	_parent->getVisualModel().get()->setModelMatrix(_model);
-	_parent->getVisualModel().get()->render(states);
+	_parent->getVisualModel().getModelAsset().get()->setModelMatrix(_model);
+	_parent->getVisualModel().render(states);
 }
 
 const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const

@@ -10,9 +10,9 @@ std::string SegmentHandler::basePath = "res/models/";
 // Loads SegmentInfos and connections from file (relative to res/models)
 SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connectionInfoPath)
 {
-	segmentInfoPath = "segmentinfos.txt";
+	//segmentInfoPath = "segmentinfos.txt";
 	// Read SegmentInfos
-	std::ifstream infoFile { segmentInfoPath };
+	std::ifstream infoFile { basePath + segmentInfoPath };
 	if (!infoFile.is_open())
 	{
 		// File could not be opened

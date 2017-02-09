@@ -50,6 +50,7 @@ vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3
 	vec3 result	= max((diffuseColor + ambientColor + specularVec) * diffuseTex * attenuation, vec3(0.0));
 
 	return result;
+	//return vec3(1.0, 0.0, 0.0) * diffuseTex;
 }
 
 void main()

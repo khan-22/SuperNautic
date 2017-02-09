@@ -22,6 +22,8 @@ namespace GFX
         void setMaterial(const MaterialAsset& material);
         void setModelAndMaterial(const ModelAsset& model, const MaterialAsset& material);
 
+		ModelAsset getModelAsset();
+
     private:
         ModelAsset _model;
         MaterialAsset _material;

@@ -165,22 +165,25 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	std::vector<glm::vec3> pointLightColor;
 	std::vector<glm::vec3> pointLightProperties;
 
-	pointLightPos.reserve(lightCount);
-	pointLightColor.reserve(lightCount);
-	pointLightProperties.reserve(lightCount);
-
-	for (int i = 0; i < lightCount; i++)
+	if (lightCount > 0)
 	{
-		pointLightPos.push_back(_pointLights[i]->getPosition());
-		pointLightColor.push_back(_pointLights[i]->getLightProperties( ).diffuseColor);
+		pointLightPos.reserve(lightCount);
+		pointLightColor.reserve(lightCount);
+		pointLightProperties.reserve(lightCount);
 
-		glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
-		pointLightProperties.push_back(properties);
+		for (int i = 0; i < lightCount; i++)
+		{
+			pointLightPos.push_back(_pointLights[i]->getPosition());
+			pointLightColor.push_back(_pointLights[i]->getLightProperties( ).diffuseColor);
+
+			glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
+			pointLightProperties.push_back(properties);
+		}
+
+		lpShader->setUniform("pointLights.pos", pointLightPos[0], lightCount);
+		lpShader->setUniform("pointLights.color", pointLightColor[0], lightCount);
+		lpShader->setUniform("pointLights.properties", pointLightProperties[0], lightCount);
 	}
-
-	lpShader->setUniform("pointLights.pos", pointLightPos[0], lightCount);
-	lpShader->setUniform("pointLights.color", pointLightColor[0], lightCount);
-	lpShader->setUniform("pointLights.properties", pointLightProperties[0], lightCount);
 
 	/*for (int i = 0; i < lightCount; i++)
 	{
