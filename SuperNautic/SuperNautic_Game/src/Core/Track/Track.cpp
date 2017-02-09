@@ -1,4 +1,5 @@
 #include <glm\gtx\transform.hpp>
+#include "glm/gtx/norm.hpp"
 #include <time.h>
 
 #include "Track.hpp"
@@ -119,7 +120,78 @@ bool Track::generate()
 	_generatedLength = totalLength;
 
 	LOG("Track generated. Length: " + std::to_string(_generatedLength) + " meters.");
+	generateObstacles();
 	return true;
+}
+
+void Track::generateObstacles()
+{
+    for(SegmentInstance* segment : _track)
+    {
+        const std::vector<glm::vec3>& waypoints = segment->getParent()->getWaypoints();
+        assert(waypoints.size() > 0);
+        float targetDepth = rand() % (segment->getLength() - 1) + 1;
+
+        std::vector<glm::vec3> distanceVectors;
+        distanceVectors.reserve(waypoints.size() - 1);
+        for(size_t i = 0; i + 1 < waypoints.size(); i++)
+        {
+            distanceVectors.push_back(waypoints[i + 1] - waypoints[i]);
+        }
+
+        size_t distanceIndex = 0;
+        float depth = 0.f;
+        while(depth < targetDepth && distanceIndex < distanceVectors.size())
+        {
+            depth += glm::length(distanceVectors[distanceIndex]);
+            distanceIndex++;
+        }
+
+        assert(distanceIndex > 0);
+        distanceIndex--;
+        const glm::vec3& finalDistance = distanceVectors[distanceIndex];
+        float finalDistanceLength = glm::length(finalDistance);
+        depth -= finalDistanceLength;
+        float remainderDepth = targetDepth - depth;
+
+        glm::vec3 rayStart = waypoints[distanceIndex] + finalDistance * (remainderDepth / finalDistanceLength);
+
+        glm::vec3 planeNormal = finalDistance / finalDistanceLength;
+
+        // ax + by + bz + d = 0
+        float d = -glm::dot(planeNormal, rayStart);
+
+        // Generate random point on plane.
+        float xModifier = std::fabs(planeNormal.x) > 0.001f ? 1.f : 0.f;
+        float yModifier = std::fabs(planeNormal.y) > 0.001f ? 1.f : 0.f;
+        glm::vec3 planePoint;
+        do
+        {
+            planePoint.x = float(rand() % 1000 - 500) * xModifier;
+            planePoint.y = float(rand() % 1000 - 500) * yModifier;
+            planePoint.z = -(d + planeNormal.x * planePoint.x + planeNormal.y * planePoint.y) / planeNormal.z;
+        } while(glm::distance2(planePoint, rayStart) > 0.01f);
+
+        glm::vec3 rayDirection = glm::normalize(planePoint - rayStart);
+
+        Ray ray(rayStart, rayDirection, 100.f);
+        RayIntersection intersection = segment->getParent()->rayIntersectionTest(ray);
+
+        assert(intersection._hit == true); // May happen... In that case you could regenerate the ray until it intersects.
+
+
+        BoundingBox box;
+        box.center = segment->getModelMatrix() * glm::vec4(intersection._position, 1.f);
+        box.directions =
+        {
+            glm::vec3(1.f, 0.f, 0.f),
+            glm::vec3(0.f, 1.f, 0.f),
+            glm::vec3(0.f, 0.f, 1.f)
+        };
+        box.halfLengths = {1.f, 1.f, 1.f};
+
+        _obstacles.emplace_back(box);
+    }
 }
 
 int Track::getNrOfSegments() const
@@ -235,12 +307,17 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 	return glm::vec3{ glm::normalize(behindDir * (1.0f - dist) + aheadDir * dist) };
 }
 
-void Track::render(GFX::DeferredRenderer& renderer)
+void Track::render(GFX::ForwardRenderer& renderer)
 {
 	for (unsigned i = 0; i < _track.size(); ++i)
 	{
 		renderer.render(*_track[i]);
 	}
+
+	for(GFX::Box& obstacle : _obstacles)
+    {
+        renderer.render(obstacle);
+    }
 }
 
 // Inserts a segment with given index at the end of the track
