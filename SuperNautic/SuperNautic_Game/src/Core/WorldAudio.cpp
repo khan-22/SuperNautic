@@ -1,8 +1,11 @@
+#include <string>
+
 #include "WorldAudio.hpp"
 
 WorldAudio::WorldAudio()
 {
-	if (!_music.openFromFile("ariel"))
+	std::string folder = "./res/audio/music/";
+	if (!_music.openFromFile(folder + "Stranger Danger - Haste(Repeat).wav"))
 	{
 	}
 
@@ -12,4 +15,13 @@ WorldAudio::WorldAudio()
 
 WorldAudio::~WorldAudio()
 {
+	_music.stop();
+}
+
+void WorldAudio::play() {
+	_music.play();
+}
+
+void WorldAudio::stop() {
+	_music.stop();
 }

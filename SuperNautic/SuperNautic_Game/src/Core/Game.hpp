@@ -19,6 +19,7 @@
 #include "DebugCamera.hpp"
 #include "Track\Track.hpp"
 #include "Track\SegmentHandler.hpp"
+#include "WorldAudio.hpp"
 
 #include "Track/SegmentHandler.hpp"
 #include "Track/Segment.hpp"
@@ -72,6 +73,12 @@ private:
 
 	SegmentHandler			_segmentHandler;
 	Track					_track;
+	//Camera		_camera;
+	//DebugCamera _debugCamera;
+
+	std::vector<PointLight>	_pointLights;
+
+	WorldAudio				_audio;
 };
 
 #endif //GAME_HPP

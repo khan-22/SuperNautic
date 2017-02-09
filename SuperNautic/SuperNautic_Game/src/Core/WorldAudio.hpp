@@ -11,6 +11,8 @@ public:
 	WorldAudio();
 	~WorldAudio();
 
+	void play();
+	void stop();
 protected:
 
 private:
