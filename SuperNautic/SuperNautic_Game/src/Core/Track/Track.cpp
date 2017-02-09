@@ -98,8 +98,8 @@ bool Track::generate()
 		bool collided = false;
 		for (unsigned int i = 0; i < inRow; i++)
 		{
-			//insertNormalSegment(index, totalLength, false);
-			insertStructure(0, totalLength);
+			insertNormalSegment(0, totalLength, false);
+			//insertStructure(0, totalLength);
 			/*if (!insertNormalSegment(index, totalLength, true))
 			{
 				deleteSegments(totalLength, 200);
