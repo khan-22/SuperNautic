@@ -8,9 +8,13 @@
 
 World::World(ApplicationContext& context)
 	: _segmentHandler{ "Segments/segmentinfos1.txt", "Segments/ConnectionTypes.txt" }, _track{ &_segmentHandler }, _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
+	, _bHasWon(false)
 {
 	_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
@@ -40,27 +44,32 @@ void World::update(float dt)
 
 		// Find segments adjacent to ship
 		std::vector<SegmentInstance*> instances;
-		for (long j = static_cast<long>(_playerSegmentIndices[i]); j <= static_cast<long>(_playerSegmentIndices[i]) + 2; ++j)
+		for (long j = static_cast<long>(_playerSegmentIndices[i] - 1); j <= static_cast<long>(_playerSegmentIndices[i]) + 1; ++j)
 		{
 			if (j >= 0 && j < _track.getNrOfSegments())
 			{
 				instances.push_back(_track.getInstance(static_cast<int>(j)));
 			}
+
 		}
 
-		if (instances.size() == 3)
+		if (instances[1] == _track.getInstance(_track.getNrOfSegments() - 1))
 		{
-			for (int k = 0; k < 3; k++)
+			_bHasWon = true;
+		}
+
+		std::vector<SegmentInstance*> instancesForLights;
+		for (long j = static_cast<long>(_playerSegmentIndices[i]); j <= static_cast<long>(_playerSegmentIndices[i]) + 5; ++j)
+		{
+			if (j >= 0 && j < _track.getNrOfSegments())
 			{
-				_pointLights[k].setPosition(instances[k]->getModelMatrix() * glm::vec4(instances[k]->getParent()->getWaypoints()[0], 1.f));
+				instancesForLights.push_back(_track.getInstance(static_cast<int>(j)));
 			}
 		}
-		else
+
+		for (int k = 0; k < instancesForLights.size(); k++)
 		{
-			for (int k = 0; k < 2; k++)
-			{
-				_pointLights[k].setPosition(instances[k]->getModelMatrix() * glm::vec4(instances[k]->getParent()->getWaypoints()[0], 1.f));
-			}
+			_pointLights[k].setPosition(instancesForLights[k]->getModelMatrix() * glm::vec4(instancesForLights[k]->getParent()->getWaypoints()[0], 1.f));
 		}
 
 
@@ -104,4 +113,9 @@ void World::render()
 	}
 
 	sfml.display(_context.window);
+}
+
+bool World::bHasWon()
+{
+	return _bHasWon;
 }
