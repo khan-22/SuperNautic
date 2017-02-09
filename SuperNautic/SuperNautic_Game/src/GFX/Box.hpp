@@ -20,6 +20,7 @@ namespace GFX
 
         void render(RenderStates& states) override;
         void setBox(const BoundingBox& box);
+        const BoundingBox& getBox() const;
 
     private:
         BoundingBox _box;

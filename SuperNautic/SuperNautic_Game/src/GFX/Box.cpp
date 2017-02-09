@@ -41,6 +41,11 @@ void Box::setBox(const BoundingBox& box)
     _model = generateModel();
 }
 
+const BoundingBox& Box::getBox() const
+{
+    return _box;
+}
+
 std::shared_ptr<Model> Box::generateModel() const
 {
     // Start in negative corner
