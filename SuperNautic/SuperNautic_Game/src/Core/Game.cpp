@@ -99,9 +99,9 @@ bool Game::bInitialize()
         LOG("Failed to load material.");
     }
 
-	_track.setLength(100000);
-	_track.setSeed(1);
-	_track.generate();
+	//_track.setLength(10000);
+	//_track.setSeed(1);
+	//_track.generate();
 
 	/*We can create a loop here (or where relevant) that loops through a list
 	of all the things we want to render and add them to the model array, such as
@@ -135,18 +135,6 @@ void Game::run()
 {
 	sf::Clock clock;
 	sf::Time deltaTime = clock.restart();
-
-	// SHIP TESTING
-	//sh = new SegmentHandler{ "Segments/segmentinfos.txt" };
-	s = { _segmentHandler.loadSegment(0) };
-
-	ship = new Ship{ s };
-	ship->setPosition(0, -5, 5);
-	ship->jump();
-
-	Ray r{ glm::vec3{ 0,0,-2 }, glm::vec3{ -1,0,-0.5 }, 10000.0f };
-	RayIntersection i = s->rayIntersectionTest(r);
-	//////////////
 
 	while (_window.isOpen())
 	{
@@ -187,7 +175,7 @@ void Game::update(float dt)
 {
     _fps = _fps * 0.9f + 0.1f / dt;
 
-	_debugCamera.update(dt, _window);
+	//_debugCamera.update(dt, _window);
 
     _stateStack.update(dt);
 }

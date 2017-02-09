@@ -69,6 +69,9 @@ private:
 
 	Camera					_camera;
 	DebugCamera				_debugCamera;
+
+	SegmentHandler			_segmentHandler;
+	Track					_track;
 };
 
 #endif //GAME_HPP
