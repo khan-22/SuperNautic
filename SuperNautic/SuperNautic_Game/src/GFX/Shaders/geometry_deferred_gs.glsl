@@ -24,7 +24,7 @@ out GS_OUT
 
 float backfaceCull(vec3 normal)
 {
-	float bfacecull = dot(gs_in[0].fragPos - vec4(uViewPos, 1.0), uModel * vec4(normal, 0.0f));
+	float bfacecull = dot(gs_in[0].fragPos - uViewPos, (uModel * vec4(normal, 0.0f)).xyz);
 
 	return bfacecull;
 }
