@@ -19,12 +19,12 @@ namespace GFX
 
 			void bind();
 
-			void setUniform(const std::string& name, GLfloat data, unsigned int count = 1);
+			void setUniform(const std::string& name, const GLfloat& data, unsigned int count = 1);
 			void setUniform(const std::string& name, const glm::vec2& data, unsigned int count = 1);
 			void setUniform(const std::string& name, const glm::vec3& data, unsigned int count = 1);
 			void setUniform(const std::string& name, const glm::vec4& data, unsigned int count = 1);
 			
-			void setUniform(const std::string& name, GLint data, unsigned int count = 1);
+			void setUniform(const std::string& name, const GLint& data, unsigned int count = 1);
 			void setUniform(const std::string& name, const glm::ivec2& data, unsigned int count = 1);
 			void setUniform(const std::string& name, const glm::ivec3& data, unsigned int count = 1);
 			void setUniform(const std::string& name, const glm::ivec4& data, unsigned int count = 1);

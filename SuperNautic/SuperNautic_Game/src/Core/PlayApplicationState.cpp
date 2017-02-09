@@ -4,6 +4,7 @@
 #include "SFML/Graphics/Text.hpp"
 
 #include "PlayApplicationState.hpp"
+#include "VictoryApplicationState.hpp"
 #include "PauseMenuApplicationState.hpp"
 #include "ApplicationStateStack.hpp"
 #include "ApplicationContext.hpp"
@@ -25,6 +26,13 @@ bool PlayApplicationState::bRender()
 bool PlayApplicationState::bUpdate(float dtSeconds)
 {
     _world.update(dtSeconds);
+
+	if (_world.bHasWon())
+	{
+		auto victoryState = std::unique_ptr<ApplicationState>(new VictoryApplicationState(_stack, _context));
+		_stack.push(victoryState);
+	}
+
     return true;
 }
 

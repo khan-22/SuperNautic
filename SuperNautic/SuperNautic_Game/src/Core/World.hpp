@@ -15,7 +15,7 @@ namespace sf
 #include "../GFX/DeferredRenderer.hpp"
 #include "../GFX/ForwardRenderer.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
-#include "DebugCamera.hpp"
+#include "Camera.h"
 
 class ApplicationContext;
 
@@ -28,10 +28,14 @@ public:
 	void update(float dt);
 	void render();
 
+	bool bHasWon();
+
 private:
-	Track				_track;
-	SegmentHandler		_segmentHandler;
-	std::vector<Player>	_players;
+	Track					_track;
+	SegmentHandler			_segmentHandler;
+	std::vector<Player>		_players;
+	std::vector<PointLight>	_pointLights;
+	bool					_bHasWon;
 
 	const ApplicationContext& _context;
 
@@ -40,7 +44,7 @@ private:
 
 	GFX::DeferredRenderer _renderer;
 
-	DebugCamera _debugCamera;
+	Camera _camera;
 };
 
 #endif //WORLD_HPP
