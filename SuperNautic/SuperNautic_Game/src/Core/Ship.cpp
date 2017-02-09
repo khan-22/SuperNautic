@@ -26,8 +26,8 @@ Ship::Ship()
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshUpDirection{ 0.0f, 1.0f, 0.0f },
 		_minAcceleration{ 0.0f },
-		_maxAcceleration{ 20.0f },
-		_maxTurningSpeed{ 5.0f },
+		_maxAcceleration{ 25.0f },
+		_maxTurningSpeed{ 10.0f },
 		_straighteningForce{ 10.0f },
 		_speedResistance{ 0.001f },
 		_preferredHeight{ 3.0f },
@@ -77,9 +77,9 @@ void Ship::update(float dt)
 		_currentJumpCooldown -= dt;
 	}
 
-	if (_velocity < 20)
+	if (_velocity < 50)
 	{
-		_velocity = 20;
+		_velocity = 50;
 	}
 
 	// Update engine temperature
