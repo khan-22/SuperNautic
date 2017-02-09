@@ -25,7 +25,7 @@ Ship::Ship()
 		_facingDirection{ 0.0f, 0.0f, 1.0f },
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshUpDirection{ 0.0f, 1.0f, 0.0f },
-		_minAcceleration{ 5.0f },
+		_minAcceleration{ 0.0f },
 		_maxAcceleration{ 50.0f },
 		_maxTurningSpeed{ 3.0f },
 		_straighteningForce{ 6.0f },
@@ -143,7 +143,7 @@ void Ship::update(float dt)
 	
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
-	_accelerationFactor = 0.0f;
+	_accelerationFactor = 0.5f;
 }
 
 void Ship::jump()
