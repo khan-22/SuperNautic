@@ -19,7 +19,7 @@ void GFX::Shader::bind()
 	glUseProgram(_shaderProgram);
 }
 
-void GFX::Shader::setUniform(const std::string& name, GLfloat data, unsigned int count)
+void GFX::Shader::setUniform(const std::string& name, const GLfloat& data, unsigned int count)
 {
 	glUniform1fv(getUniform(name), count, &data);
 }
@@ -39,7 +39,7 @@ void GFX::Shader::setUniform(const std::string& name, const glm::vec4 & data, un
 	glUniform4fv(getUniform(name), count, &data[0]);
 }
 
-void GFX::Shader::setUniform(const std::string& name, GLint data, unsigned int count)
+void GFX::Shader::setUniform(const std::string& name, const GLint & data, unsigned int count)
 {
 	glUniform1iv(getUniform(name), count, &data);
 }

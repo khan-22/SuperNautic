@@ -48,7 +48,7 @@ vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3
 	vec3 dvec			= vec3(1.0, d, d*d);
 	float attenuation	= pointLights.intensity[i] / (dot(pointLights.properties[i], dvec));
 
-	vec3 result	= max((diffuseColor + ambientColor + specularVec) * diffuseTex * attenuation, vec3(0.0));
+	vec3 result	= (diffuseColor + ambientColor + specularVec) * diffuseTex * attenuation;
 
 	return result;
 	//return vec3(1.0, 0.0, 0.0) * diffuseTex;

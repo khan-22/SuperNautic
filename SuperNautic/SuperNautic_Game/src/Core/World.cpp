@@ -6,10 +6,14 @@
 #include "Track/SegmentInstance.hpp"
 
 
-World::World(ApplicationContext& context)  
+World::World(ApplicationContext& context)
 	: _segmentHandler{ "Segments/segmentinfos1.txt", "Segments/ConnectionTypes.txt" }, _track{ &_segmentHandler }, _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
 {
 	_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 
 	// Create one player
 	_players.emplace_back();
@@ -36,7 +40,7 @@ void World::update(float dt)
 
 		// Find segments adjacent to ship
 		std::vector<SegmentInstance*> instances;
-		for (long j = static_cast<long>(_playerSegmentIndices[i]) - 1; j <= static_cast<long>(_playerSegmentIndices[i]) + 1; ++j)
+		for (long j = static_cast<long>(_playerSegmentIndices[i]); j <= static_cast<long>(_playerSegmentIndices[i]) + 2; ++j)
 		{
 			if (j >= 0 && j < _track.getNrOfSegments())
 			{
@@ -44,13 +48,29 @@ void World::update(float dt)
 			}
 		}
 
+		if (instances.size() == 3)
+		{
+			for (int k = 0; k < 3; k++)
+			{
+				_pointLights[k].setPosition(instances[k]->getModelMatrix() * glm::vec4(instances[k]->getParent()->getWaypoints()[0], 1.f));
+			}
+		}
+		else
+		{
+			for (int k = 0; k < 2; k++)
+			{
+				_pointLights[k].setPosition(instances[k]->getModelMatrix() * glm::vec4(instances[k]->getParent()->getWaypoints()[0], 1.f));
+			}
+		}
+
+
 		// Set relevant segments
 		_players[i].getShip().setSegments(instances);
 
 		_players[i].update(dt);
 	}
 
-	_camera.setPos(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 1, -6, 1 } });
+	_camera.setPos(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 2, -12, 1 } });
 	_camera.setUp(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 1, 0, 0 } });
 	_camera.setViewDir(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 0, 1, 0 } });
 	
@@ -69,6 +89,12 @@ void World::render()
 
 	PointLight testLight(_players[0].getShip().getPosition(), { 1,1,1 }, 1.f);
 	_renderer.pushPointLight(testLight);
+
+	for (int i = 0; i < _pointLights.size(); i++)
+	{
+		_renderer.pushPointLight(_pointLights[i]);
+	}
+
 	_renderer.display(_camera);
 
 	GFX::SfmlRenderer sfml;

@@ -29,9 +29,10 @@ public:
 	void render();
 
 private:
-	Track				_track;
-	SegmentHandler		_segmentHandler;
-	std::vector<Player>	_players;
+	Track					_track;
+	SegmentHandler			_segmentHandler;
+	std::vector<Player>		_players;
+	std::vector<PointLight>	_pointLights;
 
 	const ApplicationContext& _context;
 
