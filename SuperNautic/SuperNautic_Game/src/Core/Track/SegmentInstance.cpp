@@ -143,5 +143,14 @@ const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const
 				  inverse * glm::vec4{ ray.direction().x, ray.direction().y, ray.direction().z, 0.0f }, 
 				  ray.length() };
 
-	return _parent->rayIntersectionTest(localRay);
+	RayIntersection intersection = _parent->rayIntersectionTest(localRay);
+
+	// Transform to global coordinates if a hit is detected
+	if (intersection)
+	{
+		intersection._position = glm::vec3{ _model * glm::vec4{ intersection._position.x , intersection._position.y, intersection._position.z, 1.0f } };
+		intersection._normal = glm::vec3{ _model * glm::vec4{ intersection._normal.x , intersection._normal.y, intersection._normal.z, 0.0f } };
+	}
+
+	return intersection;
 }

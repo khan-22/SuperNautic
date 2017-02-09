@@ -7,7 +7,7 @@
 #include "Utility/Utilities.hpp"
 #include "Track/Segment.hpp"
 #include "LoadAssetFunctions.hpp"
-#include "../GFX/Model.hpp"
+#include "../GFX/TexturedModel.hpp"
 #include "Track/SegmentInstance.hpp"
 #include "../GFX/Renderable3D.hpp"
 
@@ -61,7 +61,7 @@ public:
 		_segmentsToTest = segments;
 	}
 
-	ModelAsset _shipModel;
+	GFX::TexturedModel _shipModel;
 
 private:
 	bool		_destroyed;

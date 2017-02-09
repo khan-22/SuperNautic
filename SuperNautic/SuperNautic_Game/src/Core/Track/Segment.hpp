@@ -87,6 +87,11 @@ public:
 		return _scene.get()->cameras[0];
 	}
 
+	const std::vector<glm::vec3>& getWaypoints() const
+	{
+		return _waypoints;
+	}
+
 	// Finds positions of and distance to the two waypoints closest to a position (position is relative to segment's local origin)
 	// First in pair is before second
 	std::pair<WaypointInfo, WaypointInfo> findClosestWaypoints(const glm::vec3& position) const;
