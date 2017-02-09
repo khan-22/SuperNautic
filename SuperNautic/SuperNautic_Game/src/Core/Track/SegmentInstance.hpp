@@ -18,6 +18,9 @@ public:
 	virtual ~SegmentInstance();
 	glm::mat4 getEndMatrix() const;
 	glm::mat4 getModelMatrix() const;
+	const int getLength() const;
+    const std::vector<BoundingBox>& getGlobalBoundingBoxes() const;
+	const int getIndex() const;
 
 	void render(GFX::RenderStates& states) override;
 	const RayIntersection rayIntersectionTest(const Ray& ray) const;

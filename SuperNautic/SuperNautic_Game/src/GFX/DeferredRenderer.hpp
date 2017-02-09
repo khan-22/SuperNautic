@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "../Core/LoadAssetFunctions.hpp"
+#include "PointLight.hpp"
 
 #include "Framebuffer.hpp"
 
@@ -21,6 +22,7 @@ namespace GFX
 		~DeferredRenderer();
 
 		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
+		void pushPointLight(PointLight& pointLight);
 
 		void render(Renderable3D& renderable);
 		void display(Camera& camera);
@@ -28,6 +30,7 @@ namespace GFX
 
 	private:
 		std::vector<Renderable3D*> _drawCalls;
+		std::vector<PointLight*> _pointLights;
 		ShaderAsset	_geometryPassShader;
 		ShaderAsset	_lightPassShader;
 
@@ -42,7 +45,7 @@ namespace GFX
 		std::unique_ptr<VertexArrayObject> _screenQuad;
 
 		void geometryPass(Camera& camera, GLsizei width, GLsizei height);
-		void lightPass(GLsizei width, GLsizei height);
+		void lightPass(Camera& camera, GLsizei width, GLsizei height);
 
 	};
 }

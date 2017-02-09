@@ -76,5 +76,5 @@ void Player::update(float dt)
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 
-	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() + 1.5f);
+	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() + 1);
 }

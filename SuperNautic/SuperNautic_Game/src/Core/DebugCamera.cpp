@@ -17,7 +17,7 @@ DebugCamera::DebugCamera(float fov, int viewWidth, int viewHeight
 	, _moveSpeed(10.f)
 	, _bActive(false)
 {
-	_perspective = glm::perspective(glm::radians(_fov), (float)_viewWidth / _viewHeight, 0.1f, 2000.f);
+	_perspective = glm::perspective(glm::radians(_fov), (float)_viewWidth / _viewHeight, 0.1f, 10000.f);
 }
 
 //Destructor

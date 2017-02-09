@@ -7,7 +7,7 @@
 
 
 World::World(ApplicationContext& context)  
-	: _segmentHandler{ "Segments/segmentinfos.txt" }, _track{ &_segmentHandler }, _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
+	: _segmentHandler{ "Segments/segmentinfos1.txt", "Segments/ConnectionTypes.txt" }, _track{ &_segmentHandler }, _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
 {
 	_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 
@@ -15,7 +15,7 @@ World::World(ApplicationContext& context)
 	_players.emplace_back();
 	_playerSegmentIndices.push_back(0);
 
-	_track.setLength(300);
+	_track.setLength(100);
 	_track.setSeed(1);
 	_track.generate();
 }
@@ -67,6 +67,8 @@ void World::render()
 	_track.render(_renderer);
 	//_renderer.render(_track.);
 
+	PointLight testLight({ 0,4,-5 }, { 1,1,1 }, 1000.f);
+	_renderer.pushPointLight(testLight);
 	_renderer.display(_camera);
 
 	GFX::SfmlRenderer sfml;

@@ -3,7 +3,7 @@
 #define TRACK_HPP
 
 #include <vector>
-#include <glm\glm.hpp>
+#include <glm\mat4x4.hpp>
 
 #include "SegmentHandler.hpp"
 #include "Segment.hpp"
@@ -27,11 +27,15 @@ public:
 
 	// Returns the forward vector for a given ship position and segment index (segment index may update)
 	glm::vec3 findForward(const glm::vec3 globalPosition, unsigned& segmentIndex);
+	//SegmentInstance& getInstance(const int index);
 
 private:
 	Track();
-	int getIndex(char connectionType) const;
-	int getInRow(int index) const;
+	int getIndex(char & connectionType) const;
+	int getInRow(const int index) const;
+	bool insertNormalSegment(const int index, int & length, bool testCollision);
+	void insertStructure(const int index, int & length);
+	void deleteSegments(int & totalLength, const int lengthToDelete);
 	
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance*>	_track;

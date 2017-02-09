@@ -7,20 +7,20 @@
 #include "../../GFX/Model.hpp"
 #include "Segment.hpp"
 
-//Default constructor (private)
+// Default constructor (private)
 Track::Track()
 {
 	//Nothing
 }
 
-//Real costructor
+// Real costructor
 Track::Track(SegmentHandler * segmentHandler)
 {
 	_segmentHandler = segmentHandler;
 	_endMatrix = glm::mat4();
 }
 
-//Destructor
+// Destructor
 Track::~Track()
 {
 	for (unsigned int i = 0; i < _track.size(); i++)
@@ -29,30 +29,31 @@ Track::~Track()
 	}
 }
 
-//Gets the targeted track length in whole meters
+// Gets the targeted track length in whole meters
 int Track::getTargetLength() const
 {
 	return _targetLength;
 }
 
-//Gets the generated track length in whole meters
+// Gets the generated track length in whole meters
 int Track::getGeneratedLength() const
 {
 	return _generatedLength;
 }
 
-//Sets the track length in whole meters
+// Sets the track length in whole meters
 bool Track::setLength(const int length)
 {
-	if (length >= 300 && length <= 100000)
+	if (length >= 3000 && length <= 100000)
 	{
 		_targetLength = length;
 		return true;
 	}
+	LOG_ERROR("Track not long enough!!!");
 	return false;
 }
 
-//Set randomization seed
+// Set randomization seed
 void Track::setSeed(const unsigned int seed)
 {
 	if (seed == 1)
@@ -66,57 +67,55 @@ void Track::setSeed(const unsigned int seed)
 	}
 }
 
-//Generates the track
+// Generates the track
 bool Track::generate()
 {
 	int totalLength = 0;
-	for (unsigned int i = 0; i < 10; i++)
+	// Make the inital stretch straight
+	while (totalLength < 500)
 	{
-		for (unsigned int i = 0; i < 5; i++)
-		{
-			const Segment * segment = _segmentHandler->loadSegment(0);
-			_track.push_back(new SegmentInstance(segment, _endMatrix, true));
-			glm::mat4 temp = segment->getEndMatrix();
-			glm::mat4 rot = glm::rotate(0.f, glm::vec3(0, 0, 1));
-			_endMatrix = _endMatrix * temp * rot;
-			totalLength += segment->getLength();
-		}
-		for (unsigned int i = 0; i < 5; i++)
-		{
-			const Segment * segment = _segmentHandler->loadSegment(2);
-			_track.push_back(new SegmentInstance(segment, _endMatrix, true));
-			glm::mat4 temp = segment->getEndMatrix();
-			glm::mat4 rot = glm::rotate(0.5f, glm::vec3(0, 0, 1));
-			_endMatrix = _endMatrix * temp * rot;
-			totalLength += segment->getLength();
-		}
+		insertNormalSegment(0, totalLength, false);
 	}
 	char end = 'a';
 	bool lighting = true;
 	int prevIndex = -1;
-	//Create random path
-	//while (totalLength < _targetLength)
-	//{
-	//	//Randomize segment index
-	//	int index;
-	//	int inRow;
-	//	do
-	//	{
-	//		index = getIndex(end);
-	//	} while (index != prevIndex);
-	//	prevIndex = index;
-	//	//Randomize nr of same segment type in row
-	//	inRow = getInRow(index);
-	//	//Instanciate the segment(s)
-	//	for (unsigned int i = 0; i < inRow; i++)
-	//	{
-	//		const Segment * segment = _segmentHandler->loadSegment(index);
-	//		_endMatrix = segment->getEndMatrix() * _endMatrix;
-	//		SegmentInstance temp = SegmentInstance(segment, _endMatrix, lighting);
-	//		_track.push_back(temp);
-	//		totalLength += segment->getLength();
-	//	}
-	//}
+	// Create random path
+	while (totalLength < _targetLength - 500 && end == 'a')
+	{
+		// Randomize segment index
+		int index;
+		int inRow;
+		do
+		{
+			index = getIndex(end);
+			if (index == -1)
+			{
+				LOG_ERROR("WARNING! Something went wrong with the track generation! Not enough connections of type '", end, "'.");
+			}
+		} while (index == prevIndex);
+		// Randomize nr of same segment type in row
+		inRow = getInRow(index);
+		// Instanciate the segment(s)
+		bool collided = false;
+		for (unsigned int i = 0; i < inRow; i++)
+		{
+			insertNormalSegment(0, totalLength, false);
+			//insertStructure(0, totalLength);
+			/*if (!insertNormalSegment(index, totalLength, true))
+			{
+				deleteSegments(totalLength, 200);
+				_endMatrix = _track[_track.size() - 1]->getEndMatrix();
+				collided = true;
+				break;
+			}*/
+		}
+		prevIndex = _track[_track.size() - 1]->getIndex();
+	}
+	// Make the final stretch straight
+	while (totalLength < _targetLength)
+	{
+		insertNormalSegment(0, totalLength, false);
+	}
 	_generatedLength = totalLength;
 
 	LOG("Track generated. Length: " + std::to_string(_generatedLength) + " meters.");
@@ -133,10 +132,11 @@ SegmentInstance* Track::getInstance(int index)
 	return _track[index];
 }
 
-int Track::getIndex(char connectionType) const
+// Returns a random index based on connection type
+int Track::getIndex(char & connectionType) const
 {
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
-	//Finding valid segments based on connection type
+	// Finding valid segments based on connection type
 	std::vector<int> validSegments = std::vector<int>();
 	for (unsigned int i = 0; i < infos.size(); i++)
 	{
@@ -145,26 +145,33 @@ int Track::getIndex(char connectionType) const
 			validSegments.push_back(i);
 		}
 	}
-	//Calculating total probability
+	if (validSegments.size() < 2)
+	{
+		return -1;
+	}
+	// Calculating total probability
 	unsigned int totalProbability = 0;
 	for (unsigned int i = 0; i < validSegments.size(); i++)
 	{
 		totalProbability += infos[validSegments[i]]._probability;
 	}
-	//Randomizing and finding corresponding segment
+	// Randomizing and finding corresponding segment
 	int r = rand() % totalProbability;
 	int tested = 0;
 	for (unsigned int i = 0; i < validSegments.size(); i++)
 	{
-		if (r - tested < infos[validSegments[i]]._probability)
+		int test = infos[validSegments[i]]._probability;
+		if (r - tested < test)
 		{
-			return r - tested;
+			connectionType = infos[validSegments[i]]._endConnection;
+			return i;
 		}
-		tested += infos[validSegments[i]]._probability;
+		tested += test;
 	}
 	return -1;
 }
 
+// Returns the random nr of same segment in a row
 int Track::getInRow(int index) const
 {
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
@@ -233,5 +240,75 @@ void Track::render(GFX::DeferredRenderer& renderer)
 	for (unsigned i = 0; i < _track.size(); ++i)
 	{
 		renderer.render(*_track[i]);
+	}
+}
+
+// Inserts a segment with given index at the end of the track
+bool Track::insertNormalSegment(const int index, int & length, bool testCollision)
+{
+	const Segment * segment = _segmentHandler->loadSegment(index);
+	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+	if (testCollision)
+	{
+		for (unsigned int i = 0; i < _track.size() - 2; i++)
+		{
+			if (tempInstance->bTestCollision(*_track[i]))
+			{
+				delete tempInstance;
+				return false;
+			}
+		}
+	}
+	glm::mat4 modelEndMat = segment->getEndMatrix();
+	int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
+	int maxRotOffset = segment->getRotationOffset() / angle;
+	float rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
+	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
+	_endMatrix = _endMatrix * modelEndMat * rotMat;
+	length += segment->getLength();
+	_track.push_back(tempInstance);
+	return true;
+}
+
+void Track::insertStructure(const int index, int & length)
+{
+	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
+	int min = s->minInRow;
+	int max = s->maxInRow;
+	double scaled = (double)rand() / RAND_MAX;
+	int amount = (max - min + 1) * scaled + min;
+	for (unsigned int i = 0; i < amount; i++)
+	{
+		for (unsigned int j = 0; j < s->pieces.size(); j++)
+		{
+			const SegmentHandler::StructurePiece * p = s->pieces[j];
+			const Segment * segment = _segmentHandler->loadSegment(p->index);
+			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+			glm::mat4 modelEndMat = segment->getEndMatrix();
+			int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
+
+			int minRot = p->minRotation / angle;
+			int maxRot = p->maxRotation / angle;
+			double scaled = (double)rand() / RAND_MAX;
+			float rotVal = ((maxRot - minRot) * scaled + minRot) * angle;
+
+			glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
+			_endMatrix = _endMatrix * modelEndMat * rotMat;
+			length += segment->getLength();
+			_track.push_back(tempInstance);
+		}
+	}
+}
+
+void Track::deleteSegments(int & totalLength, const int lengthToDelete)
+{
+	int deletedLength = 0;
+	while (deletedLength <= lengthToDelete && totalLength > 300)
+	{
+		int segmentLength = _track[_track.size() - 1]->getLength();
+		deletedLength += segmentLength;
+		totalLength -= segmentLength;
+		delete _track[_track.size() - 1];
+		_track.erase(_track.begin() + _track.size() - 1);
 	}
 }

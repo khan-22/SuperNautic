@@ -25,12 +25,12 @@ namespace GFX
 
 			void render();
 
+			VertexArrayObject& getVertexArrayObject();
 		protected:
 		private:
 			VertexArrayObject	_vao;
 
 			// This is explicitly for the ModelLoader to handle.
-			VertexArrayObject& getVertexArrayObject();
 			friend class ModelLoader;
 		};
 
@@ -45,11 +45,11 @@ namespace GFX
 		///////////////////////////////////////////
 		void render(RenderStates& states) override;
 
+		Mesh& addMesh();
 	private:
 		std::vector<std::unique_ptr<Mesh>> _meshes;
 
 		// This is explicitly for the ModelLoader to handle.
-		Mesh& addMesh();
 		void setAttributes(RenderStates& states) const;
 		friend class ModelLoader;
 		friend class TexturedModel;

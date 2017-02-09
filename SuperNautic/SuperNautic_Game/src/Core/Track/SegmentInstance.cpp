@@ -34,6 +34,16 @@ glm::mat4 SegmentInstance::getModelMatrix() const
 	return _model;
 }
 
+const int SegmentInstance::getLength() const
+{
+	return _parent->getLength();
+}
+
+const int SegmentInstance::getIndex() const
+{
+	return _parent->_segmentInfo->loadedIndex;
+}
+
 bool SegmentInstance::bTestCollisionSphere(const SegmentInstance& other) const
 {
     for(const Sphere& a : _globalBoundingSpheres)
@@ -81,6 +91,11 @@ bool SegmentInstance::bTestCollision(const SegmentInstance& other) const
     return true;
 }
 
+const std::vector<BoundingBox>& SegmentInstance::getGlobalBoundingBoxes() const
+{
+    return _globalBoundingBoxes;
+}
+
 
 void SegmentInstance::updateGlobalBounds()
 {
@@ -91,10 +106,10 @@ void SegmentInstance::updateGlobalBounds()
         BoundingBox& globalBox = _globalBoundingBoxes.back();
 
 
-        globalBox.center = glm::vec4(localBox.center, 1.f) * _model;
+        globalBox.center = _model * glm::vec4(localBox.center, 1.f);
         for(size_t i = 0; i < localBox.directions.size(); i++)
         {
-            globalBox.directions[i] = glm::vec4(localBox.directions[i], 0.f) * _model;
+            globalBox.directions[i] = _model * glm::vec4(localBox.directions[i], 0.f);
         }
         globalBox.halfLengths = localBox.halfLengths;
     }
@@ -110,8 +125,8 @@ void SegmentInstance::updateGlobalBounds()
 
 void SegmentInstance::render(GFX::RenderStates & states)
 {
-	_parent->getVisualModel().get()->setModelMatrix(_model);
-	_parent->getVisualModel().get()->render(states);
+	_parent->getVisualModel().getModelAsset().get()->setModelMatrix(_model);
+	_parent->getVisualModel().render(states);
 }
 
 const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const

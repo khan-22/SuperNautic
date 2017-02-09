@@ -15,7 +15,7 @@ void PointLight::setPosition(glm::vec3 position)
 
 const glm::vec3 PointLight::getPosition()
 {
-	return glm::vec3();
+	return _position;
 }
 
 void PointLight::updateColor(glm::vec3 diffuseColor)

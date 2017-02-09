@@ -31,7 +31,8 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 	_scene = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_dataFileName);
 
 	// Get visual model asset 
-	_visual = ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_visualFileName);
+	_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get("test3pipe.mat"));
+		//ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_visualFileName);
 
 	if (_scene.get()->cameras.size() < 1)
 	{

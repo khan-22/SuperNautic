@@ -6,7 +6,7 @@ uniform sampler2D uPosition;
 uniform sampler2D uDiffuse;
 uniform sampler2D uNormal;
 
-uniform vec3 viewPos;
+uniform vec3 uViewPos;
 
 in VS_OUT
 {
@@ -14,48 +14,58 @@ in VS_OUT
 	vec2 uv;
 } fs_in;
 
+const int NUM_LIGHTS = 32;
 struct PointLightData
 {
-	vec3 pos;
-	vec3 color;
+	vec3 pos[NUM_LIGHTS];
+	vec3 color[NUM_LIGHTS];
 
 	//Attenuation properties
-	float constant;
-	float linear;
-	float quadratic;
+	vec3 properties[NUM_LIGHTS];
 };
 
-const int NUM_LIGHTS = 32;
-uniform PointLightData pointLights[NUM_LIGHTS];
+uniform PointLightData pointLights;
 
-vec4 calculatePointLight(PointLightData pLight, vec3 fragPos, vec3 diffuse, vec3 normal, vec3 viewDir)
+vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3 viewDir)
 {
-	//DO COOL LIGHT SHIT
+	//Ambient
+	vec3 ambientColor	= pointLights.color[i] * 0.1;
 
-	float factor = dot(pLight.pos - fragPos, normal);
+	//Diffuse color
+	vec3 lightDir		= normalize(pointLights.pos[i] - fragPos);
+	float angle			= max(dot(normal, lightDir), 0.0);
+	vec3 diffuseColor	= angle * pointLights.color[i];
 
-	vec4 result = vec4(diffuse, 1.0) * factor;
+	//Specular
+	float specularStrength	= 0.5; //Should be sent in on a per object basis, possibly with specular map in the future
+	vec3 reflectionDir		= reflect(-lightDir, normal);
+	float specular			= pow(max(dot(viewDir, reflectionDir), 0.0), 32); //32 defines shininess and should also be sent in as a uniform most likely
+	vec3 specularVec		= specularStrength * specular * pointLights.color[i];
+
+	//Attenuation
+	float d				= length(pointLights.pos[i] - fragPos); //Distance to the light source
+	vec3 dvec			= vec3(1.0, d, d*d);
+	float attenuation	= 1.0 / (dot(pointLights.properties[i], dvec));
+
+	vec3 result	= max((diffuseColor + ambientColor + specularVec) * diffuseTex * attenuation, vec3(0.0));
 
 	return result;
+	//return vec3(1.0, 0.0, 0.0) * diffuseTex;
 }
 
 void main()
 {
-	vec3 fragPos = texture(uPosition, fs_in.uv).rgb;
-	vec3 diffuse = texture(uDiffuse, fs_in.uv).rgb;
-	vec3 normal = texture(uNormal, fs_in.uv).rgb;
-	vec3 viewDir = normalize(viewPos - fragPos);
+	vec3 fragPos	= texture(uPosition, fs_in.uv).rgb;
+	vec3 diffuseTex = texture(uDiffuse, fs_in.uv).rgb;
+	vec3 normal		= texture(uNormal, fs_in.uv).rgb;
+	vec3 viewDir	= normalize(uViewPos - fragPos);
 
 	vec4 lightingResult = vec4(0, 0, 0, 1);
 
 	for(int i = 0; i < NUM_LIGHTS; i++)
 	{
-		lightingResult += calculatePointLight(pointLights[i], fragPos, diffuse, normal, viewDir);
+		lightingResult += calculatePointLight(i, fragPos, diffuseTex, normal, viewDir);
 	}
-
-	lightingResult += diffuse * 0.1;
-
-	
 
 	outColor = lightingResult;
 }
