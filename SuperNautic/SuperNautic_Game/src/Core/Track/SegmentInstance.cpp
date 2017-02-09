@@ -91,6 +91,11 @@ bool SegmentInstance::bTestCollision(const SegmentInstance& other) const
     return true;
 }
 
+const std::vector<BoundingBox>& SegmentInstance::getGlobalBoundingBoxes() const
+{
+    return _globalBoundingBoxes;
+}
+
 
 void SegmentInstance::updateGlobalBounds()
 {
