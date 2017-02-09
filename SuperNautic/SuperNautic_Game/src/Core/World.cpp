@@ -23,8 +23,8 @@ World::World(ApplicationContext& context)
 	_players.emplace_back();
 	_playerSegmentIndices.push_back(0);
 
-	_track.setLength(500);
-	_track.setSeed(1);
+	_track.setLength(3000);
+	_track.setSeed(3);
 	_track.generate();
 }
 
