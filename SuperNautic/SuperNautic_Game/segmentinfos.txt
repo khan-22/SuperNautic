@@ -1,0 +1,8 @@
+3
+s01_straight_helper_aa.blend s01_straight_aa.blend      10  2 10 180
+s02_90degbend_helper_aa.blend s02_90degbend_aa.blend    30  1 2  90      
+s03_10degbend_helper_aa.blend s03_10degbend_aa.blend    10  1 15 40 
+
+
+1
+40 5 20 3   0 0 0   2 20 20   1 90 90

@@ -105,7 +105,7 @@ bool Game::bInitialize()
         LOG("Failed to load material.");
     }
 
-	_track.setLength(100000);
+	_track.setLength(10000);
 	_track.setSeed(1);
 	_track.generate();
 
@@ -143,7 +143,7 @@ void Game::run()
 	sf::Time deltaTime = clock.restart();
 
 	// SHIP TESTING
-	//sh = new SegmentHandler{ "Segments/segmentinfos.txt" };
+	sh = new SegmentHandler{ "Segments/segmentinfos.txt", "Segments/ConnectionTypes.txt" };
 	s = { _segmentHandler.loadSegment(0) };
 
 	ship = new Ship{ s };
