@@ -66,15 +66,15 @@ void Player::update(float dt)
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
-            _ship.setAcceleration(0.f);
+            _ship.setAcceleration(-1.f);
         }
     }
 
     _ship.update(dt);
 
-    _hud.setHeat(_ship.getEngineTemperature());
+    _hud.setHeat(_ship.getEngineTemperature() / 10);
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 
-	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() + 1);
+	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 10 + 1);
 }

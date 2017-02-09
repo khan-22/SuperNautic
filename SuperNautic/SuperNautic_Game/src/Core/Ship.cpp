@@ -26,10 +26,10 @@ Ship::Ship()
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshUpDirection{ 0.0f, 1.0f, 0.0f },
 		_minAcceleration{ 5.0f },
-		_maxAcceleration{ 10.0f },
+		_maxAcceleration{ 50.0f },
 		_maxTurningSpeed{ 1.0f },
 		_straighteningForce{ 3.0f },
-		_speedResistance{ 0.01f },
+		_speedResistance{ 0.001f },
 		_preferredHeight{ 2.0f },
 		_levitationForce{ 10.0f },
 		_upResistance{ 10.0f }
@@ -76,7 +76,7 @@ void Ship::update(float dt)
 	}
 
 	// Update engine temperature
-	_engineTemperature = _engineTemperature * 0.8f + _accelerationFactor * 0.2f;
+	_engineTemperature = ((_accelerationFactor + _velocity) / 2);//_engineTemperature * 0.8f + _accelerationFactor * 0.2f;
 
 	// Create ray and test for intersection
 	Ray r{ getPosition(), -_upDirection, 1000.0f };
@@ -142,7 +142,7 @@ void Ship::update(float dt)
 	
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
-	_accelerationFactor = 0.0f;
+	_accelerationFactor = 0.5f;
 }
 
 void Ship::jump()

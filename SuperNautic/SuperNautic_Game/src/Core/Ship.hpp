@@ -31,10 +31,10 @@ public:
 		_turningFactor = clamp(turnFactor, -1.0f, 1.0f);
 	}
 
-	// [0..1]
+	// [-1..1]
 	void setAcceleration(float accelerationFactor) 
 	{ 
-		_accelerationFactor = clamp(accelerationFactor, 0.0f, 1.0f);
+		_accelerationFactor = clamp(accelerationFactor, -1.0f, 1.0f);
 	}
 
 	// [0..1]
