@@ -26,9 +26,9 @@ Ship::Ship()
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshUpDirection{ 0.0f, 1.0f, 0.0f },
 		_minAcceleration{ 5.0f },
-		_maxAcceleration{ 10.0f },
-		_maxTurningSpeed{ 1.0f },
-		_straighteningForce{ 3.0f },
+		_maxAcceleration{ 50.0f },
+		_maxTurningSpeed{ 3.0f },
+		_straighteningForce{ 6.0f },
 		_speedResistance{ 0.01f },
 		_preferredHeight{ 2.0f },
 		_levitationForce{ 10.0f },
@@ -50,10 +50,12 @@ void Ship::render(GFX::RenderStates& states)
 
 void Ship::update(float dt)
 {
+	dt = clamp(dt, 0.0f, 0.05f);
+
 	if (!_stopped)
 	{
 		// Update turning angle										reduce maneuverability at high acceleration
-		_currentTurningAngle += _turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.7f) * dt;
+		_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.7f) * dt;
 		// abs to preserve sign of _currentTurningAngle
 		_currentTurningAngle -= _straighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
 
@@ -118,11 +120,9 @@ void Ship::update(float dt)
 	}
 
 	// 'Rotate' mesh up direction towards 'correct' up direction
-	_meshUpDirection = glm::normalize(_meshUpDirection * 0.8f + _upDirection * 0.2f);
+	_meshUpDirection = glm::normalize(_meshUpDirection * 0.5f + _upDirection * 0.5f);
 		
 	// Ship always faces straight forward, only movement direction and mesh rotates
-	glm::mat4 velocityMatrix = glm::rotate(getRotation(), _currentTurningAngle, glm::vec3{ 0.0f, 1.0f, 0.0f });
-
 	// Create from mesh up direction
 	glm::mat4 meshMatrix{ glm::vec4{ glm::cross(_meshUpDirection, _facingDirection), 0.0f },
 						  glm::vec4{ _meshUpDirection - glm::dot(_meshUpDirection, _facingDirection) * _facingDirection, 0.0f },	// The part of _meshUpDirection that is orthogonal to _facingDirection
@@ -132,7 +132,8 @@ void Ship::update(float dt)
 	meshMatrix = glm::rotate(meshMatrix, _currentTurningAngle, glm::vec3{ 0.0f, 1.0f, 0.0f });
 
 	// Move forward
-	move((velocityMatrix * glm::vec4{ _facingDirection, 0.0f }) * _velocity * dt);
+	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _facingDirection, 0.0f };
+	move(velocityDirection * _velocity * dt);
 
 	// Move up/down
 	move(_upDirection * _upVelocity * dt);

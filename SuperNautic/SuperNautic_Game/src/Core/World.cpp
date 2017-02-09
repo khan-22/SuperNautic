@@ -7,7 +7,7 @@
 
 
 World::World(ApplicationContext& context)  
-	: _segmentHandler{ "Segments/segmentinfos.txt" }, _track{ &_segmentHandler }, _context{ context }, _debugCamera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
+	: _segmentHandler{ "Segments/segmentinfos.txt" }, _track{ &_segmentHandler }, _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
 {
 	_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 
@@ -50,7 +50,10 @@ void World::update(float dt)
 		_players[i].update(dt);
 	}
 
-	_debugCamera.update(dt, _context.window);
+	_camera.setPos(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 1, -6, 1 } });
+	_camera.setUp(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 1, 0, 0 } });
+	_camera.setViewDir(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 0, 1, 0 } });
+	
 }
 
 void World::render()
@@ -64,7 +67,7 @@ void World::render()
 	_track.render(_renderer);
 	//_renderer.render(_track.);
 
-	_renderer.display(_debugCamera);
+	_renderer.display(_camera);
 
 	GFX::SfmlRenderer sfml;
 	for (Player& player : _players)

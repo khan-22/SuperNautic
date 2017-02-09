@@ -15,7 +15,7 @@ namespace sf
 #include "../GFX/DeferredRenderer.hpp"
 #include "../GFX/ForwardRenderer.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
-#include "DebugCamera.hpp"
+#include "Camera.h"
 
 class ApplicationContext;
 
@@ -40,7 +40,7 @@ private:
 
 	GFX::DeferredRenderer _renderer;
 
-	DebugCamera _debugCamera;
+	Camera _camera;
 };
 
 #endif //WORLD_HPP
