@@ -21,8 +21,12 @@ void main()
 	normalOut		= normalize(fs_in.normal);
 
 	vec4 diffuse	= texture(uDiffuse, fs_in.uv);
-	//vec4 specular	= texture(uSpecular, fs_in.uv);
-	//vec4 normal	= texture(uNormal, fs_in.uv);
+	vec4 specular	= texture(uSpecular, fs_in.uv);
+	vec4 normal		= texture(uNormal, fs_in.uv);
+
+	
 	diffuseOut		= diffuse.rgb;
+	
+	diffuseOut += (specular + normal).rgb * 0.f;
 
 }
