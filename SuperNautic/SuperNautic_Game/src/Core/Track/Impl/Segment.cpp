@@ -67,7 +67,7 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 }
 
 // Tests a ray collision against all collision surfaces of the segment. Returns collision information
-const RayIntersection Segment::rayIntersectionTest(Ray& ray) const
+const RayIntersection Segment::rayIntersectionTest(const Ray& ray) const
 {
 	// Get distance to largest box
 	float firstBoxDistance = _octTree.rayIntersection(ray);
@@ -183,7 +183,22 @@ std::pair<WaypointInfo, WaypointInfo> Segment::findClosestWaypoints(const glm::v
 		std::swap(firstDistance, secondDistance);
 	}
 
-	return std::make_pair(WaypointInfo{ _waypoints[closest.first], firstDistance }, WaypointInfo{ _waypoints[closest.second], secondDistance });
+	glm::vec3 firstDirection{ glm::normalize(_waypoints[closest.second] - _waypoints[closest.first]) };
+	glm::vec3 secondDirection;
+
+	// This is the last waypoint of the segment
+	if (closest.second >= _waypoints.size() - 1)
+	{
+		glm::vec3 endPoint{ getEndMatrix() * glm::vec4{0, 0, 0, 1} };
+
+		secondDirection = glm::normalize(endPoint - _waypoints[closest.second]);
+	}
+	else
+	{
+		secondDirection = glm::normalize(_waypoints[closest.second + 1] - _waypoints[closest.second]);
+	}
+
+	return std::make_pair(WaypointInfo{ _waypoints[closest.first], firstDirection, firstDistance }, WaypointInfo{ _waypoints[closest.second], secondDirection, secondDistance });
 }
 
 // Renders the segment at the position of an instance

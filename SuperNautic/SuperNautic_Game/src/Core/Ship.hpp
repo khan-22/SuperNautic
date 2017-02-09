@@ -8,15 +8,16 @@
 #include "Track/Segment.hpp"
 #include "LoadAssetFunctions.hpp"
 #include "../GFX/Model.hpp"
+#include "Track/SegmentInstance.hpp"
+#include "../GFX/Renderable3D.hpp"
 
-class Ship : public GFX::Transformable3D
+class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 {
 public:
 	Ship();
-	Ship(const Segment* segment);
 	Ship(glm::vec3 position);
 
-	void render();
+	void render(GFX::RenderStates& states) override;
 	void update(float dt);
 
 	void start() { _stopped = false; }
@@ -25,7 +26,10 @@ public:
 	void repair() { _destroyed = false; }
 
 	// [-1..1]
-	void setTurning(float turnFactor) { _turningFactor = clamp(turnFactor, -1.0f, 1.0f); }
+	void setTurning(float turnFactor)
+	{
+		_turningFactor = clamp(turnFactor, -1.0f, 1.0f);
+	}
 
 	// [0..1]
 	void setAcceleration(float accelerationFactor) 
@@ -51,6 +55,11 @@ public:
 	}
 
 	void jump();
+
+	void setSegments(std::vector<SegmentInstance*> segments)
+	{
+		_segmentsToTest = segments;
+	}
 
 	ModelAsset _shipModel;
 
@@ -81,11 +90,6 @@ private:
 	const float	_levitationForce;		// How fast the ship accelerates toward preferred height
 	const float _upResistance;			// 'Air resistance' for up/down motion
 
-	// SHIP TESTING
-	const Segment* _segment;
-	///////////////
+	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
 };
-
-
-
 #endif // SHIP_HPP

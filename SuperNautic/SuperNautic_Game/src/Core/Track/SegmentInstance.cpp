@@ -118,3 +118,14 @@ void SegmentInstance::render(GFX::RenderStates & states)
 	_parent->getVisualModel().get()->setModelMatrix(_model);
 	_parent->getVisualModel().get()->render(states);
 }
+
+const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const
+{
+	glm::mat4 inverse = glm::inverse(_model);
+
+	Ray localRay{ inverse * glm::vec4{ ray.origin().x , ray.origin().y, ray.origin().z, 1.0f },
+				  inverse * glm::vec4{ ray.direction().x, ray.direction().y, ray.direction().z, 0.0f }, 
+				  ray.length() };
+
+	return _parent->rayIntersectionTest(localRay);
+}

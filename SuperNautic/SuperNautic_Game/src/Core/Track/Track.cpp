@@ -5,6 +5,7 @@
 #include "../../Log.hpp"
 #include "SegmentInfo.hpp"
 #include "../../GFX/Model.hpp"
+#include "Segment.hpp"
 
 // Default constructor (private)
 Track::Track()
@@ -129,9 +130,9 @@ int Track::getNrOfSegments() const
 	return _track.size();
 }
 
-SegmentInstance& Track::getInstance(int index)
+SegmentInstance* Track::getInstance(int index)
 {
-	return *_track[index];
+	return _track[index];
 }
 
 // Returns a random index based on connection type
@@ -181,6 +182,68 @@ int Track::getInRow(int index) const
 	int max = infos[index]._maxInRow;
 	double scaled = (double)rand() / RAND_MAX;
 	return (max - min + 1) * scaled + min;
+}
+
+glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex)
+{
+						 // Waypoints,	segment index
+	std::vector<std::pair<WaypointInfo, long>> closestWaypoints;
+
+	// Check previous, current and next segment
+	for (long i = static_cast<long>(segmentIndex) - 1; i <= static_cast<long>(segmentIndex) + 1; ++i)
+	{
+		// Make sure current segment is within bounds
+		if (i >= 0 && i < _track.size())
+		{
+			std::pair<WaypointInfo, WaypointInfo> wps = _track[i]->getParent()->findClosestWaypoints(glm::inverse(_track[i]->getModelMatrix()) * glm::vec4{globalPosition, 1.0f});
+
+			closestWaypoints.push_back(std::make_pair(wps.first, i));
+			closestWaypoints.push_back(std::make_pair(wps.second, i));
+		}
+	}
+
+	// Find the two neighboring waypoints closest to ship, these will be just ahead and behind ship
+	// closestWaypoints are always sorted in order of appearance in track, because Segment::findClosestWaypoints() returns them in that order
+	float lowestSum = closestWaypoints[0].first.distance + closestWaypoints[1].first.distance;
+	unsigned lowestIndex = 0;
+	for (unsigned i = 1; i < closestWaypoints.size() - 1; ++i)
+	{
+		float testSum = closestWaypoints[i].first.distance + closestWaypoints[i + 1].first.distance;
+		if (testSum < lowestSum)
+		{
+			lowestSum = testSum;
+			lowestIndex = i;
+		}
+	}
+
+	// Update segment index of ship
+	segmentIndex = static_cast<unsigned>(closestWaypoints[lowestIndex].second);
+
+	// Transform vectors to global space
+	// Waypoint behind ship
+	glm::vec3 behindPos = _track[closestWaypoints[lowestIndex].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex].first.position, 1.0f };
+	glm::vec3 behindDir = _track[closestWaypoints[lowestIndex].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex].first.direction, 0.0f };
+
+	// Waypoint ahead of ship
+	glm::vec3 aheadPos = _track[closestWaypoints[lowestIndex + 1].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex + 1].first.position, 1.0f };
+	glm::vec3 aheadDir = _track[closestWaypoints[lowestIndex + 1].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex + 1].first.direction, 0.0f };
+
+	// Vector from behind waypoint to ahead waypoint
+	glm::vec3 betweenWaypoints = aheadPos - behindPos;
+
+	// Find [0..1], 0 = ship is at behind waypoint, 1 = ship is at ahead waypoint
+	float dist = glm::dot(glm::normalize(betweenWaypoints), globalPosition) / glm::length(betweenWaypoints);
+	
+	// Find forward vector, change to proper rotation?
+	return glm::vec3{ glm::normalize(behindDir * (1.0f - dist) + aheadDir * dist) };
+}
+
+void Track::render(GFX::DeferredRenderer& renderer)
+{
+	for (unsigned i = 0; i < _track.size(); ++i)
+	{
+		renderer.render(*_track[i]);
+	}
 }
 
 // Inserts a segment with given index at the end of the track

@@ -14,15 +14,19 @@ Player::Player(int id) :
 	_hud(1280, 720)
 {
 }
+Player::Player(const Player& other) : Player{ other._playerId }
+{
+	
+}
 
 Player::~Player()
 {
 }
 
 
-void Player::render()
+void Player::render(GFX::DeferredRenderer& renderer)
 {
-    // ...
+	renderer.render(_ship);
 }
 
 const sf::Drawable& Player::getHud() const
@@ -62,15 +66,15 @@ void Player::update(float dt)
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         {
-            _ship.setAcceleration(-1.f);
+            _ship.setAcceleration(0.f);
         }
     }
 
-    //_ship.update(dt);
+    _ship.update(dt);
 
     _hud.setHeat(_ship.getEngineTemperature());
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 
-	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() + 1.5);
+	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() + 1.5f);
 }

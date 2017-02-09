@@ -9,6 +9,7 @@
 #include "Ship.hpp"
 #include "HUD.hpp"
 #include "PlayerAudio.hpp"
+#include "../GFX/DeferredRenderer.hpp"
 
 class Player
 {
@@ -16,10 +17,16 @@ public:
 	Player();
 	Player(int id);
 	~Player();
+	Player(const Player& other);
 
 	void update(float dt);
-	void render();
+	void render(GFX::DeferredRenderer& renderer);
     const sf::Drawable& getHud() const;
+
+	Ship& getShip()
+	{
+		return _ship;
+	}
 
 private:
 	int _playerId;

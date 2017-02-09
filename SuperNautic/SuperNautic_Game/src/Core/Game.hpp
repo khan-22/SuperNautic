@@ -58,12 +58,6 @@ private:
 	std::vector<ModelAsset> ModelArray;
 	//////////////////////
 
-	// SHIP TESTING
-	SegmentHandler* sh;
-	const Segment* s;
-	Ship* ship;
-	///////////////
-
 	TextureAsset			_texture;
 	GFX::TexturedModel		_texturedModel;
 
@@ -75,9 +69,6 @@ private:
 
 	Camera					_camera;
 	DebugCamera				_debugCamera;
-
-	SegmentHandler			_segmentHandler;
-	Track					_track;
 };
 
 #endif //GAME_HPP
