@@ -54,9 +54,6 @@ public:
 		_trackForward = forwardDirection;
 	}
 
-	//void steer(float magnitude); // magnitude = [-1, 1]
-	//void accelerate(float magnitude); // magnitude = [-1, 1]
-	void updatePower(float magnitude); // magnitude = [-1, 1]
 	void jump();
 
 	void setSegments(std::vector<SegmentInstance*> segments)
@@ -78,17 +75,6 @@ private:
 	float		_engineTemperature;
 	float		_velocity;				// Current forward velocity
 	float		_upVelocity;			// Current up/down velocity
-	float _enginePower;
-	float _maxEnginePower;
-    /*float _steerVelocity;
-    float _forwardVelocity;
-    float _maxSteerAcceleration;
-    float _maxForwardAcceleration;
-    float _maxSteerVelocity;
-    float _maxForwardVelocity;
-    float _minForwardVelocity;
-    float _engineTemperature; // [0, 1]
-    bool _bIsJumping;*/
 
 	glm::vec3	_trackForward;			// Forward direction of track
 	glm::vec3	_facingDirection;		// Current facing direction

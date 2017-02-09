@@ -47,9 +47,6 @@ void Player::update(float dt)
     {
         _ship.setTurning(_input.getLeftStickXValue());
         _ship.setAcceleration(_input.getTriggersValue());
-        //_ship.steer(_input.getLeftStickXValue() * dt);
-        //_ship.accelerate(_input.getTriggersValue() * dt);
-		_ship.updatePower(_input.getTriggersValue() * dt);
     }
     else
     {
