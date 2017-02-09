@@ -96,6 +96,11 @@ public:
 		return _visual;
 	}
 
+	const std::vector<glm::vec3>& getWaypoints() const
+	{
+	    return _waypoints;
+	}
+
 private:
 	// The loaded scene data
 	RawMeshAsset _scene;
