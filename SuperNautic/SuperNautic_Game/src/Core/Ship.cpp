@@ -34,7 +34,7 @@ Ship::Ship()
 		_levitationForce{ 10.0f },
 		_upResistance{ 10.0f }
 {
-	_shipModel = ModelCache::get("ship.fbx");
+	_shipModel = GFX::TexturedModel(ModelCache::get("ship.fbx"), MaterialCache::get("test.mat"));
 }
 
 
@@ -45,7 +45,7 @@ Ship::Ship(glm::vec3 position) : Ship{}
 
 void Ship::render(GFX::RenderStates& states)
 {
-	_shipModel.get()->render(states);
+	_shipModel.render(states);
 }
 
 void Ship::update(float dt)
@@ -139,7 +139,7 @@ void Ship::update(float dt)
 	move(_upDirection * _upVelocity * dt);
 
 	// Update model's matrix
-	_shipModel.get()->setModelMatrix(glm::translate(getPosition()) * meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
+	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(getPosition()) * meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
 	
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
