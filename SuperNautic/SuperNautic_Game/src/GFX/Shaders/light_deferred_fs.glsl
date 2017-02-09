@@ -19,6 +19,7 @@ struct PointLightData
 {
 	vec3 pos[NUM_LIGHTS];
 	vec3 color[NUM_LIGHTS];
+	float intensity[NUM_LIGHTS];
 
 	//Attenuation properties
 	vec3 properties[NUM_LIGHTS];
@@ -45,7 +46,7 @@ vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3
 	//Attenuation
 	float d				= length(pointLights.pos[i] - fragPos); //Distance to the light source
 	vec3 dvec			= vec3(1.0, d, d*d);
-	float attenuation	= 1.0 / (dot(pointLights.properties[i], dvec));
+	float attenuation	= pointLights.intensity[i] / (dot(pointLights.properties[i], dvec));
 
 	vec3 result	= max((diffuseColor + ambientColor + specularVec) * diffuseTex * attenuation, vec3(0.0));
 

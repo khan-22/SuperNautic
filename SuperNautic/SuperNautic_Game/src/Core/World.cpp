@@ -67,7 +67,7 @@ void World::render()
 	_track.render(_renderer);
 	//_renderer.render(_track.);
 
-	PointLight testLight(_players[0].getShip().getPosition(), { 1,1,1 }, 1000.f);
+	PointLight testLight(_players[0].getShip().getPosition(), { 1,1,1 }, 1.f);
 	_renderer.pushPointLight(testLight);
 	_renderer.display(_camera);
 

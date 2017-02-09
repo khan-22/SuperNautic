@@ -163,6 +163,7 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 
 	std::vector<glm::vec3> pointLightPos;
 	std::vector<glm::vec3> pointLightColor;
+	std::vector<float>	   pointLightIntensity;
 	std::vector<glm::vec3> pointLightProperties;
 
 	if (lightCount > 0)
@@ -178,10 +179,12 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 
 			glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
 			pointLightProperties.push_back(properties);
+			pointLightIntensity.push_back(_pointLights[i]->getLightProperties().intensity);
 		}
 
 		lpShader->setUniform("pointLights.pos", pointLightPos[0], lightCount);
 		lpShader->setUniform("pointLights.color", pointLightColor[0], lightCount);
+		lpShader->setUniform("pointLights.intensity", pointLightIntensity[0], lightCount);
 		lpShader->setUniform("pointLights.properties", pointLightProperties[0], lightCount);
 	}
 
