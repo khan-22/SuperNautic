@@ -33,6 +33,16 @@ Ship::Ship()
 		_preferredHeight{ 2.0f },
 		_levitationForce{ 10.0f },
 		_upResistance{ 10.0f }
+/*: _steerVelocity(0.f)
+, _forwardVelocity(0.f)
+, _bIsJumping(false)*/
+, _maxEnginePower(50.f)
+/*, _maxSteerAcceleration(2.f)
+, _maxForwardAcceleration(50.f)
+, _engineTemperature(0.f)
+, _maxSteerVelocity(10.f)
+, _maxForwardVelocity(100.f)
+, _minForwardVelocity(20.f)*/
 {
 	_shipModel = ModelCache::get("ship.fbx");
 }
@@ -143,6 +153,20 @@ void Ship::update(float dt)
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
 	_accelerationFactor = 0.0f;
+}
+
+void Ship::updatePower(float magnitude)
+{
+	_enginePower += magnitude * _maxEnginePower;
+
+	if (_enginePower > _maxEnginePower)
+	{
+		_enginePower = _maxEnginePower;
+	}
+	else if (_enginePower < 0)
+	{
+		_enginePower = 0;
+	}
 }
 
 void Ship::jump()
