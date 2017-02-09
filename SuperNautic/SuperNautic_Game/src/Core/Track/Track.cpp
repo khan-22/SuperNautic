@@ -307,7 +307,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 	return glm::vec3{ glm::normalize(behindDir * (1.0f - dist) + aheadDir * dist) };
 }
 
-void Track::render(GFX::ForwardRenderer& renderer)
+void Track::render(GFX::DeferredRenderer& renderer)
 {
 	for (unsigned i = 0; i < _track.size(); ++i)
 	{

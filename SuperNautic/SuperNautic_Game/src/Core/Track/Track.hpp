@@ -25,7 +25,7 @@ public:
 	bool generate();
 	int getNrOfSegments() const;
 	SegmentInstance* getInstance(int index);
-	void render(GFX::ForwardRenderer& renderer);
+	void render(GFX::DeferredRenderer& renderer);
 
 	// Returns the forward vector for a given ship position and segment index (segment index may update)
 	glm::vec3 findForward(const glm::vec3 globalPosition, unsigned& segmentIndex);
