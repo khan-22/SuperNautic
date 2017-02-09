@@ -47,6 +47,9 @@ void Player::update(float dt)
     {
         _ship.setTurning(_input.getLeftStickXValue());
         _ship.setAcceleration(_input.getTriggersValue());
+        //_ship.steer(_input.getLeftStickXValue() * dt);
+        //_ship.accelerate(_input.getTriggersValue() * dt);
+		_ship.updatePower(_input.getTriggersValue() * dt);
     }
     else
     {
@@ -76,5 +79,5 @@ void Player::update(float dt)
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 
-	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() + 1.5f);
+	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() + 1);
 }

@@ -30,9 +30,7 @@ Game::Game()
 	, _quitTimer(0.f)
 	, _fps(60.f)
 	, _camera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
-	, _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -10.f), glm::vec3(0.f, 0.f, 1.f))
-	, _segmentHandler("Segments/segmentinfos.txt", "Segments/ConnectionTypes.txt")
-	, _track(&_segmentHandler)
+	, _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f))
 {
 	LOG("Game is being constructed...");
 }
@@ -47,6 +45,16 @@ bool Game::bInitialize()
 {
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
+
+	GLint vertexUniCount = 0;
+	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &vertexUniCount);
+	GLint geoUniCount = 0;
+	glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &geoUniCount);
+	GLint fragUniCount = 0;
+	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &fragUniCount);
+	LOG("[VERTEX] There are ", vertexUniCount, " available uniform locations");
+	LOG("[GEOMETRY] There are ", geoUniCount, " available uniform locations");
+	LOG("[FRAGMENT] There are ", fragUniCount, " available uniform locations");
 //
 //	// Cached asset loading **DEMO**
 	/*RawMeshAsset testRawMesh = RawMeshCache::get("Segments/s01_straight_aa.fbx");
@@ -103,6 +111,9 @@ bool Game::bInitialize()
 	//_track.setSeed(1);
 	//_track.generate();
 
+
+
+	//_model = ModelCache::get("ship.fbx");
 	/*We can create a loop here (or where relevant) that loops through a list
 	of all the things we want to render and add them to the model array, such as
 	segments, ships etc.*/
@@ -127,6 +138,11 @@ bool Game::bInitialize()
 
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
+
+	
+	_pointLights.push_back(PointLight({ 0.f,2.f,0.f }, { 1.f, 0.f, 0.f }, 1.0f));
+	_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f }, 1.f));
+	_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 0.f, 1.f }, 1.f));
 
 	return true;
 }
@@ -177,6 +193,10 @@ void Game::update(float dt)
 
 	//_debugCamera.update(dt, _window);
 
+	static float t = 0.0;
+	t += dt;
+	_pointLights[0].setPosition(glm::vec3(2.f * sinf(t*4.f), 2.f, 2.f * cosf(t*4.f)));
+
     _stateStack.update(dt);
 }
 
@@ -190,6 +210,11 @@ void Game::render()
 
 	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
 	_camera.setViewDir(glm::vec3(0.f, 0.f, -1.f));
+
+	/*for (auto& pointLight : _pointLights)
+	{
+		_deferredRenderer1.pushPointLight(pointLight);
+	}*/
 
 	//_deferredRenderer1.render(_texturedModel);
 	//_deferredRenderer1.display(_debugCamera);
@@ -216,17 +241,8 @@ void Game::render()
 
 
 	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
-	
-	//SEND TEST MODELS TO RENDERER
-	for (int i = 0; i < ModelArray.size(); i++)
-	{
-		//_forwardRenderer.render(*ModelArray[i].get());
-	}
-	/////////////////////////////
-
-	_shader.get()->bind();
-    //_shader.get()->setSampler("uTexColor", 0);
-	_texture.get()->bind(0);
+    //_forwardRenderer.render(*_model.get());
+	//_forwardRenderer.render(_texturedModel);
 	//_forwardRenderer.display(_debugCamera);
 	//LOG_GL_ERRORS();
 

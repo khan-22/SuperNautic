@@ -83,3 +83,8 @@ void TexturedModel::setModelAndMaterial(const ModelAsset& model, const MaterialA
 
     _renderFunc = &TexturedModel::renderStandard;
 }
+
+ModelAsset GFX::TexturedModel::getModelAsset()
+{
+	return _model;
+}

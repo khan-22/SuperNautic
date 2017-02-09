@@ -10,6 +10,7 @@
 
 #include "glm/glm.hpp"
 #include "../LoadAssetFunctions.hpp"
+#include "../../GFX/TexturedModel.hpp"
 #include "../Geometric Primitives/AABB.hpp"
 #include "../Geometric Primitives/BoundingBox.hpp"
 #include "../Geometric Primitives/RayIntersection.hpp"
@@ -90,7 +91,7 @@ public:
 	// First in pair is before second
 	std::pair<WaypointInfo, WaypointInfo> findClosestWaypoints(const glm::vec3& position) const;
 
-	ModelAsset getVisualModel() const
+	GFX::TexturedModel getVisualModel() const
 	{
 		return _visual;
 	}
@@ -100,7 +101,7 @@ private:
 	RawMeshAsset _scene;
 
 	// The visual geometry for this segment
-	ModelAsset _visual;
+	GFX::TexturedModel _visual;
 
 	// Indices in _scene.get()->meshes to the required meshes
 	unsigned				_baseVisual;
