@@ -99,15 +99,15 @@ bool Track::generate()
 		bool collided = false;
 		for (unsigned int i = 0; i < inRow; i++)
 		{
-			insertNormalSegment(index, totalLength, false);
+			//insertNormalSegment(index, totalLength, false);
 			//insertStructure(0, totalLength);
-			/*if (!insertNormalSegment(index, totalLength, true))
+			if (!insertNormalSegment(index, totalLength, true))
 			{
 				deleteSegments(totalLength, 200);
 				_endMatrix = _track.back()->getModelMatrix() * _track[_track.size() - 1]->getEndMatrix();
 				collided = true;
 				break;
-			}*/
+			}
 		}
 		prevIndex = _track[_track.size() - 1]->getIndex();
 	}

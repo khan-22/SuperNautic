@@ -50,7 +50,11 @@ void Player::update(float dt)
     }
     else
     {
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			_ship.jump();
+		}
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
             _ship.setTurning(-1.f);
         }
@@ -76,5 +80,5 @@ void Player::update(float dt)
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 
-	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 10 + 1);
+	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 100 + 1);
 }
