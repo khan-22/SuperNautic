@@ -19,7 +19,7 @@ World::World(ApplicationContext& context)
 	_players.emplace_back();
 	_playerSegmentIndices.push_back(0);
 
-	_track.setLength(100);
+	_track.setLength(5000);
 	_track.setSeed(1);
 	_track.generate();
 }
@@ -87,7 +87,7 @@ void World::render()
 	_track.render(_renderer);
 	//_renderer.render(_track.);
 
-	PointLight testLight(_players[0].getShip().getPosition(), { 1,1,1 }, 1.f);
+	PointLight testLight(_players[0].getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f);
 	_renderer.pushPointLight(testLight);
 
 	for (int i = 0; i < _pointLights.size(); i++)
