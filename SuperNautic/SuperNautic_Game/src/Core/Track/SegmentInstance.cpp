@@ -39,6 +39,11 @@ const int SegmentInstance::getLength() const
 	return _parent->getLength();
 }
 
+const int SegmentInstance::getIndex() const
+{
+	return _parent->_segmentInfo->loadedIndex;
+}
+
 bool SegmentInstance::bTestCollisionSphere(const SegmentInstance& other) const
 {
     for(const Sphere& a : _globalBoundingSpheres)
@@ -84,6 +89,11 @@ bool SegmentInstance::bTestCollision(const SegmentInstance& other) const
     }
 
     return true;
+}
+
+const std::vector<BoundingBox>& SegmentInstance::getGlobalBoundingBoxes() const
+{
+    return _globalBoundingBoxes;
 }
 
 
