@@ -50,7 +50,7 @@ void Ship::render(GFX::RenderStates& states)
 
 void Ship::update(float dt)
 {
-	dt = clamp(dt, 0.0f, 0.05f);
+	dt = clamp(dt, 0.0f, 0.1f);
 
 	if (!_stopped)
 	{
@@ -110,7 +110,7 @@ void Ship::update(float dt)
 		}
 		else
 		{
-			normalWeight = (_preferredHeight / ri._length) * (_preferredHeight / ri._length);
+			normalWeight = (_preferredHeight / ri._length) * 2.0f;// *(_preferredHeight / ri._length);
 		}
 
 		// Update local directions
