@@ -26,10 +26,10 @@ Ship::Ship()
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshUpDirection{ 0.0f, 1.0f, 0.0f },
 		_minAcceleration{ 0.0f },
-		_maxAcceleration{ 25.0f },
-		_maxTurningSpeed{ 10.0f },
+		_maxAcceleration{ 200.0f },
+		_maxTurningSpeed{ 5.0f },
 		_straighteningForce{ 10.0f },
-		_speedResistance{ 0.001f },
+		_speedResistance{ 0.005f },
 		_preferredHeight{ 3.0f },
 		_levitationForce{ 10.0f },
 		_upResistance{ 10.0f }
@@ -132,12 +132,12 @@ void Ship::update(float dt)
 	glm::mat4 meshMatrix{ glm::vec4{ glm::cross(_meshUpDirection, _facingDirection), 0.0f },
 						  glm::vec4{ _meshUpDirection - glm::dot(_meshUpDirection, _facingDirection) * _facingDirection, 0.0f },	// The part of _meshUpDirection that is orthogonal to _facingDirection
 						  glm::vec4{ _facingDirection, 0.0f },
-						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+						  glm::vec4{ 0.0f, 0.25f, 0.0f, 1.0f } };
 	// Rotate to display turning
 	meshMatrix = glm::rotate(meshMatrix, _currentTurningAngle, glm::vec3{ 0.0f, 1.0f, 0.0f });
 
 	// Move forward
-	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _facingDirection, 0.0f };
+	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _facingDirection + _upDirection * 0.01f, 0.0f };
 	move(velocityDirection * _velocity * dt);
 
 	// Move up/down
@@ -148,7 +148,7 @@ void Ship::update(float dt)
 	
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
-	_accelerationFactor = 0.5f;
+	_accelerationFactor = 0.0f;
 }
 
 void Ship::jump()

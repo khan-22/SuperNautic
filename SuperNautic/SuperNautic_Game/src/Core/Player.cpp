@@ -47,6 +47,10 @@ void Player::update(float dt)
     {
         _ship.setTurning(_input.getLeftStickXValue());
         _ship.setAcceleration(_input.getTriggersValue());
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			_ship.jump();
+		}
     }
     else
     {
@@ -76,7 +80,7 @@ void Player::update(float dt)
 
     _ship.update(dt);
 
-    _hud.setHeat(_ship.getEngineTemperature() / 10);
+    _hud.setHeat(_ship.getEngineTemperature() / 100);
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 
