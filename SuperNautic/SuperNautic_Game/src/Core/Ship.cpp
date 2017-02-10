@@ -121,7 +121,14 @@ void Ship::update(float dt)
 		setLookAt(_facingDirection, _upDirection);
 
 		// Set up/down velocity, for now linear to distance
-		_upVelocity = _preferredHeight - ri._length;
+		if (ri._length < _preferredHeight)
+		{
+			_upVelocity = _levitationForce;
+		}
+		else
+		{
+			_upVelocity = _preferredHeight - ri._length;
+		}
 	}
 
 	// 'Rotate' mesh up direction towards 'correct' up direction
