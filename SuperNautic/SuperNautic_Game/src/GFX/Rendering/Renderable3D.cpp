@@ -1,4 +1,4 @@
-#include "Renderable3D.hpp"
+#include "GFX/Rendering/Renderable3D.hpp"
 
 using namespace GFX;
 

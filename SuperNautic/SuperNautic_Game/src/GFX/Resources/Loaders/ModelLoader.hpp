@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "Model.hpp"
+#include "GFX/Resources/Model.hpp"
 
 
 namespace GFX {

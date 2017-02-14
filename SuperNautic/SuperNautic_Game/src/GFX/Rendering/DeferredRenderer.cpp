@@ -1,4 +1,4 @@
-#include "DeferredRenderer.hpp"
+#include "GFX/Rendering/DeferredRenderer.hpp"
 
 using namespace GFX;
 

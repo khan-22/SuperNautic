@@ -1,5 +1,5 @@
-#include "PointLight.hpp"
-#include "../Log.hpp"
+#include "GFX/Lighting/PointLight.hpp"
+#include "Core/Io/Log.hpp"
 
 PointLight::PointLight(glm::vec3 position, glm::vec3 diffuseColor, GLfloat intensity)
 	: _position(position), _diffuseColor(diffuseColor),

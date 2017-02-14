@@ -1,9 +1,9 @@
-#include "ModelLoader.hpp"
+#include "GFX/Resources/Loaders/ModelLoader.hpp"
 
 #include <algorithm>
 
-#include "../Core/LoadAssetFunctions.hpp"
-#include "VertexArrayObject.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "GFX/Resources/VertexArrayObject.hpp"
 
 using namespace GFX;
 

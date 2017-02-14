@@ -1,4 +1,4 @@
-#include "Model.hpp"
+#include "GFX/Resources/Model.hpp"
 
 using namespace GFX;
 

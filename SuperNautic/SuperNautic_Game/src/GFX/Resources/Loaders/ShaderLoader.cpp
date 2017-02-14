@@ -1,8 +1,8 @@
-#include "ShaderLoader.hpp"
+#include "GFX/Resources/Loaders/ShaderLoader.hpp"
 
 #include <fstream>
 
-#include "../Log.hpp"
+#include "Core/Io/Log.hpp"
 
 using namespace GFX;
 

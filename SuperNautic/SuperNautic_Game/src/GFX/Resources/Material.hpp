@@ -5,8 +5,8 @@
 
 #include <vector>
 
-#include "../Core/Asset.hpp"
-#include "Texture.hpp"
+#include "Core/Asset/Asset.hpp"
+#include "GFX/Resources/Texture.hpp"
 
 namespace GFX
 {

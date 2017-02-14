@@ -1,5 +1,5 @@
-#include "MaterialLoader.hpp"
-#include "../Core/LoadAssetFunctions.hpp"
+#include "GFX/Resources/Loaders/MaterialLoader.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
 
 
 using namespace GFX;

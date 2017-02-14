@@ -3,7 +3,7 @@
 #ifndef MATERIAL_LOADER_HPP
 #define MATERIAL_LOADER_HPP
 
-#include "Material.hpp"
+#include "GFX/Resources/Material.hpp"
 
 namespace GFX
 {

@@ -6,7 +6,7 @@
 #include <vector>
 #include <SFML/Graphics/RenderWindow.hpp>
 
-#include "../Core/LoadAssetFunctions.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
 
 class Camera;		// Forward-decl
 

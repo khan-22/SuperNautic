@@ -1,7 +1,7 @@
-#include "ForwardRenderer.hpp"
+#include "GFX/Rendering/ForwardRenderer.hpp"
 
-#include "Renderable3D.hpp"
-#include "../Core/Camera.h"
+#include "GFX/Rendering/Renderable3D.hpp"
+#include "Core/Utility/Camera.h"
 
 using namespace GFX;
 

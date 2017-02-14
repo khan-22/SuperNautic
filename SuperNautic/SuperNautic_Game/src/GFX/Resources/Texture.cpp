@@ -1,6 +1,6 @@
-#include "Texture.hpp"
+#include "GFX/Resources/Texture.hpp"
 
-#include "../Log.hpp"
+#include "Core/Io/Log.hpp"
 
 using namespace GFX;
 

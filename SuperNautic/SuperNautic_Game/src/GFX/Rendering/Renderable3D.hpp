@@ -4,8 +4,8 @@
 #define RENDERABLE_3D_HPP
 
 #include <glm/mat4x4.hpp>
-#include "Shaders/Shader.hpp"
-#include "../Core/Camera.h"
+#include "GFX/Resources/Shader.hpp"
+#include "Core/Utility/Camera.h"
 
 namespace GFX
 {

@@ -1,4 +1,4 @@
-#include "Shader.hpp"
+#include "GFX/Resources/Shader.hpp"
 
 #include "Core/Io/Log.hpp"
 

@@ -1,4 +1,4 @@
-#include "DirLight.h"
+#include "GFX/Lighting/DirLight.h"
 
 DirLight::DirLight(glm::vec3 direction, glm::vec3 ambientColor, glm::vec3 diffuseColor, GLfloat intensity)
 	: _direction(direction), _ambientColor(ambientColor), _diffuseColor(diffuseColor), _currentIntensity(intensity)

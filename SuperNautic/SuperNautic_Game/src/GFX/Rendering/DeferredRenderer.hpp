@@ -8,7 +8,7 @@
 
 #include "Core/Asset/LoadAssetFunctions.hpp"
 #include "GFX/Lighting/PointLight.hpp"
-#include "GFX/Resources/Framebuffer.hpp"
+#include "GFX/Rendering/Framebuffer.hpp"
 
 
 namespace GFX

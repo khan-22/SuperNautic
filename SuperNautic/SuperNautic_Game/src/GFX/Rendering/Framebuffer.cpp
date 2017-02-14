@@ -1,8 +1,8 @@
-﻿#include "Framebuffer.hpp"
+﻿#include "GFX/Rendering/Framebuffer.hpp"
 
 #include <assert.h>
 
-#include "../Log.hpp"
+#include "Core/Io/Log.hpp"
 
 using namespace GFX;
 

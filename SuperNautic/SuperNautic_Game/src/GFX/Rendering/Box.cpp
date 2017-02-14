@@ -1,6 +1,6 @@
-#include "Box.hpp"
+#include "GFX/Rendering/Box.hpp"
 
-#include "../Log.hpp"
+#include "Core/Io/Log.hpp"
 
 
 using namespace GFX;

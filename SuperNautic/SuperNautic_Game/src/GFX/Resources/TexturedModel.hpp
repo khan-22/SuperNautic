@@ -3,8 +3,8 @@
 #ifndef TEXTURED_MODEL_HPP
 #define TEXTURED_MODEL_HPP
 
-#include "Renderable3D.hpp"
-#include "../Core/LoadAssetFunctions.hpp"
+#include "GFX/Rendering/Renderable3D.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
 
 namespace GFX
 {

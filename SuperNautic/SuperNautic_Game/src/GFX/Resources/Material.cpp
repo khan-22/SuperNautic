@@ -1,4 +1,4 @@
-#include "Material.hpp"
+#include "GFX/Resources/Material.hpp"
 
 
 using namespace GFX;

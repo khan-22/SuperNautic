@@ -1,4 +1,4 @@
-#include "VertexDataImporter.hpp"
+#include "GFX/Resources/Loaders/VertexDataImporter.hpp"
 
 #include <assimp/scene.h>
 #include <assimp/cimport.h>
@@ -6,7 +6,7 @@
 
 #include <glm/gtx/transform.hpp>
 
-#include "../Log.hpp"
+#include "Core/Io/Log.hpp"
 
 namespace GFX {
 

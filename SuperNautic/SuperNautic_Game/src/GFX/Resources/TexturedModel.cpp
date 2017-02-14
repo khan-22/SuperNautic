@@ -1,6 +1,6 @@
-#include <cassert>
+#include "GFX/Resources/TexturedModel.hpp"
 
-#include "TexturedModel.hpp"
+#include <cassert>
 
 using namespace GFX;
 

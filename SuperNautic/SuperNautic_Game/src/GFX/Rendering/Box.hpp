@@ -3,9 +3,9 @@
 #ifndef BOX_HPP
 #define BOX_HPP
 
-#include "Model.hpp"
-#include "Renderable3D.hpp"
-#include "../Core/Geometric Primitives/BoundingBox.hpp"
+#include "GFX/Resources/Model.hpp"
+#include "GFX/Rendering/Renderable3D.hpp"
+#include "Core/Geometry/BoundingBox.hpp"
 
 
 namespace GFX

@@ -5,8 +5,8 @@
 
 #include <vector>
 
-#include "VertexArrayObject.hpp"
-#include "Renderable3D.hpp"
+#include "GFX/Resources/VertexArrayObject.hpp"
+#include "GFX/Rendering/Renderable3D.hpp"
 
 #include <glm/gtx/transform.hpp>
 

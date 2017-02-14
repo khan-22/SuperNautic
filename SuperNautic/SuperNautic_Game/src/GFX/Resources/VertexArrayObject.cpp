@@ -1,6 +1,6 @@
-﻿#include "VertexArrayObject.hpp"
+﻿#include "GFX/Resources/VertexArrayObject.hpp"
 
-#include "../Log.hpp"
+#include "Core/Io/Log.hpp"
 
 using namespace GFX;
 

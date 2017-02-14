@@ -1,8 +1,8 @@
+#include "GFX/Rendering/SfmlRenderer.hpp"
 
 #include "SFML/Graphics/Drawable.hpp"
 #include "SFML/Graphics/RenderTarget.hpp"
 
-#include "SfmlRenderer.hpp"
 using namespace GFX;
 
 

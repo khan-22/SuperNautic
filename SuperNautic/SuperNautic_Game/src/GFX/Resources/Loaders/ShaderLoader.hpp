@@ -6,7 +6,7 @@
 #include <string>
 #include <GL/glew.h>
 
-#include "Shaders/Shader.hpp"
+#include "GFX/Resources/Shader.hpp"
 
 namespace GFX
 {
