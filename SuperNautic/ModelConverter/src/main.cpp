@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <Windows.h>
+
 #include <assimp/scene.h>
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
@@ -8,7 +10,6 @@
 
 #include <GL/glew.h>
 
-#include <Windows.h>
 
 // Globals
 HANDLE gConsoleHandle;
@@ -36,7 +37,7 @@ std::ostream& log(LogColor color)
 int main()
 {
 	// Initialize log
-	gConsoleHandle = GetStdHandle(STD_INPUT_HANDLE);
+	gConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleScreenBufferInfo(gConsoleHandle, &gPreviousState);
 	
 	// ---
@@ -47,17 +48,8 @@ int main()
 	
 	log(GREEN) << "Loaded: " << importedData->mNumMeshes << " meshes" << std::endl;
 
-	glm::vec3 test(3.f, 5.f, 5.f);
-	glm::vec3 test2(5.f, 5.f, 5.f);
-
-	std::cout << test2.y - test.x << std::endl;
-
 	aiReleaseImport(importedData);
 
-	GLfloat t = 0.f;
-
-	std::cout << t << std::endl;
-	
 	std::cin.get();
 
 	// Clean up log
