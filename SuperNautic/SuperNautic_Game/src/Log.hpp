@@ -71,7 +71,7 @@ namespace detail
 }
 
 
-#if !defined(NDEBUG)
+#if 1
 	#define LOG(...) detail::Log::getInstance()->print(__VA_ARGS__)
 	#define LOG_ERROR(...) detail::Log::getInstance()->print((strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__), " - Line: ", __LINE__, " - ", __VA_ARGS__)
 	#define CLOSE_LOG() detail::Log::close();
