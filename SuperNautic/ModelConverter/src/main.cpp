@@ -34,14 +34,29 @@ std::ostream& log(LogColor color)
 	return std::cout;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	// Initialize log
 	gConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleScreenBufferInfo(gConsoleHandle, &gPreviousState);
 	
-	// ---
+	if (argc > 1)
+	{
+		log(GREEN) << "-------- Beginning work on: " << argv[1] << " --------" << std::endl;
+		const aiScene* importedData = aiImportFile(argv[1], aiProcessPreset_TargetRealtime_MaxQuality);
 
+		log(GREEN) << "Loaded: " << importedData->mNumMeshes << " meshes" << std::endl;
+
+		aiReleaseImport(importedData);
+	}
+	else
+	{
+		log(RED) << "No file was given as input" << std::endl;
+	}
+
+	// ---
+	
+	/*
 	log(WHITE) << "Hello World! TEST" << std::endl;
 
 	const aiScene* importedData = aiImportFile("./test.fbx", aiProcessPreset_TargetRealtime_MaxQuality);
@@ -49,6 +64,7 @@ int main()
 	log(GREEN) << "Loaded: " << importedData->mNumMeshes << " meshes" << std::endl;
 
 	aiReleaseImport(importedData);
+	*/
 
 	std::cin.get();
 
