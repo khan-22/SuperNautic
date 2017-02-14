@@ -9,7 +9,7 @@
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/ApplicationState/PlayApplicationState.hpp"
-#include "Core/Asset/§AssetCache.hpp"
+#include "Core/Asset/AssetCache.hpp"
 #include "Core/Gui/GuiButton.hpp"
 #include "Core/Utility/Camera.h"
 #include "GFX/Rendering/SfmlRenderer.hpp"

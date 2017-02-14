@@ -6,7 +6,7 @@
 #include <glm/gtx/transform.hpp>
 
 
-#include "Core/World/Game.hpp"
+#include "Core/Game.hpp"
 #include "Core/Io/Log.hpp"
 #include "Core/ApplicationState/MainMenuApplicationState.hpp"
 #include "Core/Asset/LoadAssetFunctions.hpp"
@@ -15,7 +15,7 @@
 #include "Core/Track/SegmentHandler.hpp"
 #include "Core/Track/Segment.hpp"
 
-#include "GFX/Resources/LoadersVertexDataImporter.hpp"
+#include "GFX/Resources/Loaders/VertexDataImporter.hpp"
 #include "GFX/Resources/TexturedModel.hpp"
 #include "GFX/Resources/Loaders/ShaderLoader.hpp"
 #include "GFX/Rendering/Transformable3D.hpp"

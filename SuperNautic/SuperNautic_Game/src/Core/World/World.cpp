@@ -1,6 +1,6 @@
 #include "SFML/Window/Event.hpp"
 
-#include "Core/GeometryWorld.hpp"
+#include "Core/World/World.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/Track/SegmentInstance.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"

@@ -9,7 +9,7 @@
 #include "Core/Geometry/RayIntersection.hpp"
 #include "Core/Track/Segment.hpp"
 #include "Core/Asset/LoadAssetFunctions.hpp"
-#include "GFX/Renderable3D.hpp"
+#include "GFX/Rendering/Renderable3D.hpp"
 
 class SegmentInstance : public GFX::Renderable3D
 {

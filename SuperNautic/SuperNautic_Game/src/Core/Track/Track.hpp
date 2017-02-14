@@ -8,8 +8,8 @@
 #include "Core/Track/SegmentHandler.hpp"
 #include "Core/Track/Segment.hpp"
 #include "Core/Track/SegmentInstance.hpp"
-#include "GFX/DeferredRenderer.hpp"
-#include "GFX/ForwardRenderer.hpp"
+#include "GFX/Rendering/DeferredRenderer.hpp"
+#include "GFX/Rendering/ForwardRenderer.hpp"
 
 class Track
 {

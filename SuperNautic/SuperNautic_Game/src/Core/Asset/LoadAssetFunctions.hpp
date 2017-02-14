@@ -7,7 +7,7 @@
 #include "Core/Asset/AssetCache.hpp"
 #include "GFX/Resources/Loaders/VertexDataImporter.hpp"
 #include "GFX/Resources/Loaders/ShaderLoader.hpp"
-#include "GFX/Resources/Loaders/GFX/ModelLoader.hpp"
+#include "GFX/Resources/Loaders/ModelLoader.hpp"
 #include "GFX/Resources/Texture.hpp"
 #include "GFX/Resources/Material.hpp"
 

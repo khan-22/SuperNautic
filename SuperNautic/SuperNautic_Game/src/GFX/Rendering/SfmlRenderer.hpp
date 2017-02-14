@@ -6,6 +6,7 @@
 namespace sf
 {
     class Drawable;
+    class RenderTarget;
 }
 
 #include <list>
