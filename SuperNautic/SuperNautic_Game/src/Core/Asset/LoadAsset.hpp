@@ -5,7 +5,7 @@
 
 #include <memory>
 
-#include "../Log.hpp"
+#include "Core/Io/Log.hpp"
 
 template<typename AssetT, typename KeyT>
 std::shared_ptr<AssetT> loadAsset(KeyT key);

@@ -3,11 +3,11 @@
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Graphics/Text.hpp"
 
-#include "PlayApplicationState.hpp"
-#include "VictoryApplicationState.hpp"
-#include "PauseMenuApplicationState.hpp"
-#include "ApplicationStateStack.hpp"
-#include "ApplicationContext.hpp"
+#include "Core/ApplicationState/PlayApplicationState.hpp"
+#include "Core/ApplicationState/VictoryApplicationState.hpp"
+#include "Core/ApplicationState/PauseMenuApplicationState.hpp"
+#include "Core/ApplicationState/ApplicationStateStack.hpp"
+#include "Core/ApplicationState/ApplicationContext.hpp"
 
 
 PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)

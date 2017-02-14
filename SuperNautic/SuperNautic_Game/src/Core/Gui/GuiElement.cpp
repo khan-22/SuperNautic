@@ -1,4 +1,4 @@
-#include "GuiElement.hpp"
+#include "Core/Gui/GuiElement.hpp"
 
 GuiElement::GuiElement()
 : SceneNode()

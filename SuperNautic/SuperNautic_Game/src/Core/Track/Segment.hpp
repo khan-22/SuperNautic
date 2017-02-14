@@ -9,13 +9,14 @@
 #include <memory>
 
 #include "glm/glm.hpp"
+
 #include "Core/Asset/LoadAssetFunctions.hpp"
-#include "GFX/Resources/TexturedModel.hpp"
 #include "Core/Geometry/AABB.hpp"
 #include "Core/Geometry/BoundingBox.hpp"
 #include "Core/Geometry/RayIntersection.hpp"
 #include "Core/Geometry/Ray.hpp"
-#include "SegmentInfo.hpp"
+#include "Core/Track/SegmentInfo.hpp"
+#include "GFX/Resources/TexturedModel.hpp"
 
 struct WaypointInfo
 {

@@ -6,23 +6,19 @@
 #include "SFML/Window.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
 
-#include "ApplicationStateStack.hpp"
-#include "ApplicationContext.hpp"
-
-#include "Player.hpp"
-
-#include "LoadAssetFunctions.hpp"
-#include "../GFX/ForwardRenderer.hpp"
-#include "../GFX/DeferredRenderer.hpp"
-#include "../GFX/TexturedModel.hpp"
-
-#include "DebugCamera.hpp"
-#include "Track\Track.hpp"
-#include "Track\SegmentHandler.hpp"
-#include "WorldAudio.hpp"
-
-#include "Track/SegmentHandler.hpp"
-#include "Track/Segment.hpp"
+#include "Core/ApplicationState/ApplicationStateStack.hpp"
+#include "Core/ApplicationState/ApplicationContext.hpp"
+#include "Core/World/Player.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "Core/Utility/DebugCamera.hpp"
+#include "Core/Audio/WorldAudio.hpp"
+#include "Core/Track/Track.hpp"
+#include "Core/Track/SegmentHandler.hpp"
+#include "Core/Track/SegmentHandler.hpp"
+#include "Core/Track/Segment.hpp"
+#include "GFX/Rendering/ForwardRenderer.hpp"
+#include "GFX/Rendering/DeferredRenderer.hpp"
+#include "GFX/Resources/TexturedModel.hpp"
 
 #include <vector>
 

@@ -1,8 +1,8 @@
 #include "glm/glm.hpp"
 
-#include "CollisionUtility.hpp"
-#include "Geometric Primitives/Sphere.hpp"
-#include "Geometric Primitives/BoundingBox.hpp"
+#include "Core/Utility/CollisionUtility.hpp"
+#include "Core/Geometry/Sphere.hpp"
+#include "Core/Geometry/BoundingBox.hpp"
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b);
 

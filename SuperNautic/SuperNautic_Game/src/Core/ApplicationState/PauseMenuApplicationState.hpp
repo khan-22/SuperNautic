@@ -5,10 +5,10 @@
 
 #include "SFML/Graphics/Font.hpp"
 
-#include "ApplicationState.hpp"
-#include "Asset.hpp"
-#include "GuiContainer.hpp"
-#include "Input.hpp"
+#include "Core/ApplicationState/ApplicationState.hpp"
+#include "Core/Asset/Asset.hpp"
+#include "Core/Gui/GuiContainer.hpp"
+#include "Core/Io/Input.hpp"
 
 class PauseMenuApplicationState : public ApplicationState
 {

@@ -1,11 +1,11 @@
 #include <SFML\Window\Joystick.hpp>
 #include <SFML\Window\Event.hpp>
 
-#include "Input.hpp"
 
-#include "../Log.hpp"
+#include "Core/Io/Log.hpp"
+#include "Core/Io/Input.hpp"
 
-Input::Input() : 
+Input::Input() :
 	_controllerId(0),
 	_bLeftStickDormant(true),
 	_bAWasDormant(true),

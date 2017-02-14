@@ -1,12 +1,12 @@
-#include "Log.hpp"
-
 #include <GL/glew.h>
+
+#include "Core/Io/Log.hpp"
 
 detail::Log* detail::Log::_instance = nullptr;
 
 detail::Log::Log()
 {
-	
+
 }
 
 detail::Log::~Log()

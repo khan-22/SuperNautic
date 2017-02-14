@@ -3,8 +3,8 @@
 #ifndef ASSET_CACHE_HPP
 #define ASSET_CACHE_HPP
 
-#include "Asset.hpp"
 #include <map>
+#include "Core/Asset/Asset.hpp"
 
 template<typename AssetT, typename KeyT>
 class AssetCache
@@ -18,6 +18,6 @@ private:
     static Asset<AssetT> load(KeyT key);
 };
 
-#include "AssetCache.inl"
+#include "Core/Asset/AssetCache.inl"
 
 #endif //ASSET_CACHE_HPP

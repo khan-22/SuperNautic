@@ -3,8 +3,8 @@
 #include <limits>
 #include <map>
 
-#include "../Segment.hpp"
-#include "../../../Log.hpp"
+#include "Core/Track/Segment.hpp"
+#include "Core/Io/Log.hpp"
 
 // Static constants declared in Segment.hpp
 const std::string Segment::baseVisualName					{ "VM" };
@@ -30,7 +30,7 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 	// Get the scene data asset
 	_scene = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_dataFileName);
 
-	// Get visual model asset 
+	// Get visual model asset
 	_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get("test3pipe.mat"));
 		//ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_visualFileName);
 
@@ -122,7 +122,7 @@ const RayIntersection Segment::rayIntersectionTest(const Ray& ray) const
 					return intersection;
 				}
 			}
-			
+
 			// Remove checked box from map
 			boxesToTest.erase(boxesToTest.begin());
 		}
@@ -246,13 +246,13 @@ void Segment::assignMeshPointers()
 			trailingNumber = atoi(trailingNumberString.data());
 		}
 
-		// If currentName is equal to a name mapped to a mesh index, 
+		// If currentName is equal to a name mapped to a mesh index,
 		// set the current mesh to appropriate class member
 		if (nameToIndex.find(currentName) != nameToIndex.end())
 		{
 			this->*nameToIndex[currentName] = i;
 		}
-		// If currentName is equal to a name mapped to a vector<aiMesh*>, 
+		// If currentName is equal to a name mapped to a vector<aiMesh*>,
 		// add the current mesh to the appropriate class member vector
 		else if (nameToVecIndex.find(currentName) != nameToVecIndex.end())
 		{
@@ -305,7 +305,7 @@ void Segment::createBoundingBoxes()
 			LOG_ERROR("A bounding box mesh was not a box");
 			continue;
 		}
-		
+
 		BoundingBox box {};
 
 		// Get middle of box
@@ -532,10 +532,10 @@ void Segment::createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions)
 	_octTree._maxCorner = max;
 
 	// Will contain indices into vertices/faces vectors of models
-	// [0]..[_temperatureZoneCollisions.size()] is zone collisions, [_temperatureZoneCollisions.size()] is base collision 
+	// [0]..[_temperatureZoneCollisions.size()] is zone collisions, [_temperatureZoneCollisions.size()] is base collision
 	std::vector<std::vector<unsigned>> vertexIndices;
 	std::vector<std::vector<unsigned>> faceIndices;
-	
+
 	// Fill indices
 	for (size_t i = 0; i <= _temperatureZoneCollisions.size(); ++i)
 	{
@@ -574,7 +574,7 @@ void Segment::createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions)
 			faceIndices[i].push_back(j);
 		}
 	}
-	
+
 	// Subdivide
 	subdivideOctTree(_octTree, maxFacesPerBox, maxSubdivisions, std::move(vertexIndices), std::move(faceIndices));
 }
@@ -686,7 +686,7 @@ void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxS
 
 		if (i < vertexIndices.size() - 1)
 		{
-			currentModel = _temperatureZoneCollisions[i]; 
+			currentModel = _temperatureZoneCollisions[i];
 		}
 		else
 		{

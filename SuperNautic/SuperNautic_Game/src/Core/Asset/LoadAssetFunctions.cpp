@@ -1,25 +1,14 @@
-// EXAMPLE THING.
-// TODO: Talk Karl/Toby through about this.
-
-#include "LoadAsset.hpp"
-
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Image.hpp>
 
-#include "../GFX/VertexDataImporter.hpp"
-#include "../GFX/ShaderLoader.hpp"
-#include "../GFX/ModelLoader.hpp"
-#include "../GFX/Texture.hpp"
-#include "../GFX/MaterialLoader.hpp"
-
-
-struct Mesh
-{
-
-};
-
+#include "Core/Asset/LoadAsset.hpp"
+#include "GFX/Resources/Loaders/VertexDataImporter.hpp"
+#include "GFX/Resources/Loaders/ShaderLoader.hpp"
+#include "GFX/Resources/Loaders/ModelLoader.hpp"
+#include "GFX/Resources/Loaders/MaterialLoader.hpp"
+#include "GFX/Resources/Texture.hpp"
 
 // Load raw mesh/vertex data
 template<>

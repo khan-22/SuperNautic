@@ -1,4 +1,4 @@
-#include "SegmentInfo.hpp"
+#include "Core/Track/SegmentInfo.hpp"
 
 //Constructor
 SegmentInfo::SegmentInfo(std::string&& dataFileName, std::string&& visualFileName

@@ -3,13 +3,13 @@
 #ifndef LOAD_ASSET_FUNCTIONS_HPP
 #define LOAD_ASSET_FUNCTIONS_HPP
 
-#include "AssetCache.hpp"
 
-#include "../GFX/VertexDataImporter.hpp"
-#include "../GFX/ShaderLoader.hpp"
-#include "../GFX/ModelLoader.hpp"
-#include "../GFX/Texture.hpp"
-#include "../GFX/Material.hpp"
+#include "Core/Asset/AssetCache.hpp"
+#include "GFX/Resources/Loaders/VertexDataImporter.hpp"
+#include "GFX/Resources/Loaders/ShaderLoader.hpp"
+#include "GFX/Resources/Loaders/GFX/ModelLoader.hpp"
+#include "GFX/Resources/Texture.hpp"
+#include "GFX/Resources/Material.hpp"
 
 using RawMeshCache	= AssetCache<GFX::RawMeshCollection, std::string>;
 using ShaderCache	= AssetCache<GFX::Shader, std::string>;

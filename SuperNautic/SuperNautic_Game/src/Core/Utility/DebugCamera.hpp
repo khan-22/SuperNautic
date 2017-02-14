@@ -4,7 +4,7 @@
 
 #include <SFML\Window.hpp>
 
-#include "Camera.h"
+#include "Core/Utility/Camera.h"
 
 class DebugCamera : public Camera
 {

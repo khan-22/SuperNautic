@@ -1,8 +1,8 @@
 #include <fstream>
 #include <limits>
 
-#include "../SegmentHandler.hpp"
-#include "../../../Log.hpp"
+#include "Core/Track/SegmentHandler.hpp"
+#include "Core/Io/Log.hpp"
 
 // Path to res\models
 std::string SegmentHandler::basePath = "res/models/";

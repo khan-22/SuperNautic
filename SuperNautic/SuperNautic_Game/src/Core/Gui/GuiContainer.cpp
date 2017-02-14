@@ -5,8 +5,8 @@
 #include "SFML/Window/Event.hpp"
 
 
-#include "GuiContainer.hpp"
-#include "GuiElement.hpp"
+#include "Core/Gui/GuiContainer.hpp"
+#include "Core/Gui/GuiElement.hpp"
 
 
 GuiContainer::GuiContainer()

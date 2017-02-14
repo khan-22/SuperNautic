@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "glm\vec3.hpp"
-#include "Ray.hpp"
-#include "RayIntersection.hpp"
+#include "Core/Geometry/Ray.hpp"
+#include "Core/Geometry/RayIntersection.hpp"
 
 // Axis aligned bounding box used for oct-tree
 struct AABB
@@ -16,7 +16,7 @@ struct AABB
 	std::vector<AABB>					_children;
 
 	// Will contain indices into face vectors of models
-	// [0]..[_temperatureZoneCollisions.size()] is zone collisions, [_temperatureZoneCollisions.size()] is base collision 
+	// [0]..[_temperatureZoneCollisions.size()] is zone collisions, [_temperatureZoneCollisions.size()] is base collision
 	std::vector<std::vector<unsigned>> faceIndices;
 
 	// Positions of max and min corners of this box
