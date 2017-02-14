@@ -1,5 +1,6 @@
 #include <glm\gtx\transform.hpp>
 #include <time.h>
+#include <assert.h>
 
 #include "Track.hpp"
 #include "../../Log.hpp"
@@ -9,12 +10,14 @@
 
 // Default constructor (private)
 Track::Track()
+	: _endMargin(500)
 {
-	//Nothing
+
 }
 
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler)
+	: _endMargin(500)
 {
 	_segmentHandler = segmentHandler;
 	_endMatrix = glm::mat4();
@@ -42,15 +45,10 @@ int Track::getGeneratedLength() const
 }
 
 // Sets the track length in whole meters
-bool Track::setLength(const int length)
+void Track::setLength(const unsigned int length)
 {
-	if (length >= 3000 && length <= 100000)
-	{
-		_targetLength = length;
-		return true;
-	}
-	LOG_ERROR("Track not long enough!!!");
-	return false;
+	assert(length >= 3000 && length <= 100000);
+	_targetLength = length;
 }
 
 // Set randomization seed
@@ -76,41 +74,53 @@ bool Track::generate()
 	{
 		insertNormalSegment(0, totalLength, false);
 	}
-	char end = 'a';
+
+	char endConnection = 'a';
 	bool lighting = true;
 	int prevIndex = -1;
 	// Create random path
-	while (totalLength < _targetLength - 500 && end == 'a')
+	while (totalLength < _targetLength - _endMargin)
 	{
 		// Randomize segment index
 		int index;
 		int inRow;
 		do
 		{
-			index = getIndex(end);
+			index = getIndex(endConnection);
 			if (index == -1)
 			{
-				LOG_ERROR("WARNING! Something went wrong with the track generation! Not enough connections of type '", end, "'.");
+				LOG_ERROR("WARNING! Something went wrong with the track generation! Not enough connections of type '", endConnection, "'?");
 			}
 		} while (index == prevIndex);
-		// Randomize nr of same segment type in row
-		inRow = getInRow(index);
-		// Instanciate the segment(s)
-		bool collided = false;
-		for (unsigned int i = 0; i < inRow; i++)
+		// Normal segment placement
+		if (index < _segmentHandler->infos().size())
 		{
-			insertNormalSegment(index, totalLength, false);
-			//insertStructure(0, totalLength);
-			/*if (!insertNormalSegment(index, totalLength, true))
+			// Randomize nr of same segment type in a row
+			inRow = getInRow(index);
+			// Instanciate the segment(s)
+			bool collided = false;
+			for (unsigned int i = 0; i < inRow; i++)
 			{
-				deleteSegments(totalLength, 200);
-				_endMatrix = _track.back()->getModelMatrix() * _track[_track.size() - 1]->getEndMatrix();
-				collided = true;
-				break;
-			}*/
+				insertNormalSegment(index, totalLength, false);
+				//insertStructure(0, totalLength);
+				/*if (!insertNormalSegment(index, totalLength, true))
+				{
+					deleteSegments(totalLength, 200);
+					_endMatrix = _track.back()->getModelMatrix() * _track[_track.size() - 1]->getEndMatrix();
+					collided = true;
+					break;
+				}*/
+			}
 		}
+		// Structures
+		else
+		{
+			insertStructure(index - _segmentHandler->infos().size(), totalLength);
+		}
+		endConnection = _track[_track.size() - 1]->getParent()->getEnd();
 		prevIndex = _track[_track.size() - 1]->getIndex();
 	}
+
 	// Make the final stretch straight
 	while (totalLength < _targetLength)
 	{
@@ -133,16 +143,23 @@ SegmentInstance* Track::getInstance(int index)
 }
 
 // Returns a random index based on connection type
-int Track::getIndex(char & connectionType) const
+int Track::getIndex(char connectionType) const
 {
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
 	// Finding valid segments based on connection type
 	std::vector<int> validSegments = std::vector<int>();
-	for (unsigned int i = 0; i < infos.size(); i++)
+	for (size_t i = 0; i < infos.size(); i++)
 	{
 		if (infos[i]._startConnection == connectionType)
 		{
 			validSegments.push_back(i);
+		}
+	}
+	for (size_t i = 0; i < _segmentHandler->getNrOfStructures(); i++)
+	{
+		if (infos[_segmentHandler->getStructure(i)->pieces[0]->index]._startConnection == connectionType)
+		{
+			validSegments.push_back(infos.size() + i);
 		}
 	}
 	if (validSegments.size() < 2)
@@ -153,20 +170,40 @@ int Track::getIndex(char & connectionType) const
 	unsigned int totalProbability = 0;
 	for (unsigned int i = 0; i < validSegments.size(); i++)
 	{
-		totalProbability += infos[validSegments[i]]._probability;
+		if (validSegments[i] < infos.size())
+		{
+			totalProbability += infos[validSegments[i]]._probability;
+		}
+		else
+		{
+			totalProbability += _segmentHandler->getStructure(i - infos.size())->probability;
+		}
 	}
-	// Randomizing and finding corresponding segment
+	// Randomizing and finding the corresponding segment
 	int r = rand() % totalProbability;
 	int tested = 0;
 	for (unsigned int i = 0; i < validSegments.size(); i++)
 	{
-		int test = infos[validSegments[i]]._probability;
-		if (r - tested < test)
+		if (validSegments[i] < infos.size())
 		{
-			connectionType = infos[validSegments[i]]._endConnection;
-			return i;
+
+			int test = infos[validSegments[i]]._probability;
+			if (r - tested < test)
+			{
+				//connectionType = infos[validSegments[i]]._endConnection;
+				return i;
+			}
+			tested += test;
 		}
-		tested += test;
+		else
+		{
+			int test = _segmentHandler->getStructure(i - infos.size())->probability;
+			if (r - tested < test)
+			{
+				return i;
+			}
+			tested += test;
+		}
 	}
 	return -1;
 }
@@ -179,6 +216,95 @@ int Track::getInRow(int index) const
 	int max = infos[index]._maxInRow;
 	double scaled = (double)rand() / RAND_MAX;
 	return (max - min + 1) * scaled + min;
+}
+
+// Inserts a segment with given index at the end of the track
+bool Track::insertNormalSegment(const int index, int & length, bool testCollision)
+{
+	const Segment * segment = _segmentHandler->loadSegment(index);
+	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+	if (testCollision)
+	{
+		for (unsigned int i = 0; i < _track.size() - 2; i++)
+		{
+			if (tempInstance->bTestCollision(*_track[i]))
+			{
+				delete tempInstance;
+				return false;
+			}
+		}
+	}
+	glm::mat4 modelEndMat = segment->getEndMatrix();
+	int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
+	int maxRotOffset = segment->getRotationOffset() / angle;
+	float rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
+	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
+	_endMatrix = _endMatrix * modelEndMat * rotMat;
+	length += segment->getLength();
+	_track.push_back(tempInstance);
+	return true;
+}
+
+// Inserts a whole pre-defined structure at the end of the track
+void Track::insertStructure(const int index, int & length)
+{
+	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
+	// Randomize how many times the structure should be looped
+	int min = s->minInRow;
+	int max = s->maxInRow;
+	double scaled = (double)rand() / RAND_MAX;
+	int amount = (max - min + 1) * scaled + min;
+	// Determine and randomize if there should be "negative" rotation
+	int rotationDir = 1;
+	if (s->bAllowNegativRot)
+	{
+		if (rand() % 2 == 0)
+		{
+			rotationDir = -1;
+		}
+	}
+	// Amount of "loops"
+	for (unsigned int i = 0; i < amount; i++)
+	{
+		// Amount of pieces in each "loop"
+		for (unsigned int j = 0; j < s->pieces.size(); j++)
+		{
+			const SegmentHandler::StructurePiece * p = s->pieces[j];
+			const Segment * segment = _segmentHandler->loadSegment(p->index);
+			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+			glm::mat4 modelEndMat = segment->getEndMatrix();
+			int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
+			// Randomize angle from structure info
+			int minRot = p->minRotation / angle;
+			int maxRot = p->maxRotation / angle;
+			double scaled = (double)rand() / RAND_MAX;
+			float rotVal = ((maxRot - minRot) * scaled + minRot) * angle;
+			// Finalizing
+			glm::mat4 rotMat = glm::rotate(glm::radians(rotVal * rotationDir), glm::vec3(0, 0, 1));
+			_endMatrix = _endMatrix * modelEndMat * rotMat;
+			length += segment->getLength();
+			_track.push_back(tempInstance);
+
+			// Terminating if target length is approaching
+			if (length > _targetLength - _endMargin)
+			{
+				return;
+			}
+		}
+	}
+}
+
+void Track::deleteSegments(int & totalLength, const int lengthToDelete)
+{
+	int deletedLength = 0;
+	while (deletedLength <= lengthToDelete && totalLength > 500)
+	{
+		int segmentLength = _track[_track.size() - 1]->getLength();
+		deletedLength += segmentLength;
+		totalLength -= segmentLength;
+		delete _track[_track.size() - 1];
+		_track.erase(_track.begin() + _track.size() - 1);
+	}
 }
 
 glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex)
@@ -240,75 +366,5 @@ void Track::render(GFX::DeferredRenderer& renderer)
 	for (unsigned i = 0; i < _track.size(); ++i)
 	{
 		renderer.render(*_track[i]);
-	}
-}
-
-// Inserts a segment with given index at the end of the track
-bool Track::insertNormalSegment(const int index, int & length, bool testCollision)
-{
-	const Segment * segment = _segmentHandler->loadSegment(index);
-	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
-	if (testCollision)
-	{
-		for (unsigned int i = 0; i < _track.size() - 2; i++)
-		{
-			if (tempInstance->bTestCollision(*_track[i]))
-			{
-				delete tempInstance;
-				return false;
-			}
-		}
-	}
-	glm::mat4 modelEndMat = segment->getEndMatrix();
-	int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
-	int maxRotOffset = segment->getRotationOffset() / angle;
-	float rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
-	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
-	_endMatrix = _endMatrix * modelEndMat * rotMat;
-	length += segment->getLength();
-	_track.push_back(tempInstance);
-	return true;
-}
-
-void Track::insertStructure(const int index, int & length)
-{
-	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
-	int min = s->minInRow;
-	int max = s->maxInRow;
-	double scaled = (double)rand() / RAND_MAX;
-	int amount = (max - min + 1) * scaled + min;
-	for (unsigned int i = 0; i < amount; i++)
-	{
-		for (unsigned int j = 0; j < s->pieces.size(); j++)
-		{
-			const SegmentHandler::StructurePiece * p = s->pieces[j];
-			const Segment * segment = _segmentHandler->loadSegment(p->index);
-			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
-			glm::mat4 modelEndMat = segment->getEndMatrix();
-			int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
-
-			int minRot = p->minRotation / angle;
-			int maxRot = p->maxRotation / angle;
-			double scaled = (double)rand() / RAND_MAX;
-			float rotVal = ((maxRot - minRot) * scaled + minRot) * angle;
-
-			glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
-			_endMatrix = _endMatrix * modelEndMat * rotMat;
-			length += segment->getLength();
-			_track.push_back(tempInstance);
-		}
-	}
-}
-
-void Track::deleteSegments(int & totalLength, const int lengthToDelete)
-{
-	int deletedLength = 0;
-	while (deletedLength <= lengthToDelete && totalLength > 300)
-	{
-		int segmentLength = _track[_track.size() - 1]->getLength();
-		deletedLength += segmentLength;
-		totalLength -= segmentLength;
-		delete _track[_track.size() - 1];
-		_track.erase(_track.begin() + _track.size() - 1);
 	}
 }

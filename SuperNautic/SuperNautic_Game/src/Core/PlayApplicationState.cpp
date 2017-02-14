@@ -24,7 +24,7 @@ bool PlayApplicationState::bRender()
 
 bool PlayApplicationState::bUpdate(float dtSeconds)
 {
-    _world.update(dtSeconds);
+    _world.update(dtSeconds, _context.window);
     return true;
 }
 

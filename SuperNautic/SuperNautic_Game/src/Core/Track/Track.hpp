@@ -18,7 +18,7 @@ public:
 	virtual ~Track();
 	int getTargetLength() const;
 	int getGeneratedLength() const;
-	bool setLength(const int length);
+	void setLength(const unsigned int length);
 	void setSeed(const unsigned int seed);
 	bool generate();
 	int getNrOfSegments() const;
@@ -31,7 +31,7 @@ public:
 
 private:
 	Track();
-	int getIndex(char & connectionType) const;
+	int getIndex(char connectionType) const;
 	int getInRow(const int index) const;
 	bool insertNormalSegment(const int index, int & length, bool testCollision);
 	void insertStructure(const int index, int & length);
@@ -39,6 +39,7 @@ private:
 	
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance*>	_track;
+	const int						_endMargin;
 	int								_targetLength;
 	int								_generatedLength;
 	unsigned int					_seed;
