@@ -6,10 +6,10 @@
 #include <vector>
 #include <SFML/Graphics/RenderWindow.hpp>
 
-#include "../Core/LoadAssetFunctions.hpp"
-#include "PointLight.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "GFX/Lighting/PointLight.hpp"
+#include "GFX/Resources/Framebuffer.hpp"
 
-#include "Framebuffer.hpp"
 
 namespace GFX
 {

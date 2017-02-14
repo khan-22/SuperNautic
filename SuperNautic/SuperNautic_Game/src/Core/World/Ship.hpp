@@ -3,13 +3,13 @@
 #ifndef SHIP_HPP
 #define SHIP_HPP
 
-#include "../GFX/Transformable3D.hpp"
-#include "Utility/Utilities.hpp"
-#include "Track/Segment.hpp"
-#include "LoadAssetFunctions.hpp"
-#include "../GFX/TexturedModel.hpp"
-#include "Track/SegmentInstance.hpp"
-#include "../GFX/Renderable3D.hpp"
+#include "Core/Utility/Utilities.hpp"
+#include "Core/Track/Segment.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "Core/Track/SegmentInstance.hpp"
+#include "GFX/Rendering/Transformable3D.hpp"
+#include "GFX/Resources/TexturedModel.hpp"
+#include "GFX/Rendering/Renderable3D.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 {
@@ -32,8 +32,8 @@ public:
 	}
 
 	// [-1..1]
-	void setAcceleration(float accelerationFactor) 
-	{ 
+	void setAcceleration(float accelerationFactor)
+	{
 		_accelerationFactor = clamp(accelerationFactor, -1.0f, 1.0f);
 	}
 

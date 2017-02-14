@@ -10,9 +10,9 @@
 #include <SFML\Graphics\Texture.hpp>
 #include <SFML\Graphics\RectangleShape.hpp>
 
-#include "SceneNode.hpp"
+#include "Core/Gui/SceneNode.hpp"
+#include "Core/Asset/Asset.hpp"
 
-#include "Asset.hpp"
 
 class HUD : public SceneNode
 {

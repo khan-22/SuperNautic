@@ -5,7 +5,7 @@
 
 #include <SFML\Audio.hpp>
 
-#include "Asset.hpp"
+#include "Core/Asset/Asset.hpp"
 
 class PlayerAudio
 {

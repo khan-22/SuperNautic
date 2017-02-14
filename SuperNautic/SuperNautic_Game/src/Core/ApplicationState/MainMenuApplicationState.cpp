@@ -4,14 +4,14 @@
 #include "SFML/Graphics/Text.hpp"
 #include "SFML/Window/Event.hpp"
 
-#include "MainMenuApplicationState.hpp"
-#include "ApplicationStateStack.hpp"
-#include "ApplicationContext.hpp"
-#include "AssetCache.hpp"
-#include "GuiButton.hpp"
-#include "../GFX/SfmlRenderer.hpp"
-#include "Camera.h"
-#include "PlayApplicationState.hpp"
+#include "Core/ApplicationState/MainMenuApplicationState.hpp"
+#include "Core/ApplicationState/ApplicationStateStack.hpp"
+#include "Core/ApplicationState/ApplicationContext.hpp"
+#include "Core/ApplicationState/PlayApplicationState.hpp"
+#include "Core/Asset/AssetCache.hpp"
+#include "Core/Gui/GuiButton.hpp"
+#include "Core/Utility/Camera.h"
+#include "GFX/Rendering/SfmlRenderer.hpp"
 
 
 MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack, ApplicationContext& context)

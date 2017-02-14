@@ -3,8 +3,8 @@
 #ifndef PLAY_APPLICATION_STATE_HPP
 #define PLAY_APPLICATION_STATE_HPP
 
-#include "ApplicationState.hpp"
-#include "World.hpp"
+#include "Core/ApplicationState/ApplicationState.hpp"
+#include "Core/World/World.hpp"
 
 class PlayApplicationState : public ApplicationState
 {

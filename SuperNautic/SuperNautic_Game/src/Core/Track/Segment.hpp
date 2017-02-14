@@ -9,12 +9,12 @@
 #include <memory>
 
 #include "glm/glm.hpp"
-#include "../LoadAssetFunctions.hpp"
-#include "../../GFX/TexturedModel.hpp"
-#include "../Geometric Primitives/AABB.hpp"
-#include "../Geometric Primitives/BoundingBox.hpp"
-#include "../Geometric Primitives/RayIntersection.hpp"
-#include "../Geometric Primitives/Ray.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "GFX/Resources/TexturedModel.hpp"
+#include "Core/Geometry/AABB.hpp"
+#include "Core/Geometry/BoundingBox.hpp"
+#include "Core/Geometry/RayIntersection.hpp"
+#include "Core/Geometry/Ray.hpp"
 #include "SegmentInfo.hpp"
 
 struct WaypointInfo

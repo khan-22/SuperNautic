@@ -2,9 +2,9 @@
 #include <time.h>
 
 #include "Track.hpp"
-#include "../../Log.hpp"
+#include "Core/Io/Log.hpp"
 #include "SegmentInfo.hpp"
-#include "../../GFX/Model.hpp"
+#include "GFX/Model.hpp"
 #include "Segment.hpp"
 
 // Default constructor (private)
@@ -230,7 +230,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 
 	// Find [0..1], 0 = ship is at behind waypoint, 1 = ship is at ahead waypoint
 	float dist = glm::dot(glm::normalize(betweenWaypoints), (globalPosition - behindPos)) / glm::length(betweenWaypoints);
-	
+
 	// Find forward vector, change to proper rotation?
 	return glm::vec3{ glm::normalize(behindDir * (1.0f - dist) + aheadDir * dist) };
 }

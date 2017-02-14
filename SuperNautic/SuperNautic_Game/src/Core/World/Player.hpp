@@ -5,11 +5,11 @@
 
 #include <SFML\Window\Event.hpp>
 
-#include "Input.hpp"
-#include "Ship.hpp"
-#include "HUD.hpp"
-#include "PlayerAudio.hpp"
-#include "../GFX/DeferredRenderer.hpp"
+#include "Core/Io/Input.hpp"
+#include "Core/Gui/HUD.hpp"
+#include "Core/Audio/PlayerAudio.hpp"
+#include "Core/World/Ship.hpp"
+#include "GFX/Rendering/DeferredRenderer.hpp"
 
 class Player
 {
