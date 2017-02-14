@@ -1,5 +1,6 @@
 #include <glm\gtx\transform.hpp>
 #include "glm/gtx/norm.hpp"
+#include "glm/gtx/rotate_vector.hpp"
 #include <time.h>
 
 #include "Track.hpp"
@@ -100,15 +101,15 @@ bool Track::generate()
 		bool collided = false;
 		for (unsigned int i = 0; i < inRow; i++)
 		{
-			insertNormalSegment(index, totalLength, false);
+			//insertNormalSegment(index, totalLength, false);
 			//insertStructure(0, totalLength);
-			/*if (!insertNormalSegment(index, totalLength, true))
+			if (!insertNormalSegment(index, totalLength, true))
 			{
 				deleteSegments(totalLength, 200);
 				_endMatrix = _track.back()->getModelMatrix() * _track[_track.size() - 1]->getEndMatrix();
 				collided = true;
 				break;
-			}*/
+			}
 		}
 		prevIndex = _track[_track.size() - 1]->getIndex();
 	}
@@ -155,24 +156,9 @@ void Track::generateObstacles()
         float remainderDepth = targetDepth - depth;
 
         glm::vec3 rayStart = waypoints[distanceIndex] + finalDistance * (remainderDepth / finalDistanceLength);
-
-        glm::vec3 planeNormal = finalDistance / finalDistanceLength;
-
-        // ax + by + bz + d = 0
-        float d = -glm::dot(planeNormal, rayStart);
-
-        // Generate random point on plane.
-        float xModifier = std::fabs(planeNormal.x) > 0.001f ? 1.f : 0.f;
-        float yModifier = std::fabs(planeNormal.y) > 0.001f ? 1.f : 0.f;
-        glm::vec3 planePoint;
-        do
-        {
-            planePoint.x = float(rand() % 1000 - 500) * xModifier;
-            planePoint.y = float(rand() % 1000 - 500) * yModifier;
-            planePoint.z = -(d + planeNormal.x * planePoint.x + planeNormal.y * planePoint.y) / planeNormal.z;
-        } while(glm::distance2(planePoint, rayStart) > 0.01f);
-
-        glm::vec3 rayDirection = glm::normalize(planePoint - rayStart);
+        glm::vec3 rayDirection = glm::vec3(0.f, -finalDistance.z, finalDistance.y);
+        rayDirection = glm::rotate(rayDirection, float(rand() % 360), finalDistance);
+        rayDirection = glm::normalize(rayDirection);
 
         Ray ray(rayStart, rayDirection, 100.f);
         RayIntersection intersection = segment->getParent()->rayIntersectionTest(ray);
@@ -182,13 +168,13 @@ void Track::generateObstacles()
 
         BoundingBox box;
         box.center = segment->getModelMatrix() * glm::vec4(intersection._position, 1.f);
-        box.directions =
-        {
-            glm::vec3(1.f, 0.f, 0.f),
-            glm::vec3(0.f, 1.f, 0.f),
-            glm::vec3(0.f, 0.f, 1.f)
-        };
+        intersection._normal = segment->getModelMatrix() * glm::vec4(intersection._normal, 0.f);
+        box.directions[0] = intersection._normal;
+        box.directions[1] = glm::normalize(glm::vec3(0.f, -intersection._normal.z, intersection._normal.y));
+        box.directions[2] = glm::cross(box.directions[0], box.directions[1]);
+
         box.halfLengths = {1.f, 1.f, 1.f};
+        box.center += box.directions[0] * box.halfLengths[0];
 
         _obstacles.emplace_back(box);
     }
@@ -302,7 +288,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 
 	// Find [0..1], 0 = ship is at behind waypoint, 1 = ship is at ahead waypoint
 	float dist = glm::dot(glm::normalize(betweenWaypoints), (globalPosition - behindPos)) / glm::length(betweenWaypoints);
-	
+
 	// Find forward vector, change to proper rotation?
 	return glm::vec3{ glm::normalize(behindDir * (1.0f - dist) + aheadDir * dist) };
 }
