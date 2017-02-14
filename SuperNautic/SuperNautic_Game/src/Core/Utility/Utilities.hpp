@@ -27,4 +27,12 @@ inline T clamp(T value, T low, T high)
 	return value;
 }
 
+// True if two vectors are almost equal
+inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2)
+{
+	return (0.0001f > abs(vector1.x - vector2.x)) &&
+		(0.0001f > abs(vector1.y - vector2.y)) &&
+		(0.0001f > abs(vector1.z - vector2.z));
+}
+
 #endif

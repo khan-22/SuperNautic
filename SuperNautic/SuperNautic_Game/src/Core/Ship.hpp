@@ -10,58 +10,39 @@
 #include "../GFX/TexturedModel.hpp"
 #include "Track/SegmentInstance.hpp"
 #include "../GFX/Renderable3D.hpp"
+#include "Utility/SpringRotatedVector.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 {
 public:
+	GFX::TexturedModel _shipModel;
+
 	Ship();
 	Ship(glm::vec3 position);
 
 	void render(GFX::RenderStates& states) override;
 	void update(float dt);
 
-	void start() { _stopped = false; }
-	void stop() { _stopped = true; }
-	void destroy() { _destroyed = true; }
-	void repair() { _destroyed = false; }
+	void start();
+	void stop();
+	void destroy();
+	void repair();
 
 	// [-1..1]
-	void setTurning(float turnFactor)
-	{
-		_turningFactor = clamp(turnFactor, -1.0f, 1.0f);
-	}
-
+	void setTurning(float turnFactor);
 	// [-1..1]
-	void setAcceleration(float accelerationFactor) 
-	{ 
-		_accelerationFactor = clamp(accelerationFactor, -1.0f, 1.0f);
-	}
-
+	void setAcceleration(float accelerationFactor);
 	// [0..1]
-	float getEngineTemperature()
-	{
-		return _engineTemperature;
-	}
-
-	float getSpeed()
-	{
-		return _velocity;
-	}
-
+	float getEngineTemperature();
+	float getSpeed();
 	// Sets the direction that counts as forward
-	void setForward(glm::vec3& forwardDirection)
-	{
-		_trackForward = forwardDirection;
-	}
-
+	void setForward(glm::vec3& forwardDirection);
+	glm::vec3 getCameraUp();
 	void jump();
+	void setSegments(std::vector<SegmentInstance*> segments);
+	// Indicates where to return to if ship has escaped track
+	void setReturnPos(glm::vec3& returnPos);
 
-	void setSegments(std::vector<SegmentInstance*> segments)
-	{
-		_segmentsToTest = segments;
-	}
-
-	GFX::TexturedModel _shipModel;
 
 private:
 	bool		_destroyed;
@@ -75,11 +56,14 @@ private:
 	float		_engineTemperature;
 	float		_velocity;				// Current forward velocity
 	float		_upVelocity;			// Current up/down velocity
+	float		_timeSinceIntersection;	// Time since ray intersected track
 
-	glm::vec3	_trackForward;			// Forward direction of track
-	glm::vec3	_facingDirection;		// Current facing direction
-	glm::vec3	_upDirection;			// Current up direction
-	glm::vec3	_meshUpDirection;		// Up direction of ship mesh
+	glm::vec3			_trackForward;			// Forward direction of track
+	SpringRotatedVector	_facingDirection;		// Current facing direction
+	glm::vec3			_upDirection;			// Current up direction
+	SpringRotatedVector	_meshUpDirection;		// Up direction of ship mesh
+	SpringRotatedVector _cameraUpDirection;
+	glm::vec3			_returnPos;				// Respawn position of ship
 
 	const float _minAcceleration;
 	const float _maxAcceleration;

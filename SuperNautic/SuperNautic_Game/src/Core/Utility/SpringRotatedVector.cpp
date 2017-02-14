@@ -1,0 +1,41 @@
+#include "SpringRotatedVector.hpp"
+#include "Utilities.hpp"
+#include "glm/gtx/vector_angle.hpp"
+
+SpringRotatedVector::SpringRotatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& backupAxis, float springConstant, float dampingConstant)
+	: _vector{ glm::normalize(vector) }, _target{ glm::normalize(target) }, _backupAxis{ glm::normalize(backupAxis) }, _springConstant { springConstant }, _dampingConstant{ dampingConstant }
+{
+
+}
+
+void SpringRotatedVector::update(float dt)
+{
+	glm::vec3 newAxis = glm::normalize(glm::cross(_vector, _target));
+
+	// Find angle between vectors
+	float angleBetween = acosf(glm::dot(_vector, _target));
+
+	if (!isnan(angleBetween))
+	{
+		if (!isnan(newAxis.x))
+		{
+			// Update rotation axis and velocity (represented by length)
+			_axis += glm::normalize(newAxis) * angleBetween * angleBetween * _springConstant * dt;
+		}
+		// If vectors are opposite, rotate around backup axis
+		else if (glm::dot(_vector, _target) < -0.999f)
+		{
+			_axis += _backupAxis * angleBetween * _springConstant * dt;
+		}
+	}
+	// Reduce velocity (represented by axis length) using damping constant
+	_axis -= _axis * _dampingConstant * dt;
+
+	// Rotate vector
+	if (!bAlmostEqual(_axis, glm::vec3{ 0, 0, 0 }))
+	{
+		glm::mat4 rotation = glm::rotate(glm::length(_axis) * dt, glm::normalize(_axis));
+
+		_vector = rotation * glm::vec4{ _vector, 0.0f };
+	}
+}

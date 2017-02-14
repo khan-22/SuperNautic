@@ -181,7 +181,7 @@ int Track::getInRow(int index) const
 	return (max - min + 1) * scaled + min;
 }
 
-glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex)
+glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos)
 {
 						 // Waypoints,	segment index
 	std::vector<std::pair<WaypointInfo, long>> closestWaypoints;
@@ -231,6 +231,9 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 	// Find [0..1], 0 = ship is at behind waypoint, 1 = ship is at ahead waypoint
 	float dist = glm::dot(glm::normalize(betweenWaypoints), (globalPosition - behindPos)) / glm::length(betweenWaypoints);
 	
+	// Set return pos
+	returnPos = behindPos;
+
 	// Find forward vector, change to proper rotation?
 	return glm::vec3{ glm::normalize(behindDir * (1.0f - dist) + aheadDir * dist) };
 }

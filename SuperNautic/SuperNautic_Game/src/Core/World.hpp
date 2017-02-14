@@ -17,6 +17,11 @@ namespace sf
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "Camera.h"
 
+
+#include "Utility/SpringRotatedVector.hpp"
+
+
+
 class ApplicationContext;
 
 class World
@@ -45,6 +50,8 @@ private:
 	GFX::DeferredRenderer _renderer;
 
 	Camera _camera;
+
+	SpringRotatedVector srv;
 };
 
 #endif //WORLD_HPP
