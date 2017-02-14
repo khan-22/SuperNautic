@@ -1,6 +1,6 @@
 #include <glm\gtx\transform.hpp>
 
-#include "DebugCamera.hpp"
+#include "Core/Utility/DebugCamera.hpp"
 
 //Default constructor (private)
 DebugCamera::DebugCamera() : Camera()

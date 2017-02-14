@@ -1,5 +1,5 @@
-#include "ApplicationState.hpp"
-#include "ApplicationStateStack.hpp"
+#include "Core/ApplicationState/ApplicationContext.hpp"
+#include "Core/ApplicationState/ApplicationStateStack.hpp"
 
 ApplicationState::ApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : _stack(stack)

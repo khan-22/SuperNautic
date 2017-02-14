@@ -1,7 +1,7 @@
 #include <string>
 
-#include "HUD.hpp"
-#include "AssetCache.hpp"
+#include "Core/Gui/HUD.hpp"
+#include "Core/Asset/AssetCache.hpp"
 
 HUD::HUD(int windowWidth, int windowHeight) :
 	SceneNode(),

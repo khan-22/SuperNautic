@@ -20,6 +20,6 @@ private:
     std::shared_ptr<AssetT>* _parentAsset;
 };
 
-#include "Asset.inl"
+#include "Core/Asset/Asset.inl"
 
 #endif //ASSET_HPP

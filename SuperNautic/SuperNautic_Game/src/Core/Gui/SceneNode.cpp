@@ -1,7 +1,7 @@
 #include <cassert>
 
 
-#include "SceneNode.hpp"
+#include "Core/Gui/SceneNode.hpp"
 
 SceneNode::SceneNode()
 : _children()

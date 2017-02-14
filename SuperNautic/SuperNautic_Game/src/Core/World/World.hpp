@@ -3,6 +3,7 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 
+#include "SFML/Graphics/RenderWindow.hpp"
 namespace sf
 {
     class Event;
@@ -10,12 +11,11 @@ namespace sf
 
 #include <list>
 
-#include "Player.hpp"
-#include "Track/Track.hpp"
-#include "../GFX/DeferredRenderer.hpp"
-#include "../GFX/ForwardRenderer.hpp"
-#include "SFML/Graphics/RenderWindow.hpp"
-#include "Camera.h"
+#include "Core/World/Player.hpp"
+#include "Core/Track/Track.hpp"
+#include "Core/Utility/Camera.h"
+#include "GFX/Rendering/DeferredRenderer.hpp"
+#include "GFX/Rendering/ForwardRenderer.hpp"
 
 class ApplicationContext;
 

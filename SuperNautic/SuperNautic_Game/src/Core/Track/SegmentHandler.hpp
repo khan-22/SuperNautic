@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "Segment.hpp"
+#include "Core/Track/Segment.hpp"
 
 // Holds uninstantiated versions of track segments
 class SegmentHandler

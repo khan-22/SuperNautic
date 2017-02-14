@@ -1,9 +1,9 @@
 #include "SFML/Window/Event.hpp"
 
-#include "World.hpp"
-#include "ApplicationContext.hpp"
-#include "../GFX/SfmlRenderer.hpp"
-#include "Track/SegmentInstance.hpp"
+#include "Core/GeometryWorld.hpp"
+#include "Core/ApplicationState/ApplicationContext.hpp"
+#include "Core/Track/SegmentInstance.hpp"
+#include "GFX/Rendering/SfmlRenderer.hpp"
 
 
 World::World(ApplicationContext& context)
@@ -82,7 +82,7 @@ void World::update(float dt)
 	_camera.setPos(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 2, -12, 1 } });
 	_camera.setUp(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 1, 0, 0 } });
 	_camera.setViewDir(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 0, 1, 0 } });
-	
+
 }
 
 void World::render()

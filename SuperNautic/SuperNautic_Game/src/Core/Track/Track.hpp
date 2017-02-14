@@ -5,9 +5,9 @@
 #include <vector>
 #include <glm\mat4x4.hpp>
 
-#include "SegmentHandler.hpp"
-#include "Segment.hpp"
-#include "SegmentInstance.hpp"
+#include "Core/Track/SegmentHandler.hpp"
+#include "Core/Track/Segment.hpp"
+#include "Core/Track/SegmentInstance.hpp"
 #include "GFX/DeferredRenderer.hpp"
 #include "GFX/ForwardRenderer.hpp"
 

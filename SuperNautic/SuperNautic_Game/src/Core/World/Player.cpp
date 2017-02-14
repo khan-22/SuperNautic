@@ -1,4 +1,4 @@
-#include "Player.hpp"
+#include "Core/World/Player.hpp"
 
 Player::Player() :
 	_playerId(0),
@@ -16,7 +16,7 @@ Player::Player(int id) :
 }
 Player::Player(const Player& other) : Player{ other._playerId }
 {
-	
+
 }
 
 Player::~Player()

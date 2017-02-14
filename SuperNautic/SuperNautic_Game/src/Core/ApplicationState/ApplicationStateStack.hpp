@@ -12,7 +12,7 @@ namespace sf
     class Event;
 }
 
-#include "ApplicationState.hpp"
+#include "Core/ApplicationState/ApplicationState.hpp"
 
 class ApplicationStateStack
 {

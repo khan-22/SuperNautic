@@ -18,7 +18,7 @@ namespace sf
 
 
 class GuiElement;
-#include "SceneNode.hpp"
+#include "Core/Gui/SceneNode.hpp"
 
 
 class GuiContainer : public SceneNode

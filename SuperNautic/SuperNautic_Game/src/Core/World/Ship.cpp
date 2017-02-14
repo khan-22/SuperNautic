@@ -4,9 +4,10 @@
 #include "glm/vec4.hpp"
 #include "glm/gtx/vector_angle.hpp"
 #include "glm/gtx/norm.hpp"
-#include "Ship.hpp"
-#include "Geometric Primitives/Ray.hpp"
-#include "Geometric Primitives/RayIntersection.hpp"
+
+#include "Core/World/Ship.hpp"
+#include "Core/Geometry/Ray.hpp"
+#include "Core/Geometry/RayIntersection.hpp"
 
 
 Ship::Ship()
@@ -87,8 +88,8 @@ void Ship::update(float dt)
 
 	// Create ray and test for intersection
 	Ray r{ getPosition(), -_upDirection, 1000.0f };
-	RayIntersection ri{ false }; 
-	
+	RayIntersection ri{ false };
+
 	for (unsigned i = 0; i < _segmentsToTest.size(); ++i)
 	{
 		RayIntersection intersection = _segmentsToTest[i]->rayIntersectionTest(r);
@@ -133,7 +134,7 @@ void Ship::update(float dt)
 
 	// 'Rotate' mesh up direction towards 'correct' up direction
 	_meshUpDirection = glm::normalize(_meshUpDirection * 0.5f + _upDirection * 0.5f);
-		
+
 	// Ship always faces straight forward, only movement direction and mesh rotates
 	// Create from mesh up direction
 	glm::mat4 meshMatrix{ glm::vec4{ glm::cross(_meshUpDirection, _facingDirection), 0.0f },
@@ -152,7 +153,7 @@ void Ship::update(float dt)
 
 	// Update model's matrix
 	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(getPosition()) * meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
-	
+
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
 	_accelerationFactor = 0.0f;

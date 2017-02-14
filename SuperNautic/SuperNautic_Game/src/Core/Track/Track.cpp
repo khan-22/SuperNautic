@@ -1,11 +1,11 @@
 #include <glm\gtx\transform.hpp>
 #include <time.h>
 
-#include "Track.hpp"
+#include "Core/Track/Track.hpp"
+#include "Core/Track/SegmentInfo.hpp"
+#include "Core/Track/Segment.hpp"
 #include "Core/Io/Log.hpp"
-#include "SegmentInfo.hpp"
-#include "GFX/Model.hpp"
-#include "Segment.hpp"
+#include "GFX/Resources/Model.hpp"
 
 // Default constructor (private)
 Track::Track()

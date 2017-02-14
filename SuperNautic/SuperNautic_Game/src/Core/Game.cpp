@@ -1,4 +1,3 @@
-#include "Game.hpp"
 
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
@@ -6,21 +5,20 @@
 
 #include <glm/gtx/transform.hpp>
 
-#include "../Log.hpp"
-#include "../GFX/VertexDataImporter.hpp"
-#include "MainMenuApplicationState.hpp"
-#include "../GFX/TexturedModel.hpp"
 
-#include "LoadAssetFunctions.hpp"
+#include "Core/World/Game.hpp"
+#include "Core/Io/Log.hpp"
+#include "Core/ApplicationState/MainMenuApplicationState.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "Core/Geometry/RayIntersection.hpp"
+#include "Core/Geometry/Ray.hpp"
+#include "Core/Track/SegmentHandler.hpp"
+#include "Core/Track/Segment.hpp"
 
-#include "../GFX/ShaderLoader.hpp"
-
-#include "Geometric Primitives\RayIntersection.hpp"
-#include "Geometric Primitives\Ray.hpp"
-#include "Track\SegmentHandler.hpp"
-#include "Track\Segment.hpp"
-
-#include "..\GFX\Transformable3D.hpp"
+#include "GFX/Resources/LoadersVertexDataImporter.hpp"
+#include "GFX/Resources/TexturedModel.hpp"
+#include "GFX/Resources/Loaders/ShaderLoader.hpp"
+#include "GFX/Rendering/Transformable3D.hpp"
 
 
 
@@ -139,7 +137,7 @@ bool Game::bInitialize()
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
 
-	
+
 	_pointLights.push_back(PointLight({ 0.f,2.f,0.f }, { 1.f, 0.f, 0.f }, 1.0f));
 	_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f }, 1.f));
 	_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 0.f, 1.f }, 1.f));

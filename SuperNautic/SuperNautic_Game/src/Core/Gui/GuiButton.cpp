@@ -1,6 +1,6 @@
 #include "SFML/Graphics/RenderTarget.hpp"
 
-#include "GuiButton.hpp"
+#include "Core/Gui/GuiButton.hpp"
 
 GuiButton::GuiButton(const sf::Text& text, std::function<void()> callback)
 : _text(text)

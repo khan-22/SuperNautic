@@ -1,6 +1,6 @@
 #include <glm\gtx\transform.hpp>
 
-#include "Camera.h"
+#include "Core/Utility/Camera.h"
 
 //Default constructor
 Camera::Camera()

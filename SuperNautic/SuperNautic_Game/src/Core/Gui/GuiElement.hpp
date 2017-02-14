@@ -3,7 +3,7 @@
 #ifndef GUI_ELEMENT_HPP
 #define GUI_ELEMENT_HPP
 
-#include "SceneNode.hpp"
+#include "Core/Gui/SceneNode.hpp"
 
 class GuiElement : public SceneNode
 {

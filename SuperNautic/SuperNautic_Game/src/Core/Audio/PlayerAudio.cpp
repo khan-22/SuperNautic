@@ -1,5 +1,5 @@
-#include "PlayerAudio.hpp"
-#include "AssetCache.hpp"
+#include "Core/Audio/PlayerAudio.hpp"
+#include "Core/Asset/AssetCache.hpp"
 
 PlayerAudio::PlayerAudio() :
 	_sbEngine(AssetCache<sf::SoundBuffer, std::string>::get("engine")),

@@ -8,7 +8,7 @@
 
 #include "SFML/Graphics/Text.hpp"
 
-#include "GuiElement.hpp"
+#include "Core/Gui/GuiElement.hpp"
 
 class GuiButton : public GuiElement
 {
