@@ -17,7 +17,6 @@ struct PointLightProperties
 	GLfloat		constant;
 	GLfloat		linear;
 	GLfloat		quadratic;
-	GLfloat		lightBoundsRadius;
 };
 
 class PointLight
@@ -40,7 +39,7 @@ public:
 	const PointLightProperties getLightProperties();
 
 	//Calculates the bounding sphere for the light
-	void calculatePLBoundSize();
+	GLfloat calculatePLBoundSize();
 
 	~PointLight();
 private:
