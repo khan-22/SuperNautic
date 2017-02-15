@@ -25,8 +25,8 @@ public:
 	SegmentInstance* getInstance(int index);
 	void render(GFX::DeferredRenderer& renderer, const int shipIndex);
 
-	// Returns the forward vector for a given ship position and segment index (segment index may update)
-	glm::vec3 findForward(const glm::vec3 globalPosition, unsigned& segmentIndex);
+	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos
+	glm::vec3 findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos);
 	//SegmentInstance& getInstance(const int index);
 
 private:

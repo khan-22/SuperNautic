@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <Windows.h>
+
 #include <assimp/scene.h>
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
@@ -8,7 +10,6 @@
 
 #include <GL/glew.h>
 
-#include <Windows.h>
 
 // Globals
 HANDLE gConsoleHandle;
@@ -33,31 +34,38 @@ std::ostream& log(LogColor color)
 	return std::cout;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	// Initialize log
-	gConsoleHandle = GetStdHandle(STD_INPUT_HANDLE);
+	gConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleScreenBufferInfo(gConsoleHandle, &gPreviousState);
 	
-	// ---
+	if (argc > 1)
+	{
+		log(GREEN) << "-------- Beginning work on: " << argv[1] << " --------" << std::endl;
+		const aiScene* importedData = aiImportFile(argv[1], aiProcessPreset_TargetRealtime_MaxQuality);
 
+		log(GREEN) << "Loaded: " << importedData->mNumMeshes << " meshes" << std::endl;
+
+		aiReleaseImport(importedData);
+	}
+	else
+	{
+		log(RED) << "No file was given as input" << std::endl;
+	}
+
+	// ---
+	
+	/*
 	log(WHITE) << "Hello World! TEST" << std::endl;
 
 	const aiScene* importedData = aiImportFile("./test.fbx", aiProcessPreset_TargetRealtime_MaxQuality);
 	
 	log(GREEN) << "Loaded: " << importedData->mNumMeshes << " meshes" << std::endl;
 
-	glm::vec3 test(3.f, 5.f, 5.f);
-	glm::vec3 test2(5.f, 5.f, 5.f);
-
-	std::cout << test2.y - test.x << std::endl;
-
 	aiReleaseImport(importedData);
+	*/
 
-	GLfloat t = 0.f;
-
-	std::cout << t << std::endl;
-	
 	std::cin.get();
 
 	// Clean up log

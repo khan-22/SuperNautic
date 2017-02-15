@@ -5,6 +5,7 @@
 #include "Core/Track/SegmentInstance.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 
+#include <cmath>
 
 World::World(ApplicationContext& context)
 	: _segmentHandler{ "Segments/segmentinfos.txt", "Segments/ConnectionTypes.txt" }, _track{ &_segmentHandler }
@@ -25,7 +26,7 @@ World::World(ApplicationContext& context)
 	_players.emplace_back();
 	_playerSegmentIndices.push_back(0);
 
-	_track.setLength(10000);
+	_track.setLength(100000);
 	_track.setSeed(1);
 	_track.generate();
 	_bDebugging = false;
@@ -44,8 +45,10 @@ void World::update(float dt, sf::Window& window)
 		for (unsigned i = 0; i < _players.size(); ++i)
 		{
 			// Finds forward vector of ship and updates segment index
-			glm::vec3 forward = _track.findForward(_players[i].getShip().getPosition(), _playerSegmentIndices[i]);
+			glm::vec3 returnPos;
+			glm::vec3 forward = _track.findForward(_players[i].getShip().getPosition(), _playerSegmentIndices[i], returnPos);
 			_players[i].getShip().setForward(forward);
+			_players[i].getShip().setReturnPos(returnPos);
 
 			// Find segments adjacent to ship
 			std::vector<SegmentInstance*> instances;
@@ -83,10 +86,9 @@ void World::update(float dt, sf::Window& window)
 
 			_players[i].update(dt);
 		}
-
-		_camera.setPos(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 2, -12, 1 } });
-		_camera.setUp(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 1, 0, 0 } });
-		_camera.setViewDir(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 0, 1, 0 } });
+		_camera.setPos(_players[0].getShip().getMeshPosition() - _players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 2.0f);
+		_camera.setUp(_players[0].getShip().getCameraUp());
+		_camera.setViewDir(_players[0].getShip().getCameraForward());
 	}
 	else
 	{
@@ -107,7 +109,6 @@ void World::render()
 {
 	for (Player& player : _players)
 	{
-		//player.render(_renderer);
 		_renderer.render(player.getShip());
 	}
 
