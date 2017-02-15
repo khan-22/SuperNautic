@@ -29,7 +29,6 @@ Input::~Input()
 void Input::update()
 {
 	const int thresh = 50;
-	const int lowThresh = 10;
 
 	if (checkActive())
 	{
@@ -41,9 +40,9 @@ void Input::update()
 
 		_events.clear();
 
-		if (_leftStickX)
+		if (abs(_leftStickX) < thresh)
 		{
-
+			_leftStickX = 0;
 		}
 
 		sf::Event event;
