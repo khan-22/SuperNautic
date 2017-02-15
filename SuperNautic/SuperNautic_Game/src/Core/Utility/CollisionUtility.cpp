@@ -153,7 +153,7 @@ PlaneCollisionData bTestCollision(const AxisAlignedPlane& axisAlignedPlane1, con
     {
         if(axisAlignedPlane1.distance > axisAlignedPlane2.distance)
         {
-            data.type == PlaneCollisionData::Type::FRONT;
+            data.type = PlaneCollisionData::Type::FRONT;
         }
         else if(axisAlignedPlane1.distance < axisAlignedPlane2.distance)
         {
@@ -161,12 +161,12 @@ PlaneCollisionData bTestCollision(const AxisAlignedPlane& axisAlignedPlane1, con
         }
         else
         {
-            data.type == PlaneCollisionData::Type::COLLISION;
+            data.type = PlaneCollisionData::Type::COLLISION;
         }
     }
     else
     {
-        data.type == PlaneCollisionData::Type::COLLISION;
+        data.type = PlaneCollisionData::Type::COLLISION;
     }
 
     return data;
