@@ -111,7 +111,7 @@ void World::render()
 		_renderer.render(player.getShip());
 	}
 
-	_track.render(_renderer);
+	_track.render(_renderer, _playerSegmentIndices[0]);
 	//_renderer.render(_track.);
 
 	PointLight testLight(_players[0].getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f);

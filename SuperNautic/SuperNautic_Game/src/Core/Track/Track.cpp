@@ -17,9 +17,10 @@ Track::Track()
 
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler)
-	: _endMargin(500)
+	: _endMargin(400)
 {
 	_segmentHandler = segmentHandler;
+	//_endMatrix = glm::translate(glm::vec3(0, 0, 100));
 	_endMatrix = glm::mat4();
 }
 
@@ -70,7 +71,7 @@ bool Track::generate()
 {
 	int totalLength = 0;
 	// Make the inital stretch straight
-	while (totalLength < 500)
+	while (totalLength < 200)
 	{
 		bInsertNormalSegment(0, totalLength, false);
 	}
@@ -98,7 +99,7 @@ bool Track::generate()
 			// Randomize nr of same segment type in a row
 			inRow = getInRow(index);
 
-			for (size_t i = 0; i < inRow; i++)
+			for (unsigned int i = 0; i < inRow; i++)
 			{
 				//insertNormalSegment(index, totalLength, false);
 				//insertStructure(0, totalLength);
@@ -150,14 +151,14 @@ int Track::getIndex(char connectionType) const
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
 	// Finding valid segments based on connection type
 	std::vector<int> validSegments = std::vector<int>();
-	for (size_t i = 0; i < infos.size(); i++)
+	for (unsigned int i = 0; i < infos.size(); i++)
 	{
 		if (infos[i]._startConnection == connectionType)
 		{
 			validSegments.push_back(i);
 		}
 	}
-	for (size_t i = 0; i < _segmentHandler->getNrOfStructures(); i++)
+	for (unsigned int i = 0; i < _segmentHandler->getNrOfStructures(); i++)
 	{
 		if (infos[_segmentHandler->getStructure(i)->pieces[0]->index]._startConnection == connectionType)
 		{
@@ -392,10 +393,14 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 }
 
 // Render the track
-void Track::render(GFX::DeferredRenderer& renderer)
+void Track::render(GFX::DeferredRenderer& renderer, const int shipIndex)
 {
-	for (unsigned i = 0; i < _track.size(); ++i)
+	for (int i = -2; i < 300; i++)
 	{
-		renderer.render(*_track[i]);
+		int index = shipIndex + i;
+		if (index >= 0 && index < _track.size())
+		{
+			renderer.render(*_track[index]);
+		}
 	}
 }
