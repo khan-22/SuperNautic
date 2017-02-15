@@ -2,23 +2,23 @@
 
 #include <iostream>
 
-#include <GL\glew.h>
+#include <GL/glew.h>
 
-#include <SFML\Graphics.hpp>
-#include <SFML\Window.hpp>
-#include <glm\glm.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <glm/glm.hpp>
 #include <crtdbg.h> // Leak-checking
 
-#include "Log.hpp"
-#include "Core\Game.hpp"
+#include "Core/Io/Log.hpp"
+#include "Core/Game.hpp"
 
 // For ray intersection testing
-#include "Core\Geometric Primitives\RayIntersection.hpp"
-#include "Core\Geometric Primitives\Ray.hpp"
-#include "Core\Track\SegmentHandler.hpp"
-#include "Core\Track\Segment.hpp"
+#include "Core/Geometry/RayIntersection.hpp"
+#include "Core/Geometry/Ray.hpp"
+#include "Core/Track/SegmentHandler.hpp"
+#include "Core/Track/Segment.hpp"
 
-#include "GFX\Transformable3D.hpp"
+#include "GFX/Rendering/Transformable3D.hpp"
 
 
 int main()

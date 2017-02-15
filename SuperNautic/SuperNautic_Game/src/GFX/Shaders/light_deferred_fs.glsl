@@ -40,7 +40,8 @@ vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3
 	//Specular
 	float specularStrength	= 0.5; //Should be sent in on a per object basis, possibly with specular map in the future
 	vec3 reflectionDir		= reflect(-lightDir, normal);
-	float specular			= pow(max(dot(viewDir, reflectionDir), 0.0), 32); //32 defines shininess and should also be sent in as a uniform most likely
+	vec3 halfwayDir			= normalize(lightDir + viewDir);  
+	float specular			= pow(max(dot(normal, halfwayDir), 0.0), 256); //32 defines shininess and should also be sent in as a uniform most likely
 	vec3 specularVec		= specularStrength * specular * pointLights.color[i];
 
 	//Attenuation
@@ -51,7 +52,6 @@ vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3
 	vec3 result	= (diffuseColor + ambientColor + specularVec) * diffuseTex * attenuation;
 
 	return result;
-	//return vec3(1.0, 0.0, 0.0) * diffuseTex;
 }
 
 void main()

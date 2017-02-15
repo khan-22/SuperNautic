@@ -1,7 +1,7 @@
 #include <algorithm>
 
-#include "SegmentInstance.hpp"
-#include "../CollisionUtility.hpp"
+#include "Core/Track/SegmentInstance.hpp"
+#include "Core/Utility/CollisionUtility.hpp"
 
 //Default constructor (private)
 SegmentInstance::SegmentInstance()
@@ -140,7 +140,7 @@ const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const
 	glm::mat4 inverse = glm::inverse(_model);
 
 	Ray localRay{ inverse * glm::vec4{ ray.origin().x , ray.origin().y, ray.origin().z, 1.0f },
-				  inverse * glm::vec4{ ray.direction().x, ray.direction().y, ray.direction().z, 0.0f }, 
+				  inverse * glm::vec4{ ray.direction().x, ray.direction().y, ray.direction().z, 0.0f },
 				  ray.length() };
 
 	RayIntersection intersection = _parent->rayIntersectionTest(localRay);
