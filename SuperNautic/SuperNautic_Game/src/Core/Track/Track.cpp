@@ -72,14 +72,14 @@ bool Track::generate()
 	// Make the inital stretch straight
 	while (totalLength < 500)
 	{
-		insertNormalSegment(0, totalLength, false);
+		bInsertNormalSegment(0, totalLength, false);
 	}
 
 	char endConnection = 'a';
 	bool lighting = true;
 	int prevIndex = -1;
 	// Create random path
-	while (totalLength < _targetLength - _endMargin)
+	while (true)
 	{
 		// Randomize segment index
 		int index;
@@ -97,19 +97,17 @@ bool Track::generate()
 		{
 			// Randomize nr of same segment type in a row
 			inRow = getInRow(index);
-			// Instanciate the segment(s)
-			bool collided = false;
-			for (unsigned int i = 0; i < inRow; i++)
+
+			for (size_t i = 0; i < inRow; i++)
 			{
-				insertNormalSegment(index, totalLength, false);
+				//insertNormalSegment(index, totalLength, false);
 				//insertStructure(0, totalLength);
-				/*if (!insertNormalSegment(index, totalLength, true))
+				if (!bInsertNormalSegment(index, totalLength, true))
 				{
-					deleteSegments(totalLength, 200);
-					_endMatrix = _track.back()->getModelMatrix() * _track[_track.size() - 1]->getEndMatrix();
-					collided = true;
+					deleteSegments(totalLength, 300);
+					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					break;
-				}*/
+				}
 			}
 		}
 		// Structures
@@ -117,15 +115,19 @@ bool Track::generate()
 		{
 			insertStructure(index - _segmentHandler->infos().size(), totalLength);
 		}
-		endConnection = _track[_track.size() - 1]->getParent()->getEnd();
-		prevIndex = _track[_track.size() - 1]->getIndex();
-	}
+		endConnection = _track.back()->getParent()->getEnd();
+		prevIndex = _track.back()->getIndex();
 
-	// Make the final stretch straight
-	while (totalLength < _targetLength)
-	{
-		insertNormalSegment(0, totalLength, false);
+		// Make the final stretch straight
+		if (totalLength > _targetLength - _endMargin)
+		{
+			if (bEndTrack(totalLength))
+			{
+				break;
+			}
+		}
 	}
+	
 	_generatedLength = totalLength;
 
 	LOG("Track generated. Length: " + std::to_string(_generatedLength) + " meters.");
@@ -219,7 +221,7 @@ int Track::getInRow(int index) const
 }
 
 // Inserts a segment with given index at the end of the track
-bool Track::insertNormalSegment(const int index, int & length, bool testCollision)
+bool Track::bInsertNormalSegment(const int index, int & length, bool testCollision)
 {
 	const Segment * segment = _segmentHandler->loadSegment(index);
 	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
@@ -248,6 +250,7 @@ bool Track::insertNormalSegment(const int index, int & length, bool testCollisio
 // Inserts a whole pre-defined structure at the end of the track
 void Track::insertStructure(const int index, int & length)
 {
+	int startLength = length;
 	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
 	// Randomize how many times the structure should be looped
 	int min = s->minInRow;
@@ -272,6 +275,16 @@ void Track::insertStructure(const int index, int & length)
 			const SegmentHandler::StructurePiece * p = s->pieces[j];
 			const Segment * segment = _segmentHandler->loadSegment(p->index);
 			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+			for (unsigned int i = 0; i < _track.size() - 2; i++)
+			{
+				if (tempInstance->bTestCollision(*_track[i]))
+				{
+					delete tempInstance;
+					deleteSegments(length, length - startLength);
+					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+					return;
+				}
+			}
 			glm::mat4 modelEndMat = segment->getEndMatrix();
 			int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
 			// Randomize angle from structure info
@@ -294,12 +307,13 @@ void Track::insertStructure(const int index, int & length)
 	}
 }
 
+// Deletes a certain length of the track (from the end)
 void Track::deleteSegments(int & totalLength, const int lengthToDelete)
 {
 	int deletedLength = 0;
 	while (deletedLength <= lengthToDelete && totalLength > 500)
 	{
-		int segmentLength = _track[_track.size() - 1]->getLength();
+		int segmentLength = _track.back()->getLength();
 		deletedLength += segmentLength;
 		totalLength -= segmentLength;
 		delete _track[_track.size() - 1];
@@ -307,6 +321,22 @@ void Track::deleteSegments(int & totalLength, const int lengthToDelete)
 	}
 }
 
+// Tries to end the track with a straight path
+bool Track::bEndTrack(int & totalLength)
+{
+	while (totalLength < _targetLength)
+	{
+		if (!bInsertNormalSegment(0, totalLength, true))
+		{
+			deleteSegments(totalLength, _endMargin + 200);
+			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+			return false;
+		}
+	}
+	return true;
+}
+
+// Calculates and returns the forward direction 
 glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex)
 {
 						 // Waypoints,	segment index
@@ -361,6 +391,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 	return glm::vec3{ glm::normalize(behindDir * (1.0f - dist) + aheadDir * dist) };
 }
 
+// Render the track
 void Track::render(GFX::DeferredRenderer& renderer)
 {
 	for (unsigned i = 0; i < _track.size(); ++i)

@@ -33,9 +33,10 @@ private:
 	Track();
 	int getIndex(char connectionType) const;
 	int getInRow(const int index) const;
-	bool insertNormalSegment(const int index, int & length, bool testCollision);
+	bool bInsertNormalSegment(const int index, int & length, bool testCollision);
 	void insertStructure(const int index, int & length);
 	void deleteSegments(int & totalLength, const int lengthToDelete);
+	bool bEndTrack(int & totalLength);
 
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance*>	_track;
