@@ -40,10 +40,7 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 
 		// Metadata about segment
 		int probability, minInRow, maxInRow, rotationOffset;
-		infoFile >> probability;
-		infoFile >> minInRow;
-		infoFile >> maxInRow;
-		infoFile >> rotationOffset;
+		infoFile >> probability >> minInRow >> maxInRow >> rotationOffset;
 
 		// Add SegmentInfo to vector
 		_segmentInfos.push_back(SegmentInfo{ std::move(segmentDataName), std::move(segmentVisualName)
@@ -68,9 +65,7 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 		for (unsigned int j = 0; j < pieces; j++)
 		{
 			int index, minRotation, maxRotation;
-			infoFile >> index;
-			infoFile >> minRotation;
-			infoFile >> maxRotation;
+			infoFile >> index >> minRotation >> maxRotation;
 			_structures[i].addPiece(new StructurePiece(index, minRotation, maxRotation));
 		}
 		// Skip rest of line
