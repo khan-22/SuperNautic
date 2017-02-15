@@ -33,8 +33,11 @@ World::World(ApplicationContext& context)
 	}
 
 	// TEST PLAYER
-	_players.emplace_back(10);
-	_playerSegmentIndices.push_back(0);
+	if (_players.size() == 0)
+	{
+		_players.emplace_back(10);
+		_playerSegmentIndices.push_back(0);
+	}
 	//_players.emplace_back(0);
 	//_players.emplace_back(2);
 	//_players.emplace_back(3);
