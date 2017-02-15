@@ -65,17 +65,18 @@ const PointLightProperties PointLight::getLightProperties()
 		_constant,
 		_linear,
 		_quadratic,
-		_lightBoundsRadius
 	};
 
 	return Properties;
 }
 
-void PointLight::calculatePLBoundSize()
+GLfloat PointLight::calculatePLBoundSize()
 {
 	//Defines the size of the sphere for the light
 	GLfloat MaxChannel = std::fmax(std::fmax(_diffuseColor.r, _diffuseColor.g), _diffuseColor.b);
-	_lightBoundsRadius = ( -_linear + glm::sqrt( glm::pow(_linear, 2) - 4 * _quadratic * (_constant - 256 * MaxChannel) * _currentIntensity )) / ( 2 * _quadratic );
+	GLfloat radius = ( -_linear + glm::sqrt( glm::pow(_linear, 2) - 4 * _quadratic * (_constant - 256 * MaxChannel) * _currentIntensity )) / ( 2 * _quadratic );
+
+	return radius;
 }
 
 PointLight::~PointLight()
