@@ -3,6 +3,6 @@
 
 bool floatEq(float a, float b)
 {
-    static constexpr float EPSILON = 0.00000001f;
+    static constexpr float EPSILON = 0.000001f;
     return a < b + EPSILON && a > b - EPSILON;
 }
