@@ -4,12 +4,12 @@
 
 #include <glm\glm.hpp>
 
-#include "../Geometric Primitives/Sphere.hpp"
-#include "Segment.hpp"
-#include "../LoadAssetFunctions.hpp"
-#include "../../GFX/Renderable3D.hpp"
-#include "../Geometric Primitives/Ray.hpp"
-#include "../Geometric Primitives/RayIntersection.hpp"
+#include "Core/Geometry/Sphere.hpp"
+#include "Core/Geometry/Ray.hpp"
+#include "Core/Geometry/RayIntersection.hpp"
+#include "Core/Track/Segment.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "GFX/Rendering/Renderable3D.hpp"
 
 class SegmentInstance : public GFX::Renderable3D
 {

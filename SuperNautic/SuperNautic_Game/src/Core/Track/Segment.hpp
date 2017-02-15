@@ -1,6 +1,6 @@
 #pragma once
-#ifndef SEGMENT_H
-#define SEGMENT_H
+#ifndef SEGMENT_HPP
+#define SEGMENT_HPP
 
 #include <string>
 #include <array>
@@ -9,14 +9,15 @@
 #include <memory>
 
 #include "glm/glm.hpp"
-#include "../LoadAssetFunctions.hpp"
-#include "../../GFX/TexturedModel.hpp"
-#include "../Geometric Primitives/AABB.hpp"
-#include "../Geometric Primitives/BoundingBox.hpp"
-#include "../Geometric Primitives/RayIntersection.hpp"
-#include "../Geometric Primitives/Ray.hpp"
-#include "SegmentInfo.hpp"
-#include "../Utility/Utilities.hpp"
+
+#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "Core/Geometry/AABB.hpp"
+#include "Core/Geometry/BoundingBox.hpp"
+#include "Core/Geometry/RayIntersection.hpp"
+#include "Core/Geometry/Ray.hpp"
+#include "Core/Track/SegmentInfo.hpp"
+#include "GFX/Resources/TexturedModel.hpp"
+#include "Core/Utility/Utilities.hpp"
 
 struct WaypointInfo
 {

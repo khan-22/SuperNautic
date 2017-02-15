@@ -1,9 +1,10 @@
 #pragma once
 
-#ifndef UTILITIES_H
-#define UTILITIES_H
+#ifndef UTILITIES_HPP
+#define UTILITIES_HPP
 
-#include "../../Log.hpp"
+#include "Core/Io/Log.hpp"
+#include "glm/vec3.hpp"
 
 template<typename T>
 inline T clamp(T value, T low, T high)

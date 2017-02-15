@@ -5,11 +5,11 @@
 #include <vector>
 #include <glm\mat4x4.hpp>
 
-#include "SegmentHandler.hpp"
-#include "Segment.hpp"
-#include "SegmentInstance.hpp"
-#include "../../GFX/DeferredRenderer.hpp"
-#include "../../GFX/ForwardRenderer.hpp"
+#include "Core/Track/SegmentHandler.hpp"
+#include "Core/Track/Segment.hpp"
+#include "Core/Track/SegmentInstance.hpp"
+#include "GFX/Rendering/DeferredRenderer.hpp"
+#include "GFX/Rendering/ForwardRenderer.hpp"
 
 class Track
 {
@@ -36,7 +36,7 @@ private:
 	bool insertNormalSegment(const int index, int & length, bool testCollision);
 	void insertStructure(const int index, int & length);
 	void deleteSegments(int & totalLength, const int lengthToDelete);
-	
+
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance*>	_track;
 	int								_targetLength;

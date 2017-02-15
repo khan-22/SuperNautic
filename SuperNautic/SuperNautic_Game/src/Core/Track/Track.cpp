@@ -1,11 +1,11 @@
 #include <glm\gtx\transform.hpp>
 #include <time.h>
 
-#include "Track.hpp"
-#include "../../Log.hpp"
-#include "SegmentInfo.hpp"
-#include "../../GFX/Model.hpp"
-#include "Segment.hpp"
+#include "Core/Track/Track.hpp"
+#include "Core/Track/SegmentInfo.hpp"
+#include "Core/Track/Segment.hpp"
+#include "Core/Io/Log.hpp"
+#include "GFX/Resources/Model.hpp"
 
 // Default constructor (private)
 Track::Track()
@@ -230,7 +230,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 
 	// Find [0..1], 0 = ship is at behind waypoint, 1 = ship is at ahead waypoint
 	float dist = glm::dot(glm::normalize(betweenWaypoints), (globalPosition - behindPos)) / glm::length(betweenWaypoints);
-	
+
 	// Set return pos
 	returnPos = behindPos;
 

@@ -1,11 +1,12 @@
 #pragma once
-#ifndef SEGMENTHANDLER_H
-#define SEGMENTHANDLER_H
+#ifndef SEGMENTHANDLER_HPP
+#define SEGMENTHANDLER_HPP
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
-#include "Segment.hpp"
+#include "Core/Track/Segment.hpp"
 
 // Holds uninstantiated versions of track segments
 class SegmentHandler

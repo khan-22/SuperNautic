@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef SPRINGROTATEDVECTOR_H
-#define SPRINGROTATEDVECTOR_H
+#ifndef SPRINGROTATEDVECTOR_HPP
+#define SPRINGROTATEDVECTOR_HPP
 
 #include "glm/glm.hpp"
 
