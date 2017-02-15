@@ -117,6 +117,32 @@ PlaneCollisionData bTestCollision(const Sphere& sphere, const AxisAlignedPlane& 
     return data;
 }
 
+PlaneCollisionData bTestCollision(const AxisAlignedPlane& axisAlignedPlane1, const AxisAlignedPlane& axisAlignedPlane2)
+{
+    PlaneCollisionData data;
+    if(axisAlignedPlane1.axis == axisAlignedPlane2.axis)
+    {
+        if(axisAlignedPlane1.distance > axisAlignedPlane2.distance)
+        {
+            data.type == PlaneCollisionData::Type::FRONT;
+        }
+        else if(axisAlignedPlane1.distance < axisAlignedPlane2.distance)
+        {
+            data.type = PlaneCollisionData::Type::BACK;
+        }
+        else
+        {
+            data.type == PlaneCollisionData::Type::COLLISION;
+        }
+    }
+    else
+    {
+        data.type == PlaneCollisionData::Type::COLLISION;
+    }
+
+    return data;
+}
+
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b)
 {
