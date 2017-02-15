@@ -5,13 +5,21 @@
 #include "Core/Geometry/BoundingBox.hpp"
 #include "Core/Geometry/AxisAlignedPlane.hpp"
 #include "Core/Io/Log.hpp"
+#include "Core/Utility/Utilities.hpp"
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b);
 float computeHalfProjectionLength(const glm::vec3& projectionLine, const BoundingBox& obb);
+void assertObbCorrectness(const BoundingBox& obb);
+void assertSphereCorrectness(const Sphere& sphere);
 
 
 bool bTestCollision(const Sphere& a, const Sphere& b)
 {
+    #ifndef NDEBUG
+    assertSphereCorrectness(a);
+    assertSphereCorrectness(b);
+    #endif // NDEBUG
+
     glm::vec3 distanceVector = a.center - b.center;
     float distanceSqrd = glm::dot(distanceVector, distanceVector);
 
@@ -22,6 +30,11 @@ bool bTestCollision(const Sphere& a, const Sphere& b)
 
 bool bTestCollision(const BoundingBox& a, const BoundingBox& b)
 {
+    #ifndef NDEBUG
+    assertObbCorrectness(a);
+    assertObbCorrectness(b);
+    #endif // NDEBUG
+
     // Check for separating axis using a's and b's directions.
     for(unsigned char i = 0; i < 3; i++)
     {
@@ -57,6 +70,11 @@ bool bTestCollision(const BoundingBox& a, const BoundingBox& b)
 
 bool bTestCollision(const BoundingBox& obb, const Sphere& sphere)
 {
+    #ifndef NDEBUG
+    assertObbCorrectness(obb);
+    assertSphereCorrectness(sphere);
+    #endif // NDEBUG
+
     glm::vec3 distance = sphere.center - obb.center;
     float projectionLengthDistance = glm::length(distance);
 
@@ -69,6 +87,10 @@ bool bTestCollision(const BoundingBox& obb, const Sphere& sphere)
 
 PlaneCollisionData bTestCollision(const BoundingBox& obb, const AxisAlignedPlane& axisAlignedPlane)
 {
+    #ifndef NDEBUG
+    assertObbCorrectness(obb);
+    #endif // NDEBUG
+
     unsigned char axisIndex = axisAlignedPlane.getAxisIndex();
 
     float projectionLengthDistance = std::fabs(axisAlignedPlane.distance - obb.center[axisIndex]);
@@ -98,6 +120,10 @@ PlaneCollisionData bTestCollision(const BoundingBox& obb, const AxisAlignedPlane
 
 PlaneCollisionData bTestCollision(const Sphere& sphere, const AxisAlignedPlane& axisAlignedPlane)
 {
+    #ifndef NDEBUG
+    assertSphereCorrectness(sphere);
+    #endif // NDEBUG
+
     float spherePos = sphere.center[axisAlignedPlane.getAxisIndex()];
 
     PlaneCollisionData data;
@@ -146,6 +172,12 @@ PlaneCollisionData bTestCollision(const AxisAlignedPlane& axisAlignedPlane1, con
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b)
 {
+    #ifndef NDEBUG
+    assert(floatEq(glm::length(axis), 1.f));
+    assertObbCorrectness(a);
+    assertObbCorrectness(b);
+    #endif // NDEBUG
+
     float projectionLengthDistance = std::fabs(glm::dot(b.center - a.center, axis));
     float projectionLengthA = computeHalfProjectionLength(axis, a);
     float projectionLengthB = computeHalfProjectionLength(axis, b);
@@ -154,6 +186,11 @@ bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const Boundi
 
 float computeHalfProjectionLength(const glm::vec3& projectionLine, const BoundingBox& obb)
 {
+    #ifndef NDEBUG
+    assert(floatEq(glm::length(projectionLine), 1.f));
+    assertObbCorrectness(obb);
+    #endif // NDEBUG
+
     float length = 0.f;
     for(unsigned char i = 0; i < 3; i++)
     {
@@ -161,4 +198,18 @@ float computeHalfProjectionLength(const glm::vec3& projectionLine, const Boundin
     }
 
     return length;
+}
+
+void assertObbCorrectness(const BoundingBox& obb)
+{
+    for(unsigned char i = 0; i < 3; i++)
+    {
+        assert(floatEq(glm::length(obb.directions[i]), 1.f));
+        assert(obb.halfLengths[i] > 0.f);
+    }
+}
+
+void assertSphereCorrectness(const Sphere& sphere)
+{
+    assert(sphere.radius > 0.f);
 }
