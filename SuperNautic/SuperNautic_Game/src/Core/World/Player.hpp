@@ -10,6 +10,7 @@
 #include "Core/Audio/PlayerAudio.hpp"
 #include "Core/World/Ship.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
+#include "Core/Utility/Camera.h"
 
 class Player
 {
@@ -28,12 +29,15 @@ public:
 		return _ship;
 	}
 
+	const Camera* getCamera();
+
 private:
-	int			_playerId;
-	Input		_input;
-	Ship		_ship;
-	HUD			_hud;
-	PlayerAudio _audio;
+	int							_playerId;
+	Input						_input;
+	Ship						_ship;
+	HUD							_hud;
+	PlayerAudio					_audio;
+	Camera						_camera;
 
 };
 
