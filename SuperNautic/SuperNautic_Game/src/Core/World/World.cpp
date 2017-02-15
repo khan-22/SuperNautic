@@ -23,7 +23,7 @@ World::World(ApplicationContext& context)
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 6.f));
 
 	// Create one player
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		if (sf::Joystick::isConnected(i)) {
 			_players.emplace_back(i);
@@ -31,6 +31,10 @@ World::World(ApplicationContext& context)
 			LOG(i);
 		}
 	}
+
+	// TEST PLAYER
+	_players.emplace_back(10);
+	_playerSegmentIndices.push_back(0);
 	//_players.emplace_back(0);
 	//_players.emplace_back(2);
 	//_players.emplace_back(3);
