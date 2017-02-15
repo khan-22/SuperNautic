@@ -3,6 +3,8 @@
 #include "Core/Utility/CollisionUtility.hpp"
 #include "Core/Geometry/Sphere.hpp"
 #include "Core/Geometry/BoundingBox.hpp"
+#include "Core/Geometry/AxisAlignedPlane.hpp"
+#include "Core/Io/Log.hpp"
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b);
 float computeHalfProjectionLength(const glm::vec3& projectionLine, const BoundingBox& obb);
@@ -64,6 +66,36 @@ bool bTestCollision(const BoundingBox& obb, const Sphere& sphere)
 
     return projectionLengthDistance > projectionLengthObb + projectionLengthSphere;
 }
+
+PlaneCollisionData bTestCollision(const BoundingBox& obb, const AxisAlignedPlane& axisAlignedPlane)
+{
+    unsigned char axisIndex = axisAlignedPlane.getAxisIndex();
+
+    float projectionLengthDistance = std::fabs(axisAlignedPlane.distance - obb.center[axisIndex]);
+    float projectionLengthObb = 0.f;
+    for(unsigned char i = 0; i < 3; i++)
+    {
+        projectionLengthObb += std::fabs(obb.halfLengths[i] * obb.directions[i][axisIndex]);
+    }
+
+    PlaneCollisionData data;
+    if(projectionLengthDistance > projectionLengthObb)
+    {
+        if(obb.center[axisIndex] > axisAlignedPlane.distance)
+        {
+            data.type = PlaneCollisionData::Type::FRONT;
+        }
+        else
+        {
+            data.type = PlaneCollisionData::Type::BACK;
+        }
+        return data;
+    }
+
+    data.type = PlaneCollisionData::Type::COLLISION;
+    return data;
+}
+
 
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b)
