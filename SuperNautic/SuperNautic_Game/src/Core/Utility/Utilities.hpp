@@ -27,4 +27,6 @@ inline T clamp(T value, T low, T high)
 	return value;
 }
 
+bool floatEq(float a, float b);
+
 #endif
