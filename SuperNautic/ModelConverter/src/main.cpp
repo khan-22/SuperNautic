@@ -157,7 +157,7 @@ void processIndices(std::vector<glm::uvec3>& faces, std::vector<GLuint>& indices
 struct Header
 {
 public:
-	uint32_t fuck			= 149;
+	uint32_t magicNumber	= 149;
 	uint32_t numVertices	= 0;
 	uint32_t numFaces		= 0;
 	uint32_t nameLength		= 0;
@@ -165,22 +165,12 @@ public:
 private:
 };
 
-//uint32_t FILLER[HEADER_RESERVED - sizeof(Header) / sizeof(uint32_t)];
-
 static_assert(sizeof(Header) <= HEADER_RESERVED_BYTES, "Header has exceeded reserved bytes!");
 
 void writeHeader(Header* header, FILE* file)
 {
 	fwrite(header, sizeof(Header), 1, file);
-/*
-	memset(FILLER, 0, HEADER_RESERVED_BYTES - sizeof(Header));
-	fwrite(FILLER, sizeof(uint32_t), HEADER_RESERVED - sizeof(Header) / sizeof(uint32_t), file);*/
-
-
-	//log(WHITE) << "SIZE OF HEADER: " << sizeof(Header) << std::endl;
-	//log(WHITE) << "Alignment: " << alignof(Header) << std::endl;
 }
-
 
 void testRead(const char* fileName);
 
@@ -214,11 +204,8 @@ bool convertFile(char* filePath)
 		textureIndex = importedMesh->mMaterialIndex;
 
 		processPositions(positions, importedMesh);
-
 		processTexCoords(texCoords, importedMesh);
-
 		processNormals(normals, importedMesh);
-
 		processIndices(faces, indices, importedMesh);
 	}
 	
@@ -323,9 +310,7 @@ int main(int argc, char* argv[])
 		}
 
 		log(color) << "--------" << std::endl;
-		//log(color) << "-- // -- // -- // -- // -- // -- // -- // -- // -- // -- // " << std::endl;
 		log(color) << "Finished! " << successCount << " out of " << argc - 1 << " succeeded!" << std::endl;
-		//log(color) << "-- // -- // -- // -- // -- // -- // -- // -- // -- // -- // " << std::endl;
 	}
 	else
 	{
@@ -335,20 +320,6 @@ int main(int argc, char* argv[])
 
 		log(RED) << "No file was given as input" << std::endl;
 	}
-
-
-
-	// ---
-	
-	/*
-	log(WHITE) << "Hello World! TEST" << std::endl;
-
-	const aiScene* importedData = aiImportFile("./test.fbx", aiProcessPreset_TargetRealtime_MaxQuality);
-	
-	log(GREEN) << "Loaded: " << importedData->mNumMeshes << " meshes" << std::endl;
-
-	aiReleaseImport(importedData);
-	*/
 
 	std::cin.get();
 
