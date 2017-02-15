@@ -128,7 +128,7 @@ CollisionMesh::CollisionResult CollisionMesh::testCollisionSphereAxisAlignedPlan
 
 CollisionMesh::CollisionResult CollisionMesh::testCollisionAxisAlignedPlaneAxisAlignedPlane(const CollisionMesh& axisAlignedPlane1, const CollisionMesh& axisAlignedPlane2)
 {
-    return convertPlaneCollisionDataToCollisionResult(::bTestCollision(axisAlignedPlane1._axisAlignedPlane, axisAlignedPlane1._axisAlignedPlane));
+    return convertPlaneCollisionDataToCollisionResult(::bTestCollision(axisAlignedPlane1._axisAlignedPlane, axisAlignedPlane2._axisAlignedPlane));
 }
 
 CollisionMesh::CollisionResult CollisionMesh::convertPlaneCollisionDataToCollisionResult(const PlaneCollisionData& data)
