@@ -12,6 +12,7 @@ World::World(ApplicationContext& context)
 	, _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
+	, _timer(1280, 720)
 {
 	_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 
@@ -48,7 +49,7 @@ World::World(ApplicationContext& context)
 	//_playerSegmentIndices.push_back(0);
 	//_playerSegmentIndices.push_back(0);
 
-	_track.setLength(40000);
+	_track.setLength(10000);
 	_track.setSeed(1);
 	_track.generate();
 	_bDebugging = false;
@@ -125,6 +126,9 @@ void World::update(float dt, sf::Window& window)
 	{
 		_bDebugging = false;
 	}
+
+	_timer.updateTime(dt);
+	_timer.updateCurrent();
 }
 
 void World::render()
@@ -164,6 +168,8 @@ void World::render()
 	{
 		sfml.render(player.getHud());
 	}
+
+	sfml.render(_timer);
 
 	sfml.display(_context.window);
 }

@@ -3,12 +3,12 @@
 #ifndef HUD_HPP
 #define HUD_HPP
 
-#include <SFML\Graphics\Font.hpp>
-#include <SFML\Graphics\Text.hpp>
-#include <SFML\Graphics\RenderTarget.hpp>
-#include <SFML\Graphics\Sprite.hpp>
-#include <SFML\Graphics\Texture.hpp>
-#include <SFML\Graphics\RectangleShape.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 #include "Core/Gui/SceneNode.hpp"
 #include "Core/Asset/Asset.hpp"
