@@ -48,7 +48,7 @@ int Track::getGeneratedLength() const
 // Sets the track length in whole meters
 void Track::setLength(const unsigned int length)
 {
-	assert(length >= 3000 && length <= 100000);
+	assert(length >= 3000 && length <= 1000000);
 	_targetLength = length;
 }
 

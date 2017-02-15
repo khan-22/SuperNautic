@@ -26,7 +26,7 @@ World::World(ApplicationContext& context)
 	_players.emplace_back();
 	_playerSegmentIndices.push_back(0);
 
-	_track.setLength(100000);
+	_track.setLength(40000);
 	_track.setSeed(1);
 	_track.generate();
 	_bDebugging = false;
