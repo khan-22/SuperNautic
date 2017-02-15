@@ -55,7 +55,7 @@ bool bTestCollision(const BoundingBox& a, const BoundingBox& b)
     {
         for(unsigned char j = 0; j < 3; j++)
         {
-            if(bIsSeparatingAxis(glm::cross(a.directions[i], b.directions[j]), a, b))
+            if(bIsSeparatingAxis(glm::normalize(glm::cross(a.directions[i], b.directions[j])), a, b))
             {
                 return false;
             }
@@ -169,6 +169,11 @@ PlaneCollisionData bTestCollision(const AxisAlignedPlane& axisAlignedPlane1, con
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b)
 {
+    if(!std::isfinite(axis.x) || !std::isfinite(axis.x) || !std::isfinite(axis.x))
+    {
+        return false;
+    }
+
     if(floatEq(std::fabs(axis.x) + std::fabs(axis.y) + std::fabs(axis.z), 0.f))
     {
         return false;
