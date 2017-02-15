@@ -21,10 +21,17 @@ World::World(ApplicationContext& context)
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 
 	// Create one player
-	_players.emplace_back();
+	_players.emplace_back(0);
+	_players.emplace_back(2);
+	_players.emplace_back(3);
+	_players.emplace_back(4);
+
+	_playerSegmentIndices.push_back(0);
+	_playerSegmentIndices.push_back(0);
+	_playerSegmentIndices.push_back(0);
 	_playerSegmentIndices.push_back(0);
 
-	_track.setLength(10000);
+	_track.setLength(3000);
 	_track.setSeed(1);
 	_track.generate();
 }
@@ -89,15 +96,20 @@ void World::update(float dt)
 
 void World::render()
 {
+	std::vector<PointLight> shipLights;
 	for (Player& player : _players)
 	{
 		_renderer.render(player.getShip());
+		shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f));
+	}
+
+	for (int i = 0; i < shipLights.size(); i++)
+	{
+		_renderer.pushPointLight(shipLights[i]);
 	}
 
 	_track.render(_renderer);
 
-	PointLight testLight(_players[0].getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f);
-	_renderer.pushPointLight(testLight);
 
 	for (int i = 0; i < _pointLights.size(); i++)
 	{

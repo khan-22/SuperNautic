@@ -74,6 +74,8 @@ private:
 
 	SpringTranslatedVector _meshPosition;			// Global position of ship mesh
 
+	glm::mat4	_meshMatrix;
+
 	const float _minAcceleration;
 	const float _maxAcceleration;
 	const float _maxTurningSpeed;
