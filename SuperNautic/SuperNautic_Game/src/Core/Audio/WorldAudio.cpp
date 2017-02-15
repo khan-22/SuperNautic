@@ -1,4 +1,5 @@
 #include <string>
+#include <SFML/Audio/SoundBufferRecorder.hpp>
 
 #include "Core/Audio/WorldAudio.hpp"
 
@@ -10,7 +11,7 @@ WorldAudio::WorldAudio()
 	}
 
 	_music.setLoop(true);
-	_music.play();
+	play();
 }
 
 WorldAudio::~WorldAudio()
@@ -19,7 +20,10 @@ WorldAudio::~WorldAudio()
 }
 
 void WorldAudio::play() {
-	_music.play();
+	if (sf::SoundBufferRecorder::isAvailable())
+	{
+		_music.play();
+	}
 }
 
 void WorldAudio::stop() {
