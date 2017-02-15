@@ -5,6 +5,7 @@
 #include "Core/Geometry/BoundingBox.hpp"
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b);
+float computeHalfProjectionLength(const glm::vec3& projectionLine, const BoundingBox& obb);
 
 
 bool bTestCollision(const Sphere& a, const Sphere& b)
@@ -17,22 +18,6 @@ bool bTestCollision(const Sphere& a, const Sphere& b)
     return distanceSqrd < maxRadius * maxRadius;
 }
 
-bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b)
-{
-    float projectionLengthA = 0.f;
-    float projectionLengthB = 0.f;
-    for(unsigned char i = 0; i < 3; i++)
-    {
-        projectionLengthA += a.halfLengths[i] * std::fabs(glm::dot(a.directions[i], axis));
-        projectionLengthB += b.halfLengths[i] * std::fabs(glm::dot(b.directions[i], axis));
-    }
-
-    float projectionLengthDistance = std::fabs(glm::dot(b.center - a.center, axis));
-
-    return projectionLengthDistance > projectionLengthA + projectionLengthB;
-}
-
-
 bool bTestCollision(const BoundingBox& a, const BoundingBox& b)
 {
     // Check for separating axis using a's and b's directions.
@@ -42,12 +27,15 @@ bool bTestCollision(const BoundingBox& a, const BoundingBox& b)
         {
             return false;
         }
-
+    }
+    for(unsigned char i = 0; i < 3; i++)
+    {
         if(bIsSeparatingAxis(b.directions[i], a, b))
         {
             return false;
         }
     }
+
 
     // Check for separating axis using all cross products
     // of a's and b's directions.
@@ -63,4 +51,36 @@ bool bTestCollision(const BoundingBox& a, const BoundingBox& b)
     }
 
     return true;
+}
+
+bool bTestCollision(const BoundingBox& obb, const Sphere& sphere)
+{
+    glm::vec3 distance = sphere.center - obb.center;
+    float projectionLengthDistance = glm::length(distance);
+
+    glm::vec3 separatingAxis = glm::normalize(distance);
+    float projectionLengthObb = computeHalfProjectionLength(separatingAxis, obb);
+    float projectionLengthSphere = sphere.radius;
+
+    return projectionLengthDistance > projectionLengthObb + projectionLengthSphere;
+}
+
+
+bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b)
+{
+    float projectionLengthDistance = std::fabs(glm::dot(b.center - a.center, axis));
+    float projectionLengthA = computeHalfProjectionLength(axis, a);
+    float projectionLengthB = computeHalfProjectionLength(axis, b);
+    return projectionLengthDistance > projectionLengthA + projectionLengthB;
+}
+
+float computeHalfProjectionLength(const glm::vec3& projectionLine, const BoundingBox& obb)
+{
+    float length = 0.f;
+    for(unsigned char i = 0; i < 3; i++)
+    {
+        length += obb.halfLengths[i] * std::fabs(glm::dot(obb.directions[i], projectionLine));
+    }
+
+    return length;
 }
