@@ -54,7 +54,7 @@ void Player::update(float dt)
     }
     else
     {
-		/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 		{
 			_ship.jump();
 		}
@@ -75,7 +75,7 @@ void Player::update(float dt)
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
             _ship.setAcceleration(-1.f);
-        }*/
+        }
     }
 
     _ship.update(dt);

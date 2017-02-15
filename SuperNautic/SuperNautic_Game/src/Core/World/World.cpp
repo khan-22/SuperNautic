@@ -21,15 +21,23 @@ World::World(ApplicationContext& context)
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 
 	// Create one player
-	_players.emplace_back(0);
-	_players.emplace_back(2);
-	_players.emplace_back(3);
-	_players.emplace_back(4);
+	for (int i = 0; i < 10; i++)
+	{
+		if (sf::Joystick::isConnected(i)) {
+			_players.emplace_back(i);
+			_playerSegmentIndices.push_back(0);
+			LOG(i);
+		}
+	}
+	//_players.emplace_back(0);
+	//_players.emplace_back(2);
+	//_players.emplace_back(3);
+	//_players.emplace_back(4);
 
-	_playerSegmentIndices.push_back(0);
-	_playerSegmentIndices.push_back(0);
-	_playerSegmentIndices.push_back(0);
-	_playerSegmentIndices.push_back(0);
+	//_playerSegmentIndices.push_back(0);
+	//_playerSegmentIndices.push_back(0);
+	//_playerSegmentIndices.push_back(0);
+	//_playerSegmentIndices.push_back(0);
 
 	_track.setLength(3000);
 	_track.setSeed(1);
