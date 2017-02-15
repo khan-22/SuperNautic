@@ -25,16 +25,18 @@ Ship::Ship()
 		_trackForward{ 0.0f, 0.0f, 1.0f },
 		_shipForward{ 0.0f, 0.0f, 1.0f },
 		_upDirection{ 0.0f, 1.0f, 0.0f },
-		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 300.0f, 7.0f },
-		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 50.0f, 3.0f },
-		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 10.0f, 5.0f },
+		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 200.0f, 6.0f },
+		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 150.0f, 10.0f },
+		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 15.0f, 5.0f },
+		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 400.0f, 20.0f },
+		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 250.0f },
 		_minAcceleration{ 0.0f },
 		_maxAcceleration{ 200.0f },
 		_maxTurningSpeed{ 8.0f },
-		_straighteningForce{ 10.0f },
-		_steerStraighteningForce{ 10.0f },
+		_straighteningForce{ 3.0f },
+		_steerStraighteningForce{ 15.0f },
 		_speedResistance{ 0.005f },
-		_preferredHeight{ 3.0f }
+		_preferredHeight{ 4.0f }
 {
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.fbx"), MaterialCache::get("test.mat"));
 	setOrigin(glm::vec3{ 0.0f, 0.25f, 0.0f });
@@ -68,7 +70,7 @@ void Ship::update(float dt)
 	if (!_stopped)
 	{
 		// Update turning angle										reduce maneuverability at high acceleration
-		_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.5f) * dt;
+		_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.3f) * dt;
 		// abs to preserve sign of _currentTurningAngle
 		_currentTurningAngle -= _steerStraighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
 
@@ -100,8 +102,32 @@ void Ship::update(float dt)
 
 	// Rotate ship forward towards track forward
 	glm::vec3 rotateTowards = glm::normalize(_trackForward - glm::dot(_trackForward, _upDirection) * _upDirection);
-	float angle = acosf(glm::dot(_shipForward, rotateTowards));
-	glm::mat4 forwardRotation = glm::rotate(-angle * 10.0f * dt, _upDirection);
+	float dot = glm::dot(_shipForward, rotateTowards);
+	float angle;
+
+	// Protect against angle == nan
+	if (dot >= 1.0f)
+	{
+		angle = 0.0f;
+	}
+	else if (dot <= -1.0f)
+	{
+		angle = glm::pi<float>();
+	}
+	else
+	{
+		angle = acosf(dot);
+	}
+
+	// Ensure correct rotation direction
+	glm::vec3 cross = glm::cross(rotateTowards, _shipForward);
+	if (glm::dot(cross, _upDirection) > 0)
+	{
+		angle = -angle;
+	}
+
+	// Rotate direction
+	glm::mat4 forwardRotation = glm::rotate(angle * _straighteningForce * dt, _upDirection);
 	_shipForward = forwardRotation * glm::vec4{ _shipForward, 0 };
 
 	// Create rays and test for intersections
@@ -143,13 +169,17 @@ void Ship::update(float dt)
 	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _shipForward, 0.0f };
 	move(velocityDirection * _velocity * dt);
 
+	// Update mesh position
+	_meshPosition.setTarget(getPosition());
+	_meshPosition.update(dt);
+
 	// Update mesh forward direction
 	_meshForwardDirection.setTarget(velocityDirection);
 	_meshForwardDirection.setBackupAxis(_upDirection);
 	_meshForwardDirection.update(dt);
 
-	// Rotate mesh up direction towards 'correct' up direction
-	_meshUpDirection.setTarget(_upDirection);
+	// Update mesh up direction
+	_meshUpDirection.setTarget( glm::rotate(-_currentTurningAngle * 1.5f, _shipForward) * glm::vec4{ _upDirection, 0.0f });
 	_meshUpDirection.setBackupAxis(_meshForwardDirection());
 	_meshUpDirection.update(dt);
 
@@ -157,16 +187,22 @@ void Ship::update(float dt)
 	_cameraUpDirection.setTarget(_upDirection);
 	_cameraUpDirection.setBackupAxis(_meshForwardDirection());
 	_cameraUpDirection.update(dt);
+
+	// Update camera forward direction
+	_cameraForwardDirection.setTarget(_shipForward);
+	_cameraForwardDirection.setBackupAxis(_upDirection);
+	_cameraForwardDirection.update(dt);
 		
-	// Ship always faces straight forward, only movement direction and mesh rotates
-	// Create from mesh up direction
-	glm::mat4 meshMatrix{ glm::vec4{ glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection())), 0.0f },
-						  glm::vec4{ glm::normalize(_meshUpDirection() - glm::dot(_meshUpDirection(), _meshForwardDirection()) * _meshForwardDirection()), 0.0f },	// The part of _meshUpDirection that is orthogonal to _meshForwardDirection
+	// Create mesh rotation matrix from mesh up and forward directions
+	glm::vec3 up = glm::rotate(-_currentTurningAngle * 0.0f, _shipForward) * glm::vec4{ _meshUpDirection(), 0.0f };
+
+	glm::mat4 meshMatrix{ glm::vec4{ glm::normalize(glm::cross(up, _meshForwardDirection())), 0.0f },
+						  glm::vec4{ glm::normalize(up - glm::dot(up, _meshForwardDirection()) * _meshForwardDirection()), 0.0f },	// The part of _meshUpDirection that is orthogonal to _meshForwardDirection
 						  glm::vec4{ _meshForwardDirection(), 0.0f },
 						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 
 	// Update model's matrix
-	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(getPosition()) * meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
+	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(_meshPosition()) * meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -242,7 +278,12 @@ void Ship::setReturnPos(const glm::vec3& returnPos)
 	_returnPos = returnPos;
 }
 
-const glm::vec3& Ship::getForward() const
+const glm::vec3& Ship::getCameraForward() const
 {
-	return _shipForward;
+	return _cameraForwardDirection();
+}
+
+const glm::vec3& Ship::getMeshPosition() const
+{
+	return _meshPosition();
 }

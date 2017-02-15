@@ -23,7 +23,7 @@ public:
 
 	void setDampingConstant(float dampingConstant);
 
-	void setVector(glm::vec3& vector);
+	void setVector(const glm::vec3& vector);
 
 private:
 	// The rotating vector

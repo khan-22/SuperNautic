@@ -70,7 +70,7 @@ void SpringRotatedVector::setDampingConstant(float dampingConstant)
 	_dampingConstant = dampingConstant;
 }
 
-void SpringRotatedVector::setVector(glm::vec3& vector)
+void SpringRotatedVector::setVector(const glm::vec3& vector)
 {
 	_vector = vector;
 }

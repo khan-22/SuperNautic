@@ -13,6 +13,7 @@
 #include "GFX/Resources/TexturedModel.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
 #include "Core/Utility/SpringRotatedVector.hpp"
+#include "Core/Utility/SpringTranslatedVector.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 {
@@ -45,7 +46,8 @@ public:
 	void setSegments(const std::vector<SegmentInstance*> segments);
 	// Indicates where to return to if ship has escaped track
 	void setReturnPos(const glm::vec3& returnPos);
-	const glm::vec3& getForward() const;
+	const glm::vec3& getCameraForward() const;
+	const glm::vec3& getMeshPosition() const;
 
 
 private:
@@ -60,14 +62,17 @@ private:
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
 
-	glm::vec3			_trackForward;			// Forward direction of track
-	glm::vec3			_shipForward;			// Current forward direction of ship
-	glm::vec3			_upDirection;			// Current up direction
-	glm::vec3			_returnPos;				// Respawn position of ship
+	glm::vec3				_trackForward;			// Forward direction of track
+	glm::vec3				_shipForward;			// Current forward direction of ship
+	glm::vec3				_upDirection;			// Current up direction
+	glm::vec3				_returnPos;				// Respawn position of ship
 
-	SpringRotatedVector	_meshForwardDirection;	// Current facing direction
-	SpringRotatedVector	_meshUpDirection;		// Up direction of ship mesh
-	SpringRotatedVector _cameraUpDirection;
+	SpringRotatedVector		_meshForwardDirection;	// Current facing direction
+	SpringRotatedVector		_meshUpDirection;		// Up direction of ship mesh
+	SpringRotatedVector		_cameraUpDirection;
+	SpringRotatedVector		_cameraForwardDirection;
+
+	SpringTranslatedVector _meshPosition;			// Global position of ship mesh
 
 	const float _minAcceleration;
 	const float _maxAcceleration;
