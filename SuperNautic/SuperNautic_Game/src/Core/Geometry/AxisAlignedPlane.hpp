@@ -7,21 +7,16 @@ struct AxisAlignedPlane
 {
     enum class Axis : unsigned char
     {
-        X,
-        Y,
-        Z,
+        X = 0,
+        Y = 1,
+        Z = 2,
     };
     // axis is the normal of the plane.
     // distance is distance from origo.
-    AxisAlignedPlane(Axis axis, float distance)
-    : axis(axis)
-    , distance(distance)
-    {
-    }
+    AxisAlignedPlane(Axis axis, float distance);
+    AxisAlignedPlane();
 
-    AxisAlignedPlane()
-    {
-    }
+    unsigned char getAxisIndex() const;
 
     Axis axis = Axis::X;
     float distance = 0.f;
