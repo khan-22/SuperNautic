@@ -22,7 +22,9 @@ bool bTestCollision(const Sphere& a, const Sphere& b)
 
     glm::vec3 distanceVector = a.center - b.center;
     float distanceSqrd = glm::dot(distanceVector, distanceVector);
-    return distanceSqrd < a.radius * a.radius + b.radius * b.radius;
+    float minDistanceSqrd = a.radius + b.radius;
+    minDistanceSqrd *= minDistanceSqrd;
+    return distanceSqrd < minDistanceSqrd;
 }
 
 bool bTestCollision(const BoundingBox& a, const BoundingBox& b)
@@ -74,12 +76,16 @@ bool bTestCollision(const BoundingBox& obb, const Sphere& sphere)
 
     glm::vec3 distance = sphere.center - obb.center;
     float projectionLengthDistance = glm::length(distance);
-
+    if(floatEq(projectionLengthDistance, 0.f))
+    {
+        return true;
+    }
     glm::vec3 separatingAxis = glm::normalize(distance);
     float projectionLengthObb = computeHalfProjectionLength(separatingAxis, obb);
     float projectionLengthSphere = sphere.radius;
 
-    return projectionLengthDistance > projectionLengthObb + projectionLengthSphere;
+    // Allow equality for edge intersections.
+    return !(projectionLengthDistance > projectionLengthObb + projectionLengthSphere);
 }
 
 PlaneCollisionData bTestCollision(const BoundingBox& obb, const AxisAlignedPlane& axisAlignedPlane)
@@ -169,7 +175,7 @@ PlaneCollisionData bTestCollision(const AxisAlignedPlane& axisAlignedPlane1, con
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b)
 {
-    if(!std::isfinite(axis.x) || !std::isfinite(axis.x) || !std::isfinite(axis.x))
+    if(!std::isfinite(axis.x) || !std::isfinite(axis.y) || !std::isfinite(axis.z))
     {
         return false;
     }
@@ -193,7 +199,12 @@ bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const Boundi
 
 float computeHalfProjectionLength(const glm::vec3& projectionLine, const BoundingBox& obb)
 {
+
     #ifndef NDEBUG
+    if(!floatEq(glm::length(projectionLine), 1.f))
+    {
+        int flerp = 0;
+    }
     assert(floatEq(glm::length(projectionLine), 1.f));
     assertObbCorrectness(obb);
     #endif // NDEBUG
