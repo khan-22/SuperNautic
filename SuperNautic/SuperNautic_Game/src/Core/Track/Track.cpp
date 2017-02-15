@@ -66,6 +66,13 @@ void Track::setSeed(const unsigned int seed)
 	}
 }
 
+// Sets the difficulty of the track (0-5)
+void Track::setCurviness(const unsigned int curviness)
+{
+	assert(curviness >= 0 && curviness <= 5);
+	_curviness = curviness;
+}
+
 // Generates the track
 bool Track::generate()
 {
@@ -92,7 +99,7 @@ bool Track::generate()
 			{
 				LOG_ERROR("WARNING! Something went wrong with the track generation! Not enough connections of type '", endConnection, "'?");
 			}
-		} while (index == prevIndex);
+		} while ((_segmentHandler->infos().size() >= 2 && index == prevIndex));
 		// Normal segment placement
 		if (index < _segmentHandler->infos().size())
 		{
@@ -153,7 +160,7 @@ int Track::getIndex(char connectionType) const
 	std::vector<int> validSegments = std::vector<int>();
 	for (unsigned int i = 0; i < infos.size(); i++)
 	{
-		if (infos[i]._startConnection == connectionType)
+		if (infos[i]._startConnection == connectionType && infos[i]._probability != 0)
 		{
 			validSegments.push_back(i);
 		}
@@ -165,10 +172,10 @@ int Track::getIndex(char connectionType) const
 			validSegments.push_back(infos.size() + i);
 		}
 	}
-	if (validSegments.size() < 2)
-	{
-		return -1;
-	}
+	//if (validSegments.size() < 2)
+	//{
+	//	return -1;
+	//}
 	// Calculating total probability
 	unsigned int totalProbability = 0;
 	for (unsigned int i = 0; i < validSegments.size(); i++)

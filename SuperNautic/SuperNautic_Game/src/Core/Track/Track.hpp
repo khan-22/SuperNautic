@@ -20,6 +20,7 @@ public:
 	int getGeneratedLength() const;
 	void setLength(const unsigned int length);
 	void setSeed(const unsigned int seed);
+	void setCurviness(const unsigned int curviness);
 	bool generate();
 	int getNrOfSegments() const;
 	SegmentInstance* getInstance(int index);
@@ -44,6 +45,7 @@ private:
 	int								_targetLength;
 	int								_generatedLength;
 	unsigned int					_seed;
+	unsigned int					_curviness;
 	glm::mat4						_endMatrix;
 };
 
