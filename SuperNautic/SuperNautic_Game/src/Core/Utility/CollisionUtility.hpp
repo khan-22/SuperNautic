@@ -23,5 +23,6 @@ bool bTestCollision(const Sphere& a, const Sphere& b);
 bool bTestCollision(const BoundingBox& a, const BoundingBox& b);
 bool bTestCollision(const BoundingBox& obb, const Sphere& sphere);
 PlaneCollisionData bTestCollision(const BoundingBox& obb, const AxisAlignedPlane& axisAlignedPlane);
+PlaneCollisionData bTestCollision(const Sphere& sphere, const AxisAlignedPlane& axisAlignedPlane);
 
 #endif //COLLISION_UTILITY_HPP
