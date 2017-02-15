@@ -39,3 +39,38 @@ void SpringRotatedVector::update(float dt)
 		_vector = rotation * glm::vec4{ _vector, 0.0f };
 	}
 }
+
+const glm::vec3& SpringRotatedVector::operator()() const
+{
+	return _vector;
+}
+
+const glm::vec3& SpringRotatedVector::getVector() const
+{
+	return (*this)();
+}
+
+void SpringRotatedVector::setTarget(const glm::vec3& target)
+{
+	_target = glm::normalize(target);
+}
+
+void SpringRotatedVector::setBackupAxis(const glm::vec3& backupAxis)
+{
+	_backupAxis = glm::normalize(backupAxis);
+}
+
+void SpringRotatedVector::setSpringConstant(float springConstant)
+{
+	_springConstant = springConstant;
+}
+
+void SpringRotatedVector::setDampingConstant(float dampingConstant)
+{
+	_dampingConstant = dampingConstant;
+}
+
+void SpringRotatedVector::setVector(glm::vec3& vector)
+{
+	_vector = vector;
+}

@@ -7,7 +7,7 @@
 
 World::World(ApplicationContext& context)
 	: _segmentHandler{ "Segments/segmentinfos1.txt", "Segments/ConnectionTypes.txt" }, _track{ &_segmentHandler }, _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
-	, _bHasWon(false), srv{ glm::vec3{ 0,-1,0 }, glm::vec3{ 0,1,0 },glm::vec3{ 0,0,1 }, 1.0f, 0.3f }
+	, _bHasWon(false)
 {
 	_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 
@@ -80,24 +80,19 @@ void World::update(float dt)
 		_players[i].update(dt);
 	}
 
-	_camera.setPos(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 2, -30, 1 } });
-	_camera.setUp(glm::vec3{ _players[0].getShip().getCameraUp() });
-	_camera.setViewDir(glm::vec3{ _players[0].getShip().getTransformMatrix() * glm::vec4{ 0, 0, 1, 0 } });
-	
-
-	srv.update(dt);
+	_camera.setPos(_players[0].getShip().getPosition() + glm::vec3{ 0, 2, -30 });
+	_camera.setUp(_players[0].getShip().getCameraUp());
+	_camera.setViewDir(glm::vec3{ 0, 0, 1 });
 }
 
 void World::render()
 {
 	for (Player& player : _players)
 	{
-		//player.render(_renderer);
 		_renderer.render(player.getShip());
 	}
 
 	_track.render(_renderer);
-	//_renderer.render(_track.);
 
 	PointLight testLight(_players[0].getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f);
 	_renderer.pushPointLight(testLight);

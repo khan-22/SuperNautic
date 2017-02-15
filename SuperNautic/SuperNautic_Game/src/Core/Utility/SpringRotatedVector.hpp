@@ -11,40 +11,19 @@ public:
 	SpringRotatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& backupAxis, float springConstant, float dampingConstant);
 	void update(float dt);
 
-	const glm::vec3& operator()() const
-	{
-		return _vector;
-	}
+	const glm::vec3& operator()() const;
 
-	const glm::vec3& getVector() const
-	{
-		return (*this)();
-	}
+	const glm::vec3& getVector() const;
 
-	void setTarget(const glm::vec3& target)
-	{
-		_target = glm::normalize(target);
-	}
+	void setTarget(const glm::vec3& target);
 
-	void setBackupAxis(const glm::vec3& backupAxis)
-	{
-		_backupAxis = glm::normalize(backupAxis);
-	}
+	void setBackupAxis(const glm::vec3& backupAxis);
 
-	void setSpringConstant(float springConstant)
-	{
-		_springConstant = springConstant;
-	}
+	void setSpringConstant(float springConstant);
 
-	void setDampingConstant(float dampingConstant)
-	{
-		_dampingConstant = dampingConstant;
-	}
+	void setDampingConstant(float dampingConstant);
 
-	void setVector(glm::vec3& vector)
-	{
-		_vector = vector;
-	}
+	void setVector(glm::vec3& vector);
 
 private:
 	// The rotating vector
@@ -58,7 +37,7 @@ private:
 
 	// Spring strength
 	float _springConstant;
-	// Force of damping linear to velocity
+	// Force of damping, linear to velocity
 	float _dampingConstant;
 };
 

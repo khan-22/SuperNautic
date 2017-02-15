@@ -14,25 +14,24 @@ Ship::Ship()
 		_turningFactor{ 0.0f },
 		_currentTurningAngle{ 0.0f },
 		_accelerationFactor{ 0.5f },
-		_upAcceleration{ 0.0f },
 		_jumpCooldown{ 2.0f },
 		_currentJumpCooldown{ 0.0f },
 		_engineTemperature{ 0.0f },
 		_velocity{ 0.0f },
-		_upVelocity{ 0.0f },
+		_timeSinceIntersection{ 0.0f },
 		_trackForward{ 0.0f, 0.0f, 1.0f },
-		_facingDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 300.0f, 10.0f },
+		_shipForward{ 0.0f, 0.0f, 1.0f },
 		_upDirection{ 0.0f, 1.0f, 0.0f },
+		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 300.0f, 7.0f },
 		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 50.0f, 3.0f },
 		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 10.0f, 5.0f },
 		_minAcceleration{ 0.0f },
 		_maxAcceleration{ 200.0f },
-		_maxTurningSpeed{ 5.0f },
+		_maxTurningSpeed{ 8.0f },
 		_straighteningForce{ 10.0f },
+		_steerStraighteningForce{ 10.0f },
 		_speedResistance{ 0.005f },
-		_preferredHeight{ 3.0f },
-		_levitationForce{ 3.0f },
-		_upResistance{ 10.0f }
+		_preferredHeight{ 3.0f }
 {
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.fbx"), MaterialCache::get("test.mat"));
 	setOrigin(glm::vec3{ 0.0f, 0.25f, 0.0f });
@@ -66,9 +65,9 @@ void Ship::update(float dt)
 	if (!_stopped)
 	{
 		// Update turning angle										reduce maneuverability at high acceleration
-		_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.7f) * dt;
+		_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.5f) * dt;
 		// abs to preserve sign of _currentTurningAngle
-		_currentTurningAngle -= _straighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
+		_currentTurningAngle -= _steerStraighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
 
 		// Update velocity
 		_velocity += (_minAcceleration + _accelerationFactor * (_maxAcceleration - _minAcceleration)) * dt;
@@ -96,91 +95,72 @@ void Ship::update(float dt)
 	// Update engine temperature
 	_engineTemperature = ((_accelerationFactor + _velocity) / 2);
 
-	// Create ray and test for intersection
-	Ray r{ getPosition(), -_upDirection, 1000.0f };
-	RayIntersection ri{ false }; 
+	// Rotate ship forward towards track forward
+	glm::vec3 rotateTowards = glm::normalize(_trackForward - glm::dot(_trackForward, _upDirection) * _upDirection);
+	float angle = acosf(glm::dot(_shipForward, rotateTowards));
+	glm::mat4 forwardRotation = glm::rotate(-angle * 10.0f * dt, _upDirection);
+	_shipForward = forwardRotation * glm::vec4{ _shipForward, 0 };
+
+	// Create rays and test for intersections
+	Ray atShipRay{ getPosition() + _upDirection * _rayHeight, -_upDirection, 1000.0f };
+	Ray aheadOfShipRay{ getPosition() + _shipForward * _rayAheadDistance + _upDirection * _rayHeight, -_upDirection, 1000.0f };
+	RayIntersection atShipIntersection{ false };
+	RayIntersection aheadOfShipIntersection{ false };
 	
 	for (unsigned i = 0; i < _segmentsToTest.size(); ++i)
 	{
-		RayIntersection intersection = _segmentsToTest[i]->rayIntersectionTest(r);
+		RayIntersection at = _segmentsToTest[i]->rayIntersectionTest(atShipRay);
+		RayIntersection aheadOf = _segmentsToTest[i]->rayIntersectionTest(aheadOfShipRay);
 
-		if (intersection && (!ri || intersection._length < ri._length))
+		if (at && (!atShipIntersection || at._length < atShipIntersection._length))
 		{
-			ri = intersection;
+			atShipIntersection = at;
+		}
+
+		if (aheadOf && (!aheadOfShipIntersection || aheadOf._length < aheadOfShipIntersection._length))
+		{
+			aheadOfShipIntersection = aheadOf;
 		}
 	}
 
-	if (ri)
+	if (atShipIntersection && aheadOfShipIntersection)
 	{
 		// Reset hit timer
 		_timeSinceIntersection = 0.0f;
 
-		// How much influence the surface normal will have on the rotation of the ship, decreases as distance from surface increases
-		float normalWeight;
-
-		if (ri._length <= _preferredHeight)
-		{
-			normalWeight = 1.0f;
-		}
-		else
-		{
-			normalWeight = (_preferredHeight / ri._length) * 0.3f;
-		}
-
 		// Update local directions
-		_upDirection = glm::normalize(_upDirection * (1.0f - normalWeight) + ri._normal * normalWeight);
-		_facingDirection.setTarget(glm::normalize(_trackForward - glm::dot(_trackForward, ri._normal) * ri._normal));
-		_facingDirection.setBackupAxis(_upDirection);
-		_facingDirection.update(dt);
-
-		// Set rotation matrix
-		setLookAt(_facingDirection(), _upDirection);
-
-		// Set up/down velocity, for now linear to distance
-		/*if (ri._length < _preferredHeight)
-		{*/
-			_upVelocity = _preferredHeight - ri._length;
-		/*}
-		else
-		{
-			_upVelocity = (_preferredHeight - ri._length) * _levitationForce;
-		}*/
+		_upDirection = atShipIntersection._normal;
+		_shipForward = glm::normalize(aheadOfShipIntersection._position - atShipIntersection._position);
+		
+		// Move up/down to the correct track height
+		move(_upDirection * (_preferredHeight - (atShipIntersection._length - _rayHeight)));
 	}
 
-	// 'Rotate' mesh up direction towards 'correct' up direction
+	// Move forward
+	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _shipForward, 0.0f };
+	move(velocityDirection * _velocity * dt);
+
+	// Update mesh forward direction
+	_meshForwardDirection.setTarget(velocityDirection);
+	_meshForwardDirection.setBackupAxis(_upDirection);
+	_meshForwardDirection.update(dt);
+
+	// Rotate mesh up direction towards 'correct' up direction
 	_meshUpDirection.setTarget(_upDirection);
-	_meshUpDirection.setBackupAxis(_facingDirection());
+	_meshUpDirection.setBackupAxis(_meshForwardDirection());
 	_meshUpDirection.update(dt);
 
 	// Update camera up direction
 	_cameraUpDirection.setTarget(_upDirection);
-	_cameraUpDirection.setBackupAxis(_facingDirection());
+	_cameraUpDirection.setBackupAxis(_meshForwardDirection());
 	_cameraUpDirection.update(dt);
 		
 	// Ship always faces straight forward, only movement direction and mesh rotates
 	// Create from mesh up direction
-	glm::mat4 meshMatrix{ glm::vec4{ glm::normalize(glm::cross(_meshUpDirection(), _facingDirection())), 0.0f },
-						  glm::vec4{ glm::normalize(_meshUpDirection() - glm::dot(_meshUpDirection(), _facingDirection()) * _facingDirection()), 0.0f },	// The part of _meshUpDirection that is orthogonal to _facingDirection
-						  glm::vec4{ _facingDirection(), 0.0f },
+	glm::mat4 meshMatrix{ glm::vec4{ glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection())), 0.0f },
+						  glm::vec4{ glm::normalize(_meshUpDirection() - glm::dot(_meshUpDirection(), _meshForwardDirection()) * _meshForwardDirection()), 0.0f },	// The part of _meshUpDirection that is orthogonal to _meshForwardDirection
+						  glm::vec4{ _meshForwardDirection(), 0.0f },
 						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
-
-	// Rotate to display turning
-	meshMatrix = glm::rotate(meshMatrix, _currentTurningAngle, glm::vec3{ 0.0f, 1.0f, 0.0f });
-
-	// Move forward
-	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _facingDirection(), 0.0f };
-
-	move(velocityDirection * _velocity * dt);
-
-	// Move up/down
-	/*if (ri._length < _preferredHeight)
-	{*/
-		move(_upDirection * _upVelocity);
-	/*}
-	else
-	{
-		move(_upDirection * _upVelocity * dt);
-	}*/
 
 	// Update model's matrix
 	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(getPosition()) * meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
@@ -194,7 +174,7 @@ void Ship::jump()
 {
 	if (_currentJumpCooldown <= 0.0f)
 	{
-		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _facingDirection());
+		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _shipForward);
 
 		_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
 
@@ -222,12 +202,12 @@ float Ship::getSpeed()
 	return _velocity;
 }
 
-void Ship::setForward(glm::vec3& forwardDirection)
+void Ship::setForward(const glm::vec3& forwardDirection)
 {
 	_trackForward = forwardDirection;
 }
 
-void Ship::setSegments(std::vector<SegmentInstance*> segments)
+void Ship::setSegments(const std::vector<SegmentInstance*> segments)
 {
 	_segmentsToTest = segments;
 }
@@ -254,7 +234,12 @@ void Ship::repair()
 	_destroyed = false; 
 }
 
-void Ship::setReturnPos(glm::vec3& returnPos)
+void Ship::setReturnPos(const glm::vec3& returnPos)
 {
 	_returnPos = returnPos;
+}
+
+const glm::vec3& Ship::getForward() const
+{
+	return _shipForward;
 }
