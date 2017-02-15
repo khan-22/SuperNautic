@@ -46,6 +46,9 @@ Ship::Ship(glm::vec3 position) : Ship{}
 
 void Ship::render(GFX::RenderStates& states)
 {
+	// Update model's matrix
+	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(getPosition()) * _meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
+
 	_shipModel.render(states);
 }
 
@@ -137,12 +140,12 @@ void Ship::update(float dt)
 
 	// Ship always faces straight forward, only movement direction and mesh rotates
 	// Create from mesh up direction
-	glm::mat4 meshMatrix{ glm::vec4{ glm::cross(_meshUpDirection, _facingDirection), 0.0f },
-						  glm::vec4{ _meshUpDirection - glm::dot(_meshUpDirection, _facingDirection) * _facingDirection, 0.0f },	// The part of _meshUpDirection that is orthogonal to _facingDirection
-						  glm::vec4{ _facingDirection, 0.0f },
-						  glm::vec4{ 0.0f, 0.25f, 0.0f, 1.0f } };
+	_meshMatrix = { glm::vec4{ glm::cross(_meshUpDirection, _facingDirection), 0.0f },
+					glm::vec4{ _meshUpDirection - glm::dot(_meshUpDirection, _facingDirection) * _facingDirection, 0.0f },	// The part of _meshUpDirection that is orthogonal to _facingDirection
+					glm::vec4{ _facingDirection, 0.0f },
+					glm::vec4{ 0.0f, 0.25f, 0.0f, 1.0f } };
 	// Rotate to display turning
-	meshMatrix = glm::rotate(meshMatrix, _currentTurningAngle, glm::vec3{ 0.0f, 1.0f, 0.0f });
+	_meshMatrix = glm::rotate(_meshMatrix, _currentTurningAngle, glm::vec3{ 0.0f, 1.0f, 0.0f });
 
 	// Move forward
 	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _facingDirection + _upDirection * 0.01f, 0.0f };
@@ -150,9 +153,6 @@ void Ship::update(float dt)
 
 	// Move up/down
 	move(_upDirection * _upVelocity * dt);
-
-	// Update model's matrix
-	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(getPosition()) * meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;

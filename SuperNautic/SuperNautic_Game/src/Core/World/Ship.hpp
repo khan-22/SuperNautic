@@ -81,6 +81,8 @@ private:
 	glm::vec3	_upDirection;			// Current up direction
 	glm::vec3	_meshUpDirection;		// Up direction of ship mesh
 
+	glm::mat4	_meshMatrix;
+
 	const float _minAcceleration;
 	const float _maxAcceleration;
 	const float _maxTurningSpeed;

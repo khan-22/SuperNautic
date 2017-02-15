@@ -29,6 +29,7 @@ Input::~Input()
 void Input::update()
 {
 	const int thresh = 50;
+	const int lowThresh = 10;
 
 	if (checkActive())
 	{
@@ -39,6 +40,11 @@ void Input::update()
 		_triggers = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Z);
 
 		_events.clear();
+
+		if (_leftStickX)
+		{
+
+		}
 
 		sf::Event event;
 		if (_bButtonA && _bAWasDormant)
