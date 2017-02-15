@@ -17,7 +17,7 @@ Ship::Ship()
 		_turningFactor{ 0.0f },
 		_currentTurningAngle{ 0.0f },
 		_accelerationFactor{ 0.5f },
-		_jumpCooldown{ 2.0f },
+		_jumpCooldown{ 0.5f },
 		_currentJumpCooldown{ 0.0f },
 		_engineTemperature{ 0.0f },
 		_velocity{ 0.0f },
@@ -50,6 +50,9 @@ Ship::Ship(glm::vec3 position) : Ship{}
 
 void Ship::render(GFX::RenderStates& states)
 {
+	// Update model's matrix
+	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(getPosition()) * _meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
+
 	_shipModel.render(states);
 }
 
@@ -196,13 +199,10 @@ void Ship::update(float dt)
 	// Create mesh rotation matrix from mesh up and forward directions
 	glm::vec3 up = glm::rotate(-_currentTurningAngle * 0.0f, _shipForward) * glm::vec4{ _meshUpDirection(), 0.0f };
 
-	glm::mat4 meshMatrix{ glm::vec4{ glm::normalize(glm::cross(up, _meshForwardDirection())), 0.0f },
+	_meshMatrix = { glm::vec4{ glm::normalize(glm::cross(up, _meshForwardDirection())), 0.0f },
 						  glm::vec4{ glm::normalize(up - glm::dot(up, _meshForwardDirection()) * _meshForwardDirection()), 0.0f },	// The part of _meshUpDirection that is orthogonal to _meshForwardDirection
 						  glm::vec4{ _meshForwardDirection(), 0.0f },
 						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
-
-	// Update model's matrix
-	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(_meshPosition()) * meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
