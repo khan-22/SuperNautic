@@ -172,6 +172,11 @@ PlaneCollisionData bTestCollision(const AxisAlignedPlane& axisAlignedPlane1, con
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b)
 {
+    if(floatEq(axis.x + axis.y + axis.z, 0.f))
+    {
+        return false;
+    }
+
     #ifndef NDEBUG
     assert(floatEq(glm::length(axis), 1.f));
     assertObbCorrectness(a);
