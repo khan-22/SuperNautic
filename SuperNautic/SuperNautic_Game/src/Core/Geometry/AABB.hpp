@@ -79,7 +79,7 @@ struct AABB
 				float det = glm::dot(e0, pvec);
 
 				// Ray and triangle is in the same plane
-				if (abs(det) < 0.00001f)
+				if (det < 0.00001f)
 				{
 					continue;
 				}

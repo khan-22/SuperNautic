@@ -372,6 +372,8 @@ void Segment::createWaypoints()
 		length += lowestDistance;
 	}
 
+	length += glm::distance(glm::vec3{ _scene.get()->cameras[0] * glm::vec4{ 0, 0, 0, 1 } }, _waypoints[_waypoints.size() - 1]);
+
 	// Initialize _length
 	_length = length;
 }

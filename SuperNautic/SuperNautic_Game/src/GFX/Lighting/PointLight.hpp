@@ -39,7 +39,7 @@ public:
 	const PointLightProperties getLightProperties();
 
 	//Calculates the bounding sphere for the light
-	const GLfloat calculatePLBoundSize();
+	GLfloat calculatePLBoundSize();
 
 	~PointLight();
 private:
@@ -56,8 +56,9 @@ private:
 
 	//Attenuation properties, should probably expose these to allow modifcation in the future
 	GLfloat _constant	= 1.0f;
-	GLfloat _linear		= 0.045f;
-	GLfloat _quadratic	= 0.0075f;
+	GLfloat _linear		= 0.022;
+	GLfloat _quadratic	= 0.0019;
+	GLfloat _lightBoundsRadius;
 
 	PointLight();
 };
