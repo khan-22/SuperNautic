@@ -19,6 +19,11 @@
 HANDLE gConsoleHandle;
 CONSOLE_SCREEN_BUFFER_INFO gPreviousState;
 
+const char* reservedNames[] =
+{
+	"CM", "WP", "PL", "BB", "WPEnd"
+};
+
 enum LogColor : WORD
 {
 	BLUE	= 0x1 | 0x8,
@@ -158,11 +163,34 @@ struct Header
 {
 public:
 	uint32_t magicNumber	= 149;
+	uint32_t numMeshes		= 0;
+	/*
 	uint32_t numVertices	= 0;
 	uint32_t numFaces		= 0;
-	uint32_t nameLength		= 0;
+	uint32_t nameLength		= 0;*/
 
 private:
+};
+
+struct MeshHeader
+{
+	uint32_t numVertices = 0;
+	uint32_t numFaces = 0;
+	uint32_t nameLength = 0;
+};
+
+struct Mesh
+{
+	MeshHeader	header;
+	
+	std::string name;
+	unsigned int textureIndex = 0;
+
+	std::vector<glm::vec3>		positions;
+	std::vector<glm::vec3>		texCoords;
+	std::vector<glm::vec3>		normals;
+	std::vector<glm::uvec3>		faces;
+	std::vector<GLuint>			indices;
 };
 
 static_assert(sizeof(Header) <= HEADER_RESERVED_BYTES, "Header has exceeded reserved bytes!");
@@ -173,6 +201,20 @@ void writeHeader(Header* header, FILE* file)
 }
 
 void testRead(const char* fileName);
+
+bool containsSpecialName(const char* name)
+{
+	int numSpecialNames = sizeof(reservedNames) / sizeof(const char*);
+	for (int i = 0; i < numSpecialNames; i++)
+	{
+		if (strstr(name, reservedNames[i]) != nullptr)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
 
 bool convertFile(char* filePath)
 {
@@ -186,29 +228,7 @@ bool convertFile(char* filePath)
 
 	log(GREEN) << "Processing " << importedData->mNumMeshes << " meshes" << std::endl;
 
-	std::string name;
-	unsigned int textureIndex = 0;
-
-	std::vector<glm::vec3>		positions;
-	std::vector<glm::vec3>		texCoords;
-	std::vector<glm::vec3>		normals;
-	std::vector<glm::uvec3>		faces;
-	std::vector<GLuint>			indices;
-	
-
-	for (int meshNum = 0; meshNum < importedData->mNumMeshes; meshNum++)
-	{
-		const aiMesh* importedMesh = importedData->mMeshes[meshNum];
-
-		name = std::string(importedMesh->mName.C_Str());
-		textureIndex = importedMesh->mMaterialIndex;
-
-		processPositions(positions, importedMesh);
-		processTexCoords(texCoords, importedMesh);
-		processNormals(normals, importedMesh);
-		processIndices(faces, indices, importedMesh);
-	}
-	
+	// Open the output file...
 	std::string outputFilePrefix = getPathExceptEnding(filePath);
 	std::string mainOutput = outputFilePrefix + ".kmf";
 
@@ -221,18 +241,52 @@ bool convertFile(char* filePath)
 		return false;
 	}
 
+	// Process each mesh
+
+	std::vector<Mesh>	meshes;
+
+
+	for (int meshNum = 0; meshNum < importedData->mNumMeshes; meshNum++)
+	{
+		const aiMesh* importedMesh = importedData->mMeshes[meshNum];
+
+		if (meshes.size() == 0 || containsSpecialName(getNameOfFile(filePath)))
+		{
+			meshes.emplace_back();
+		}
+		Mesh* current = &meshes.back();
+		
+		current->name = std::string(importedMesh->mName.C_Str());
+		current->textureIndex = importedMesh->mMaterialIndex;
+
+		processPositions(current->positions, importedMesh);
+		processTexCoords(current->texCoords, importedMesh);
+		processNormals(current->normals, importedMesh);
+		processIndices(current->faces, current->indices, importedMesh);
+
+
+	}
+	
 	Header header;
-	header.numVertices	= (uint32_t)positions.size();
-	header.numFaces		= (uint32_t)faces.size();
-	header.nameLength	= (uint32_t)name.size();
+	header.numMeshes = meshes.size();
 
 	writeHeader(&header, file);
 
-	fwrite(name.data(), sizeof(name[0]), name.size(), file);
-	fwrite(positions.data(), sizeof(positions[0]), positions.size(), file);
-	fwrite(texCoords.data(), sizeof(texCoords[0]), texCoords.size(), file);
-	fwrite(normals.data(), sizeof(normals[0]), normals.size(), file);
-	fwrite(faces.data(), sizeof(faces[0]), faces.size(), file);
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		Mesh& current = meshes[i];
+		current.header.numVertices	= current.positions.size();
+		current.header.numFaces		= current.faces.size();
+		current.header.nameLength	= current.name.size();
+
+
+	}
+
+	//fwrite(name.data(), sizeof(name[0]), name.size(), file);
+	//fwrite(positions.data(), sizeof(positions[0]), positions.size(), file);
+	//fwrite(texCoords.data(), sizeof(texCoords[0]), texCoords.size(), file);
+	//fwrite(normals.data(), sizeof(normals[0]), normals.size(), file);
+	//fwrite(faces.data(), sizeof(faces[0]), faces.size(), file);
 
 	fclose(file);
 
@@ -262,19 +316,19 @@ void testRead(const char* fileName)
 
 	fread_s(&test, sizeof(Header), sizeof(Header), 1, in);
 	
-	name.resize(test.nameLength);
+	/*name.resize(test.nameLength);
 	positions.resize(test.numVertices);
 	texCoords.resize(test.numVertices);
 	normals.resize(test.numVertices);
 	faces.resize(test.numFaces);
-	indices.resize(test.numFaces * 3);
+	indices.resize(test.numFaces * 3);*/
 
-	read_buffer(name);
+	/*read_buffer(name);
 
 	read_buffer(positions);
 	read_buffer(texCoords);
 	read_buffer(normals);
-	read_buffer(faces);
+	read_buffer(faces);*/
 
 	//fread_s(positions.data(), positions.size() * sizeof(positions[0]), sizeof(positions[0]), test.numVertices, in);
 
