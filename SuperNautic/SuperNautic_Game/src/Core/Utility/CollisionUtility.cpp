@@ -22,10 +22,7 @@ bool bTestCollision(const Sphere& a, const Sphere& b)
 
     glm::vec3 distanceVector = a.center - b.center;
     float distanceSqrd = glm::dot(distanceVector, distanceVector);
-
-    float maxRadius = std::max(a.radius, b.radius);
-
-    return distanceSqrd < maxRadius * maxRadius;
+    return distanceSqrd < a.radius * a.radius + b.radius * b.radius;
 }
 
 bool bTestCollision(const BoundingBox& a, const BoundingBox& b)
@@ -172,7 +169,7 @@ PlaneCollisionData bTestCollision(const AxisAlignedPlane& axisAlignedPlane1, con
 
 bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const BoundingBox& b)
 {
-    if(floatEq(axis.x + axis.y + axis.z, 0.f))
+    if(floatEq(std::fabs(axis.x) + std::fabs(axis.y) + std::fabs(axis.z), 0.f))
     {
         return false;
     }
