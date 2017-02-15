@@ -11,10 +11,11 @@ struct AxisAlignedPlane
         Y,
         Z,
     };
-    // The normal of the plane points towards positive axis.
-    AxisAlignedPlane(Axis axis, float distanceFromAxis)
+    // axis is the normal of the plane.
+    // distance is distance from origo.
+    AxisAlignedPlane(Axis axis, float distance)
     : axis(axis)
-    , distance(distanceFromAxis)
+    , distance(distance)
     {
     }
 
