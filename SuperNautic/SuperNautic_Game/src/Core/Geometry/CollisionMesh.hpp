@@ -24,7 +24,7 @@ public:
     CollisionMesh(const Sphere& sphere);
     CollisionMesh(const AxisAlignedPlane& axisAlignedPlane);
 
-    CollisionResult bTestCollision(const CollisionMesh& other) const;
+    CollisionResult testCollision(const CollisionMesh& other) const;
 
 private:
     enum class Type : unsigned char
@@ -39,12 +39,12 @@ private:
     AxisAlignedPlane _axisAlignedPlane;
     Type _type;
 
-    static CollisionResult bTestCollisionObbObb(const CollisionMesh& obb1, const CollisionMesh& obb2);
-    static CollisionResult bTestCollisionObbSphere(const CollisionMesh& obb, const CollisionMesh& sphere);
-    static CollisionResult bTestCollisionObbAxisAlignedPlane(const CollisionMesh& obb, const CollisionMesh& axisAlignedPlane);
-    static CollisionResult bTestCollisionSphereSphere(const CollisionMesh& sphere1, const CollisionMesh& sphere2);
-    static CollisionResult bTestCollisioSphereAxisAlignedPlane(const CollisionMesh& sphere, const CollisionMesh& axisAlignedPlane);
-    static CollisionResult bTestCollisionAxisAlignedPlaneAxisAlignedPlane(const CollisionMesh& axisAlignedPlane1, const CollisionMesh& axisAlignedPlane2);
+    static CollisionResult testCollisionObbObb(const CollisionMesh& obb1, const CollisionMesh& obb2);
+    static CollisionResult testCollisionObbSphere(const CollisionMesh& obb, const CollisionMesh& sphere);
+    static CollisionResult testCollisionObbAxisAlignedPlane(const CollisionMesh& obb, const CollisionMesh& axisAlignedPlane);
+    static CollisionResult testCollisionSphereSphere(const CollisionMesh& sphere1, const CollisionMesh& sphere2);
+    static CollisionResult testCollisionSphereAxisAlignedPlane(const CollisionMesh& sphere, const CollisionMesh& axisAlignedPlane);
+    static CollisionResult testCollisionAxisAlignedPlaneAxisAlignedPlane(const CollisionMesh& axisAlignedPlane1, const CollisionMesh& axisAlignedPlane2);
     static CollisionResult convertPlaneCollisionDataToCollisionResult(const PlaneCollisionData& data);
 };
 

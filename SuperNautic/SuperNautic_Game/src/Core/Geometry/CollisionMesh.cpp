@@ -25,16 +25,16 @@ CollisionMesh::CollisionMesh(const AxisAlignedPlane& axisAlignedPlane)
 
 }
 
-CollisionMesh::CollisionResult CollisionMesh::bTestCollision(const CollisionMesh& other) const
+CollisionMesh::CollisionResult CollisionMesh::testCollision(const CollisionMesh& other) const
 {
     switch(_type)
     {
     case Type::OBB:
         switch(other._type)
         {
-        case Type::OBB: return bTestCollisionObbObb(*this, other);
-        case Type::SPHERE: return bTestCollisionObbSphere(*this, other);
-        case Type::AXIS_ALIGNED_PLANE: return bTestCollisionObbAxisAlignedPlane(*this, other);
+        case Type::OBB: return testCollisionObbObb(*this, other);
+        case Type::SPHERE: return testCollisionObbSphere(*this, other);
+        case Type::AXIS_ALIGNED_PLANE: return testCollisionObbAxisAlignedPlane(*this, other);
         default:
             LOG_ERROR("Unimplemented CollisionMesh type: ", (int)other._type);
             return CollisionResult::NO_COLLISION;
@@ -43,9 +43,9 @@ CollisionMesh::CollisionResult CollisionMesh::bTestCollision(const CollisionMesh
     case Type::SPHERE:
         switch(other._type)
         {
-        case Type::OBB: return bTestCollisionObbSphere(other, *this);
-        case Type::SPHERE: return bTestCollisionSphereSphere(*this, other);
-        case Type::AXIS_ALIGNED_PLANE: return bTestCollisioSphereAxisAlignedPlane(*this, other);
+        case Type::OBB: return testCollisionObbSphere(other, *this);
+        case Type::SPHERE: return testCollisionSphereSphere(*this, other);
+        case Type::AXIS_ALIGNED_PLANE: return testCollisionSphereAxisAlignedPlane(*this, other);
         default:
             LOG_ERROR("Unimplemented CollisionMesh type: ", (int)other._type);
             return CollisionResult::NO_COLLISION;
@@ -54,9 +54,9 @@ CollisionMesh::CollisionResult CollisionMesh::bTestCollision(const CollisionMesh
     case Type::AXIS_ALIGNED_PLANE:
         switch(other._type)
         {
-        case Type::OBB: return bTestCollisionObbAxisAlignedPlane(other, *this);
-        case Type::SPHERE: return bTestCollisioSphereAxisAlignedPlane(other, *this);
-        case Type::AXIS_ALIGNED_PLANE: return bTestCollisionAxisAlignedPlaneAxisAlignedPlane(*this, other);
+        case Type::OBB: return testCollisionObbAxisAlignedPlane(other, *this);
+        case Type::SPHERE: return testCollisionSphereAxisAlignedPlane(other, *this);
+        case Type::AXIS_ALIGNED_PLANE: return testCollisionAxisAlignedPlaneAxisAlignedPlane(*this, other);
         default:
             LOG_ERROR("Unimplemented CollisionMesh type: ", (int)other._type);
             return CollisionResult::NO_COLLISION;
@@ -69,7 +69,7 @@ CollisionMesh::CollisionResult CollisionMesh::bTestCollision(const CollisionMesh
     }
 }
 
-CollisionMesh::CollisionResult CollisionMesh::bTestCollisionObbObb(const CollisionMesh& obb1, const CollisionMesh& obb2)
+CollisionMesh::CollisionResult CollisionMesh::testCollisionObbObb(const CollisionMesh& obb1, const CollisionMesh& obb2)
 {
     if(!::bTestCollision(obb1._sphere, obb2._sphere))
     {
@@ -84,7 +84,7 @@ CollisionMesh::CollisionResult CollisionMesh::bTestCollisionObbObb(const Collisi
     return CollisionResult::COLLISION;
 }
 
-CollisionMesh::CollisionResult CollisionMesh::bTestCollisionObbSphere(const CollisionMesh& obb, const CollisionMesh& sphere)
+CollisionMesh::CollisionResult CollisionMesh::testCollisionObbSphere(const CollisionMesh& obb, const CollisionMesh& sphere)
 {
     if(!::bTestCollision(obb._sphere, sphere._sphere))
     {
@@ -99,7 +99,7 @@ CollisionMesh::CollisionResult CollisionMesh::bTestCollisionObbSphere(const Coll
     return CollisionResult::COLLISION;
 }
 
-CollisionMesh::CollisionResult CollisionMesh::bTestCollisionObbAxisAlignedPlane(const CollisionMesh& obb, const CollisionMesh& axisAlignedPlane)
+CollisionMesh::CollisionResult CollisionMesh::testCollisionObbAxisAlignedPlane(const CollisionMesh& obb, const CollisionMesh& axisAlignedPlane)
 {
     CollisionResult result = convertPlaneCollisionDataToCollisionResult(::bTestCollision(obb._sphere, axisAlignedPlane._axisAlignedPlane));
 
@@ -111,7 +111,7 @@ CollisionMesh::CollisionResult CollisionMesh::bTestCollisionObbAxisAlignedPlane(
     return convertPlaneCollisionDataToCollisionResult(::bTestCollision(obb._obb, axisAlignedPlane._axisAlignedPlane));
 }
 
-CollisionMesh::CollisionResult CollisionMesh::bTestCollisionSphereSphere(const CollisionMesh& sphere1, const CollisionMesh& sphere2)
+CollisionMesh::CollisionResult CollisionMesh::testCollisionSphereSphere(const CollisionMesh& sphere1, const CollisionMesh& sphere2)
 {
     if(!::bTestCollision(sphere1._sphere, sphere2._sphere))
     {
@@ -121,12 +121,12 @@ CollisionMesh::CollisionResult CollisionMesh::bTestCollisionSphereSphere(const C
     return CollisionResult::COLLISION;
 }
 
-CollisionMesh::CollisionResult CollisionMesh::bTestCollisioSphereAxisAlignedPlane(const CollisionMesh& sphere, const CollisionMesh& axisAlignedPlane)
+CollisionMesh::CollisionResult CollisionMesh::testCollisionSphereAxisAlignedPlane(const CollisionMesh& sphere, const CollisionMesh& axisAlignedPlane)
 {
     return convertPlaneCollisionDataToCollisionResult(::bTestCollision(sphere._sphere, axisAlignedPlane._axisAlignedPlane));
 }
 
-CollisionMesh::CollisionResult CollisionMesh::bTestCollisionAxisAlignedPlaneAxisAlignedPlane(const CollisionMesh& axisAlignedPlane1, const CollisionMesh& axisAlignedPlane2)
+CollisionMesh::CollisionResult CollisionMesh::testCollisionAxisAlignedPlaneAxisAlignedPlane(const CollisionMesh& axisAlignedPlane1, const CollisionMesh& axisAlignedPlane2)
 {
     return convertPlaneCollisionDataToCollisionResult(::bTestCollision(axisAlignedPlane1._axisAlignedPlane, axisAlignedPlane1._axisAlignedPlane));
 }
