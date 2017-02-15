@@ -199,7 +199,7 @@ void Ship::update(float dt)
 	// Create mesh rotation matrix from mesh up and forward directions
 	glm::vec3 up = glm::rotate(-_currentTurningAngle * 0.0f, _shipForward) * glm::vec4{ _meshUpDirection(), 0.0f };
 
-	glm::mat4 meshMatrix{ glm::vec4{ glm::normalize(glm::cross(up, _meshForwardDirection())), 0.0f },
+	_meshMatrix = { glm::vec4{ glm::normalize(glm::cross(up, _meshForwardDirection())), 0.0f },
 						  glm::vec4{ glm::normalize(up - glm::dot(up, _meshForwardDirection()) * _meshForwardDirection()), 0.0f },	// The part of _meshUpDirection that is orthogonal to _meshForwardDirection
 						  glm::vec4{ _meshForwardDirection(), 0.0f },
 						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
