@@ -7,22 +7,6 @@
 #include "Core/Io/Log.hpp"
 #include "GFX/Resources/Model.hpp"
 
-
-
-
-
-
-
-
-
-#include <cmath>
-
-
-
-
-
-
-
 // Default constructor (private)
 Track::Track()
 {
