@@ -4,7 +4,6 @@
 #define OCTREE_HPP
 
 #include "glm/glm.hpp"
-#include <list>
 #include <vector>
 
 #include "Core/Geometry/CollisionMesh.hpp"
@@ -15,23 +14,43 @@ class Octree
 public:
     Octree(const glm::vec3& center, float size);
 
-    void insert(const CollisionMesh& mesh, const ElementT& element);
+    bool bInsert(const CollisionMesh& mesh, const ElementT& element);
     bool bInsertIfNoCollision(const CollisionMesh& mesh, const ElementT& element);
 
 private:
-    static constexpr unsigned int _MAX_ELEMENTS = 5;
-    std::list<std::pair<CollisionMesh, ElementT>> _elements;
-    std::vector<Octree> _children;
+    class Node
+    {
+    public:
+        using ElementPtr = std::shared_ptr<std::pair<CollisionMesh, ElementT>>;
+
+        Node(const glm::vec3& center, float size);
+
+        void insert(ElementPtr element);
+        void getIntersectingLeafNodes(const CollisionMesh& mesh, std::vector<Node*>& leafNodes);
+        const std::vector<ElementPtr>& getElements() const;
+
+    private:
+        static constexpr unsigned int                   _MAX_ELEMENTS = 5;
+        static constexpr unsigned int                   _NUM_CHILDREN = 8;
+
+        glm::vec3                                       _center;
+        float                                           _size;
+        CollisionMesh                                   _xPlane;
+        CollisionMesh                                   _yPlane;
+        CollisionMesh                                   _zPlane;
+        std::vector<ElementPtr>                         _elements;
+        std::vector<Node>                               _children;
+
+        void split();
+        bool bIsLeafNode() const;
+        unsigned int getSize() const;
+        bool bIsCollisionResultValid(CollisionMesh::CollisionResult result) const;
+
+    };
 
 
-    CollisionMesh _xPlane;
-    CollisionMesh _yPlane;
-    CollisionMesh _zPlane;
-
-    void split();
-    bool bHasChildren() const;
-    unsigned int getSize() const;
-    const std::vector<Octree*>& getIntersectingChildren(const CollisionMesh& mesh) const;
+    CollisionMesh   _bounds;
+    Node            _root;
 };
 
 #include "Core/Geometry/Octree.inl"
