@@ -13,6 +13,7 @@
 #include "GFX/Resources/TexturedModel.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
 #include "Core/Utility/SpringRotatedVector.hpp"
+#include "Core/Utility/DampedSpringRotatedVector.hpp"
 #include "Core/Utility/SpringTranslatedVector.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
@@ -67,7 +68,7 @@ private:
 	glm::vec3				_upDirection;			// Current up direction
 	glm::vec3				_returnPos;				// Respawn position of ship
 
-	SpringRotatedVector		_meshForwardDirection;	// Current facing direction
+	DampedSpringRotatedVector		_meshForwardDirection;	// Current facing direction
 	SpringRotatedVector		_meshUpDirection;		// Up direction of ship mesh
 	SpringRotatedVector		_cameraUpDirection;
 	SpringRotatedVector		_cameraForwardDirection;

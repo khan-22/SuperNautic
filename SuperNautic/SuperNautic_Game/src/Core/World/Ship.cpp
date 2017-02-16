@@ -58,7 +58,7 @@ void Ship::render(GFX::RenderStates& states)
 
 void Ship::update(float dt)
 {
-	dt = clamp(dt, 0.0f, 0.1f);
+	dt = clamp(dt, 0.0f, 0.3f);
 
 	// Update intersection timer
 	_timeSinceIntersection += dt;
@@ -178,8 +178,10 @@ void Ship::update(float dt)
 
 	// Update mesh forward direction
 	_meshForwardDirection.setTarget(velocityDirection);
+	_meshForwardDirection.setSpringConstant(5.0f + _velocity / 30.0f);
 	_meshForwardDirection.setBackupAxis(_upDirection);
 	_meshForwardDirection.update(dt);
+	_meshForwardDirection.setVector(_trackForward);
 
 	// Update mesh up direction
 	_meshUpDirection.setTarget( glm::rotate(-_currentTurningAngle * 1.5f, _shipForward) * glm::vec4{ _upDirection, 0.0f });
@@ -280,6 +282,8 @@ void Ship::setReturnPos(const glm::vec3& returnPos)
 
 const glm::vec3& Ship::getCameraForward() const
 {
+	// test
+	return _meshForwardDirection();
 	return _cameraForwardDirection();
 }
 

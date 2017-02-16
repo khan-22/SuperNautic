@@ -9,7 +9,7 @@ class SpringRotatedVector
 {
 public:
 	SpringRotatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& backupAxis, float springConstant, float dampingConstant);
-	void update(float dt);
+	virtual void update(float dt);
 
 	const glm::vec3& operator()() const;
 
@@ -25,7 +25,7 @@ public:
 
 	void setVector(const glm::vec3& vector);
 
-private:
+protected:
 	// The rotating vector
 	glm::vec3 _vector;
 	// The rotation target

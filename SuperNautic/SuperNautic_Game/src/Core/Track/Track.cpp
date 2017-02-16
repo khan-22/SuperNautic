@@ -223,7 +223,7 @@ int Track::getInRow(int index) const
 
 glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos)
 {
-						 // Waypoints,	segment index
+						 // Waypoint,	segment index
 	std::vector<std::pair<WaypointInfo, long>> closestWaypoints;
 
 	// Check previous, current and next segment
