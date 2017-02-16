@@ -95,7 +95,7 @@ bool Game::bInitialize()
 	/*We can create a loop here (or where relevant) that loops through a list
 	of all the things we want to render and add them to the model array, such as
 	segments, ships etc.*/
-	ModelArray.push_back(ModelCache::get("ship.fbx"));
+	ModelArray.push_back(ModelCache::get("ship.kmf"));
 	////ModelArray.push_back(ModelCache::get("segments/s01_straight_aa.fbx"));
 	//for (unsigned int i = 0; i < _track.getNrOfSegments(); i++)
 	//{
@@ -186,10 +186,16 @@ void Game::render()
 	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
 	_camera.setViewDir(glm::vec3(0.f, 0.f, -1.f));
 
-	/*for (auto& pointLight : _pointLights)
+	for (auto& pointLight : _pointLights)
 	{
-		_deferredRenderer1.pushPointLight(pointLight);
-	}*/
+		_deferredRenderer.pushPointLight(pointLight);
+	}
+
+	_deferredRenderer.render(_texturedModel);
+
+	_deferredRenderer.display(_camera);
+
+	return;
 
 	//_deferredRenderer1.render(_texturedModel);
 	//_deferredRenderer1.display(_debugCamera);
