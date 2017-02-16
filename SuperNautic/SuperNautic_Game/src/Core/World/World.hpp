@@ -14,9 +14,10 @@ namespace sf
 #include "Core/World/Player.hpp"
 #include "Core/Track/Track.hpp"
 #include "Core/Utility/Camera.h"
+#include "Core/Utility/DebugCamera.hpp"
+#include "Core/Gui/Timer.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
-#include "Core/Utility/DebugCamera.hpp"
 
 class ApplicationContext;
 
@@ -37,6 +38,8 @@ private:
 	std::vector<Player>			_players;
 	std::vector<PointLight>		_pointLights;
 	bool						_bHasWon;
+
+	Timer						_timer;
 
 	const ApplicationContext&	_context;
 
