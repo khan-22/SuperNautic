@@ -15,9 +15,9 @@ void SpringRotatedVector::update(float dt)
 	// Find angle between vectors
 	float angleBetween = acosf(glm::dot(_vector, _target));
 
-	if (!isnan(angleBetween))
+	if (!std::isnan(angleBetween))
 	{
-		if (!isnan(newAxis.x))
+		if (!std::isnan(newAxis.x))
 		{
 			// Update rotation axis and velocity (represented by length)
 			_axis += glm::normalize(newAxis) * angleBetween * angleBetween * _springConstant * dt;
