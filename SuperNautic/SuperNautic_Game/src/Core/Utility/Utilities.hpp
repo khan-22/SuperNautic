@@ -28,6 +28,7 @@ inline T clamp(T value, T low, T high)
 	return value;
 }
 
+// True if two floats are almost equal
 bool floatEq(float a, float b);
 
 // True if two vectors are almost equal
