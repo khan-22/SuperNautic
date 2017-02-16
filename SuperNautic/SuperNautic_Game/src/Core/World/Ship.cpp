@@ -280,8 +280,6 @@ void Ship::setReturnPos(const glm::vec3& returnPos)
 
 const glm::vec3& Ship::getCameraForward() const
 {
-	// test
-	return _meshForwardDirection();
 	return _cameraForwardDirection();
 }
 
