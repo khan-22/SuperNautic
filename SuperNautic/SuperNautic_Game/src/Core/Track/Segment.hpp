@@ -1,6 +1,6 @@
 #pragma once
-#ifndef SEGMENT_H
-#define SEGMENT_H
+#ifndef SEGMENT_HPP
+#define SEGMENT_HPP
 
 #include <string>
 #include <array>
@@ -17,6 +17,7 @@
 #include "Core/Geometry/Ray.hpp"
 #include "Core/Track/SegmentInfo.hpp"
 #include "GFX/Resources/TexturedModel.hpp"
+#include "Core/Utility/Utilities.hpp"
 
 struct WaypointInfo
 {
@@ -184,14 +185,6 @@ private:
 	// Helper for subdivideOctTree, finds index of child to copy a vertex to
 	unsigned findChildIndex(size_t currentModel, unsigned index, glm::vec3 boxMiddle);
 };
-
-// True if two vectors are almost equal
-inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2)
-{
-	return (0.0001f > abs(vector1.x - vector2.x)) &&
-		(0.0001f > abs(vector1.y - vector2.y)) &&
-		(0.0001f > abs(vector1.z - vector2.z));
-}
 
 #endif // SEGMENT_H
 

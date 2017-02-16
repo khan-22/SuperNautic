@@ -3,6 +3,8 @@
 #ifndef SHIP_HPP
 #define SHIP_HPP
 
+#include <vector>
+
 #include "Core/Utility/Utilities.hpp"
 #include "Core/Track/Segment.hpp"
 #include "Core/Asset/LoadAssetFunctions.hpp"
@@ -10,58 +12,43 @@
 #include "GFX/Rendering/Transformable3D.hpp"
 #include "GFX/Resources/TexturedModel.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
+#include "Core/Utility/SpringRotatedVector.hpp"
+#include "Core/Utility/SpringTranslatedVector.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 {
 public:
+	GFX::TexturedModel _shipModel;
+
 	Ship();
 	Ship(glm::vec3 position);
 
 	void render(GFX::RenderStates& states) override;
 	void update(float dt);
 
-	void start() { _stopped = false; }
-	void stop() { _stopped = true; }
-	void destroy() { _destroyed = true; }
-	void repair() { _destroyed = false; }
+	void start();
+	void stop();
+	void destroy();
+	void repair();
 
 	// [-1..1]
-	void setTurning(float turnFactor)
-	{
-		_turningFactor = clamp(turnFactor, -1.0f, 1.0f);
-	}
-
+	void setTurning(float turnFactor);
 	// [-1..1]
-	void setAcceleration(float accelerationFactor)
-	{
-		_accelerationFactor = clamp(accelerationFactor, -1.0f, 1.0f);
-	}
+	void setAcceleration(float accelerationFactor);
 
 	// [0..1]
-	float getEngineTemperature()
-	{
-		return _engineTemperature;
-	}
-
-	float getSpeed()
-	{
-		return _velocity;
-	}
-
+	float getEngineTemperature();
+	float getSpeed();
 	// Sets the direction that counts as forward
-	void setForward(glm::vec3& forwardDirection)
-	{
-		_trackForward = forwardDirection;
-	}
-
+	void setForward(const glm::vec3& forwardDirection);
+	glm::vec3 getCameraUp();
 	void jump();
+	void setSegments(const std::vector<SegmentInstance*> segments);
+	// Indicates where to return to if ship has escaped track
+	void setReturnPos(const glm::vec3& returnPos);
+	const glm::vec3& getCameraForward() const;
+	const glm::vec3& getMeshPosition() const;
 
-	void setSegments(std::vector<SegmentInstance*> segments)
-	{
-		_segmentsToTest = segments;
-	}
-
-	GFX::TexturedModel _shipModel;
 
 private:
 	bool		_destroyed;
@@ -69,26 +56,36 @@ private:
 	float		_turningFactor;
 	float		_currentTurningAngle;
 	float		_accelerationFactor;	// How hard the engine is currently working
-	float		_upAcceleration;		// Acceleration away/towards track
 	float		_jumpCooldown;			// Cooldown when jump is activated
 	float		_currentJumpCooldown;	// Current cooldown
 	float		_engineTemperature;
 	float		_velocity;				// Current forward velocity
-	float		_upVelocity;			// Current up/down velocity
+	float		_timeSinceIntersection;	// Time since ray intersected track
 
-	glm::vec3	_trackForward;			// Forward direction of track
-	glm::vec3	_facingDirection;		// Current facing direction
-	glm::vec3	_upDirection;			// Current up direction
-	glm::vec3	_meshUpDirection;		// Up direction of ship mesh
+	glm::vec3				_trackForward;			// Forward direction of track
+	glm::vec3				_shipForward;			// Current forward direction of ship
+	glm::vec3				_upDirection;			// Current up direction
+	glm::vec3				_returnPos;				// Respawn position of ship
+
+	SpringRotatedVector		_meshForwardDirection;	// Current facing direction
+	SpringRotatedVector		_meshUpDirection;		// Up direction of ship mesh
+	SpringRotatedVector		_cameraUpDirection;
+	SpringRotatedVector		_cameraForwardDirection;
+
+	SpringTranslatedVector _meshPosition;			// Global position of ship mesh
+
+	glm::mat4	_meshMatrix;
 
 	const float _minAcceleration;
 	const float _maxAcceleration;
 	const float _maxTurningSpeed;
-	const float _straighteningForce;	// How strongly the ship turns toward track's forward direction
-	const float _speedResistance;		// 'Air resistance'
-	const float _preferredHeight;		// Desired height above track
-	const float	_levitationForce;		// How fast the ship accelerates toward preferred height
-	const float _upResistance;			// 'Air resistance' for up/down motion
+	const float _straighteningForce;		// How strongly the velocity direction turns toward track's forward direction
+	const float _steerStraighteningForce;	// How strongly the ship resists turning
+	const float _speedResistance;			// 'Air resistance'
+	const float _preferredHeight;			// Desired ship height above track
+
+	const float _rayHeight{ 5.0f };			// Height above ship of the origin of the rays used for intersection
+	const float _rayAheadDistance{ 2.0f };	// Distance ahead of ship the second ray starts
 
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
 };

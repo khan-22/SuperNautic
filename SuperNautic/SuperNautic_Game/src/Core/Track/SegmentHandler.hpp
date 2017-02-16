@@ -1,9 +1,10 @@
 #pragma once
-#ifndef SEGMENTHANDLER_H
-#define SEGMENTHANDLER_H
+#ifndef SEGMENTHANDLER_HPP
+#define SEGMENTHANDLER_HPP
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "Core/Track/Segment.hpp"
 
@@ -29,13 +30,15 @@ public:
 		int probability;
 		int minInRow;
 		int maxInRow;
+		bool bAllowNegativRot;
 		std::vector<StructurePiece*> pieces;
 
-		Structure(int prob, int minRow, int maxRow)
+		Structure(int prob, int minRow, int maxRow, bool bAllowNegativRot)
 		{
 			probability = prob;
 			minInRow = minRow;
 			maxInRow = maxRow;
+			this->bAllowNegativRot = bAllowNegativRot;
 		}
 		void addPiece(StructurePiece * newPiece)
 		{
@@ -61,6 +64,8 @@ public:
 	const Segment* loadSegment(unsigned i);
 
 	const SegmentHandler::Structure * getStructure(const unsigned int index) const;
+
+	const int getNrOfStructures() const;
 
 	// Returns rotation info about connection type 'type'
 	int getConnectionRotation(const char type);

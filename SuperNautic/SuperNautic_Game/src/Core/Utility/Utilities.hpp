@@ -1,9 +1,10 @@
 #pragma once
 
-#ifndef UTILITIES_H
-#define UTILITIES_H
+#ifndef UTILITIES_HPP
+#define UTILITIES_HPP
 
 #include "Core/Io/Log.hpp"
+#include "glm/vec3.hpp"
 
 template<typename T>
 inline T clamp(T value, T low, T high)
@@ -28,5 +29,13 @@ inline T clamp(T value, T low, T high)
 }
 
 bool floatEq(float a, float b);
+
+// True if two vectors are almost equal
+inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2)
+{
+	return (0.0001f > abs(vector1.x - vector2.x)) &&
+		(0.0001f > abs(vector1.y - vector2.y)) &&
+		(0.0001f > abs(vector1.z - vector2.z));
+}
 
 #endif

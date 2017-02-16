@@ -40,6 +40,11 @@ void Input::update()
 
 		_events.clear();
 
+		if (abs(_leftStickX) < thresh)
+		{
+			_leftStickX = 0;
+		}
+
 		sf::Event event;
 		if (_bButtonA && _bAWasDormant)
 		{

@@ -6,6 +6,7 @@ PointLight::PointLight(glm::vec3 position, glm::vec3 diffuseColor, GLfloat inten
 	_currentIntensity(intensity)
 {
 	_bLightActive = true;
+	calculatePLBoundSize();
 }
 
 void PointLight::setPosition(glm::vec3 position)
@@ -63,19 +64,19 @@ const PointLightProperties PointLight::getLightProperties()
 		_bLightActive,
 		_constant,
 		_linear,
-		_quadratic
+		_quadratic,
 	};
 
 	return Properties;
 }
 
-const GLfloat PointLight::calculatePLBoundSize()
+GLfloat PointLight::calculatePLBoundSize()
 {
 	//Defines the size of the sphere for the light
 	GLfloat MaxChannel = std::fmax(std::fmax(_diffuseColor.r, _diffuseColor.g), _diffuseColor.b);
-	GLfloat size = ( -_linear + glm::sqrt( glm::pow(_linear, 2) - 4 * _quadratic * (_constant - 256 * MaxChannel) * _currentIntensity )) / ( 2 * _quadratic );
+	GLfloat radius = ( -_linear + glm::sqrt( glm::pow(_linear, 2) - 4 * _quadratic * (_constant - 256 * MaxChannel) * _currentIntensity )) / ( 2 * _quadratic );
 
-	return size;
+	return radius;
 }
 
 PointLight::~PointLight()
