@@ -48,7 +48,7 @@ void processPositions(std::vector<glm::vec3>& positions, const aiMesh* importedM
 {
 	log(YELLOW) << "Positions: 0%";
 	positions.reserve(positions.capacity() + importedMesh->mNumVertices);
-	for (int i = 0; i < importedMesh->mNumVertices; i++)
+	for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
 	{
 		glm::vec3 pos = toGLM(importedMesh->mVertices[i]);
 		glm::vec3 transformedPos = glm::vec3(transform * glm::vec4(pos, 1.f));
@@ -68,7 +68,7 @@ void processTexCoords(std::vector<glm::vec3>& texCoords, const aiMesh* importedM
 	if (importedMesh->mTextureCoords[0] != nullptr)
 	{
 		log(YELLOW) << "TexCoord: 0%";
-		for (int i = 0; i < importedMesh->mNumVertices; i++)
+		for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
 		{
 			glm::vec3 uvw = toGLM(importedMesh->mTextureCoords[0][i]);
 			uvw.z = (float)(importedMesh->mMaterialIndex) + 0.1f;
@@ -83,7 +83,7 @@ void processTexCoords(std::vector<glm::vec3>& texCoords, const aiMesh* importedM
 	else
 	{
 		log(YELLOW) << "The mesh should have texture coordinates. All are set to 0." << std::endl;
-		for (int i = 0; i < importedMesh->mNumVertices; i++)
+		for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
 		{
 			texCoords.push_back({ 0.f, 0.f, 0.f });
 		}
@@ -95,7 +95,7 @@ void processNormals(std::vector<glm::vec3>& normals, const aiMesh* importedMesh,
 {
 	log(YELLOW) << "Normals: 0%";
 	normals.reserve(normals.capacity() + importedMesh->mNumVertices);
-	for (int i = 0; i < importedMesh->mNumVertices; i++)
+	for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
 	{
 		glm::vec3 normal = toGLM(importedMesh->mNormals[i]);
 		glm::vec3 transformedNormal = glm::normalize(glm::vec3(transform * glm::vec4(normal, 0.f)));
@@ -114,7 +114,7 @@ void processIndices(std::vector<glm::uvec3>& faces, std::vector<GLuint>& indices
 	log(YELLOW) << "Indices: 0%";
 	faces.reserve(faces.capacity() + importedMesh->mNumFaces);
 	indices.reserve(indices.capacity() + importedMesh->mNumFaces * 3);
-	for (int i = 0; i < importedMesh->mNumFaces; i++)
+	for (unsigned int i = 0; i < importedMesh->mNumFaces; i++)
 	{
 		// We assume all faces only have 3 vertices.
 		glm::uvec3 face;
@@ -276,9 +276,9 @@ bool convertFile(char* filePath)
 	}
 	
 	Header header;
-	header.numMeshes  = meshes.size();
-	header.numLights  = lights.size();
-	header.numCameras = cameras.size();
+	header.numMeshes  = static_cast<uint32_t>(meshes.size());
+	header.numLights  = static_cast<uint32_t>(lights.size());
+	header.numCameras = static_cast<uint32_t>(cameras.size());
 
 	writeHeader(&header, file);
 
@@ -288,9 +288,9 @@ bool convertFile(char* filePath)
 		Mesh& current = meshes[i];
 
 		MeshHeader meshHeader;
-		meshHeader.numVertices	= current.positions.size();
-		meshHeader.numFaces		= current.faces.size();
-		meshHeader.nameLength	= current.name.size();
+		meshHeader.numVertices	= static_cast<uint32_t>(current.positions.size());
+		meshHeader.numFaces		= static_cast<uint32_t>(current.faces.size());
+		meshHeader.nameLength	= static_cast<uint32_t>(current.name.size());
 
 		writeHeader(&meshHeader, file);
 		writeData(&current, file);
@@ -350,7 +350,7 @@ void testRead(const char* fileName)
 
 	fread_s(&header, sizeof(Header), sizeof(Header), 1, in);
 
-	for (int i = 0; i < header.numMeshes; i++)
+	for (unsigned int i = 0; i < header.numMeshes; i++)
 	{
 		MeshHeader meshHeader;
 		
@@ -378,7 +378,7 @@ void testRead(const char* fileName)
 		read_buffer(current.indices);
 	}
 
-	for (int i = 0; i < header.numLights; i++)
+	for (unsigned int i = 0; i < header.numLights; i++)
 	{
 		lights.emplace_back();
 		Light& current = lights.back();
@@ -386,7 +386,7 @@ void testRead(const char* fileName)
 		// Does nothing yet...
 	}
 
-	for (int i = 0; i < header.numCameras; i++)
+	for (unsigned int i = 0; i < header.numCameras; i++)
 	{
 		cameras.emplace_back();
 		Camera& current = cameras.back();
