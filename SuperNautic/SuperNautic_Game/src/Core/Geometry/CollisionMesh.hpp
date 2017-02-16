@@ -20,10 +20,16 @@ public:
         BACK, // No collision occurred. LHS (this) is behind of RHS.
     };
 
+    // Generate collision mesh from an OBB
     CollisionMesh(const BoundingBox& obb);
+
+    // Generate collision mesh from a sphere
     CollisionMesh(const Sphere& sphere);
+
+    // Generate collision mesh from an axis aligned plane
     CollisionMesh(const AxisAlignedPlane& axisAlignedPlane);
 
+    // Evaluate collision between this and another collision mesh
     CollisionResult testCollision(const CollisionMesh& other) const;
 
 private:
@@ -34,17 +40,31 @@ private:
         AXIS_ALIGNED_PLANE,
     };
 
-    Sphere _sphere;
-    BoundingBox _obb;
-    AxisAlignedPlane _axisAlignedPlane;
-    Type _type;
+    Sphere              _sphere;
+    BoundingBox         _obb;
+    AxisAlignedPlane    _axisAlignedPlane;
+    Type                _type;
 
+    // OBB-OBB collision check
     static CollisionResult testCollisionObbObb(const CollisionMesh& obb1, const CollisionMesh& obb2);
+
+    // OBB-sphere collision check
     static CollisionResult testCollisionObbSphere(const CollisionMesh& obb, const CollisionMesh& sphere);
+
+    // OBB-AxisAlignedPlane collision check
     static CollisionResult testCollisionObbAxisAlignedPlane(const CollisionMesh& obb, const CollisionMesh& axisAlignedPlane);
+
+    // Sphere-Sphere collision check
     static CollisionResult testCollisionSphereSphere(const CollisionMesh& sphere1, const CollisionMesh& sphere2);
+
+    // Sphere-AxisAlignedPlane collision check
     static CollisionResult testCollisionSphereAxisAlignedPlane(const CollisionMesh& sphere, const CollisionMesh& axisAlignedPlane);
+
+    // AxisAlignedPlane-AxisAlignedPlane collision check
     static CollisionResult testCollisionAxisAlignedPlaneAxisAlignedPlane(const CollisionMesh& axisAlignedPlane1, const CollisionMesh& axisAlignedPlane2);
+
+    // Convert PlaneCollisionData from CollisionUtility functions to
+    // CollisionResult data of this class.
     static CollisionResult convertPlaneCollisionDataToCollisionResult(const PlaneCollisionData& data);
 };
 
