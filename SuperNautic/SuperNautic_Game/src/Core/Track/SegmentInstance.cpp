@@ -109,7 +109,7 @@ void SegmentInstance::updateGlobalBounds()
         globalBox.center = _model * glm::vec4(localBox.center, 1.f);
         for(size_t i = 0; i < localBox.directions.size(); i++)
         {
-            globalBox.directions[i] = _model * glm::vec4(localBox.directions[i], 0.f);
+            globalBox.directions[i] = glm::normalize(_model * glm::vec4(localBox.directions[i], 0.f));
         }
         globalBox.halfLengths = localBox.halfLengths;
     }
