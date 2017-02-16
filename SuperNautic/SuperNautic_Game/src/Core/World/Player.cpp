@@ -80,11 +80,11 @@ void Player::update(float dt)
         }
     }
 
+    _ship.update(dt);
+
 	_camera.setPos(_ship.getMeshPosition() - _ship.getCameraForward() * 12.0f + _ship.getCameraUp() * 2.0f);
 	_camera.setUp(_ship.getCameraUp());
 	_camera.setViewDir(_ship.getCameraForward());
-
-    _ship.update(dt);
 
     _hud.setHeat(_ship.getEngineTemperature() / 100);
     _hud.setSpeed(_ship.getSpeed());

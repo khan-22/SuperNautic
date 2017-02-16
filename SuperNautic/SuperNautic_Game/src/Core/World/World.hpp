@@ -48,7 +48,6 @@ private:
 
 	GFX::DeferredRenderer		_renderer;
 
-	Camera						_camera;
 	DebugCamera					_debugCamera;
 	bool						_bDebugging;
 };

@@ -109,11 +109,6 @@ void World::update(float dt, sf::Window& window)
 
 			_players[i].update(dt);
 		}
-		///////////TEST CAMERA////////////
-		//_camera.setPos(_players[0].getShip().getMeshPosition() - _players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 2.0f);
-		//_camera.setUp(_players[0].getShip().getCameraUp());
-		//_camera.setViewDir(_players[0].getShip().getCameraForward());
-		/////////////////////////////////
 
 	}
 	else
@@ -159,8 +154,8 @@ void World::render()
 
 	if (!_bDebugging)
 	{
+		//TODO LOOP FOR ALL PLAYAHS AND MAKE UNIQUE DEFERRED RENDERAERRS
 		_renderer.display(*_players[0].getCamera());
-		//_renderer.display(_camera);
 	}
 	else
 	{
