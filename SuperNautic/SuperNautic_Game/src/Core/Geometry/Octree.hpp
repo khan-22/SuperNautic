@@ -17,6 +17,7 @@ public:
 
     bool bInsert(const CollisionMesh& mesh, const ElementT& element);
     bool bInsertIfNoCollision(const CollisionMesh& mesh, const ElementT& element);
+    std::vector<ElementT*> getCollisions(const CollisionMesh& mesh) const;
 
 private:
     class Node
@@ -27,7 +28,7 @@ private:
         Node(const glm::vec3& center, float size);
 
         void insert(ElementPtr element);
-        void getIntersectingLeafNodes(const CollisionMesh& mesh, std::vector<Node*>& leafNodes);
+        void getIntersectingLeafNodes(const CollisionMesh& mesh, std::vector<Node*>& leafNodes) const;
         const std::vector<ElementPtr>& getElements() const;
 
     private:

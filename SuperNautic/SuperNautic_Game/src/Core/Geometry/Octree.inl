@@ -63,6 +63,29 @@ bool Octree<ElementT>::bInsertIfNoCollision(const CollisionMesh& mesh, const Ele
 }
 
 template<typename ElementT>
+std::vector<ElementT*> Octree<ElementT>::getCollisions(const CollisionMesh& mesh) const
+{
+    std::vector<Node*> nodes;
+    _root.getIntersectingLeafNodes(mesh, nodes);
+    assert(!nodes.empty());
+
+    std::vector<ElementT*> collisions;
+    for(Node* node : nodes)
+    {
+        for(const typename Node::ElementPtr& nodeElement : node->getElements())
+        {
+            if(mesh.testCollision(nodeElement->first) == CollisionMesh::CollisionResult::COLLISION)
+            {
+                collisions.push_back(&nodeElement->second);
+            }
+        }
+    }
+
+    return collisions;
+}
+
+
+template<typename ElementT>
 Octree<ElementT>::Node::Node(const glm::vec3& center, float size)
 : _center(center)
 , _size(size)
@@ -93,11 +116,11 @@ void Octree<ElementT>::Node::insert(ElementPtr element)
 }
 
 template<typename ElementT>
-void Octree<ElementT>::Node::getIntersectingLeafNodes(const CollisionMesh& mesh, std::vector<Node*>& leafNodes)
+void Octree<ElementT>::Node::getIntersectingLeafNodes(const CollisionMesh& mesh, std::vector<Node*>& leafNodes) const
 {
     if(bIsLeafNode())
     {
-        leafNodes.push_back(this);
+        leafNodes.push_back((Node*)this);
         return;
     }
 
