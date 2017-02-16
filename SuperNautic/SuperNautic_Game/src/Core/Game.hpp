@@ -59,10 +59,7 @@ private:
 	GFX::TexturedModel		_texturedModel;
 
 	GFX::ForwardRenderer	_forwardRenderer;
-	GFX::DeferredRenderer	_deferredRenderer1;
-	//GFX::DeferredRenderer	_deferredRenderer2;
-	//GFX::DeferredRenderer	_deferredRenderer3;
-	//GFX::DeferredRenderer	_deferredRenderer4;
+	GFX::DeferredRenderer	_deferredRenderer;
 
 	Camera					_camera;
 	DebugCamera				_debugCamera;

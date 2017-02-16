@@ -53,22 +53,7 @@ bool Game::bInitialize()
 	LOG("[VERTEX] There are ", vertexUniCount, " available uniform locations");
 	LOG("[GEOMETRY] There are ", geoUniCount, " available uniform locations");
 	LOG("[FRAGMENT] There are ", fragUniCount, " available uniform locations");
-//
-//	// Cached asset loading **DEMO**
-	/*RawMeshAsset testRawMesh = RawMeshCache::get("Segments/s01_straight_aa.fbx");
 
-	if (testRawMesh.get() == nullptr)
-	{
-		LOG("Failed to load model... Oopsie poopsie!");
-	}
-	else
-	{
-		LOG("The loaded mesh has: ", testRawMesh.get()->meshes[0].vertices.size(), " vertices");
-	}*/
-
-	// Shader loading **DEMO**
-	/*GFX::ShaderLoader shaderLoader("./src/GFX/Shaders/");
-	GFX::Shader* testShader = shaderLoader.loadShader("forward");*/
 
 	Asset<GFX::Shader> testShader = ShaderCache::get("forward");
 
@@ -105,11 +90,6 @@ bool Game::bInitialize()
         LOG("Failed to load material.");
     }
 
-	//_track.setLength(10000);
-	//_track.setSeed(1);
-	//_track.generate();
-
-
 
 	//_model = ModelCache::get("ship.fbx");
 	/*We can create a loop here (or where relevant) that loops through a list
@@ -129,10 +109,7 @@ bool Game::bInitialize()
 	_texturedModel.setModelAndMaterial(ModelArray[0], materialTest);
 
 	_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
-	_deferredRenderer1.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
-	//_deferredRenderer2.initialize(&_window, 0.5f, 0.0f, 0.5f, 0.5f);
-	//_deferredRenderer3.initialize(&_window, 0.0f, 0.5f, 0.5f, 0.5f);
-	//_deferredRenderer4.initialize(&_window, 0.5f, 0.5f, 0.5f, 0.5f);
+	_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
