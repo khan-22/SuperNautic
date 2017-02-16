@@ -29,7 +29,7 @@ Ship::Ship()
 		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 150.0f, 10.0f },
 		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 15.0f, 5.0f },
 		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 400.0f, 20.0f },
-		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 250.0f },
+		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 100.0f },
 		_minAcceleration{ 0.0f },
 		_maxAcceleration{ 200.0f },
 		_maxTurningSpeed{ 8.0f },
@@ -51,7 +51,7 @@ Ship::Ship(glm::vec3 position) : Ship{}
 void Ship::render(GFX::RenderStates& states)
 {
 	// Update model's matrix
-	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(getPosition()) * _meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
+	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(_meshPosition()) * _meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
 
 	_shipModel.render(states);
 }
