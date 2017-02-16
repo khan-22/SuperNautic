@@ -2,6 +2,7 @@
 
 #include "Core/Track/SegmentInstance.hpp"
 #include "Core/Utility/CollisionUtility.hpp"
+#include "Core/Utility/GeometryUtility.hpp"
 
 //Default constructor (private)
 SegmentInstance::SegmentInstance()
@@ -117,14 +118,7 @@ void SegmentInstance::updateGlobalBounds()
     _globalBoundingSpheres.clear();
     for(const BoundingBox& globalBox : _globalBoundingBoxes)
     {
-        //float maxHalfLength = *std::max_element(globalBox.halfLengths.begin(), globalBox.halfLengths.end());
-        float radius = 0.f;
-        for(const float& halfLength : globalBox.halfLengths)
-        {
-            radius += halfLength * halfLength;
-        }
-        radius = std::sqrt(radius);
-        _globalBoundingSpheres.emplace_back(globalBox.center, radius);
+        _globalBoundingSpheres.emplace_back(generateBoundingSphere(globalBox));
     }
 }
 
