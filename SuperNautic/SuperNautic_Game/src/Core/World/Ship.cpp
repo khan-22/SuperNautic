@@ -25,10 +25,10 @@ Ship::Ship()
 		_trackForward{ 0.0f, 0.0f, 1.0f },
 		_shipForward{ 0.0f, 0.0f, 1.0f },
 		_upDirection{ 0.0f, 1.0f, 0.0f },
-		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 200.0f, 6.0f },
-		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 150.0f, 10.0f },
+		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 20.0f, 10.0f },
+		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 100.0f, 2.0f },
 		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 15.0f, 5.0f },
-		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 400.0f, 20.0f },
+		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 20.0f },
 		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 100.0f },
 		_minAcceleration{ 0.0f },
 		_maxAcceleration{ 200.0f },
@@ -95,9 +95,9 @@ void Ship::update(float dt)
 		_currentJumpCooldown -= dt;
 	}
 
-	if (_velocity < 50)
+	if (_velocity < 20)
 	{
-		_velocity = 50;
+		_velocity = 20;
 	}
 
 	// Update engine temperature
@@ -165,7 +165,7 @@ void Ship::update(float dt)
 		_shipForward = glm::normalize(aheadOfShipIntersection._position - atShipIntersection._position);
 		
 		// Move up/down to the correct track height
-		move(_upDirection * (_preferredHeight - (atShipIntersection._length - _rayHeight)));
+		move(_upDirection * (_preferredHeight - (((atShipIntersection._length + aheadOfShipIntersection._length) / 2.0f) - _rayHeight)));
 	}
 
 	// Move forward
@@ -280,6 +280,8 @@ void Ship::setReturnPos(const glm::vec3& returnPos)
 
 const glm::vec3& Ship::getCameraForward() const
 {
+	// test
+	return _meshForwardDirection();
 	return _cameraForwardDirection();
 }
 
