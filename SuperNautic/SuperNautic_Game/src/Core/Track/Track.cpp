@@ -74,7 +74,7 @@ void Track::setSeed(const unsigned int seed)
 	}
 }
 
-// Sets the difficulty of the track (0-10)
+// Sets the difficulty of the track (0-5)
 void Track::setCurviness(const unsigned int curviness)
 {
 	assert(curviness >= 0 && curviness <= 5);
@@ -94,21 +94,14 @@ bool Track::generate()
 	char endConnection = 'a';
 	bool lighting = true;
 	int prevIndex = -1;
+	const Segment* lastSegment = nullptr;
 	// Create random path
 	while (true)
 	{
 		// Randomize segment index
-		int index = -1;
+		int index;
 		int inRow;
-		//do
-		//{
-			prevIndex = index;
-			index = getIndex(endConnection, prevIndex);
-			if (index == -1)
-			{
-				LOG_ERROR("WARNING! Something went wrong with the track generation! Not enough connections of type '", endConnection, "'?");
-			}
-		//} while ((_segmentHandler->infos().size() >= 2 && index == prevIndex));
+		index = getIndex(endConnection, prevIndex, lastSegment);
 		// Normal segment placement
 		if (index < _segmentHandler->infos().size())
 		{
@@ -117,8 +110,6 @@ bool Track::generate()
 
 			for (unsigned int i = 0; i < inRow; i++)
 			{
-				//insertNormalSegment(index, totalLength, false);
-				//insertStructure(0, totalLength);
 				if (!bInsertNormalSegment(index, totalLength, true))
 				{
 					deleteSegments(totalLength, 300);
@@ -132,8 +123,6 @@ bool Track::generate()
 		{
 			insertStructure(index - _segmentHandler->infos().size(), totalLength);
 		}
-		endConnection = _track.back()->getParent()->getEnd();
-		//prevIndex = _track.back()->getIndex();
 
 		// Make the final stretch straight
 		if (totalLength > _targetLength - _endMargin)
@@ -141,6 +130,12 @@ bool Track::generate()
 			if (bEndTrack(totalLength))
 			{
 				break;
+			}
+			else
+			{
+				endConnection = _track.back()->getParent()->getEnd();
+				prevIndex = index;
+				lastSegment = _track.back()->getParent();
 			}
 		}
 	}
@@ -162,7 +157,7 @@ SegmentInstance* Track::getInstance(int index)
 }
 
 // Returns a random index based on connection type
-int Track::getIndex(char connectionType, const unsigned int prevIndex) const
+int Track::getIndex(char connectionType, const unsigned int prevIndex, const Segment* lastSegment) const
 {
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
 	int nonZeroProbSegments = 0;
@@ -180,7 +175,8 @@ int Track::getIndex(char connectionType, const unsigned int prevIndex) const
 		// Normal segments
 		for (unsigned int i = 0; i < infos.size(); i++)
 		{
-			if (infos[i]._startConnection == connectionType && infos[i].getProbaility(_curviness) != 0 && i != prevIndex)
+			if (infos[i]._startConnection == connectionType && infos[i].getProbaility(_curviness) != 0
+				&& _segmentHandler->loadSegment(i))
 			{
 				validSegments.push_back(i);
 			}
@@ -189,7 +185,7 @@ int Track::getIndex(char connectionType, const unsigned int prevIndex) const
 		for (unsigned int i = 0; i < _segmentHandler->getNrOfStructures(); i++)
 		{
 			if (infos[_segmentHandler->getStructure(i)->pieces[0]->index]._startConnection == connectionType
-				&& _segmentHandler->getStructure(i)->curviness <= _curviness)
+				&& i != prevIndex && _segmentHandler->getStructure(i)->curviness <= _curviness)
 			{
 				validSegments.push_back(infos.size() + i);
 			}
@@ -217,7 +213,6 @@ int Track::getIndex(char connectionType, const unsigned int prevIndex) const
 				int test = infos[validSegments[i]].getProbaility(_curviness);
 				if (r - tested < test)
 				{
-					//connectionType = infos[validSegments[i]]._endConnection;
 					return validSegments[i];
 				}
 				tested += test;
@@ -238,12 +233,8 @@ int Track::getIndex(char connectionType, const unsigned int prevIndex) const
 		return 0;
 	}
 	
-	//if (validSegments.size() < 2)
-	//{
-	//	return -1;
-	//}
-	
-	return -1;
+	//This should never run!
+	assert(true);
 }
 
 // Returns the random nr of same segment in a row
@@ -331,7 +322,7 @@ bool Track::bInsertNormalSegment(const int index, int & length, bool testCollisi
 	}
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
-	int maxRotOffset = segment->getInfo().getRotationOffset(_curviness) / angle;
+	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
 	float rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;

@@ -28,11 +28,10 @@ public:
 
 	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos
 	glm::vec3 findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos);
-	//SegmentInstance& getInstance(const int index);
 
 private:
 	Track();
-	int getIndex(char connectionType, const unsigned int prevIndex) const;
+	int getIndex(char connectionType, const unsigned int prevIndex, const Segment* lastSegment) const;
 	int getInRow(const int index) const;
 	bool bInsertNormalSegment(const int index, int & length, bool testCollision);
 	void insertStructure(const int index, int & length);
