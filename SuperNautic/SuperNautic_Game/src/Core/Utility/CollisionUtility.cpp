@@ -76,7 +76,7 @@ bool bTestCollision(const BoundingBox& obb, const Sphere& sphere)
 
     glm::vec3 distance = sphere.center - obb.center;
     float projectionLengthDistance = glm::length(distance);
-    if(floatEq(projectionLengthDistance, 0.f))
+    if(bIsFloatEq(projectionLengthDistance, 0.f))
     {
         return true;
     }
@@ -180,13 +180,13 @@ bool bIsSeparatingAxis(const glm::vec3& axis, const BoundingBox& a, const Boundi
         return false;
     }
 
-    if(floatEq(std::fabs(axis.x) + std::fabs(axis.y) + std::fabs(axis.z), 0.f))
+    if(bIsFloatEq(std::fabs(axis.x) + std::fabs(axis.y) + std::fabs(axis.z), 0.f))
     {
         return false;
     }
 
     #ifndef NDEBUG
-    assert(floatEq(glm::length(axis), 1.f));
+    assert(bIsFloatEq(glm::length(axis), 1.f));
     assertObbCorrectness(a);
     assertObbCorrectness(b);
     #endif // NDEBUG
@@ -201,11 +201,11 @@ float computeHalfProjectionLength(const glm::vec3& projectionLine, const Boundin
 {
 
     #ifndef NDEBUG
-    if(!floatEq(glm::length(projectionLine), 1.f))
+    if(!bIsFloatEq(glm::length(projectionLine), 1.f))
     {
         int flerp = 0;
     }
-    assert(floatEq(glm::length(projectionLine), 1.f));
+    assert(bIsFloatEq(glm::length(projectionLine), 1.f));
     assertObbCorrectness(obb);
     #endif // NDEBUG
 
@@ -222,7 +222,7 @@ void assertObbCorrectness(const BoundingBox& obb)
 {
     for(unsigned char i = 0; i < 3; i++)
     {
-        assert(floatEq(glm::length(obb.directions[i]), 1.f));
+        assert(bIsFloatEq(glm::length(obb.directions[i]), 1.f));
         assert(obb.halfLengths[i] > 0.f);
     }
 }

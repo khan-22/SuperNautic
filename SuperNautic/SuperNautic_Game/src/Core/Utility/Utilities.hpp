@@ -29,7 +29,7 @@ inline T clamp(T value, T low, T high)
 }
 
 // True if two floats are almost equal
-bool floatEq(float a, float b);
+bool bIsFloatEq(float a, float b);
 
 // True if two vectors are almost equal
 inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2)
