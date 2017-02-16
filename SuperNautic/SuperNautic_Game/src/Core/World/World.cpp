@@ -39,15 +39,6 @@ World::World(ApplicationContext& context)
 		_players.emplace_back(10);
 		_playerSegmentIndices.push_back(0);
 	}
-	//_players.emplace_back(0);
-	//_players.emplace_back(2);
-	//_players.emplace_back(3);
-	//_players.emplace_back(4);
-
-	//_playerSegmentIndices.push_back(0);
-	//_playerSegmentIndices.push_back(0);
-	//_playerSegmentIndices.push_back(0);
-	//_playerSegmentIndices.push_back(0);
 
 	_track.setLength(10000);
 	_track.setSeed(1);
