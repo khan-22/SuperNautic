@@ -33,6 +33,7 @@ private:
     private:
         static constexpr unsigned int                   _MAX_ELEMENTS = 5;
         static constexpr unsigned int                   _NUM_CHILDREN = 8;
+        static constexpr float                          _MIN_SIZE = 0.5f;
 
         glm::vec3                                       _center;
         float                                           _size;

@@ -86,7 +86,7 @@ void Octree<ElementT>::Node::insert(ElementPtr element)
     }
 
     _elements.emplace_back(element);
-    if(getSize() >= _MAX_ELEMENTS)
+    if(getSize() >= _MAX_ELEMENTS && _size > _MIN_SIZE)
     {
         split();
     }
