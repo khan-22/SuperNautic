@@ -109,7 +109,7 @@ void World::update(float dt, sf::Window& window)
 
 			_players[i].update(dt);
 		}
-		_camera.setPos(_players[0].getShip().getMeshPosition() - _players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 2.0f);
+		_camera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 2.0f);
 		_camera.setUp(_players[0].getShip().getCameraUp());
 		_camera.setViewDir(_players[0].getShip().getCameraForward());
 	}
