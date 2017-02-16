@@ -13,15 +13,24 @@ World::World(ApplicationContext& context)
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
+	, _playerRTs(4)
 {
-	_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+	//_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 6.f));
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 6.f));
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 6.f));
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 6.f));
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 6.f));
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 6.f));
+	//for (int i = 0; i < _playerRTs.size(); i++)
+	//{
+		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
+		_playerRTs[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_playerRTs[3].initialize(&context.window, 0.2f, 0.0f, 0.5f, 0.5f);
+	//}
+
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 4.f));
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 4.f));
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 4.f));
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 4.f));
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 4.f));
+	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 4.f));
 
 	// Create one player
 	for (int i = 0; i < 5; i++)
@@ -34,6 +43,7 @@ World::World(ApplicationContext& context)
 	}
 
 	// TEST PLAYER
+
 	if (_players.size() == 0)
 	{
 		_players.emplace_back(10);
@@ -123,34 +133,61 @@ void World::update(float dt, sf::Window& window)
 void World::render()
 {
 	std::vector<PointLight> shipLights;
-	for (Player& player : _players)
+	//for (Player& player : _players)
+	//{
+	//	//_renderer.render(player.getShip());
+	//	shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f));
+	//}
+
+	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		_renderer.render(player.getShip());
-		shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f));
+		for (Player& player : _players)
+		{
+			_playerRTs[i].render(player.getShip());
+			shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
+		}
 	}
 
-	for (int i = 0; i < shipLights.size(); i++)
+	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		_renderer.pushPointLight(shipLights[i]);
+		for (int j = 0; j < shipLights.size(); j++)
+		{
+			_playerRTs[i].pushPointLight(shipLights[j]);
+		}
+	}
+	
+
+	//_track.render(_renderer, _playerSegmentIndices[0]);
+
+	for (int i = 0; i < _playerRTs.size(); i++)
+	{
+		_track.render(_playerRTs[i], _playerSegmentIndices[0]);
 	}
 
-	_track.render(_renderer, _playerSegmentIndices[0]);
 	//_renderer.render(_track.);
 
 
-	for (int i = 0; i < _pointLights.size(); i++)
+	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		_renderer.pushPointLight(_pointLights[i]);
+		for (int j = 0; j < _pointLights.size(); j++)
+		{
+			_playerRTs[i].pushPointLight(_pointLights[j]);
+		}
 	}
 
 	if (!_bDebugging)
 	{
 		//TODO LOOP FOR ALL PLAYAHS AND MAKE UNIQUE DEFERRED RENDERAERRS
-		_renderer.display(*_players[0].getCamera());
+		//_renderer.display(*_players[0].getCamera());
+
+		for (int i = 0; i < _playerRTs.size(); i++)
+		{
+			_playerRTs[i].display(*_players[0].getCamera());
+		}
 	}
 	else
 	{
-		_renderer.display(_debugCamera);
+		_playerRTs[0].display(_debugCamera);
 	}
 
 	GFX::SfmlRenderer sfml;
