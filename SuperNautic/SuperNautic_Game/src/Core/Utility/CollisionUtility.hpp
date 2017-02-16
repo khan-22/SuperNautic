@@ -19,11 +19,22 @@ struct PlaneCollisionData
     Type type;
 };
 
+// True if spheres intersect
 bool bTestCollision(const Sphere& a, const Sphere& b);
+
+// True if OBBs intersect
 bool bTestCollision(const BoundingBox& a, const BoundingBox& b);
+
+// True if OBB and sphere intersect
 bool bTestCollision(const BoundingBox& obb, const Sphere& sphere);
-PlaneCollisionData bTestCollision(const BoundingBox& obb, const AxisAlignedPlane& axisAlignedPlane);
-PlaneCollisionData bTestCollision(const Sphere& sphere, const AxisAlignedPlane& axisAlignedPlane);
-PlaneCollisionData bTestCollision(const AxisAlignedPlane& axisAlignedPlane1, const AxisAlignedPlane& axisAlignedPlane2);
+
+// Evaluate OBB-AxisAlignedPlane intersection
+PlaneCollisionData testCollision(const BoundingBox& obb, const AxisAlignedPlane& axisAlignedPlane);
+
+// Evaluate sphere-AxisAlignedPlane intersection
+PlaneCollisionData testCollision(const Sphere& sphere, const AxisAlignedPlane& axisAlignedPlane);
+
+// Evaluate AxisAlignedPlane-AxisAlignedPlane intersection
+PlaneCollisionData testCollision(const AxisAlignedPlane& axisAlignedPlane1, const AxisAlignedPlane& axisAlignedPlane2);
 
 #endif //COLLISION_UTILITY_HPP

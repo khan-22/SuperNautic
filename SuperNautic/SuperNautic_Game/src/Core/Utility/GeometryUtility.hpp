@@ -6,6 +6,7 @@
 #include "Core/Geometry/Sphere.hpp"
 #include "Core/Geometry/BoundingBox.hpp"
 
+// Generate a bounding sphere for obb.
 Sphere generateBoundingSphere(const BoundingBox& obb);
 
 #endif //GEOMETRY_UTILITY_HPP
