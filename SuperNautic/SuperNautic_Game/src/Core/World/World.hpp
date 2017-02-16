@@ -46,7 +46,7 @@ private:
 	// Indices of current segment for players
 	std::vector<unsigned>		_playerSegmentIndices;
 
-	GFX::DeferredRenderer		_renderer;
+	//GFX::DeferredRenderer		_renderer;
 
 	std::vector<GFX::DeferredRenderer> _playerRTs;
 

@@ -17,12 +17,12 @@ World::World(ApplicationContext& context)
 {
 	//_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 
-	//for (int i = 0; i < _playerRTs.size(); i++)
+	//for (int i = 0; i < _playerRTs.size(); i++) //TODODO
 	//{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_playerRTs[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerRTs[3].initialize(&context.window, 0.2f, 0.0f, 0.5f, 0.5f);
+		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 	//}
 
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 4.f));
