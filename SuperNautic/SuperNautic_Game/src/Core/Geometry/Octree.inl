@@ -1,3 +1,5 @@
+#include "Core/Io/Log.hpp"
+
 template<typename ElementT>
 Octree<ElementT>::Octree(const glm::vec3& center, float size)
 : _bounds(BoundingBox
