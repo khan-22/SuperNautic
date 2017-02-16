@@ -7,24 +7,16 @@
 
 #include <cmath>
 
-World::World(ApplicationContext& context)
+World::World(ApplicationContext& context, const int numberOfPlayers)
 	: _segmentHandler{ "Segments/segmentinfos.txt", "Segments/ConnectionTypes.txt" }, _track{ &_segmentHandler }
 	, _context{ context }
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
-	, _playerRTs(4)
+	, _playerRTs(numberOfPlayers)
 {
 	//_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
-
-	//for (int i = 0; i < _playerRTs.size(); i++) //TODODO
-	//{
-		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
-		_playerRTs[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-	//}
-
+	
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 4.f));
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 4.f));
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 4.f));
@@ -48,6 +40,38 @@ World::World(ApplicationContext& context)
 	{
 		_players.emplace_back(10);
 		_playerSegmentIndices.push_back(0);
+	}
+
+	if (_players.size() == 1)
+	{
+		_playerRTs[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+	}
+	else if (_players.size() == 2)
+	{
+		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		_players[0].setScreenSize(1280, 360, 0, 0);
+		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
+		_players[1].setScreenSize(1280, 360, 0, 360);
+	}
+	else if (_players.size() == 3)
+	{
+		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		_players[0].setScreenSize(1280, 360, 0, 0);
+		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_players[1].setScreenSize(640, 360, 0, 360);
+		_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_players[2].setScreenSize(640, 360, 640, 360);
+	}
+	else if (_players.size() == 4)
+	{
+		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
+		_players[0].setScreenSize(640, 360, 0, 0);
+		_playerRTs[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_players[1].setScreenSize(640, 360, 360, 0);
+		_playerRTs[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_players[2].setScreenSize(640, 360, 0, 360);
+		_playerRTs[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_players[3].setScreenSize(640, 360, 360, 360);
 	}
 
 	_track.setLength(10000);
@@ -165,7 +189,7 @@ void World::render()
 
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		_track.render(_playerRTs[i], _playerSegmentIndices[0]);
+		_track.render(_playerRTs[i], _playerSegmentIndices[i]);
 	}
 
 	//_renderer.render(_track.);
@@ -184,9 +208,9 @@ void World::render()
 		//TODO LOOP FOR ALL PLAYAHS AND MAKE UNIQUE DEFERRED RENDERAERRS
 		//_renderer.display(*_players[0].getCamera());
 
-		for (int i = 0; i < _playerRTs.size(); i++)
+		for (int i = 0; i < _players.size(); i++)
 		{
-			_playerRTs[i].display(*_players[0].getCamera());
+			_playerRTs[i].display(*_players[i].getCamera());
 		}
 	}
 	else

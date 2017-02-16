@@ -1,14 +1,5 @@
 #include "Core/World/Player.hpp"
 
-Player::Player() :
-	_playerId(0),
-	_input(0),
-	_hud(1280, 720),
-	_camera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 })
-{
-	_audio.playAudio(PlayerAudio::Sounds::engine);
-}
-
 Player::Player(int id) :
 	_playerId(id),
 	_input(id),
@@ -33,6 +24,12 @@ void Player::render(GFX::DeferredRenderer& renderer)
 const sf::Drawable& Player::getHud() const
 {
     return _hud;
+}
+
+void Player::setScreenSize(int screenWidth, int screenHeight, int offsetX, int offsetY)
+{
+	_camera.setAspectRatio(screenWidth, screenHeight);
+	_hud.setScreenSize(screenWidth, screenHeight, offsetX, offsetY);
 }
 
 

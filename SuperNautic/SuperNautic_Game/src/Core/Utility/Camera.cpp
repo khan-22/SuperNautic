@@ -106,3 +106,11 @@ void Camera::changeFOV(float deltaFOV)
 	_fov += deltaFOV;
 	_perspective = glm::perspective(glm::radians(_fov), (float)_viewWidth / _viewHeight, 0.1f, 1000.f);
 }
+
+void Camera::setAspectRatio(int width, int height)
+{
+	_viewWidth  = width;
+	_viewHeight = height;
+
+	_perspective = glm::perspective(glm::radians(_fov), (float)_viewWidth / _viewHeight, 0.1f, 1000.f);
+}

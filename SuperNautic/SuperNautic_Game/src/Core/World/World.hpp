@@ -24,7 +24,7 @@ class ApplicationContext;
 class World
 {
 public:
-    World(ApplicationContext& context);
+    World(ApplicationContext& context, const int numberOfPlayers);
 
 	void handleEvent(const sf::Event& e);
 	void update(float dt, sf::Window& window);

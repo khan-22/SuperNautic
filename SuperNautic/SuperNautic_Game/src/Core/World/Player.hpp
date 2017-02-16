@@ -15,7 +15,6 @@
 class Player
 {
 public:
-	Player();
 	Player(int id);
 	~Player();
 	Player(const Player& other);
@@ -23,6 +22,8 @@ public:
 	void update(float dt);
 	void render(GFX::DeferredRenderer& renderer);
     const sf::Drawable& getHud() const;
+
+	void setScreenSize(int screenWidth, int screenHeight, int offsetX, int offsetY);
 
 	Ship& getShip()
 	{

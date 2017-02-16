@@ -24,6 +24,7 @@ public:
 	void changeHeat(float change);
 	void setSpeed(float speed);
 	void setPosition(int position);
+	void setScreenSize(int width, int height, int offsetX, int offsetY);
 
 	void updateCurrent() override;
 	void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
@@ -31,6 +32,8 @@ public:
 private:
 	float				_widthStep;
 	float				_heightStep;
+	int					_offsetX;
+	int					_offsetY;
 	float				_heat;
 	float				_speed;
 	int					_position;

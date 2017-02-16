@@ -10,9 +10,9 @@
 #include "Core/ApplicationState/ApplicationContext.hpp"
 
 
-PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
+PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context, int numberOfPlayers)
 : ApplicationState(stack, context)
-, _world(context)
+, _world(context, numberOfPlayers)
 {
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
 }

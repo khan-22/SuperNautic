@@ -9,7 +9,7 @@
 class PlayApplicationState : public ApplicationState
 {
 public:
-    PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context);
+    PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context, int numberOfPlayers);
 
     bool bRender() override;
     bool bUpdate(float dtSeconds) override;

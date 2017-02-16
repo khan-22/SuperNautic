@@ -23,6 +23,8 @@ private:
     GuiContainer _guiContainer;
     Input _input;
     Asset<sf::Font> _font;
+
+	int _playersActive;
 };
 
 
