@@ -150,7 +150,7 @@ void HUD::updateCurrent()
 	_heatMeter.setPosition(_widthStep * 3 + _offsetX, _heightStep * 90 - size + _offsetY);
 
 	_tSpeed.setString("Speed: " + std::to_string(_speed));
-	_tPosition.setString("#" + std::to_string(_position));
+	_tPosition.setString(std::to_string(_position));
 }
 
 void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) const

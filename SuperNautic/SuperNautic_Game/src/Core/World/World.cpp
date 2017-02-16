@@ -67,11 +67,11 @@ World::World(ApplicationContext& context, const int numberOfPlayers)
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_players[0].setScreenSize(640, 360, 0, 0);
 		_playerRTs[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_players[1].setScreenSize(640, 360, 360, 0);
+		_players[1].setScreenSize(640, 360, 640, 0);
 		_playerRTs[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_players[2].setScreenSize(640, 360, 0, 360);
 		_playerRTs[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_players[3].setScreenSize(640, 360, 360, 360);
+		_players[3].setScreenSize(640, 360, 640, 360);
 	}
 
 	_track.setLength(10000);
