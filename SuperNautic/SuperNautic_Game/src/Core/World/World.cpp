@@ -9,7 +9,7 @@
 
 World::World(ApplicationContext& context)
 	: _segmentHandler{ "Segments/segmentinfos.txt", "Segments/ConnectionTypes.txt" }, _track{ &_segmentHandler }
-	, _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
+	, _context{ context }
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
@@ -39,15 +39,6 @@ World::World(ApplicationContext& context)
 		_players.emplace_back(10);
 		_playerSegmentIndices.push_back(0);
 	}
-	//_players.emplace_back(0);
-	//_players.emplace_back(2);
-	//_players.emplace_back(3);
-	//_players.emplace_back(4);
-
-	//_playerSegmentIndices.push_back(0);
-	//_playerSegmentIndices.push_back(0);
-	//_playerSegmentIndices.push_back(0);
-	//_playerSegmentIndices.push_back(0);
 
 	_track.setLength(10000);
 	_track.setSeed(1);
