@@ -88,7 +88,7 @@ bool bTestCollision(const BoundingBox& obb, const Sphere& sphere)
     return !(projectionLengthDistance > projectionLengthObb + projectionLengthSphere);
 }
 
-PlaneCollisionData bTestCollision(const BoundingBox& obb, const AxisAlignedPlane& axisAlignedPlane)
+PlaneCollisionData testCollision(const BoundingBox& obb, const AxisAlignedPlane& axisAlignedPlane)
 {
     #ifndef NDEBUG
     assertObbCorrectness(obb);
@@ -121,7 +121,7 @@ PlaneCollisionData bTestCollision(const BoundingBox& obb, const AxisAlignedPlane
     return data;
 }
 
-PlaneCollisionData bTestCollision(const Sphere& sphere, const AxisAlignedPlane& axisAlignedPlane)
+PlaneCollisionData testCollision(const Sphere& sphere, const AxisAlignedPlane& axisAlignedPlane)
 {
     #ifndef NDEBUG
     assertSphereCorrectness(sphere);
@@ -146,7 +146,7 @@ PlaneCollisionData bTestCollision(const Sphere& sphere, const AxisAlignedPlane& 
     return data;
 }
 
-PlaneCollisionData bTestCollision(const AxisAlignedPlane& axisAlignedPlane1, const AxisAlignedPlane& axisAlignedPlane2)
+PlaneCollisionData testCollision(const AxisAlignedPlane& axisAlignedPlane1, const AxisAlignedPlane& axisAlignedPlane2)
 {
     PlaneCollisionData data;
     if(axisAlignedPlane1.axis == axisAlignedPlane2.axis)

@@ -101,14 +101,14 @@ CollisionMesh::CollisionResult CollisionMesh::testCollisionObbSphere(const Colli
 
 CollisionMesh::CollisionResult CollisionMesh::testCollisionObbAxisAlignedPlane(const CollisionMesh& obb, const CollisionMesh& axisAlignedPlane)
 {
-    CollisionResult result = convertPlaneCollisionDataToCollisionResult(::bTestCollision(obb._sphere, axisAlignedPlane._axisAlignedPlane));
+    CollisionResult result = convertPlaneCollisionDataToCollisionResult(::testCollision(obb._sphere, axisAlignedPlane._axisAlignedPlane));
 
     if(result != CollisionResult::COLLISION)
     {
         return result;
     }
 
-    return convertPlaneCollisionDataToCollisionResult(::bTestCollision(obb._obb, axisAlignedPlane._axisAlignedPlane));
+    return convertPlaneCollisionDataToCollisionResult(::testCollision(obb._obb, axisAlignedPlane._axisAlignedPlane));
 }
 
 CollisionMesh::CollisionResult CollisionMesh::testCollisionSphereSphere(const CollisionMesh& sphere1, const CollisionMesh& sphere2)
@@ -123,12 +123,12 @@ CollisionMesh::CollisionResult CollisionMesh::testCollisionSphereSphere(const Co
 
 CollisionMesh::CollisionResult CollisionMesh::testCollisionSphereAxisAlignedPlane(const CollisionMesh& sphere, const CollisionMesh& axisAlignedPlane)
 {
-    return convertPlaneCollisionDataToCollisionResult(::bTestCollision(sphere._sphere, axisAlignedPlane._axisAlignedPlane));
+    return convertPlaneCollisionDataToCollisionResult(::testCollision(sphere._sphere, axisAlignedPlane._axisAlignedPlane));
 }
 
 CollisionMesh::CollisionResult CollisionMesh::testCollisionAxisAlignedPlaneAxisAlignedPlane(const CollisionMesh& axisAlignedPlane1, const CollisionMesh& axisAlignedPlane2)
 {
-    return convertPlaneCollisionDataToCollisionResult(::bTestCollision(axisAlignedPlane1._axisAlignedPlane, axisAlignedPlane2._axisAlignedPlane));
+    return convertPlaneCollisionDataToCollisionResult(::testCollision(axisAlignedPlane1._axisAlignedPlane, axisAlignedPlane2._axisAlignedPlane));
 }
 
 CollisionMesh::CollisionResult CollisionMesh::convertPlaneCollisionDataToCollisionResult(const PlaneCollisionData& data)
