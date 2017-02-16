@@ -29,7 +29,7 @@ public:
 		return _ship;
 	}
 
-	const Camera* getCamera();
+	Camera* getCamera();
 
 private:
 	int							_playerId;

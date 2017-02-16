@@ -93,7 +93,7 @@ void Player::update(float dt)
 	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 100 + 1);
 }
 
-const Camera* Player::getCamera()
+Camera* Player::getCamera()
 {
 	return &_camera;
 }
