@@ -58,7 +58,7 @@ public:
 	}
 
 	// Returns "probability"
-	int getProbability() const
+	/*int getProbability() const
 	{
 		return _segmentInfo->_probability;
 	}
@@ -76,6 +76,11 @@ public:
 	int getRotationOffset() const
 	{
 		return _segmentInfo->_rotationOffset;
+	}*/
+
+	const SegmentInfo & getInfo() const
+	{
+		return *_segmentInfo;
 	}
 
 	// Returns approximate segment length

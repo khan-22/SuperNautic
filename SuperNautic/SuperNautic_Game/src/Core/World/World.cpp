@@ -50,6 +50,7 @@ World::World(ApplicationContext& context)
 
 	_track.setLength(40000);
 	_track.setSeed(1);
+	_track.setCurviness(2);
 	_track.generate();
 	_bDebugging = false;
 }

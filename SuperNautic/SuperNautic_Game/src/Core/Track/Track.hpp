@@ -32,7 +32,7 @@ public:
 
 private:
 	Track();
-	int getIndex(char connectionType) const;
+	int getIndex(char connectionType, const unsigned int prevIndex) const;
 	int getInRow(const int index) const;
 	bool bInsertNormalSegment(const int index, int & length, bool testCollision);
 	void insertStructure(const int index, int & length);
@@ -45,7 +45,7 @@ private:
 	int								_targetLength;
 	int								_generatedLength;
 	unsigned int					_seed;
-	unsigned int					_curviness;
+	float							_curviness;
 	glm::mat4						_endMatrix;
 };
 
