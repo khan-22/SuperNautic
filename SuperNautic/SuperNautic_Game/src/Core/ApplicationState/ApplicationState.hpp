@@ -21,6 +21,8 @@ class ApplicationState
         virtual bool bUpdate(float dtSeconds) = 0; // Return false to prevent updating of states behind this one.
         virtual bool bHandleEvent(const sf::Event& event) = 0; // Return false to prevent event handling of states behind this one.
 
+        virtual bool bIsTransparent();
+
     protected:
         ApplicationStateStack& _stack;
         ApplicationContext& _context;

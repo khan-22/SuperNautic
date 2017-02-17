@@ -10,3 +10,9 @@ ApplicationState::ApplicationState(ApplicationStateStack& stack, ApplicationCont
 ApplicationState::~ApplicationState()
 {
 }
+
+
+bool ApplicationState::bIsTransparent()
+{
+    return true;
+}
