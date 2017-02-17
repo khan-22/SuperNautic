@@ -14,6 +14,12 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_widthStep = windowWidth / 100.f;
 	_heightStep = windowHeight / 100.f;
 
+	_heatSizeX = _widthStep * 2;
+	_heatSizeY = _heightStep * 80;
+
+	_heatPosX = _widthStep * 3 + _offsetX;
+	_heatPosY = _heightStep * 90 + _offsetY;
+
 	_badRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 5));
 	_badRect.setOutlineColor(sf::Color::Red);
 	_badRect.setFillColor(sf::Color::Transparent);
@@ -94,8 +100,9 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_offsetY = offsetY;
 
 	_heatSizeX = _widthStep * 2;
-	_heatPosX = _widthStep * 3 + _offsetX; 
 	_heatSizeY = _heightStep * 80;
+
+	_heatPosX = _widthStep * 3 + _offsetX; 
 	_heatPosY = _heightStep * 90 + _offsetY;
 
 	_badRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 5));
