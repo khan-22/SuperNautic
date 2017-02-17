@@ -223,8 +223,9 @@ int Track::getInRow(int index) const
 
 glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos)
 {
-						 // Waypoint,	segment index
-	std::vector<std::pair<WaypointInfo, long>> closestWaypoints;
+	WaypointInfo closest;
+	closest.found = false;
+	unsigned closestIndex;
 
 	// Check previous, current and next segment
 	for (long i = static_cast<long>(segmentIndex) - 1; i <= static_cast<long>(segmentIndex) + 1; ++i)
@@ -232,50 +233,68 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 		// Make sure current segment is within bounds
 		if (i >= 0 && i < _track.size())
 		{
-			std::pair<WaypointInfo, WaypointInfo> wps = _track[i]->getParent()->findClosestWaypoints(glm::inverse(_track[i]->getModelMatrix()) * glm::vec4{globalPosition, 1.0f});
+			WaypointInfo test = _track[i]->getParent()->findClosestWaypoint(glm::inverse(_track[i]->getModelMatrix()) * glm::vec4{globalPosition, 1.0f});
 
-			closestWaypoints.push_back(std::make_pair(wps.first, i));
-			closestWaypoints.push_back(std::make_pair(wps.second, i));
+			// If test found an appropriate waypoint and closest is empty or test is closer than closest
+			if (test.found && (!closest.found || test.distance < closest.distance))
+			{
+				closest = test;
+				closestIndex = i;
+			}
 		}
 	}
 
-	// Find the two neighboring waypoints closest to ship, these will be just ahead and behind ship
-	// closestWaypoints are always sorted in order of appearance in track, because Segment::findClosestWaypoints() returns them in that order
-	float lowestSum = closestWaypoints[0].first.distance + closestWaypoints[1].first.distance;
-	unsigned lowestIndex = 0;
-	for (unsigned i = 1; i < closestWaypoints.size() - 1; ++i)
+	if (!closest.found)
 	{
-		float testSum = closestWaypoints[i].first.distance + closestWaypoints[i + 1].first.distance;
-		if (testSum < lowestSum)
-		{
-			lowestSum = testSum;
-			lowestIndex = i;
-		}
+		LOG_ERROR("No closest waypoint was found! Returning (0, 0, 1) as forward vector.");
+		return glm::vec3{ 0, 0, 1 };
+	}
+	else
+	{
+		// Return to global world space
+		closest.direction = _track[closestIndex]->getModelMatrix() * glm::vec4{ closest.direction, 0.0f };
+		closest.position = _track[closestIndex]->getModelMatrix() * glm::vec4{ closest.position, 1.0f };
+
+		// Update ship's current segment
+		segmentIndex = closestIndex;
+	}
+	
+	// Find direction and position of next waypoint
+	WaypointInfo next = findNextWaypointInfo(closest, closestIndex);
+
+	// Update ship return position
+	returnPos = closest.position;
+
+	if (bAlmostEqual(closest.direction, next.direction))
+	{
+		//return closest.direction;
 	}
 
-	// Update segment index of ship
-	segmentIndex = static_cast<unsigned>(closestWaypoints[lowestIndex].second);
+	// Project globalPosition onto the plane defined by closest.direction and closest.position
+	// Cast a ray from this position in the direction of closest.direction and find 
+	//     intersection with plane defined by next.direction and next.distance
+	// The length of the ray is used to find interpolation value between waypoint normals
+	glm::vec3 projectedGlobalPos{ globalPosition - glm::dot(closest.direction, globalPosition - closest.position) * closest.direction };
 
-	// Transform vectors to global space
-	// Waypoint behind ship
-	glm::vec3 behindPos = _track[closestWaypoints[lowestIndex].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex].first.position, 1.0f };
-	glm::vec3 behindDir = _track[closestWaypoints[lowestIndex].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex].first.direction, 0.0f };
+	// Distance from origin to next-plane
+	float planeD = glm::dot(next.direction, next.position);
 
-	// Waypoint ahead of ship
-	glm::vec3 aheadPos = _track[closestWaypoints[lowestIndex + 1].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex + 1].first.position, 1.0f };
-	glm::vec3 aheadDir = _track[closestWaypoints[lowestIndex + 1].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex + 1].first.direction, 0.0f };
+	float divisor = glm::dot(next.direction, closest.direction);
 
-	// Vector from behind waypoint to ahead waypoint
-	glm::vec3 betweenWaypoints = aheadPos - behindPos;
+	// Ray is parallell to plane
+	if (divisor <= 0.0f)
+	{
+		LOG_ERROR("The direction of two waypoints are orthogonal. Returning direction of waypoint ahead of position.");
+		return next.direction;
+	}
 
-	// Find [0..1], 0 = ship is at behind waypoint, 1 = ship is at ahead waypoint
-	float dist = glm::dot(glm::normalize(betweenWaypoints), (globalPosition - behindPos)) / glm::length(betweenWaypoints);
+	float distanceToPlane = (-glm::dot(next.direction, projectedGlobalPos) + planeD) / divisor;
 
-	// Set return pos
-	returnPos = behindPos;
+	// [0..1], 0 = at closest waypoint, 1 = at next waypoint
+	float interpolationValue = glm::dot(closest.direction, globalPosition - closest.position) / distanceToPlane;
 
-	// Find forward vector, change to proper rotation?
-	return glm::vec3{ glm::normalize(behindDir * (1.0f - dist) + aheadDir * dist) };
+	// Interpolate between directions
+	return glm::normalize(closest.direction * (1 - interpolationValue) + next.direction * interpolationValue);
 }
 
 // Inserts a segment with given index at the end of the track
@@ -405,4 +424,62 @@ void Track::render(GFX::DeferredRenderer& renderer, const int shipIndex)
 			renderer.render(*_track[index]);
 		}
 	}
+}
+
+WaypointInfo Track::findNextWaypointInfo(const WaypointInfo& current, unsigned segmentIndex) const
+{
+	WaypointInfo next;
+
+	if (current.index >= _track[segmentIndex]->getParent()->getWaypoints().size() - 1)
+	{
+		// The waypoint is the last in its segment
+
+		// If this is the last segment, just return direction of current
+		if (segmentIndex >= _track.size() - 1)
+		{
+			return next = current;
+		}
+		// Else use first waypoint of next segment
+		else
+		{
+			next.position = _track[segmentIndex + 1]->getModelMatrix() * glm::vec4{ _track[segmentIndex + 1]->getParent()->getWaypoints()[0], 1.0f };
+
+			// Get local position, transform to global space, subtract next.position to get global direction, normalize
+			next.direction = glm::normalize(
+				glm::vec3{ (_track[segmentIndex + 1]->getModelMatrix() *
+					glm::vec4{ _track[segmentIndex + 1]->getParent()->getWaypoints()[1], 1.0f }) }
+				-next.position
+			);
+		}
+	}
+	else
+	{
+		// Use next waypoint in segment
+		next.position = _track[segmentIndex]->getModelMatrix() * glm::vec4{ _track[segmentIndex]->getParent()->getWaypoints()[current.index + 1], 1.0f };
+
+		if (current.index >= _track[segmentIndex]->getParent()->getWaypoints().size() - 2)
+		{
+			// Use the end of the segment to find direction of next
+
+			// Get local position, transform to global space, subtract next.position to get global direction, normalize
+			next.direction = glm::normalize(
+				glm::vec3{ (_track[segmentIndex]->getModelMatrix() * _track[segmentIndex]->getEndMatrix() *
+					glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f }) }
+				-next.position
+			);
+		}
+		else
+		{
+			// Use the waypoint after next to find direction of next
+
+			// Get local position, transform to global space, subtract next.position to get global direction, normalize
+			next.direction = glm::normalize(
+				glm::vec3{ (_track[segmentIndex]->getModelMatrix() *
+					glm::vec4{ _track[segmentIndex]->getParent()->getWaypoints()[current.index + 2], 1.0f }) }
+				-next.position
+			);
+		}
+	}
+
+	return next;
 }

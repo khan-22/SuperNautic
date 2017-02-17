@@ -70,6 +70,7 @@ void World::update(float dt, sf::Window& window)
 			// Finds forward vector of ship and updates segment index
 			glm::vec3 returnPos;
 			glm::vec3 forward = _track.findForward(_players[i].getShip().getPosition(), _playerSegmentIndices[i], returnPos);
+
 			_players[i].getShip().setForward(forward);
 			_players[i].getShip().setReturnPos(returnPos);
 
@@ -81,7 +82,6 @@ void World::update(float dt, sf::Window& window)
 				{
 					instances.push_back(_track.getInstance(static_cast<int>(j)));
 				}
-
 			}
 
 			if (instances[1] == _track.getInstance(_track.getNrOfSegments() - 1))
@@ -102,7 +102,6 @@ void World::update(float dt, sf::Window& window)
 			{
 				_pointLights[k].setPosition(instancesForLights[k]->getModelMatrix() * glm::vec4(instancesForLights[k]->getParent()->getWaypoints()[0], 1.f));
 			}
-
 
 			// Set relevant segments
 			_players[i].getShip().setSegments(instances);

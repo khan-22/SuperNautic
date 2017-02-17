@@ -21,9 +21,11 @@
 
 struct WaypointInfo
 {
+	bool found{ false };
 	glm::vec3 position;
 	glm::vec3 direction;
 	float distance;
+	unsigned index;	// index in _waypoints
 };
 
 // Uninstantiated version of a track segment
@@ -94,9 +96,8 @@ public:
 		return _waypoints;
 	}
 
-	// Finds positions of and distance to the two waypoints closest to a position (position is relative to segment's local origin)
-	// First in pair is before second
-	std::pair<WaypointInfo, WaypointInfo> findClosestWaypoints(const glm::vec3& position) const;
+	// Finds position of and distance to the waypoint closest to a position (position is relative to segment's local origin)
+	WaypointInfo findClosestWaypoint(const glm::vec3& position) const;
 
 	GFX::TexturedModel getVisualModel() const
 	{

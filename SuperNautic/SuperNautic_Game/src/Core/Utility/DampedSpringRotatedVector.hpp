@@ -9,8 +9,10 @@
 class DampedSpringRotatedVector : public SpringRotatedVector
 {
 public:
-	DampedSpringRotatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& backupAxis, float springConstant, float dampingConstant);
+	DampedSpringRotatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& backupAxis, float springConstant);
 	void update(float dt) override;
+
+	virtual ~DampedSpringRotatedVector() {};
 
 
 private:

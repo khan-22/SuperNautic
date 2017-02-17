@@ -37,6 +37,7 @@ private:
 	void insertStructure(const int index, int & length);
 	void deleteSegments(int & totalLength, const int lengthToDelete);
 	bool bEndTrack(int & totalLength);
+	WaypointInfo findNextWaypointInfo(const WaypointInfo& current, unsigned segmentIndex) const;
 
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance*>	_track;
