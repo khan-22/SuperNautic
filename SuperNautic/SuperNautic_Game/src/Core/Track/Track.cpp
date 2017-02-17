@@ -8,28 +8,18 @@
 #include "Core/Io/Log.hpp"
 #include "GFX/Resources/Model.hpp"
 
-// Default constructor (private)
-Track::Track()
-	: _segmentHandler(nullptr)
-	, _endMargin(400)
-	, _targetLength(10000)
-	, _seed(1)
-	, _curviness(0)
-	, _endMatrix(glm::mat4())
-{
-
-}
-
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler)
 	: _segmentHandler(segmentHandler)
-	, _endMargin(400)
-	, _targetLength(10000)
 	, _seed(1)
 	, _curviness(0)
+	, _targetLength(10000)
+	, _generatedLength(0)
+	, _totalProgress(0.f)
+	, _endMargin(400)
 	, _endMatrix(glm::mat4())
 {
-	//_endMatrix = glm::translate(glm::vec3(0, 0, 100));
+	
 }
 
 // Destructor
@@ -58,6 +48,7 @@ void Track::setLength(const unsigned int length)
 {
 	assert(length >= 3000 && length <= 1000000);
 	_targetLength = length;
+	_progressionLength = _targetLength / 30;
 }
 
 // Set randomization seed
@@ -81,27 +72,36 @@ void Track::setCurviness(const unsigned int curviness)
 	_curviness = curviness / 5.f;
 }
 
-// Generates the track
-bool Track::generate()
+void Track::startNewTrack()
 {
-	int totalLength = 0;
-	// Make the inital stretch straight
-	while (totalLength < 300)
+	_generatedLength = 0;
+	_totalProgress = 0.f;
+	_endMatrix = glm::mat4();
+	_endConnection = 'a';
+	_prevIndex = -1;
+	_lastSegment = nullptr;
+	for (unsigned int i = 0; i < _track.size(); i++)
 	{
-		bInsertNormalSegment(0, totalLength, false);
+		delete _track[i];
+	}
+}
+
+// Generates the track
+bool Track::bGenerate()
+{
+	// Make the inital stretch straight
+	while (_generatedLength < 300)
+	{
+		bInsertNormalSegment(0, false);
 	}
 
-	char endConnection = 'a';
-	bool lighting = true;
-	int prevIndex = -1;
-	const Segment* lastSegment = nullptr;
 	// Create random path
-	while (true)
+	while (_generatedLength - _lengthAfterLastCall < _progressionLength)
 	{
 		// Randomize segment index
 		int index;
 		int inRow;
-		index = getIndex(endConnection, prevIndex, lastSegment);
+		index = getIndex();
 		// Normal segment placement
 		if (index < _segmentHandler->infos().size())
 		{
@@ -110,9 +110,9 @@ bool Track::generate()
 
 			for (unsigned int i = 0; i < inRow; i++)
 			{
-				if (!bInsertNormalSegment(index, totalLength, true))
+				if (!bInsertNormalSegment(index, true))
 				{
-					deleteSegments(totalLength, 300);
+					deleteSegments(300);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					break;
 				}
@@ -121,29 +121,33 @@ bool Track::generate()
 		// Structures
 		else
 		{
-			insertStructure(index - _segmentHandler->infos().size(), totalLength);
+			insertStructure(index - _segmentHandler->infos().size());
 		}
+		_endConnection = _track.back()->getParent()->getEnd();
+		_prevIndex = index;
+		_lastSegment = _track.back()->getParent();
 
 		// Make the final stretch straight
-		if (totalLength > _targetLength - _endMargin)
+		if (_generatedLength > _targetLength - _endMargin)
 		{
-			if (bEndTrack(totalLength))
+			if (bEndTrack())
 			{
-				break;
+				return true;
+				LOG("Track generated. Length: ", _generatedLength);
 			}
 			else
 			{
-				endConnection = _track.back()->getParent()->getEnd();
-				prevIndex = index;
-				lastSegment = _track.back()->getParent();
+				_endConnection = _track.back()->getParent()->getEnd();
+				_prevIndex = index;
+				_lastSegment = _track.back()->getParent();
 			}
 		}
 	}
-	
-	_generatedLength = totalLength;
 
-	LOG("Track generated. Length: " + std::to_string(_generatedLength) + " meters.");
-	return true;
+	_lengthAfterLastCall = _generatedLength;
+	_totalProgress = (float)_generatedLength / _targetLength;
+	LOG("Progression: ", _totalProgress * 100);
+	return false;
 }
 
 int Track::getNrOfSegments() const
@@ -156,8 +160,13 @@ SegmentInstance* Track::getInstance(int index)
 	return _track[index];
 }
 
+float Track::getProgression() const
+{
+	return _totalProgress;
+}
+
 // Returns a random index based on connection type
-int Track::getIndex(char connectionType, const unsigned int prevIndex, const Segment* lastSegment) const
+int Track::getIndex() const
 {
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
 	int nonZeroProbSegments = 0;
@@ -175,8 +184,8 @@ int Track::getIndex(char connectionType, const unsigned int prevIndex, const Seg
 		// Normal segments
 		for (unsigned int i = 0; i < infos.size(); i++)
 		{
-			if (infos[i]._startConnection == connectionType && infos[i].getProbaility(_curviness) != 0
-				&& _segmentHandler->loadSegment(i))
+			if (infos[i]._startConnection == _endConnection && infos[i].getProbaility(_curviness) != 0
+				&& _segmentHandler->loadSegment(i) != _lastSegment)
 			{
 				validSegments.push_back(i);
 			}
@@ -184,8 +193,8 @@ int Track::getIndex(char connectionType, const unsigned int prevIndex, const Seg
 		// Structures
 		for (unsigned int i = 0; i < _segmentHandler->getNrOfStructures(); i++)
 		{
-			if (infos[_segmentHandler->getStructure(i)->pieces[0]->index]._startConnection == connectionType
-				&& i != prevIndex && _segmentHandler->getStructure(i)->curviness <= _curviness)
+			if (infos[_segmentHandler->getStructure(i)->pieces[0]->index]._startConnection == _endConnection
+				&& i != _prevIndex && _segmentHandler->getStructure(i)->curviness <= _curviness)
 			{
 				validSegments.push_back(infos.size() + i);
 			}
@@ -200,7 +209,9 @@ int Track::getIndex(char connectionType, const unsigned int prevIndex, const Seg
 			}
 			else
 			{
-				totalProbability += _segmentHandler->getStructure(i - infos.size())->getProbability(_curviness);
+				int index = validSegments[i] - infos.size();
+				int prob = _segmentHandler->getStructure(index)->getProbability(_curviness);
+				totalProbability += prob;
 			}
 		}
 		// Randomizing and finding the corresponding segment
@@ -219,7 +230,7 @@ int Track::getIndex(char connectionType, const unsigned int prevIndex, const Seg
 			}
 			else
 			{
-				int test = _segmentHandler->getStructure(i - infos.size())->getProbability(_curviness);
+				int test = _segmentHandler->getStructure(validSegments[i] - infos.size())->getProbability(_curviness);
 				if (r - tested < test)
 				{
 					return i;
@@ -233,7 +244,7 @@ int Track::getIndex(char connectionType, const unsigned int prevIndex, const Seg
 		return 0;
 	}
 	
-	//This should never run!
+	//This should never ever run!
 	assert(true);
 }
 
@@ -305,7 +316,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 }
 
 // Inserts a segment with given index at the end of the track
-bool Track::bInsertNormalSegment(const int index, int & length, bool testCollision)
+bool Track::bInsertNormalSegment(const int index, bool testCollision)
 {
 	const Segment * segment = _segmentHandler->loadSegment(index);
 	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
@@ -326,15 +337,15 @@ bool Track::bInsertNormalSegment(const int index, int & length, bool testCollisi
 	float rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
-	length += segment->getLength();
+	_generatedLength += segment->getLength();
 	_track.push_back(tempInstance);
 	return true;
 }
 
 // Inserts a whole pre-defined structure at the end of the track
-void Track::insertStructure(const int index, int & length)
+void Track::insertStructure(const int index)
 {
-	int startLength = length;
+	int startLength = _generatedLength;
 	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
 	// Randomize how many times the structure should be looped
 	int min = s->minInRow;
@@ -361,7 +372,7 @@ void Track::insertStructure(const int index, int & length)
 				if (tempInstance->bTestCollision(*_track[i]))
 				{
 					delete tempInstance;
-					deleteSegments(length, length - startLength);
+					deleteSegments(_generatedLength - startLength);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					return;
 				}
@@ -376,11 +387,11 @@ void Track::insertStructure(const int index, int & length)
 			// Finalizing
 			glm::mat4 rotMat = glm::rotate(glm::radians(rotVal * rotationDir), glm::vec3(0, 0, 1));
 			_endMatrix = _endMatrix * modelEndMat * rotMat;
-			length += segment->getLength();
+			_generatedLength += segment->getLength();
 			_track.push_back(tempInstance);
 
 			// Terminating if target length is approaching
-			if (length > _targetLength - _endMargin)
+			if (_generatedLength > _targetLength - _endMargin)
 			{
 				return;
 			}
@@ -389,27 +400,27 @@ void Track::insertStructure(const int index, int & length)
 }
 
 // Deletes a certain length of the track (from the end)
-void Track::deleteSegments(int & totalLength, const int lengthToDelete)
+void Track::deleteSegments(const int lengthToDelete)
 {
 	int deletedLength = 0;
-	while (deletedLength <= lengthToDelete && totalLength > 500)
+	while (deletedLength <= lengthToDelete && _generatedLength > 500)
 	{
 		int segmentLength = _track.back()->getLength();
 		deletedLength += segmentLength;
-		totalLength -= segmentLength;
+		_generatedLength -= segmentLength;
 		delete _track[_track.size() - 1];
 		_track.erase(_track.begin() + _track.size() - 1);
 	}
 }
 
 // Tries to end the track with a straight path
-bool Track::bEndTrack(int & totalLength)
+bool Track::bEndTrack()
 {
-	while (totalLength < _targetLength)
+	while (_generatedLength < _targetLength)
 	{
-		if (!bInsertNormalSegment(0, totalLength, true))
+		if (!bInsertNormalSegment(0, true))
 		{
-			deleteSegments(totalLength, _endMargin + 200);
+			deleteSegments(_endMargin + 200);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 			return false;
 		}

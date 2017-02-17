@@ -30,10 +30,10 @@ public:
 	void render();
 
 	bool bHasWon();
+	void setTrack(Track * track);
 
 private:
-	Track						_track;
-	SegmentHandler				_segmentHandler;
+	Track*						_track;
 	std::vector<Player>			_players;
 	std::vector<PointLight>		_pointLights;
 	bool						_bHasWon;

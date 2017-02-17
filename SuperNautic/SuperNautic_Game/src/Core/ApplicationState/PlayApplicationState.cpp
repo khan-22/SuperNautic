@@ -8,13 +8,25 @@
 #include "Core/ApplicationState/PauseMenuApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
+#include "Core/ApplicationState/TrackGenerationApplicationState.h"
 
 
 PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
-: ApplicationState(stack, context)
-, _world(context)
+	: ApplicationState(stack, context)
+	, _segmentHandler("Segments/segmentinfos1.txt", "Segments/ConnectionTypes.txt")
+	, _track(&_segmentHandler)
+	, _world(context)
 {
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
+	_track.setCurviness(2);
+	_track.setSeed(2);
+	_track.setLength(20000);
+	_world.setTrack(&_track);
+}
+
+void PlayApplicationState::initialize()
+{
+	_stack.push(std::unique_ptr<ApplicationState>(new TrackGenerationApplicationState(_stack, _context, &_track)));
 }
 
 bool PlayApplicationState::bRender()

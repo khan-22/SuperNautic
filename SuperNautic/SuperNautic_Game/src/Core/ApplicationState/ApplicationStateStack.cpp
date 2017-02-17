@@ -79,6 +79,7 @@ void ApplicationStateStack::applyPendingRequests()
         {
             case Push:
                 _stack.push_back(std::move(_pushQueue.front()));
+				_stack.back()->initialize();
                 _pushQueue.pop();
                 break;
 

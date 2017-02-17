@@ -32,6 +32,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
         _stack.pop();
         auto playState = std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context));
         _stack.push(playState);
+
     }));
 
     text.setString("Quit");

@@ -48,7 +48,7 @@ public:
 		}
 		int getProbability(const float p) const
 		{
-			float realCurviness = (1 - curviness) * p;
+			float realCurviness = (p - curviness) / (1 - curviness);
 			return int((1 - realCurviness) * probability1 + realCurviness * probability2);
 		}
 	};

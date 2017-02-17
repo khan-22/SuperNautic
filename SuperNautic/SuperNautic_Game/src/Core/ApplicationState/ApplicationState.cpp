@@ -10,3 +10,8 @@ ApplicationState::ApplicationState(ApplicationStateStack& stack, ApplicationCont
 ApplicationState::~ApplicationState()
 {
 }
+
+void ApplicationState::initialize()
+{
+
+}
