@@ -14,7 +14,8 @@ public:
 	virtual ~TrackGenerationApplicationState();
 	bool bHandleEvent(const sf::Event& event) override;
 	bool bUpdate(float dtSeconds) override;
-	bool bRender() override;
+	void render() override;
+	bool bIsTransparent() override;
 
 private:
 	Track *				_track;

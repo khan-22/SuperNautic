@@ -68,7 +68,7 @@ bool TrackGenerationApplicationState::bUpdate(float dtSeconds)
 	return false;
 }
 
-bool TrackGenerationApplicationState::bRender()
+void TrackGenerationApplicationState::render()
 {
 	_renderer.render(_background);
 	_renderer.render(_text);
@@ -76,5 +76,9 @@ bool TrackGenerationApplicationState::bRender()
 	_renderer.render(_filler);
 	_renderer.display(_context.window);
 	_bRenderedOnce = true;
+}
+
+bool TrackGenerationApplicationState::bIsTransparent()
+{
 	return false;
 }
