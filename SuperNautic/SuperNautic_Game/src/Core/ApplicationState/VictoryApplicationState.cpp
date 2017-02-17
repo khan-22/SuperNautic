@@ -69,6 +69,10 @@ bool VictoryApplicationState::bUpdate(float dtSeconds)
 		}
 	}
 	_playersActive = playersFound;
+	if (_playersActive == 0)
+	{
+		_playersActive = 1;
+	}
     return false;
 }
 
