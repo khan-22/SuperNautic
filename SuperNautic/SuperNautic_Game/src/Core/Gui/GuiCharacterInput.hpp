@@ -23,6 +23,8 @@ class GuiCharacterInput : public GuiElement
             ALL = ONLY_LETTERS | DIGITS,
         };
 
+
+
         GuiCharacterInput(CharacterFlags flags = CharacterFlags::ALL);
 
         bool bIsSelectable() const override;
@@ -35,6 +37,9 @@ class GuiCharacterInput : public GuiElement
 
         CharacterFlags getCurrentCharacterList() const;
 
+        void onChange(const std::function<void(char)>& callback);
+
+
     private:
         Asset<sf::Font> _font;
         sf::Text _text;
@@ -42,11 +47,16 @@ class GuiCharacterInput : public GuiElement
         unsigned char _currentDigit = 0;
         std::vector<CharacterFlags> _characterLists;
         unsigned char _currentCharacterListIndex = 0;
+        std::function<void(char)> _onChangeCallback;
 
+        void handleEventCurrent(const sf::Event& event) override;
         void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
         void select() override;
         void deselect() override;
         void stepCharacter(bool bForward);
+        void updateText();
+        static std::vector<CharacterFlags> generateCharacterLists(CharacterFlags flags);
+
 
 };
 
