@@ -19,7 +19,12 @@
 // Globals
 HANDLE gConsoleHandle;
 CONSOLE_SCREEN_BUFFER_INFO gPreviousState;
-
+//bool gTransformCoordinates;
+//glm::mat4 gCoordinateTransform = glm::mat4(
+//	1.f, 0.f, 0.f, 0.f,
+//	0.f, 0.f, 1.f, 0.f,
+//	0.f, 1.f, 0.f, 0.f,
+//	0.f, 0.f, 0.f, 1.f);
 
 enum LogColor : WORD
 {
@@ -53,6 +58,11 @@ void processPositions(std::vector<glm::vec3>& positions, const aiMesh* importedM
 		glm::vec3 pos = toGLM(importedMesh->mVertices[i]);
 		glm::vec3 transformedPos = glm::vec3(transform * glm::vec4(pos, 1.f));
 		positions.push_back(transformedPos);
+
+		//if (gTransformCoordinates)
+		//{
+		//	transformedPos = glm::vec3(gCoordinateTransform * glm::vec4(transformedPos, 1.f));
+		//}
 
 		if (i >= importedMesh->mNumVertices / 2)
 		{
@@ -99,6 +109,12 @@ void processNormals(std::vector<glm::vec3>& normals, const aiMesh* importedMesh,
 	{
 		glm::vec3 normal = toGLM(importedMesh->mNormals[i]);
 		glm::vec3 transformedNormal = glm::normalize(glm::vec3(transform * glm::vec4(normal, 0.f)));
+
+		//if (gTransformCoordinates)
+		//{
+		//	transformedNormal = glm::vec3(gCoordinateTransform * glm::vec4(transformedNormal, 1.f));
+		//}
+
 		normals.push_back(transformedNormal);
 
 		if (i >= importedMesh->mNumVertices / 2)
@@ -215,6 +231,11 @@ void processNodeCameras(const aiScene* scene, std::vector<Camera>& cameras)
 	log(GREEN) << "-- Processing Camera: " << cameraNode->mName.C_Str() << std::endl;
 	
 	glm::mat4 cameraTransform = glm::inverse(toGLM(cameraNode->mTransformation));
+
+	/*if (gTransformCoordinates)
+	{
+		cameraTransform = gCoordinateTransform * cameraTransform;
+	}*/
 
 	Camera camera;
 	camera.transform = cameraTransform;
@@ -425,7 +446,12 @@ int main(int argc, char* argv[])
 		for (int i = 1; i < argc; i++)
 		{
 			log(GREEN) << "-------- Beginning work on: " << getNameOfFile(argv[i]) << " --------" << std::endl;
-			
+
+			if (strstr(argv[i], ".blend") != nullptr)
+			{
+				log(RED) << "Warning! .blend files may not be correctly converted!" << std::endl;
+			}
+
 			if (convertFile(argv[i]))
 			{
 				successCount++;
@@ -448,7 +474,8 @@ int main(int argc, char* argv[])
 	else
 	{
 #if _DEBUG
-		convertFile("testmayafile.fbx");
+		convertFile("converter_test_case.blend");
+		//gTransformCoordinates = true;
 #endif
 
 		log(RED) << "No file was given as input" << std::endl;
