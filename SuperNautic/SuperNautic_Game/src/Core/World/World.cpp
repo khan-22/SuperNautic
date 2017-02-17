@@ -4,17 +4,18 @@
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/Track/SegmentInstance.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
+#include "Core/World/Player.hpp"
 
 #include <cmath>
 
-World::World(ApplicationContext& context, Track * track)
-	: _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
-	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
+World::World(ApplicationContext& context, Track* track, const int numberOfPlayers)
+	: _context{ context }
+	, _camera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
-	, _track (track)
+	, _track(track)
+	, _playerRTs(numberOfPlayers)
 {
-	_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
@@ -24,7 +25,7 @@ World::World(ApplicationContext& context, Track * track)
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 
 	// Create one player
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		if (sf::Joystick::isConnected(i)) {
 			_players.emplace_back(i);
@@ -34,10 +35,44 @@ World::World(ApplicationContext& context, Track * track)
 	}
 
 	// TEST PLAYER
+
 	if (_players.size() == 0)
 	{
 		_players.emplace_back(10);
 		_playerProgression.push_back(TrackProgression{ 0, _track });
+	}
+
+	if (_players.size() == 1)
+	{
+		_playerRTs[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+		_players[0].setScreenSize(1280, 720, 0, 0);
+	}
+	else if (_players.size() == 2)
+	{
+		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		_players[0].setScreenSize(1280, 360, 0, 0);
+		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
+		_players[1].setScreenSize(1280, 360, 0, 360);
+	}
+	else if (_players.size() == 3)
+	{
+		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		_players[0].setScreenSize(1280, 360, 0, 0);
+		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_players[1].setScreenSize(640, 360, 0, 360);
+		_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_players[2].setScreenSize(640, 360, 640, 360);
+	}
+	else if (_players.size() == 4)
+	{
+		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
+		_players[0].setScreenSize(640, 360, 0, 0);
+		_playerRTs[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_players[1].setScreenSize(640, 360, 640, 0);
+		_playerRTs[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_players[2].setScreenSize(640, 360, 0, 360);
+		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_players[3].setScreenSize(640, 360, 640, 360);
 	}
 
 	_bDebugging = false;
@@ -111,12 +146,10 @@ void World::update(float dt, sf::Window& window)
 	}
 	else
 	{
-		_debugCamera.update(dt, window);
 	}
 	if (!_bDebugging && sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
 		_bDebugging = true;
-		_debugCamera.setPos(_players[0].getShip().getPosition());
 	}
 	if (_bDebugging && sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
 	{
@@ -130,33 +163,51 @@ void World::update(float dt, sf::Window& window)
 void World::render()
 {
 	std::vector<PointLight> shipLights;
+
+	for (int i = 0; i < _playerRTs.size(); i++)
+	{
+		for (Player& player : _players)
+		{
+			_playerRTs[i].render(player.getShip());
+		}
+	}
 	for (Player& player : _players)
 	{
-		_renderer.render(player.getShip());
-		shipLights.push_back(PointLight(player.getShip().getMeshPosition(), { 1.f,0.5f,0.f }, 1.f));
+		shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
 	}
 
-	for (int i = 0; i < shipLights.size(); i++)
+	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		_renderer.pushPointLight(shipLights[i]);
+		for (int j = 0; j < shipLights.size(); j++)
+		{
+			_playerRTs[i].pushPointLight(shipLights[j]);
+		}
+	}
+	
+	for (int i = 0; i < _playerRTs.size(); i++)
+	{
+		_track->render(_playerRTs[i], _playerProgression[i].getCurrentSegment());
 	}
 
-	_track->render(_renderer, _playerProgression[0].getCurrentSegment());
-	//_renderer.render(_track->);
 
-
-	for (int i = 0; i < _pointLights.size(); i++)
+	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		_renderer.pushPointLight(_pointLights[i]);
+		for (int j = 0; j < _pointLights.size(); j++)
+		{
+			_playerRTs[i].pushPointLight(_pointLights[j]);
+		}
 	}
 
 	if (!_bDebugging)
 	{
-		_renderer.display(_camera);
+		for (int i = 0; i < _players.size(); i++)
+		{
+			_playerRTs[i].display(*_players[i].getCamera());
+		}
 	}
 	else
 	{
-		_renderer.display(_debugCamera);
+		_playerRTs[0].display(_camera);
 	}
 
 	GFX::SfmlRenderer sfml;

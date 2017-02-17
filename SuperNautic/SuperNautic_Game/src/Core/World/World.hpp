@@ -25,7 +25,7 @@ class ApplicationContext;
 class World
 {
 public:
-    World(ApplicationContext& context, Track * track);
+    World(ApplicationContext& context, Track * track, const int numberOfPlayers);
 
 	void handleEvent(const sf::Event& e);
 	void update(float dt, sf::Window& window);
@@ -47,11 +47,12 @@ private:
 	// Keeps track of indices and progress of players
 	std::vector<TrackProgression>	_playerProgression;
 
-	GFX::DeferredRenderer			_renderer;
+	//GFX::DeferredRenderer		_renderer;
 
-	Camera							_camera;
-	DebugCamera						_debugCamera;
-	bool							_bDebugging;
+	std::vector<GFX::DeferredRenderer> _playerRTs;
+
+	Camera						_camera;
+	bool						_bDebugging;
 };
 
 #endif //WORLD_HPP

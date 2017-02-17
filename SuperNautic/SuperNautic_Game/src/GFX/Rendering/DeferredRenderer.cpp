@@ -104,7 +104,7 @@ void DeferredRenderer::display(Camera& camera)
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	geometryPass(camera, windowWidth, windowHeight);
 	lightPass(camera, windowWidth, windowHeight);

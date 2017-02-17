@@ -11,11 +11,11 @@
 #include "Core/ApplicationState/TrackGenerationApplicationState.h"
 
 
-PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
+PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context, int numberOfPlayers)
 	: ApplicationState(stack, context)
 	, _segmentHandler("Segments/segmentinfos2.txt", "Segments/ConnectionTypes.txt")
 	, _track(&_segmentHandler)
-	, _world(context, &_track)
+	, _world(context, &_track, numberOfPlayers)
 {
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
 	_track.setCurviness(3);
