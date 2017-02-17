@@ -130,56 +130,39 @@ void Octree<ElementT>::Node::getIntersectingLeafNodes(const CollisionMesh& mesh,
         return;
     }
 
-    using R = CollisionMesh::CollisionResult;
-    R resultX = mesh.testCollision(_xPlane);
-    R resultY = mesh.testCollision(_yPlane);
-    R resultZ = mesh.testCollision(_zPlane);
+    CollisionMesh::CollisionResult collisionResults[3] =
+    {
+        mesh.testCollision(_xPlane),
+        mesh.testCollision(_yPlane),
+        mesh.testCollision(_zPlane)
+    };
+
+    static constexpr unsigned char FRONT_MASKS[3] =
+    {
+        0b11110000,
+        0b11001100,
+        0b10101010
+    };
+    static_assert(sizeof(FRONT_MASKS[0])* 8 == _NUM_CHILDREN, "Mask bit size must match octree split size.");
 
     unsigned char intersectingNodeIndices = 0b11111111;
     assert(sizeof(intersectingNodeIndices) * 8 == _NUM_CHILDREN);
-    switch(resultX)
+    for(unsigned char i = 0; i < 3; i++)
     {
-        case CollisionMesh::CollisionResult::BACK:
-            intersectingNodeIndices &= 0b00001111;
-            break;
-        case CollisionMesh::CollisionResult::FRONT:
-            intersectingNodeIndices &= 0b11110000;
-            break;
-        case CollisionMesh::CollisionResult::COLLISION:
-            break;
-        default:
-            LOG_ERROR("Unexpected collision result: ", (int)resultX);
-            return;
-    }
-
-    switch(resultY)
-    {
-        case CollisionMesh::CollisionResult::BACK:
-            intersectingNodeIndices &= 0b00110011;
-            break;
-        case CollisionMesh::CollisionResult::FRONT:
-            intersectingNodeIndices &= 0b11001100;
-            break;
-        case CollisionMesh::CollisionResult::COLLISION:
-            break;
-        default:
-            LOG_ERROR("Unexpected collision result: ", (int)resultY);
-            return;
-    }
-
-    switch(resultZ)
-    {
-        case CollisionMesh::CollisionResult::BACK:
-            intersectingNodeIndices &= 0b01010101;
-            break;
-        case CollisionMesh::CollisionResult::FRONT:
-            intersectingNodeIndices &= 0b10101010;
-            break;
-        case CollisionMesh::CollisionResult::COLLISION:
-            break;
-        default:
-            LOG_ERROR("Unexpected collision result: ", (int)resultZ);
-            return;
+        switch(collisionResults[i])
+        {
+            case CollisionMesh::CollisionResult::BACK:
+                intersectingNodeIndices &= ~FRONT_MASKS[i];
+                break;
+            case CollisionMesh::CollisionResult::FRONT:
+                intersectingNodeIndices &= FRONT_MASKS[i];
+                break;
+            case CollisionMesh::CollisionResult::COLLISION:
+                break;
+            default:
+                LOG_ERROR("Unexpected collision result: ", (int)collisionResults[i]);
+                return;
+        }
     }
 
     for(unsigned char i = 0; i < sizeof(intersectingNodeIndices) * 8; i++)
