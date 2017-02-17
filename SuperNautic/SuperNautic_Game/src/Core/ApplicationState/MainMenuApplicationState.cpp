@@ -48,13 +48,12 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
 }
 
-bool MainMenuApplicationState::bRender()
+void MainMenuApplicationState::render()
 {
     GFX::SfmlRenderer renderer;
     renderer.render(_guiContainer);
     renderer.display(_context.window);
 //    _context.window.draw(_guiContainer);
-    return true;
 }
 
 bool MainMenuApplicationState::bUpdate(float dtSeconds)

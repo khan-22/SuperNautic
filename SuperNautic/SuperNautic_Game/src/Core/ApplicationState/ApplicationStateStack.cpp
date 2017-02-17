@@ -38,7 +38,7 @@ void ApplicationStateStack::render()
 
     for(ApplicationState* visibleState : visibleStates)
     {
-        visibleState->bRender();
+        visibleState->render();
     }
 
     applyPendingRequests();
