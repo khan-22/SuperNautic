@@ -69,18 +69,21 @@ std::vector<ElementT*> Octree<ElementT>::getCollisions(const CollisionMesh& mesh
     _root.getIntersectingLeafNodes(mesh, nodes);
     assert(!nodes.empty());
 
-    std::vector<ElementT*> collisions;
+    std::set<typename Node::ElementPtr> elements;
     for(Node* node : nodes)
     {
-        for(const typename Node::ElementPtr& nodeElement : node->getElements())
-        {
-            if(mesh.testCollision(nodeElement->first) == CollisionMesh::CollisionResult::COLLISION)
-            {
-                collisions.push_back(&nodeElement->second);
-            }
-        }
+        const auto& nodeElements = node->getElements();
+        elements.insert(nodeElements.begin(), nodeElements.end());
     }
 
+    std::vector<ElementT*> collisions;
+    for(const typename Node::ElementPtr& nodeElement : elements)
+    {
+        if(mesh.testCollision(nodeElement->first) == CollisionMesh::CollisionResult::COLLISION)
+        {
+            collisions.push_back(&nodeElement->second);
+        }
+    }
     return collisions;
 }
 
