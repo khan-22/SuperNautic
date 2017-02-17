@@ -27,22 +27,29 @@ public:
 	};
 	struct Structure
 	{
-		int probability;
+		float curviness;
+		int probability1;
+		int probability2;
 		int minInRow;
 		int maxInRow;
-		bool bAllowNegativRot;
 		std::vector<StructurePiece*> pieces;
 
-		Structure(int prob, int minRow, int maxRow, bool bAllowNegativRot)
+		Structure(float curviness, int prob1, int prob2, int minRow, int maxRow)
 		{
-			probability = prob;
+			this->curviness = curviness;
+			probability1 = prob1;
+			probability2 = prob2;
 			minInRow = minRow;
 			maxInRow = maxRow;
-			this->bAllowNegativRot = bAllowNegativRot;
 		}
 		void addPiece(StructurePiece * newPiece)
 		{
 			pieces.push_back(newPiece);
+		}
+		int getProbability(const float p) const
+		{
+			float realCurviness = (p - curviness) / (1 - curviness);
+			return int((1 - realCurviness) * probability1 + realCurviness * probability2);
 		}
 	};
 

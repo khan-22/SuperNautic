@@ -51,12 +51,11 @@ VictoryApplicationState::VictoryApplicationState(ApplicationStateStack& stack, A
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
 }
 
-bool VictoryApplicationState::bRender()
+void VictoryApplicationState::render()
 {
     GFX::SfmlRenderer renderer;
     renderer.render(_guiContainer);
     renderer.display(_context.window);
-    return true;
 }
 
 bool VictoryApplicationState::bUpdate(float dtSeconds)

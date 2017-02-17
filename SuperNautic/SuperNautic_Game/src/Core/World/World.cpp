@@ -8,8 +8,7 @@
 #include <cmath>
 
 World::World(ApplicationContext& context, const int numberOfPlayers)
-	: _segmentHandler{ "Segments/segmentinfos.txt", "Segments/ConnectionTypes.txt" }, _track{ &_segmentHandler }
-	, _context{ context }
+	: _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
@@ -95,7 +94,8 @@ void World::update(float dt, sf::Window& window)
 		{
 			// Finds forward vector of ship and updates segment index
 			glm::vec3 returnPos;
-			glm::vec3 forward = _track.findForward(_players[i].getShip().getPosition(), _playerSegmentIndices[i], returnPos);
+			glm::vec3 forward = _track->findForward(_players[i].getShip().getPosition(), _playerSegmentIndices[i], returnPos);
+
 			_players[i].getShip().setForward(forward);
 			_players[i].getShip().setReturnPos(returnPos);
 
@@ -103,14 +103,13 @@ void World::update(float dt, sf::Window& window)
 			std::vector<SegmentInstance*> instances;
 			for (long j = static_cast<long>(_playerSegmentIndices[i] - 1); j <= static_cast<long>(_playerSegmentIndices[i]) + 1; ++j)
 			{
-				if (j >= 0 && j < _track.getNrOfSegments())
+				if (j >= 0 && j < _track->getNrOfSegments())
 				{
-					instances.push_back(_track.getInstance(static_cast<int>(j)));
+					instances.push_back(_track->getInstance(static_cast<int>(j)));
 				}
-
 			}
 
-			if (instances[1] == _track.getInstance(_track.getNrOfSegments() - 1))
+			if (instances[1] == _track->getInstance(_track->getNrOfSegments() - 1))
 			{
 				_bHasWon = true;
 			}
@@ -118,9 +117,9 @@ void World::update(float dt, sf::Window& window)
 			std::vector<SegmentInstance*> instancesForLights;
 			for (long j = static_cast<long>(_playerSegmentIndices[i]); j <= static_cast<long>(_playerSegmentIndices[i]) + 5; ++j)
 			{
-				if (j >= 0 && j < _track.getNrOfSegments())
+				if (j >= 0 && j < _track->getNrOfSegments())
 				{
-					instancesForLights.push_back(_track.getInstance(static_cast<int>(j)));
+					instancesForLights.push_back(_track->getInstance(static_cast<int>(j)));
 				}
 			}
 
@@ -128,7 +127,6 @@ void World::update(float dt, sf::Window& window)
 			{
 				_pointLights[k].setPosition(instancesForLights[k]->getModelMatrix() * glm::vec4(instancesForLights[k]->getParent()->getWaypoints()[0], 1.f));
 			}
-
 
 			// Set relevant segments
 			_players[i].getShip().setSegments(instances);
@@ -230,4 +228,9 @@ void World::render()
 bool World::bHasWon()
 {
 	return _bHasWon;
+}
+
+void World::setTrack(Track * track)
+{
+	_track = track;
 }

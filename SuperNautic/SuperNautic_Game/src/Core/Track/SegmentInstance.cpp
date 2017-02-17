@@ -42,7 +42,7 @@ const int SegmentInstance::getLength() const
 
 const int SegmentInstance::getIndex() const
 {
-	return _parent->_segmentInfo->loadedIndex;
+	return _parent->getInfo()->loadedIndex;
 }
 
 bool SegmentInstance::bTestCollisionSphere(const SegmentInstance& other) const

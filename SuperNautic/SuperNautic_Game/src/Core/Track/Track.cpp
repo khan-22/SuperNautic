@@ -8,20 +8,18 @@
 #include "Core/Io/Log.hpp"
 #include "GFX/Resources/Model.hpp"
 
-// Default constructor (private)
-Track::Track()
-	: _endMargin(500)
-{
-
-}
-
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler)
-	: _endMargin(400)
+	: _segmentHandler(segmentHandler)
+	, _seed(1)
+	, _curviness(0)
+	, _targetLength(10000)
+	, _generatedLength(0)
+	, _totalProgress(0.f)
+	, _endMargin(400)
+	, _endMatrix(glm::mat4())
 {
-	_segmentHandler = segmentHandler;
-	//_endMatrix = glm::translate(glm::vec3(0, 0, 100));
-	_endMatrix = glm::mat4();
+	
 }
 
 // Destructor
@@ -50,6 +48,7 @@ void Track::setLength(const unsigned int length)
 {
 	assert(length >= 3000 && length <= 1000000);
 	_targetLength = length;
+	_progressionLength = _targetLength / 30;
 }
 
 // Set randomization seed
@@ -66,33 +65,43 @@ void Track::setSeed(const unsigned int seed)
 	}
 }
 
-// Generates the track
-bool Track::generate()
+// Sets the difficulty of the track (0-5)
+void Track::setCurviness(const unsigned int curviness)
 {
-	int totalLength = 0;
-	// Make the inital stretch straight
-	while (totalLength < 300)
+	assert(curviness >= 0 && curviness <= 5);
+	_curviness = curviness / 5.f;
+}
+
+void Track::startNewTrack()
+{
+	_generatedLength = 0;
+	_totalProgress = 0.f;
+	_endMatrix = glm::mat4();
+	_endConnection = 'a';
+	_prevIndex = -1;
+	_lastSegment = nullptr;
+	for (unsigned int i = 0; i < _track.size(); i++)
 	{
-		bInsertNormalSegment(0, totalLength, false);
+		delete _track[i];
+	}
+}
+
+// Generates the track
+bool Track::bGenerate()
+{
+	// Make the inital stretch straight
+	while (_generatedLength < 300)
+	{
+		bInsertNormalSegment(0, false);
 	}
 
-	char endConnection = 'a';
-	bool lighting = true;
-	int prevIndex = -1;
 	// Create random path
-	while (true)
+	while (_generatedLength - _lengthAfterLastCall < _progressionLength)
 	{
 		// Randomize segment index
 		int index;
 		int inRow;
-		do
-		{
-			index = getIndex(endConnection);
-			if (index == -1)
-			{
-				LOG_ERROR("WARNING! Something went wrong with the track generation! Not enough connections of type '", endConnection, "'?");
-			}
-		} while (index == prevIndex);
+		index = getIndex();
 		// Normal segment placement
 		if (index < _segmentHandler->infos().size())
 		{
@@ -101,11 +110,9 @@ bool Track::generate()
 
 			for (unsigned int i = 0; i < inRow; i++)
 			{
-				//insertNormalSegment(index, totalLength, false);
-				//insertStructure(0, totalLength);
-				if (!bInsertNormalSegment(index, totalLength, true))
+				if (!bInsertNormalSegment(index, true))
 				{
-					deleteSegments(totalLength, 300);
+					deleteSegments(300);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					break;
 				}
@@ -114,25 +121,33 @@ bool Track::generate()
 		// Structures
 		else
 		{
-			insertStructure(index - _segmentHandler->infos().size(), totalLength);
+			insertStructure(index - _segmentHandler->infos().size());
 		}
-		endConnection = _track.back()->getParent()->getEnd();
-		prevIndex = _track.back()->getIndex();
+		_endConnection = _track.back()->getParent()->getEnd();
+		_prevIndex = index;
+		_lastSegment = _track.back()->getParent();
 
 		// Make the final stretch straight
-		if (totalLength > _targetLength - _endMargin)
+		if (_generatedLength > _targetLength - _endMargin)
 		{
-			if (bEndTrack(totalLength))
+			if (bEndTrack())
 			{
-				break;
+				return true;
+				LOG("Track generated. Length: ", _generatedLength);
+			}
+			else
+			{
+				_endConnection = _track.back()->getParent()->getEnd();
+				_prevIndex = index;
+				_lastSegment = _track.back()->getParent();
 			}
 		}
 	}
-	
-	_generatedLength = totalLength;
 
-	LOG("Track generated. Length: " + std::to_string(_generatedLength) + " meters.");
-	return true;
+	_lengthAfterLastCall = _generatedLength;
+	_totalProgress = (float)_generatedLength / _targetLength;
+	LOG("Progression: ", _totalProgress * 100);
+	return false;
 }
 
 int Track::getNrOfSegments() const
@@ -145,86 +160,109 @@ SegmentInstance* Track::getInstance(int index)
 	return _track[index];
 }
 
+float Track::getProgression() const
+{
+	return _totalProgress;
+}
+
 // Returns a random index based on connection type
-int Track::getIndex(char connectionType) const
+int Track::getIndex() const
 {
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
-	// Finding valid segments based on connection type
-	std::vector<int> validSegments = std::vector<int>();
+	int nonZeroProbSegments = 0;
 	for (unsigned int i = 0; i < infos.size(); i++)
 	{
-		if (infos[i]._startConnection == connectionType)
+		if (infos[i].getProbaility(_curviness) != 0)
 		{
-			validSegments.push_back(i);
+			nonZeroProbSegments++;
 		}
 	}
-	for (unsigned int i = 0; i < _segmentHandler->getNrOfStructures(); i++)
+	if (nonZeroProbSegments >= 2)
 	{
-		if (infos[_segmentHandler->getStructure(i)->pieces[0]->index]._startConnection == connectionType)
+		// Finding valid segments based on connection type
+		std::vector<int> validSegments = std::vector<int>();
+		// Normal segments
+		for (unsigned int i = 0; i < infos.size(); i++)
 		{
-			validSegments.push_back(infos.size() + i);
-		}
-	}
-	if (validSegments.size() < 2)
-	{
-		return -1;
-	}
-	// Calculating total probability
-	unsigned int totalProbability = 0;
-	for (unsigned int i = 0; i < validSegments.size(); i++)
-	{
-		if (validSegments[i] < infos.size())
-		{
-			totalProbability += infos[validSegments[i]]._probability;
-		}
-		else
-		{
-			totalProbability += _segmentHandler->getStructure(i - infos.size())->probability;
-		}
-	}
-	// Randomizing and finding the corresponding segment
-	int r = rand() % totalProbability;
-	int tested = 0;
-	for (unsigned int i = 0; i < validSegments.size(); i++)
-	{
-		if (validSegments[i] < infos.size())
-		{
-
-			int test = infos[validSegments[i]]._probability;
-			if (r - tested < test)
+			if (infos[i]._startConnection == _endConnection && infos[i].getProbaility(_curviness) != 0
+				&& _segmentHandler->loadSegment(i) != _lastSegment)
 			{
-				//connectionType = infos[validSegments[i]]._endConnection;
-				return i;
+				validSegments.push_back(i);
 			}
-			tested += test;
 		}
-		else
+		// Structures
+		for (unsigned int i = 0; i < _segmentHandler->getNrOfStructures(); i++)
 		{
-			int test = _segmentHandler->getStructure(i - infos.size())->probability;
-			if (r - tested < test)
+			if (infos[_segmentHandler->getStructure(i)->pieces[0]->index]._startConnection == _endConnection
+				&& i != _prevIndex && _segmentHandler->getStructure(i)->curviness <= _curviness)
 			{
-				return i;
+				validSegments.push_back(infos.size() + i);
 			}
-			tested += test;
+		}
+		// Calculating total probability
+		unsigned int totalProbability = 0;
+		for (unsigned int i = 0; i < validSegments.size(); i++)
+		{
+			if (validSegments[i] < infos.size())
+			{
+				totalProbability += infos[validSegments[i]].getProbaility(_curviness);
+			}
+			else
+			{
+				int index = validSegments[i] - infos.size();
+				int prob = _segmentHandler->getStructure(index)->getProbability(_curviness);
+				totalProbability += prob;
+			}
+		}
+		// Randomizing and finding the corresponding segment
+		int r = rand() % totalProbability;
+		int tested = 0;
+		for (unsigned int i = 0; i < validSegments.size(); i++)
+		{
+			if (validSegments[i] < infos.size())
+			{
+				int test = infos[validSegments[i]].getProbaility(_curviness);
+				if (r - tested < test)
+				{
+					return validSegments[i];
+				}
+				tested += test;
+			}
+			else
+			{
+				int test = _segmentHandler->getStructure(validSegments[i] - infos.size())->getProbability(_curviness);
+				if (r - tested < test)
+				{
+					return i;
+				}
+				tested += test;
+			}
 		}
 	}
-	return -1;
+	else
+	{
+		return 0;
+	}
+	
+	//This should never ever run!
+	assert(true);
 }
 
 // Returns the random nr of same segment in a row
 int Track::getInRow(int index) const
 {
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
-	int min = infos[index]._minInRow;
-	int max = infos[index]._maxInRow;
+	int min = infos[index].getMinInRow(_curviness);
+	int max = infos[index].getMaxInRow(_curviness);
 	double scaled = (double)rand() / RAND_MAX;
 	return (max - min + 1) * scaled + min;
 }
 
 glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos)
 {
-						 // Waypoints,	segment index
-	std::vector<std::pair<WaypointInfo, long>> closestWaypoints;
+	WaypointInfo closest;
+	closest.found = false;
+	unsigned closestIndex;
 
 	// Check previous, current and next segment
 	for (long i = static_cast<long>(segmentIndex) - 1; i <= static_cast<long>(segmentIndex) + 1; ++i)
@@ -232,54 +270,72 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 		// Make sure current segment is within bounds
 		if (i >= 0 && i < _track.size())
 		{
-			std::pair<WaypointInfo, WaypointInfo> wps = _track[i]->getParent()->findClosestWaypoints(glm::inverse(_track[i]->getModelMatrix()) * glm::vec4{globalPosition, 1.0f});
+			WaypointInfo test = _track[i]->getParent()->findClosestWaypoint(glm::inverse(_track[i]->getModelMatrix()) * glm::vec4{globalPosition, 1.0f});
 
-			closestWaypoints.push_back(std::make_pair(wps.first, i));
-			closestWaypoints.push_back(std::make_pair(wps.second, i));
+			// If test found an appropriate waypoint and closest is empty or test is closer than closest
+			if (test.found && (!closest.found || test.distance < closest.distance))
+			{
+				closest = test;
+				closestIndex = i;
+			}
 		}
 	}
 
-	// Find the two neighboring waypoints closest to ship, these will be just ahead and behind ship
-	// closestWaypoints are always sorted in order of appearance in track, because Segment::findClosestWaypoints() returns them in that order
-	float lowestSum = closestWaypoints[0].first.distance + closestWaypoints[1].first.distance;
-	unsigned lowestIndex = 0;
-	for (unsigned i = 1; i < closestWaypoints.size() - 1; ++i)
+	if (!closest.found)
 	{
-		float testSum = closestWaypoints[i].first.distance + closestWaypoints[i + 1].first.distance;
-		if (testSum < lowestSum)
-		{
-			lowestSum = testSum;
-			lowestIndex = i;
-		}
+		LOG_ERROR("No closest waypoint was found! Returning (0, 0, 1) as forward vector.");
+		return glm::vec3{ 0, 0, 1 };
+	}
+	else
+	{
+		// Return to global world space
+		closest.direction = _track[closestIndex]->getModelMatrix() * glm::vec4{ closest.direction, 0.0f };
+		closest.position = _track[closestIndex]->getModelMatrix() * glm::vec4{ closest.position, 1.0f };
+
+		// Update ship's current segment
+		segmentIndex = closestIndex;
+	}
+	
+	// Find direction and position of next waypoint
+	WaypointInfo next = findNextWaypointInfo(closest, closestIndex);
+
+	// Update ship return position
+	returnPos = closest.position;
+
+	if (bAlmostEqual(closest.direction, next.direction))
+	{
+		//return closest.direction;
 	}
 
-	// Update segment index of ship
-	segmentIndex = static_cast<unsigned>(closestWaypoints[lowestIndex].second);
+	// Project globalPosition onto the plane defined by closest.direction and closest.position
+	// Cast a ray from this position in the direction of closest.direction and find 
+	//     intersection with plane defined by next.direction and next.distance
+	// The length of the ray is used to find interpolation value between waypoint normals
+	glm::vec3 projectedGlobalPos{ globalPosition - glm::dot(closest.direction, globalPosition - closest.position) * closest.direction };
 
-	// Transform vectors to global space
-	// Waypoint behind ship
-	glm::vec3 behindPos = _track[closestWaypoints[lowestIndex].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex].first.position, 1.0f };
-	glm::vec3 behindDir = _track[closestWaypoints[lowestIndex].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex].first.direction, 0.0f };
+	// Distance from origin to next-plane
+	float planeD = glm::dot(next.direction, next.position);
 
-	// Waypoint ahead of ship
-	glm::vec3 aheadPos = _track[closestWaypoints[lowestIndex + 1].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex + 1].first.position, 1.0f };
-	glm::vec3 aheadDir = _track[closestWaypoints[lowestIndex + 1].second]->getModelMatrix() * glm::vec4{ closestWaypoints[lowestIndex + 1].first.direction, 0.0f };
+	float divisor = glm::dot(next.direction, closest.direction);
 
-	// Vector from behind waypoint to ahead waypoint
-	glm::vec3 betweenWaypoints = aheadPos - behindPos;
+	// Ray is parallell to plane
+	if (divisor <= 0.0f)
+	{
+		LOG_ERROR("The direction of two waypoints are orthogonal. Returning direction of waypoint ahead of position.");
+		return next.direction;
+	}
 
-	// Find [0..1], 0 = ship is at behind waypoint, 1 = ship is at ahead waypoint
-	float dist = glm::dot(glm::normalize(betweenWaypoints), (globalPosition - behindPos)) / glm::length(betweenWaypoints);
+	float distanceToPlane = (-glm::dot(next.direction, projectedGlobalPos) + planeD) / divisor;
 
-	// Set return pos
-	returnPos = behindPos;
+	// [0..1], 0 = at closest waypoint, 1 = at next waypoint
+	float interpolationValue = glm::dot(closest.direction, globalPosition - closest.position) / distanceToPlane;
 
-	// Find forward vector, change to proper rotation?
-	return glm::vec3{ glm::normalize(behindDir * (1.0f - dist) + aheadDir * dist) };
+	// Interpolate between directions
+	return glm::normalize(closest.direction * (1 - interpolationValue) + next.direction * interpolationValue);
 }
 
 // Inserts a segment with given index at the end of the track
-bool Track::bInsertNormalSegment(const int index, int & length, bool testCollision)
+bool Track::bInsertNormalSegment(const int index, bool testCollision)
 {
 	const Segment * segment = _segmentHandler->loadSegment(index);
 	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
@@ -296,33 +352,30 @@ bool Track::bInsertNormalSegment(const int index, int & length, bool testCollisi
 	}
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
-	int maxRotOffset = segment->getRotationOffset() / angle;
+	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
 	float rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
-	length += segment->getLength();
+	_generatedLength += segment->getLength();
 	_track.push_back(tempInstance);
 	return true;
 }
 
 // Inserts a whole pre-defined structure at the end of the track
-void Track::insertStructure(const int index, int & length)
+void Track::insertStructure(const int index)
 {
-	int startLength = length;
+	int startLength = _generatedLength;
 	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
 	// Randomize how many times the structure should be looped
 	int min = s->minInRow;
 	int max = s->maxInRow;
 	double scaled = (double)rand() / RAND_MAX;
 	int amount = (max - min + 1) * scaled + min;
-	// Determine and randomize if there should be "negative" rotation
+	// Randomize if there should be "negative" rotation
 	int rotationDir = 1;
-	if (s->bAllowNegativRot)
+	if (rand() % 2 == 0)
 	{
-		if (rand() % 2 == 0)
-		{
-			rotationDir = -1;
-		}
+		rotationDir = -1;
 	}
 	// Amount of "loops"
 	for (unsigned int i = 0; i < amount; i++)
@@ -338,7 +391,7 @@ void Track::insertStructure(const int index, int & length)
 				if (tempInstance->bTestCollision(*_track[i]))
 				{
 					delete tempInstance;
-					deleteSegments(length, length - startLength);
+					deleteSegments(_generatedLength - startLength);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					return;
 				}
@@ -353,11 +406,11 @@ void Track::insertStructure(const int index, int & length)
 			// Finalizing
 			glm::mat4 rotMat = glm::rotate(glm::radians(rotVal * rotationDir), glm::vec3(0, 0, 1));
 			_endMatrix = _endMatrix * modelEndMat * rotMat;
-			length += segment->getLength();
+			_generatedLength += segment->getLength();
 			_track.push_back(tempInstance);
 
 			// Terminating if target length is approaching
-			if (length > _targetLength - _endMargin)
+			if (_generatedLength > _targetLength - _endMargin)
 			{
 				return;
 			}
@@ -366,27 +419,27 @@ void Track::insertStructure(const int index, int & length)
 }
 
 // Deletes a certain length of the track (from the end)
-void Track::deleteSegments(int & totalLength, const int lengthToDelete)
+void Track::deleteSegments(const int lengthToDelete)
 {
 	int deletedLength = 0;
-	while (deletedLength <= lengthToDelete && totalLength > 500)
+	while (deletedLength <= lengthToDelete && _generatedLength > 500)
 	{
 		int segmentLength = _track.back()->getLength();
 		deletedLength += segmentLength;
-		totalLength -= segmentLength;
+		_generatedLength -= segmentLength;
 		delete _track[_track.size() - 1];
 		_track.erase(_track.begin() + _track.size() - 1);
 	}
 }
 
 // Tries to end the track with a straight path
-bool Track::bEndTrack(int & totalLength)
+bool Track::bEndTrack()
 {
-	while (totalLength < _targetLength)
+	while (_generatedLength < _targetLength)
 	{
-		if (!bInsertNormalSegment(0, totalLength, true))
+		if (!bInsertNormalSegment(0, true))
 		{
-			deleteSegments(totalLength, _endMargin + 200);
+			deleteSegments(_endMargin + 200);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 			return false;
 		}
@@ -405,4 +458,62 @@ void Track::render(GFX::DeferredRenderer& renderer, const int shipIndex)
 			renderer.render(*_track[index]);
 		}
 	}
+}
+
+WaypointInfo Track::findNextWaypointInfo(const WaypointInfo& current, unsigned segmentIndex) const
+{
+	WaypointInfo next;
+
+	if (current.index >= _track[segmentIndex]->getParent()->getWaypoints().size() - 1)
+	{
+		// The waypoint is the last in its segment
+
+		// If this is the last segment, just return direction of current
+		if (segmentIndex >= _track.size() - 1)
+		{
+			return next = current;
+		}
+		// Else use first waypoint of next segment
+		else
+		{
+			next.position = _track[segmentIndex + 1]->getModelMatrix() * glm::vec4{ _track[segmentIndex + 1]->getParent()->getWaypoints()[0], 1.0f };
+
+			// Get local position, transform to global space, subtract next.position to get global direction, normalize
+			next.direction = glm::normalize(
+				glm::vec3{ (_track[segmentIndex + 1]->getModelMatrix() *
+					glm::vec4{ _track[segmentIndex + 1]->getParent()->getWaypoints()[1], 1.0f }) }
+				-next.position
+			);
+		}
+	}
+	else
+	{
+		// Use next waypoint in segment
+		next.position = _track[segmentIndex]->getModelMatrix() * glm::vec4{ _track[segmentIndex]->getParent()->getWaypoints()[current.index + 1], 1.0f };
+
+		if (current.index >= _track[segmentIndex]->getParent()->getWaypoints().size() - 2)
+		{
+			// Use the end of the segment to find direction of next
+
+			// Get local position, transform to global space, subtract next.position to get global direction, normalize
+			next.direction = glm::normalize(
+				glm::vec3{ (_track[segmentIndex]->getModelMatrix() * _track[segmentIndex]->getEndMatrix() *
+					glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f }) }
+				-next.position
+			);
+		}
+		else
+		{
+			// Use the waypoint after next to find direction of next
+
+			// Get local position, transform to global space, subtract next.position to get global direction, normalize
+			next.direction = glm::normalize(
+				glm::vec3{ (_track[segmentIndex]->getModelMatrix() *
+					glm::vec4{ _track[segmentIndex]->getParent()->getWaypoints()[current.index + 2], 1.0f }) }
+				-next.position
+			);
+		}
+	}
+
+	return next;
 }
