@@ -17,15 +17,28 @@ namespace sf
 class ApplicationStateStack
 {
 public:
+    // Ctor...
     ApplicationStateStack();
 
+    // Update all states with a timestep.
     void update(float dtSeconds);
+
+    // Render all states.
     void render();
+
+    // Handle input event for all states.
     void handleEvent(const sf::Event& event);
 
+    // Push a state onto the top of the stack.
     void push(std::unique_ptr<ApplicationState>& state);
+
+    // Pop the state on the top of the stack.
     void pop();
+
+    // Pop all states from the stack.
     void clear();
+
+    // Return true if stack contains no states.
     bool bIsEmpty() const;
 
 private:
