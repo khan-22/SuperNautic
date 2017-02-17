@@ -37,10 +37,10 @@ void GuiCharacterInput::handleEventCurrent(const sf::Event& event)
 {
     switch(event.key.code)
     {
-        case sf::Keyboard::Left:
+        case sf::Keyboard::Up:
             selectPreviousCharacter();
             break;
-        case sf::Keyboard::Right:
+        case sf::Keyboard::Down:
             selectNextCharacter();
             break;
         case sf::Keyboard::Z:
@@ -109,16 +109,39 @@ void GuiCharacterInput::stepCharacter(bool bForward)
 {
     static constexpr int NUM_LETTERS = 'z' - 'a';
     static constexpr int NUM_DIGITS = '9' - '0';
-    char direction = bForward ? 1 : -1;
     CharacterFlags list = getCurrentCharacterList();
     switch(list)
     {
         case CharacterFlags::LOWERCASE:
         case CharacterFlags::UPPERCASE:
-            _currentLetter = clamp(_currentLetter + direction, 0, NUM_LETTERS);
+            if(bForward)
+            {
+                _currentLetter++;
+                _currentLetter %= NUM_LETTERS;
+            }
+            else
+            {
+                _currentLetter--;
+                if(_currentLetter > NUM_LETTERS)
+                {
+                    _currentLetter = NUM_LETTERS - 1;
+                }
+            }
             break;
         case CharacterFlags::DIGITS:
-            _currentDigit = clamp(_currentDigit + direction, 0, NUM_DIGITS);
+            if(bForward)
+            {
+                _currentDigit++;
+                _currentDigit %= NUM_DIGITS;
+            }
+            else
+            {
+                _currentDigit--;
+                if(_currentDigit > NUM_DIGITS)
+                {
+                    _currentDigit = NUM_DIGITS - 1;
+                }
+            }
             break;
         default:
             LOG_ERROR("Unexpected character flag: ", (int)list);
@@ -147,12 +170,21 @@ void GuiCharacterInput::updateText()
             LOG_ERROR("Unexpected character flag: ", (int)list);
             break;
     }
-    if(character != _text.getString())
+
+    bool bHasCharacterChanged = character != _text.getString();
+    _text.setString(character);
+    if(bHasCharacterChanged)
     {
         _onChangeCallback(character);
     }
-    _text.setString(character);
 }
+
+char GuiCharacterInput::getCharacter() const
+{
+    assert(_text.getString().getSize() == 1);
+    return _text.getString()[0];
+}
+
 
 std::vector<GuiCharacterInput::CharacterFlags> GuiCharacterInput::generateCharacterLists(CharacterFlags flags)
 {

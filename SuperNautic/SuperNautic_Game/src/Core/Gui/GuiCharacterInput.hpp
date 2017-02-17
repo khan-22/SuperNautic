@@ -38,6 +38,7 @@ class GuiCharacterInput : public GuiElement
         CharacterFlags getCurrentCharacterList() const;
 
         void onChange(const std::function<void(char)>& callback);
+        char getCharacter() const;
 
 
     private:
