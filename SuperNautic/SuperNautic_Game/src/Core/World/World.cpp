@@ -45,6 +45,7 @@ World::World(ApplicationContext& context, const int numberOfPlayers)
 	if (_players.size() == 1)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+		_players[0].setScreenSize(1280, 720, 0, 0);
 	}
 	else if (_players.size() == 2)
 	{
