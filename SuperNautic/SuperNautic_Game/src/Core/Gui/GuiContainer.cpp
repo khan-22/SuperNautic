@@ -9,14 +9,18 @@
 #include "Core/Gui/GuiElement.hpp"
 
 
-GuiContainer::GuiContainer()
+GuiContainer::GuiContainer(sf::Keyboard::Key nextKey, sf::Keyboard::Key previousKey)
 : _selection(_elements.end())
+, _nextKey(nextKey)
+, _previousKey(previousKey)
 {
     _background.setFillColor(sf::Color::Transparent);
 }
 
-GuiContainer::GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements)
+GuiContainer::GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey, sf::Keyboard::Key previousKey)
 : _selection(_elements.end())
+, _nextKey(nextKey)
+, _previousKey(previousKey)
 {
     _background.setFillColor(sf::Color::Transparent);
     insert(elements);
@@ -46,34 +50,43 @@ void GuiContainer::renderCurrent(sf::RenderTarget& target, sf::RenderStates stat
 
 void GuiContainer::handleEventCurrent(const sf::Event& event)
 {
-    if(!_elements.empty() && !(*_selection)->bIsActive())
+    if(_elements.empty())
     {
-        if(event.type == sf::Event::KeyPressed)
-        {
-            if(!_elements.empty())
-            {
-                switch(event.key.code)
-                {
-                    case sf::Keyboard::Return:
-					case sf::Keyboard::A:
-                        activate();
-                        break;
-                    case sf::Keyboard::Down:
-                        selectNext();
-                        break;
-                    case sf::Keyboard::Up:
-                        selectPrevious();
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
+        return;
     }
-    else
+
+    if(event.type == sf::Event::KeyPressed)
     {
-        (*_selection)->handleEvent(event);
+        if((*_selection)->bIsActive())
+        {
+            (*_selection)->handleEvent(event);
+            return;
+        }
+
+
+        switch(event.key.code)
+        {
+            case sf::Keyboard::Return:
+            case sf::Keyboard::A:
+                activate();
+                break;
+            default:
+                if(event.key.code == _nextKey)
+                {
+                    selectNext();
+                }
+                else if(event.key.code == _previousKey)
+                {
+                    selectPrevious();
+                }
+                else
+                {
+                    (*_selection)->handleEvent(event);
+                }
+                break;
+        }
+
+        return;
     }
 }
 

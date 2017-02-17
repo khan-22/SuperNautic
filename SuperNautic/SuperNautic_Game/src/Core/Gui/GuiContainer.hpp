@@ -23,9 +23,9 @@ namespace sf
 class GuiContainer : public GuiElement
 {
 public:
-    GuiContainer();
+    GuiContainer(sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
 
-    GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements);
+    GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
     ~GuiContainer();
 
     void update();
@@ -39,6 +39,8 @@ private:
     std::list<std::unique_ptr<GuiElement>>::iterator _selection;
     sf::FloatRect _bounds;
     sf::RectangleShape _background;
+    sf::Keyboard::Key _nextKey;
+    sf::Keyboard::Key _previousKey;
 
     void handleEventCurrent(const sf::Event& event) override;
     void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
