@@ -28,8 +28,8 @@ public:
 	float getProgression() const;
 	void render(GFX::DeferredRenderer& renderer, const int shipIndex);
 
-	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos
-	glm::vec3 findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos);
+	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos and length from start of segment
+	glm::vec3 findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos, float& lengthInSegment);
 
 private:
 	int getIndex() const;

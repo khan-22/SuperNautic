@@ -15,6 +15,7 @@ namespace sf
 #include "Core/Track/Track.hpp"
 #include "Core/Utility/Camera.h"
 #include "Core/Utility/DebugCamera.hpp"
+#include "Core/Track/TrackProgression.hpp"
 #include "Core/Gui/Timer.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
@@ -24,7 +25,7 @@ class ApplicationContext;
 class World
 {
 public:
-    World(ApplicationContext& context);
+    World(ApplicationContext& context, Track * track);
 
 	void handleEvent(const sf::Event& e);
 	void update(float dt, sf::Window& window);
@@ -34,23 +35,23 @@ public:
 	void setTrack(Track * track);
 
 private:
-	Track*						_track;
-	std::vector<Player>			_players;
-	std::vector<PointLight>		_pointLights;
-	bool						_bHasWon;
+	Track*							_track;
+	std::vector<Player>				_players;
+	std::vector<PointLight>			_pointLights;
+	bool							_bHasWon;
 
-	Timer						_timer;
+	Timer							_timer;
 
-	const ApplicationContext&	_context;
+	const ApplicationContext&		_context;
 
-	// Indices of current segment for players
-	std::vector<unsigned>		_playerSegmentIndices;
+	// Keeps track of indices and progress of players
+	std::vector<TrackProgression>	_playerProgression;
 
-	GFX::DeferredRenderer		_renderer;
+	GFX::DeferredRenderer			_renderer;
 
-	Camera						_camera;
-	DebugCamera					_debugCamera;
-	bool						_bDebugging;
+	Camera							_camera;
+	DebugCamera						_debugCamera;
+	bool							_bDebugging;
 };
 
 #endif //WORLD_HPP
