@@ -11,6 +11,11 @@
 #include "Core/Geometry/RayIntersection.hpp"
 
 
+// TEST
+#include "SFML/System/Clock.hpp"
+///////
+
+
 Ship::Ship()
 	:	_destroyed{ false },
 		_stopped{ false },
@@ -27,9 +32,10 @@ Ship::Ship()
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 30.0f},
 		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 100.0f, 6.0f },
-		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 15.0f, 5.0f },
-		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 20.0f },
-		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 100.0f },
+		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 15.0f, 10.0f },
+		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 30.0f },
+		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 10.0f },
+		_meshXZPosition{ glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 0, 0 }, 100.0f },
 		_minAcceleration{ 0.0f },
 		_maxAcceleration{ 200.0f },
 		_maxTurningSpeed{ 8.0f },
@@ -195,6 +201,13 @@ void Ship::update(float dt)
 	_cameraForwardDirection.setTarget(_shipForward);
 	_cameraForwardDirection.setBackupAxis(_upDirection);
 	_cameraForwardDirection.update(dt);
+
+	// Update forward/right position 
+	_meshXZPosition.setTarget(getPosition());
+	_meshXZPosition.update(dt);
+
+	// Move ship mesh to correct forward/right position, keep up position
+	_meshPosition.setVector(_meshPosition() + (_meshXZPosition() - _meshPosition()) - glm::dot(_upDirection, (_meshXZPosition() - _meshPosition())) * _upDirection);
 		
 	// Create mesh rotation matrix from mesh up and forward directions
 	glm::vec3 up = glm::rotate(-_currentTurningAngle * 0.0f, _shipForward) * glm::vec4{ _meshUpDirection(), 0.0f };
@@ -280,6 +293,10 @@ void Ship::setReturnPos(const glm::vec3& returnPos)
 
 const glm::vec3& Ship::getCameraForward() const
 {
+	//TEST
+	//return _trackForward;
+	///
+
 	return _cameraForwardDirection();
 }
 

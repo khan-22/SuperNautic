@@ -133,7 +133,7 @@ void World::render()
 	for (Player& player : _players)
 	{
 		_renderer.render(player.getShip());
-		shipLights.push_back(PointLight(player.getShip().getMeshPosition(), { 1.f,0.5f,0.f }, 1.f));
+		shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f));
 	}
 
 	for (int i = 0; i < shipLights.size(); i++)

@@ -12,12 +12,12 @@ void DampedSpringRotatedVector::update(float dt)
 	// Find angle between vectors
 	float angleBetween;
 	float dot = glm::dot(_vector, _target);
-	if (dot >= 0.999f)
+	if (dot >= 0.99f)
 	{
 		angleBetween = 0.0f;
 		newAxis = _backupAxis;
 	}
-	else if (dot <= -0.999f)
+	else if (dot <= -0.99f)
 	{
 		angleBetween = glm::pi<float>();
 		newAxis = _backupAxis;

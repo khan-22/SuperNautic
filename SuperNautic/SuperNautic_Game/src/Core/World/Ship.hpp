@@ -73,7 +73,9 @@ public:
 	SpringRotatedVector			_cameraUpDirection;
 	DampedSpringRotatedVector	_cameraForwardDirection;
 
-	SpringTranslatedVector		_meshPosition;			// Global position of ship mesh
+	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
+	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
+
 
 	glm::mat4	_meshMatrix;
 
