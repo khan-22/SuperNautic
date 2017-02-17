@@ -105,7 +105,7 @@ void World::update(float dt, sf::Window& window)
 
 			_players[i].update(dt);
 		}
-		_camera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 2.0f);
+		_camera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
 		_camera.setUp(_players[0].getShip().getCameraUp());
 		_camera.setViewDir(_players[0].getShip().getCameraForward());
 	}
@@ -133,7 +133,7 @@ void World::render()
 	for (Player& player : _players)
 	{
 		_renderer.render(player.getShip());
-		shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f));
+		shipLights.push_back(PointLight(player.getShip().getMeshPosition(), { 1.f,0.5f,0.f }, 1.f));
 	}
 
 	for (int i = 0; i < shipLights.size(); i++)

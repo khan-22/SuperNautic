@@ -68,10 +68,10 @@ public:
 	glm::vec3					_upDirection;			// Current up direction
 	glm::vec3					_returnPos;				// Respawn position of ship
 
-	DampedSpringRotatedVector	_meshForwardDirection;	// Current facing direction
+	SpringRotatedVector	_meshForwardDirection;	// Current facing direction
 	SpringRotatedVector			_meshUpDirection;		// Up direction of ship mesh
 	SpringRotatedVector			_cameraUpDirection;
-	DampedSpringRotatedVector	_cameraForwardDirection;
+	SpringRotatedVector	_cameraForwardDirection;
 
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
