@@ -36,9 +36,9 @@ public:
     bool bIsEmpty() const;
 
 private:
-    std::list<std::unique_ptr<ApplicationState>> _stack;
-    std::queue<std::unique_ptr<ApplicationState>> _pushQueue;
-    std::queue<Request> _requestQueue;
+    std::list<std::unique_ptr<ApplicationState>>    _stack;
+    std::queue<std::unique_ptr<ApplicationState>>   _pushQueue;
+    std::queue<Request>                             _requestQueue;
 
     void applyPendingRequests();
 };
