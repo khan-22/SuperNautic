@@ -24,7 +24,7 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 
 	// Create one player
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		if (sf::Joystick::isConnected(i)) {
 			_players.emplace_back(i);
@@ -66,11 +66,11 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_players[0].setScreenSize(640, 360, 0, 0);
-		_playerRTs[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_playerRTs[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_players[1].setScreenSize(640, 360, 640, 0);
-		_playerRTs[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_playerRTs[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_players[2].setScreenSize(640, 360, 0, 360);
-		_playerRTs[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_players[3].setScreenSize(640, 360, 640, 360);
 	}
 
