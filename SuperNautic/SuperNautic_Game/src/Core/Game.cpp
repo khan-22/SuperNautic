@@ -106,18 +106,18 @@ bool Game::bInitialize()
 	_shader = ShaderCache::get("forward");
 	_texture = TextureCache::get("heatchart.png");
 
-	_texturedModel.setModelAndMaterial(ModelArray[0], materialTest);
+	_texturedModel.setModelAndMaterial(ModelCache::get("converter_test_case.kmf"), materialTest);
 
-	_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
+	//_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 	_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 
 	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
 	_stateStack.push(mainMenu);
 
 
-	_pointLights.push_back(PointLight({ 0.f,2.f,0.f }, { 1.f, 0.f, 0.f }, 1.0f));
-	_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f }, 1.f));
-	_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 0.f, 1.f }, 1.f));
+	_pointLights.push_back(PointLight({ 0.f,2.f,0.f }, { 1.f, 0.f, 0.f }, 16.0f));
+	_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f }, 16.f));
+	_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 0.f, 1.f }, 16.f));
 
 	return true;
 }
@@ -135,7 +135,7 @@ void Game::run()
 
 		if(_stateStack.bIsEmpty())
         {
-            _window.close();
+        //    _window.close();
         }
 
 		deltaTime = clock.restart();
@@ -155,7 +155,7 @@ void Game::handleEvents()
 			break;
 
         default:
-            _stateStack.handleEvent(event);
+            //_stateStack.handleEvent(event);
             break;
 		}
 	}
@@ -166,13 +166,13 @@ void Game::update(float dt)
 {
     _fps = _fps * 0.9f + 0.1f / dt;
 
-	//_debugCamera.update(dt, _window);
+	_debugCamera.update(dt, _window);
 
 	static float t = 0.0;
 	t += dt;
 	_pointLights[0].setPosition(glm::vec3(2.f * sinf(t*4.f), 2.f, 2.f * cosf(t*4.f)));
 
-    _stateStack.update(dt);
+   // _stateStack.update(dt);
 }
 
 void Game::render()
@@ -184,7 +184,7 @@ void Game::render()
 	time += 0.009f;
 
 	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
-	_camera.setViewDir(glm::vec3(0.f, 0.f, -1.f));
+	_camera.setViewDir(glm::vec3(0.f, 0.f, 1.f));
 
 	for (auto& pointLight : _pointLights)
 	{
@@ -193,8 +193,9 @@ void Game::render()
 
 	_deferredRenderer.render(_texturedModel);
 
-	_deferredRenderer.display(_camera);
+	_deferredRenderer.display(_debugCamera);
 
+	_window.display();
 	return;
 
 	//_deferredRenderer1.render(_texturedModel);
