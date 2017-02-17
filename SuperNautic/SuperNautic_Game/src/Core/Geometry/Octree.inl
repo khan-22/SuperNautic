@@ -41,17 +41,14 @@ bool Octree<ElementT>::bInsertIfNoCollision(const CollisionMesh& mesh, const Ele
     _root.getIntersectingLeafNodes(mesh, nodes);
     assert(!nodes.empty());
 
-    for(Node* node : nodes)
+
+    for(const typename Node::ElementPtr& nodeElement : getUniqueElements(nodes))
     {
-        for(const typename Node::ElementPtr& nodeElement : node->getElements())
+        if(mesh.testCollision(nodeElement->first) == CollisionMesh::CollisionResult::COLLISION)
         {
-            if(mesh.testCollision(nodeElement->first) == CollisionMesh::CollisionResult::COLLISION)
-            {
-                return false;
-            }
+            return false;
         }
     }
-
 
     typename Node::ElementPtr nodeElement(new std::pair<CollisionMesh, ElementT>(mesh, element));
     for(Node* node : nodes)
