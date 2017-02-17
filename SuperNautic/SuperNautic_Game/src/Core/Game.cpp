@@ -95,7 +95,9 @@ bool Game::bInitialize()
 	/*We can create a loop here (or where relevant) that loops through a list
 	of all the things we want to render and add them to the model array, such as
 	segments, ships etc.*/
-	ModelArray.push_back(ModelCache::get("ship.kmf"));
+	//ModelArray.emplace_back(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+	ModelArray.emplace_back(ModelCache::get("gizmo.kmf"), MaterialCache::get("gizmo.mat"));
+	ModelArray.emplace_back(ModelCache::get("s01_straight_aa.kmf"), MaterialCache::get("test3pipe.mat"));
 	////ModelArray.push_back(ModelCache::get("segments/s01_straight_aa.fbx"));
 	//for (unsigned int i = 0; i < _track.getNrOfSegments(); i++)
 	//{
@@ -106,7 +108,7 @@ bool Game::bInitialize()
 	_shader = ShaderCache::get("forward");
 	_texture = TextureCache::get("heatchart.png");
 
-	_texturedModel.setModelAndMaterial(ModelCache::get("converter_test_case.kmf"), materialTest);
+	_texturedModel.setModelAndMaterial(ModelCache::get("gizmo.kmf"), materialTest);
 
 	//_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 	_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
@@ -115,9 +117,9 @@ bool Game::bInitialize()
 	_stateStack.push(mainMenu);
 
 
-	_pointLights.push_back(PointLight({ 0.f,2.f,0.f }, { 1.f, 0.f, 0.f }, 16.0f));
-	_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f }, 16.f));
-	_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 0.f, 1.f }, 16.f));
+	_pointLights.push_back(PointLight({ 0.f,-2.f,0.f }, { 1.f, 1.f, 1.f }, 6.0f));
+	//_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f }, 6.0f));
+	//_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 0.f, 1.f }, 6.0f));
 
 	return true;
 }
@@ -170,7 +172,7 @@ void Game::update(float dt)
 
 	static float t = 0.0;
 	t += dt;
-	_pointLights[0].setPosition(glm::vec3(2.f * sinf(t*4.f), 2.f, 2.f * cosf(t*4.f)));
+	_pointLights[0].setPosition(glm::vec3(2.f * sinf(t*2.f), -2.f, 2.f * cosf(t*2.f)));
 
    // _stateStack.update(dt);
 }
@@ -186,12 +188,22 @@ void Game::render()
 	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
 	_camera.setViewDir(glm::vec3(0.f, 0.f, 1.f));
 
+
 	for (auto& pointLight : _pointLights)
 	{
 		_deferredRenderer.pushPointLight(pointLight);
 	}
 
-	_deferredRenderer.render(_texturedModel);
+	for (auto& model : ModelArray)
+	{
+		_deferredRenderer.render(model);
+	}
+
+	glm::vec3 pos = _debugCamera.getPosition();
+	std::string title = "( " + std::to_string((int)pos.x) + ", " + std::to_string((int)pos.y) + ", " + std::to_string((int)pos.z) + " )";
+	_window.setTitle(title);
+
+	//_deferredRenderer.render(_texturedModel);
 
 	_deferredRenderer.display(_debugCamera);
 
