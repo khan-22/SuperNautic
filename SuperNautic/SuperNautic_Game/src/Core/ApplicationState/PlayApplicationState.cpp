@@ -15,13 +15,12 @@ PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, Applica
 	: ApplicationState(stack, context)
 	, _segmentHandler("Segments/segmentinfos2.txt", "Segments/ConnectionTypes.txt")
 	, _track(&_segmentHandler)
-	, _world(context, numberOfPlayers)
+	, _world(context, &_track, numberOfPlayers)
 {
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
 	_track.setCurviness(3);
 	_track.setSeed(1);
 	_track.setLength(40000);
-	_world.setTrack(&_track);
 }
 
 void PlayApplicationState::initialize()
