@@ -8,7 +8,7 @@
 #include <cmath>
 
 World::World(ApplicationContext& context, const int numberOfPlayers)
-	: _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
+	: _context{ context }
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
@@ -74,9 +74,6 @@ World::World(ApplicationContext& context, const int numberOfPlayers)
 		_players[3].setScreenSize(640, 360, 640, 360);
 	}
 
-	_track.setLength(10000);
-	_track.setSeed(1);
-	_track.generate();
 	_bDebugging = false;
 }
 
@@ -156,18 +153,12 @@ void World::update(float dt, sf::Window& window)
 void World::render()
 {
 	std::vector<PointLight> shipLights;
-	//for (Player& player : _players)
-	//{
-	//	//_renderer.render(player.getShip());
-	//	shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f));
-	//}
 
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
 		for (Player& player : _players)
 		{
 			_playerRTs[i].render(player.getShip());
-			//shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
 		}
 	}
 	for (Player& player : _players)
@@ -188,10 +179,8 @@ void World::render()
 
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		_track.render(_playerRTs[i], _playerSegmentIndices[i]);
+		_track->render(_playerRTs[i], _playerSegmentIndices[i]);
 	}
-
-	//_renderer.render(_track.);
 
 
 	for (int i = 0; i < _playerRTs.size(); i++)
