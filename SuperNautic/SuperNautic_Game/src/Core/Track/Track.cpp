@@ -431,7 +431,7 @@ bool Track::bEndTrack()
 // Render the track
 void Track::render(GFX::DeferredRenderer& renderer, const int shipIndex)
 {
-	for (int i = -2; i < 300; i++)
+	for (int i = -2; i < 30; i++)
 	{
 		int index = shipIndex + i;
 		if (index >= 0 && index < _track.size())
