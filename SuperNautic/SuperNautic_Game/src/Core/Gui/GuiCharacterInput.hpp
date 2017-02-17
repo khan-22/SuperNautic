@@ -23,19 +23,10 @@ class GuiCharacterInput : public GuiElement
             ALL = ONLY_LETTERS | DIGITS,
         };
 
-
-
         GuiCharacterInput(CharacterFlags flags = CharacterFlags::ALL);
 
         bool bIsSelectable() const override;
         sf::FloatRect getBoundingRect() const override;
-
-        void selectNextCharacter();
-        void selectPreviousCharacter();
-        void selectPreviousCharacterList();
-        void selectNextCharacterList();
-
-        CharacterFlags getCurrentCharacterList() const;
 
         void onChange(const std::function<void(char)>& callback);
         char getCharacter() const;
@@ -56,8 +47,13 @@ class GuiCharacterInput : public GuiElement
         void deselect() override;
         void stepCharacter(bool bForward);
         void updateText();
-        static std::vector<CharacterFlags> generateCharacterLists(CharacterFlags flags);
+        void selectNextCharacter();
+        void selectPreviousCharacter();
+        void selectPreviousCharacterList();
+        void selectNextCharacterList();
+        CharacterFlags getCurrentCharacterList() const;
 
+        static std::vector<CharacterFlags> generateCharacterLists(CharacterFlags flags);
 
 };
 
