@@ -54,6 +54,8 @@ private:
 
     CollisionMesh   _bounds;
     Node            _root;
+
+    static std::set<typename Node::ElementPtr> getUniqueElements(const std::vector<Node*>& nodes);
 };
 
 #include "Core/Geometry/Octree.inl"

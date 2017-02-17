@@ -69,15 +69,8 @@ std::vector<ElementT*> Octree<ElementT>::getCollisions(const CollisionMesh& mesh
     _root.getIntersectingLeafNodes(mesh, nodes);
     assert(!nodes.empty());
 
-    std::set<typename Node::ElementPtr> elements;
-    for(Node* node : nodes)
-    {
-        const auto& nodeElements = node->getElements();
-        elements.insert(nodeElements.begin(), nodeElements.end());
-    }
-
     std::vector<ElementT*> collisions;
-    for(const typename Node::ElementPtr& nodeElement : elements)
+    for(const typename Node::ElementPtr& nodeElement : getUniqueElements(nodes))
     {
         if(mesh.testCollision(nodeElement->first) == CollisionMesh::CollisionResult::COLLISION)
         {
@@ -85,6 +78,19 @@ std::vector<ElementT*> Octree<ElementT>::getCollisions(const CollisionMesh& mesh
         }
     }
     return collisions;
+}
+
+
+template<typename ElementT>
+std::set<typename Octree<ElementT>::Node::ElementPtr> Octree<ElementT>::getUniqueElements(const std::vector<Node*>& nodes)
+{
+    std::set<typename Node::ElementPtr> elements;
+    for(Node* node : nodes)
+    {
+        const auto& nodeElements = node->getElements();
+        elements.insert(nodeElements.begin(), nodeElements.end());
+    }
+    return elements;
 }
 
 
