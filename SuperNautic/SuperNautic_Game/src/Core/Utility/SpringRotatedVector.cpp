@@ -13,21 +13,29 @@ void SpringRotatedVector::update(float dt)
 	glm::vec3 newAxis = glm::normalize(glm::cross(_vector, _target));
 
 	// Find angle between vectors
-	float angleBetween = acosf(glm::dot(_vector, _target));
-
-	if (!isnan(angleBetween))
+	float angleBetween;
+	float dot = glm::dot(_vector, _target);
+	if (dot >= 0.999f)
 	{
-		if (!isnan(newAxis.x))
-		{
-			// Update rotation axis and velocity (represented by length)
-			_axis += glm::normalize(newAxis) * angleBetween * angleBetween * _springConstant * dt;
-		}
-		// If vectors are opposite, rotate around backup axis
-		else if (glm::dot(_vector, _target) < -0.999f)
-		{
-			_axis += _backupAxis * angleBetween * _springConstant * dt;
-		}
+		angleBetween = 0.0f;
+		newAxis = _backupAxis;
 	}
+	else if (dot <= -0.999f)
+	{
+		angleBetween = glm::pi<float>();
+		newAxis = _backupAxis;
+	}
+	else
+	{
+		angleBetween = acosf(dot);
+	}
+
+	if (!std::isnan(newAxis.x))
+	{
+		// Update rotation axis and velocity (represented by length)
+		_axis += glm::normalize(newAxis) * angleBetween * angleBetween * _springConstant * dt;
+	}
+
 	// Reduce velocity (represented by axis length) using damping constant
 	_axis -= _axis * _dampingConstant * dt;
 

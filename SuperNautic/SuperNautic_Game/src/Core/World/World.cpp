@@ -11,6 +11,7 @@ World::World(ApplicationContext& context)
 	: _context{ context }, _camera{ 90.0f, 1280, 720, glm::vec3{0,0,0}, glm::vec3{0,0,1} }
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
+	, _timer(1280, 720)
 {
 	_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 
@@ -37,10 +38,6 @@ World::World(ApplicationContext& context)
 		_players.emplace_back(10);
 		_playerSegmentIndices.push_back(0);
 	}
-	//_players.emplace_back(0);
-	//_players.emplace_back(2);
-	//_players.emplace_back(3);
-	//_players.emplace_back(4);
 
 	//_playerSegmentIndices.push_back(0);
 	//_playerSegmentIndices.push_back(0);
@@ -104,7 +101,7 @@ void World::update(float dt, sf::Window& window)
 
 			_players[i].update(dt);
 		}
-		_camera.setPos(_players[0].getShip().getMeshPosition() - _players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 2.0f);
+		_camera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 2.0f);
 		_camera.setUp(_players[0].getShip().getCameraUp());
 		_camera.setViewDir(_players[0].getShip().getCameraForward());
 	}
@@ -121,6 +118,9 @@ void World::update(float dt, sf::Window& window)
 	{
 		_bDebugging = false;
 	}
+
+	_timer.updateTime(dt);
+	_timer.updateCurrent();
 }
 
 void World::render()
@@ -160,6 +160,8 @@ void World::render()
 	{
 		sfml.render(player.getHud());
 	}
+
+	sfml.render(_timer);
 
 	sfml.display(_context.window);
 }

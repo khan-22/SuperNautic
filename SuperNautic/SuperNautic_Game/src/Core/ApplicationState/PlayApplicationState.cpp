@@ -29,10 +29,9 @@ void PlayApplicationState::initialize()
 	_stack.push(std::unique_ptr<ApplicationState>(new TrackGenerationApplicationState(_stack, _context, &_track)));
 }
 
-bool PlayApplicationState::bRender()
+void PlayApplicationState::render()
 {
     _world.render();
-    return true;
 }
 
 bool PlayApplicationState::bUpdate(float dtSeconds)
