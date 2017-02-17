@@ -8,25 +8,29 @@
 
 #include "SFML/Graphics/Text.hpp"
 
-#include "Core/Gui/GuiElement.hpp"
+#include "Core/Gui/GuiContainer.hpp"
 #include "Core/Gui/GuiCharacterInput.hpp"
 
-class GuiTextInput : public GuiElement
+class GuiTextInput : public GuiContainer
 {
     public:
         GuiTextInput(size_t numCharacters, GuiCharacterInput::CharacterFlags flags);
 
         bool bIsActivatable() const override;
         bool bIsSelectable() const override;
-        sf::FloatRect getBoundingRect() const override;
+
+        void onChange(const std::function<void(const std::string&)>& callback);
+
 
     private:
-        std::list<GuiCharacterInput> _slots;
+        std::vector<GuiCharacterInput*> _characters;
+        std::string _text;
+        std::function<void(const std::string&)> _onChangeCallback;
 
-        void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
         void select() override;
         void deselect() override;
-        void activate() override;
+
+        void updateCharacter(size_t index, char character);
 
 };
 
