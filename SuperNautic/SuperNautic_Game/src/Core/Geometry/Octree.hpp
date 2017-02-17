@@ -13,10 +13,20 @@ template<typename ElementT>
 class Octree
 {
 public:
+    // Place cubic octree with its center at center
+    // and size as its halflength.
     Octree(const glm::vec3& center, float size);
 
+    // Insert element along with a collision mesh.
+    // Return true if element is inserted. (insertion fails if mesh does not intersect octree).
     bool bInsert(const CollisionMesh& mesh, const ElementT& element);
+
+    // Insert element along with a collision mesh if
+    // the mesh does not collide with any existing elements.
+    // Return true if element is inserted.
     bool bInsertIfNoCollision(const CollisionMesh& mesh, const ElementT& element);
+
+    // Get all elements that collide with a collision mesh.
     std::vector<ElementT*> getCollisions(const CollisionMesh& mesh) const;
 
 private:
