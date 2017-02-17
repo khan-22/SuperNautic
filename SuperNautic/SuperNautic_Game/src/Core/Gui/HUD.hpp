@@ -21,7 +21,6 @@ public:
 	~HUD();
 
 	void setHeat(float heat);
-	void changeHeat(float change);
 	void setSpeed(float speed);
 	void setPosition(int position);
 	void setScreenSize(int width, int height, int offsetX, int offsetY);
@@ -37,6 +36,11 @@ private:
 	float				_heat;
 	float				_speed;
 	int					_position;
+	float				_sizeY;
+	float				_heatSizeY;
+	float				_heatSizeX;
+	float				_heatPosY;
+	float				_heatPosX;
 
 	Asset<sf::Font>		_font;
 	Asset<sf::Texture>	_texture;

@@ -205,9 +205,6 @@ void World::render()
 
 	if (!_bDebugging)
 	{
-		//TODO LOOP FOR ALL PLAYAHS AND MAKE UNIQUE DEFERRED RENDERAERRS
-		//_renderer.display(*_players[0].getCamera());
-
 		for (int i = 0; i < _players.size(); i++)
 		{
 			_playerRTs[i].display(*_players[i].getCamera());

@@ -67,10 +67,6 @@ bool MainMenuApplicationState::bUpdate(float dtSeconds)
 		}
 	}
 	_playersActive = playersFound;
-	if (_playersActive < 1)
-	{
-		_playersActive = 1;
-	}
     return true;
 }
 
