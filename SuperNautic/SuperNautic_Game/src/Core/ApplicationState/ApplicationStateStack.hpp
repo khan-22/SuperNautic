@@ -17,13 +17,6 @@ namespace sf
 class ApplicationStateStack
 {
 public:
-    enum Request
-    {
-        Push,
-        Pop,
-        Clear,
-    };
-
     ApplicationStateStack();
 
     void update(float dtSeconds);
@@ -36,6 +29,13 @@ public:
     bool bIsEmpty() const;
 
 private:
+    enum Request
+    {
+        Push,
+        Pop,
+        Clear,
+    };
+
     std::list<std::unique_ptr<ApplicationState>>    _stack;
     std::queue<std::unique_ptr<ApplicationState>>   _pushQueue;
     std::queue<Request>                             _requestQueue;
