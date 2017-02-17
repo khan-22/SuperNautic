@@ -49,12 +49,11 @@ PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stac
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
 }
 
-bool PauseMenuApplicationState::bRender()
+void PauseMenuApplicationState::render()
 {
     GFX::SfmlRenderer renderer;
     renderer.render(_guiContainer);
     renderer.display(_context.window);
-    return true;
 }
 
 bool PauseMenuApplicationState::bUpdate(float dtSeconds)

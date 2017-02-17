@@ -17,10 +17,9 @@ PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, Applica
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
 }
 
-bool PlayApplicationState::bRender()
+void PlayApplicationState::render()
 {
     _world.render();
-    return true;
 }
 
 bool PlayApplicationState::bUpdate(float dtSeconds)

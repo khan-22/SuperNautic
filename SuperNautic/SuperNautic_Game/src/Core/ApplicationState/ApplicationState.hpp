@@ -14,16 +14,29 @@ struct ApplicationContext;
 class ApplicationState
 {
 	public:
+	    // Ctor...
         ApplicationState(ApplicationStateStack& stack, ApplicationContext& context);
+
+        // Dtor...
         virtual ~ApplicationState();
 
-        virtual bool bRender() = 0; // Return false to prevent rendering of states in front of this one.
-        virtual bool bUpdate(float dtSeconds) = 0; // Return false to prevent updating of states behind this one.
-        virtual bool bHandleEvent(const sf::Event& event) = 0; // Return false to prevent event handling of states behind this one.
+        // Render the state
+        virtual void render() = 0;
+
+        // Update the state with a timestep
+        // Return false to prevent updating states further down the stack.
+        virtual bool bUpdate(float dtSeconds) = 0;
+
+        // Handle an input event
+        // Return false to prevent event handling for states further down the stack.
+        virtual bool bHandleEvent(const sf::Event& event) = 0;
+
+        // Return false to prevent rendering of states further down the stack.
+        virtual bool bIsTransparent();
 
     protected:
-        ApplicationStateStack& _stack;
-        ApplicationContext& _context;
+        ApplicationStateStack&  _stack;
+        ApplicationContext&     _context;
 };
 
 

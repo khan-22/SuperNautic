@@ -11,7 +11,7 @@ class PlayApplicationState : public ApplicationState
 public:
     PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context);
 
-    bool bRender() override;
+    void render() override;
     bool bUpdate(float dtSeconds) override;
     bool bHandleEvent(const sf::Event& event) override;
 
