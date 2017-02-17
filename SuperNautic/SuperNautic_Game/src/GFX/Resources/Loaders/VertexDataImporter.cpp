@@ -100,6 +100,14 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		fread_s(&currentMesh.indices[0], currentMesh.indices.size() * sizeof(currentMesh.indices[0]), sizeof(currentMesh.indices[0]), currentMesh.indices.size(), in);
 	}
 
+	for (int i = 0; i < header.numCameras; i++)
+	{
+		collection->cameras.emplace_back();
+		glm::mat4& cameraMat = collection->cameras.back();
+
+		fread_s(&cameraMat[0][0], sizeof(cameraMat), sizeof(cameraMat), 1, in);
+	}
+
 	fclose(in);
 
 	LOG("Finished loading: ", filepath);

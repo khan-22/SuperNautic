@@ -7,6 +7,7 @@
 #include <assimp/postprocess.h>
 
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 
 #include <GL/glew.h>
 
@@ -20,11 +21,11 @@
 HANDLE gConsoleHandle;
 CONSOLE_SCREEN_BUFFER_INFO gPreviousState;
 //bool gTransformCoordinates;
-//glm::mat4 gCoordinateTransform = glm::mat4(
-//	1.f, 0.f, 0.f, 0.f,
-//	0.f, 0.f, 1.f, 0.f,
-//	0.f, 1.f, 0.f, 0.f,
-//	0.f, 0.f, 0.f, 1.f);
+glm::mat4 gCoordinateTransform = glm::mat4(
+	1.f, 0.f, 0.f, 0.f,
+	0.f, 0.f, 1.f, 0.f,
+	0.f, -1.f, 0.f, 0.f,
+	0.f, 0.f, 0.f, 1.f);
 
 enum LogColor : WORD
 {
@@ -226,24 +227,39 @@ void processNodeCameras(const aiScene* scene, std::vector<Camera>& cameras)
 		log(YELLOW) << "The converter can currently not handle more than one camera.\nShould there really be more than one?" << std::endl;
 	}
 
-	const aiNode* cameraNode = scene->mRootNode->FindNode(scene->mCameras[0]->mName);
+	const aiCamera* camera	 = scene->mCameras[0];
+	const aiNode* cameraNode = scene->mRootNode->FindNode(camera->mName);
+
 
 	log(GREEN) << "-- Processing Camera: " << cameraNode->mName.C_Str() << std::endl;
 	
-	glm::mat4 cameraTransform = glm::inverse(toGLM(cameraNode->mTransformation));
+	glm::mat4 cameraTransform = toGLM(cameraNode->mTransformation);
+	/*
+	glm::vec3 pos	 = glm::vec3( cameraTransform * glm::vec4(toGLM(camera->mPosition), 1.f));
+	glm::vec3 lookAt = glm::vec3( cameraTransform * glm::vec4(toGLM(camera->mLookAt), 0.f));
+	glm::vec3 up	 = glm::vec3( cameraTransform * glm::vec4(toGLM(camera->mUp), 0.f));
+	*/
+	
+	glm::vec3 pos	 = toGLM(camera->mPosition) / 100.f;
+	glm::vec3 lookAt = toGLM(camera->mLookAt);
+	glm::vec3 up	 = toGLM(camera->mUp);
+
+	glm::mat4 endMatrix = glm::inverse(glm::lookAt(pos, pos + glm::normalize(lookAt), up));
 
 	/*if (gTransformCoordinates)
 	{
 		cameraTransform = gCoordinateTransform * cameraTransform;
 	}*/
+	glm::vec3 temp = glm::normalize(lookAt);
+	log(GREEN) << "Camera lookAt: " << temp.x << ", " << temp.y << ", " << temp.z << ", " << " " << std::endl;
 
-	Camera camera;
-	camera.transform = cameraTransform;
+	Camera finalCamera;
+	finalCamera.transform = endMatrix;
 
-	glm::vec4 camPos = camera.transform * glm::vec4(0.f, 0.f, 0.f, 1.f);
+	glm::vec4 camPos = finalCamera.transform * glm::vec4(0.f, 0.f, 0.f, 1.f);
 	log(GREEN) << "Camera location: " << camPos.x << ", " << camPos.y << ", " << camPos.z << ", " << camPos.w << " " << std::endl;
 	
-	cameras.push_back(camera);
+	cameras.push_back(finalCamera);
 }
 
 bool convertFile(char* filePath)
@@ -474,7 +490,7 @@ int main(int argc, char* argv[])
 	else
 	{
 #if _DEBUG
-		convertFile("converter_test_case.blend");
+		convertFile("s03_10degbend_helper_aa.fbx");
 		//gTransformCoordinates = true;
 #endif
 

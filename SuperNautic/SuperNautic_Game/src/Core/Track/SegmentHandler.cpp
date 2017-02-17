@@ -35,8 +35,8 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 		// blah_aa.blend
 		//      ^^
 		// size - 8, size - 7 contains connection info
-		startConnection = segmentDataName[segmentDataName.size() - 8];
-		endConnection = segmentDataName[segmentDataName.size() - 7];
+		startConnection = segmentDataName[segmentDataName.size() - 6];
+		endConnection = segmentDataName[segmentDataName.size() - 5];
 
 		// Metadata about segment
 		int probability, minInRow, maxInRow, rotationOffset;
