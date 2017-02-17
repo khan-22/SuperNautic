@@ -32,8 +32,6 @@ struct WaypointInfo
 class Segment
 {
 public:
-	const SegmentInfo*	_segmentInfo;
-
 	// Loads a segment from an fbx file
 	Segment(const SegmentInfo* segmentInfo);
 
@@ -59,25 +57,9 @@ public:
 		return _segmentInfo->_endConnection;
 	}
 
-	// Returns "probability"
-	int getProbability() const
+	const SegmentInfo * getInfo() const
 	{
-		return _segmentInfo->_probability;
-	}
-
-	int getMinInRow() const
-	{
-		return _segmentInfo->_minInRow;
-	}
-
-	int getMaxInRow() const
-	{
-		return _segmentInfo->_maxInRow;
-	}
-
-	int getRotationOffset() const
-	{
-		return _segmentInfo->_rotationOffset;
+		return _segmentInfo;
 	}
 
 	// Returns approximate segment length
@@ -105,6 +87,8 @@ public:
 	}
 
 private:
+	const SegmentInfo*	_segmentInfo;
+
 	// The loaded scene data
 	RawMeshAsset _scene;
 
