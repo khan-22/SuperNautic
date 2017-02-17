@@ -15,7 +15,6 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	, _track(track)
 	, _playerRTs(numberOfPlayers)
 {
-	//_renderer.initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
@@ -184,12 +183,9 @@ void World::render()
 		}
 	}
 	
-
-	//_track.render(_renderer, _playerSegmentIndices[0]);
-
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		_track->render(_playerRTs[i], _playerSegmentIndices[i]);
+		_track->render(_playerRTs[i], _playerProgression[i].getCurrentSegment());
 	}
 
 
