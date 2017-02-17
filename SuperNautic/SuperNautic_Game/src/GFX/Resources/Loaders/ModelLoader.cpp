@@ -38,7 +38,10 @@ Model* GFX::ModelLoader::loadModel(std::string filePath)
 
 	LOG("Beginning processing on model: ", filePath);
 
-	std::vector<ModelLoader::Grouping> groupings = generateGroupings(rawModel.get());
+
+
+
+	/*std::vector<ModelLoader::Grouping> groupings = generateGroupings(rawModel.get());
 
 	LOG("Model was grouped into ", groupings.size(), " group(s).");
 
@@ -109,7 +112,7 @@ Model* GFX::ModelLoader::loadModel(std::string filePath)
 
 			LOG("Sent ", rawMesh.normals.size(), " normals to vertex buffer.");
 		}
-	}
+	}*/
 	
 	return model;
 }
