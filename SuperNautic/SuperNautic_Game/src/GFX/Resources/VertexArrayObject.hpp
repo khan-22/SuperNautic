@@ -30,6 +30,7 @@ namespace GFX
 		void setDrawCount(GLuint drawCount);
 
 		void render();
+		void renderPoints();
 
 		void bind() const;
 		static void unbind();

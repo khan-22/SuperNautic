@@ -24,6 +24,7 @@ void GFX::ParticleSystem::init(GLuint particleCount, glm::vec3 position, glm::ve
 
 	_vao.addVertexBuffer(_sizeInBytes, GL_DYNAMIC_DRAW);
 	_vao.sendDataToBuffer(0, 0, 0, _sizeInBytes, nullptr, 3, GL_FLOAT);
+	_vao.setDrawCount(particleCount);
 
 	update(0.f, position, velocity);
 }
@@ -56,7 +57,7 @@ void GFX::ParticleSystem::render(RenderStates & states)
 	//_vao.sendDataToBuffer(0, 0, 0, _sizeInBytes, nullptr, 3, GL_FLOAT);
 	_vao.sendDataToBuffer(0, 0, 0, _sizeInBytes, _renderParticles.data(), 3, GL_FLOAT);
 
-
+	_vao.renderPoints();
 }
 
 

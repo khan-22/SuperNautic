@@ -97,6 +97,13 @@ void VertexArrayObject::render()
 	unbind();
 }
 
+void GFX::VertexArrayObject::renderPoints()
+{
+	bind();
+	glDrawArrays(GL_POINTS, 0, _drawCount);
+	unbind();
+}
+
 void VertexArrayObject::bind() const
 {
 	glBindVertexArray(_vao);
