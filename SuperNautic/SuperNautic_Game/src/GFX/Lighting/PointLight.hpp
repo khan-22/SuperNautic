@@ -27,7 +27,7 @@ public:
 	void setPosition(glm::vec3 position);
 	const glm::vec3 getPosition();
 	void updateColor(glm::vec3 diffuseColor);
-	
+
 	void changeIntensity(GLfloat intensity);
 
 	void update(GLfloat dt);
@@ -39,7 +39,9 @@ public:
 	const PointLightProperties getLightProperties();
 
 	//Calculates the bounding sphere for the light
-	GLfloat calculatePLBoundSize();
+	void calculatePLBoundSize();
+
+	GLfloat getLightRadius();
 
 	~PointLight();
 private:
@@ -55,9 +57,9 @@ private:
 	bool		_bLightActive;
 
 	//Attenuation properties, should probably expose these to allow modifcation in the future
-	GLfloat _constant	= 1.0f;
-	GLfloat _linear		= 0.045;
-	GLfloat _quadratic	= 0.0075;
+	GLfloat _constant = 1.0f;
+	GLfloat _linear = 0.045;
+	GLfloat _quadratic = 0.0075;
 	GLfloat _lightBoundsRadius;
 
 	PointLight();
