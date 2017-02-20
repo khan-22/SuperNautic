@@ -10,6 +10,7 @@ GuiCharacterInput::GuiCharacterInput(CharacterFlags flags)
 , _text("a", *_font.get())
 , _characterLists(generateCharacterLists(flags))
 {
+    updateText();
     sf::FloatRect textBounds = _text.getLocalBounds();
     setOrigin(textBounds.width / 2.f, textBounds.height / 2.f);
     _text.setFillColor(sf::Color::Black);
