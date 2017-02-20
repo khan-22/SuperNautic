@@ -34,7 +34,7 @@ void DampedSpringRotatedVector::update(float dt)
 	}
 
 	// Rotate vector
-	if (!bAlmostEqual(_axis, glm::vec3{ 0, 0, 0 }) && !isnan(_axis.x))
+	if (!bAlmostEqual(_axis, glm::vec3{ 0, 0, 0 }) && !std::isnan(_axis.x))
 	{
 		glm::mat4 rotation = glm::rotate(-glm::length(_axis) * dt, glm::normalize(_axis));
 
