@@ -11,7 +11,7 @@ WorldAudio::WorldAudio()
 	}
 
 	_music.setLoop(true);
-	play();
+	//play();
 }
 
 WorldAudio::~WorldAudio()

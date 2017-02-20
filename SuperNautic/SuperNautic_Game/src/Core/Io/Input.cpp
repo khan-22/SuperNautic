@@ -45,7 +45,7 @@ void Input::update()
 			_leftStickX = 0;
 		}
 
-		if (abs(_triggers) < thresh)
+		if (abs(_triggers) < 5)
 		{
 			_triggers = 0;
 		}
