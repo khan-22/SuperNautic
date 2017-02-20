@@ -22,7 +22,10 @@ Player::~Player()
 
 void Player::render(GFX::DeferredRenderer& renderer)
 {
-	renderer.render(_ship);
+	if (!_bIsFirstPerson)
+	{
+		renderer.render(_ship);
+	}
 }
 
 const sf::Drawable& Player::getHud() const
