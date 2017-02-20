@@ -26,8 +26,8 @@ public:
 
     void update();
     virtual bool bIsActivatable() const override;
-    void insert(std::unique_ptr<GuiElement>& element);
-    void insert(std::list<std::unique_ptr<GuiElement>>& elements);
+    virtual void insert(std::unique_ptr<GuiElement>& element);
+    virtual void insert(std::list<std::unique_ptr<GuiElement>>& elements);
     sf::FloatRect getBoundingRect() const override;
     void setBackground(sf::Color fillColor, sf::Color outlineColor = sf::Color::White, float outlineThickness = 0.f);
 
