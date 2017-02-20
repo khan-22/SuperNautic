@@ -20,6 +20,7 @@ public:
 	int getGeneratedLength() const;
 	void setLength(const unsigned int length);
 	void setSeed(const std::string& seed);
+	const std::string& getSeed() const;
 	void setCurviness(const unsigned int curviness);
 	void startNewTrack();
 	bool bGenerate();

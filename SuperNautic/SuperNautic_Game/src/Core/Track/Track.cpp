@@ -54,13 +54,13 @@ void Track::setLength(const unsigned int length)
 // Set randomization seed
 void Track::setSeed(const std::string& seed)
 {
+	_seed = seed;
 	if (seed.length() == 1 && seed[0] == '1')
 	{
 		srand(time(NULL));
 	}
 	else
 	{
-		_seed = seed;
 		unsigned int intSeed = 0;
 		for (unsigned int i = 0; i < seed.length(); i++)
 		{
@@ -70,6 +70,12 @@ void Track::setSeed(const std::string& seed)
 	}
 }
 
+// Get the seed in string format
+const std::string & Track::getSeed() const
+{
+	return _seed;
+}
+
 // Sets the difficulty of the track (0-5)
 void Track::setCurviness(const unsigned int curviness)
 {
@@ -77,6 +83,7 @@ void Track::setCurviness(const unsigned int curviness)
 	_curviness = curviness / 5.f;
 }
 
+// Resets the track
 void Track::startNewTrack()
 {
 	_generatedLength = 0;
@@ -155,16 +162,19 @@ bool Track::bGenerate()
 	return false;
 }
 
+// Get the number of segment instances the track is made of
 int Track::getNrOfSegments() const
 {
 	return _track.size();
 }
 
+// Get a instance-pointer based on index in the track
 SegmentInstance* Track::getInstance(int index)
 {
 	return _track[index];
 }
 
+// Get the track progression in percent
 float Track::getProgression() const
 {
 	return _totalProgress;
