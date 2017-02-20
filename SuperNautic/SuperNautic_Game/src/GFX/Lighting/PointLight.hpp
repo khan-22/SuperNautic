@@ -39,9 +39,7 @@ public:
 	const PointLightProperties getLightProperties();
 
 	//Calculates the bounding sphere for the light
-	void calculatePLBoundSize();
-
-	GLfloat getLightRadius();
+	GLfloat calculatePLBoundSize();
 
 	~PointLight();
 private:

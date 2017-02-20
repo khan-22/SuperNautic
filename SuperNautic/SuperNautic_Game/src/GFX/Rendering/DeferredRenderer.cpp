@@ -5,7 +5,6 @@ using namespace GFX;
 DeferredRenderer::DeferredRenderer()
 	: _screenQuad(nullptr)
 {
-
 }
 
 
@@ -43,8 +42,6 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	GLfloat screenY1 = _y * 2.f - 1.f;
 	GLfloat screenX2 = (_x + _width)  * 2.f - 1.f;
 	GLfloat screenY2 = (_y + _height) * 2.f - 1.f;
-
-	_lightVolume = ModelCache::get("lightbound.blend"); //TODO: update to KMF
 
 	glm::vec3 positions[] =
 	{
@@ -160,83 +157,65 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	//lpShader->setSampler("uNormal", 2);
 
 	lpShader->setUniform("uViewPos", camera.getPosition());
-	lpShader->setUniform("screenSize", glm::vec2(width, height));
 
-	//// Send all point light data as a uniform array struct
-	//int lightCount = std::min((int)_pointLights.size(), 32);
+	// Send all point light data as a uniform array struct
+	int lightCount = std::min((int)_pointLights.size(), 32);
 
-	//std::vector<glm::vec3> pointLightPos;
-	//std::vector<glm::vec3> pointLightColor;
-	//std::vector<float>	   pointLightIntensity;
-	//std::vector<glm::vec3> pointLightProperties;
+	std::vector<glm::vec3> pointLightPos;
+	std::vector<glm::vec3> pointLightColor;
+	std::vector<float>	   pointLightIntensity;
+	std::vector<glm::vec3> pointLightProperties;
 
-	//pointLightPos.reserve(32);
-	//pointLightColor.reserve(32);
-	//pointLightIntensity.reserve(32);
-	//pointLightProperties.reserve(32);
+	pointLightPos.reserve(32);
+	pointLightColor.reserve(32);
+	pointLightIntensity.reserve(32);
+	pointLightProperties.reserve(32);
 
-	//for (int i = 0; i < lightCount; i++)
-	//{
-	//	pointLightPos.push_back(_pointLights[i]->getPosition());
-	//	pointLightColor.push_back(_pointLights[i]->getLightProperties( ).diffuseColor);
-	//	pointLightIntensity.push_back(_pointLights[i]->getLightProperties().intensity);
+	for (int i = 0; i < lightCount; i++)
+	{
+		pointLightPos.push_back(_pointLights[i]->getPosition());
+		pointLightColor.push_back(_pointLights[i]->getLightProperties( ).diffuseColor);
+		pointLightIntensity.push_back(_pointLights[i]->getLightProperties().intensity);
 
-	//	glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
-	//	pointLightProperties.push_back(properties);
+		glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
+		pointLightProperties.push_back(properties);
 
-	//}
-	//for (int i = lightCount; i < 32; i++)
-	//{
-	//	pointLightPos.push_back({0.f, 0.f, 0.f});
-	//	pointLightColor.push_back({0.f, 0.f, 0.f});
-	//	pointLightIntensity.push_back({1.f});
-	//	pointLightProperties.push_back({1.f, 0.f, 0.f});
-	//}
+	}
+	for (int i = lightCount; i < 32; i++)
+	{
+		pointLightPos.push_back({0.f, 0.f, 0.f});
+		pointLightColor.push_back({0.f, 0.f, 0.f});
+		pointLightIntensity.push_back({1.f});
+		pointLightProperties.push_back({1.f, 0.f, 0.f});
+	}
 
-	////lpShader->setUniform("pointLights.pos", pointLightPos[0], 32);
-	////lpShader->setUniform("pointLights.color", pointLightColor[0], 32);
-	////lpShader->setUniform("pointLights.intensity", pointLightIntensity[0], 32);
-	////lpShader->setUniform("pointLights.properties", pointLightProperties[0], 32);
+	lpShader->setUniform("pointLights.pos", pointLightPos[0], 32);
+	lpShader->setUniform("pointLights.color", pointLightColor[0], 32);
+	lpShader->setUniform("pointLights.intensity", pointLightIntensity[0], 32);
+	lpShader->setUniform("pointLights.properties", pointLightProperties[0], 32);
+	
+
+
+	/*for (int i = 0; i < lightCount; i++)
+	{
+		std::string uName = "pointLights[" + std::to_string(i) + "]";
+		lpShader->setUniform(uName + ".pos",		_pointLights[i]->getPosition());
+		lpShader->setUniform(uName + ".color",		_pointLights[i]->getLightProperties().diffuseColor);
+
+		glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
+
+		lpShader->setUniform(uName + ".properties", properties);
+	}*/
+	_pointLights.clear();
 
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//glDisable(GL_CULL_FACE);
 
 	glViewport(0, 0, width, height);
-	//_screenQuad->render();
-
-	RenderStates states{ &camera , glm::mat4(1.f), _lightPassShader.get() };
-	for (auto& pointLight : _pointLights)
-	{
-		//Awful, make this shit better
-		glm::vec3 pos			= pointLight->getPosition();
-		glm::vec3 color			= pointLight->getLightProperties().diffuseColor;
-		GLfloat intensity		= pointLight->getLightProperties().intensity;
-		glm::vec3 attenuation	= glm::vec3(pointLight->getLightProperties().constant, pointLight->getLightProperties().linear, pointLight->getLightProperties().quadratic); 
-		/////////////////////////////////
-
-		glm::mat4 modelMat = glm::translate(pos) * glm::scale(glm::vec3{ pointLight->getLightRadius() });
-		//glm::mat4 modelMat = glm::translate(pos) * glm::scale(glm::vec3{3.0f, 3.0f, 3.0f});
-
-
-		_lightVolume.get()->setModelMatrix(modelMat);
-
-		lpShader->setUniform("lightPos", pos);
-		lpShader->setUniform("lightColor", color);
-		lpShader->setUniform("lightIntensity", intensity);
-		lpShader->setUniform("lightAttenuation", attenuation);
-
-		_lightVolume.get()->render(states);
-	}
-
-	_pointLights.clear();
+	_screenQuad->render();
 
 	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
 
-	glDisable(GL_CULL_FACE);
 }

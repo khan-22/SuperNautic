@@ -10,6 +10,7 @@
 #include "GFX/Lighting/PointLight.hpp"
 #include "GFX/Rendering/Framebuffer.hpp"
 
+
 namespace GFX
 {
 	class Renderable3D; // Forward-decl
@@ -42,8 +43,6 @@ namespace GFX
 		GLfloat _height;
 
 		std::unique_ptr<VertexArrayObject> _screenQuad;
-
-		ModelAsset _lightVolume;
 
 		void geometryPass(Camera& camera, GLsizei width, GLsizei height);
 		void lightPass(Camera& camera, GLsizei width, GLsizei height);
