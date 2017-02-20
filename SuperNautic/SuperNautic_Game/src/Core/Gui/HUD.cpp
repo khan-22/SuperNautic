@@ -36,12 +36,12 @@ HUD::HUD(int windowWidth, int windowHeight) :
 
 	_progressionOutline.setSize(sf::Vector2f(_widthStep, _heightStep * 80));
 	_progressionOutline.setOutlineColor(sf::Color(0, 50, 100, 100));
-	_progressionOutline.setFillColor(sf::Color::Transparent);
-	_progressionOutline.setOutlineThickness(_heightStep);
+	_progressionOutline.setFillColor(sf::Color(50, 0, 100, 100));
+	//_progressionOutline.setOutlineThickness(_heightStep);
 	_progressionOutline.setPosition(_progressionPosX, _heightStep * 9 + _offsetY);
 
-	_progressionMeter.setSize(sf::Vector2f(_widthStep * 2, _heightStep));
-	_progressionMeter.setFillColor(sf::Color::Black);
+	_progressionMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
+	_progressionMeter.setFillColor(sf::Color(200, 200, 200, 255));
 	_progressionMeter.setOrigin(_widthStep, _heightStep);
 	_progressionMeter.setPosition(_progressionPosX, _heightStep * 90 + _offsetY);
 
@@ -105,10 +105,10 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_heatMeter.setPosition(_widthStep * 2 + _offsetX, _heightStep * 90 + _offsetY);
 
 	_progressionOutline.setSize(sf::Vector2f(_widthStep, _heightStep * 80));
-	_progressionOutline.setOutlineThickness(_heightStep);
+	//_progressionOutline.setOutlineThickness(_heightStep);
 	_progressionOutline.setPosition(_progressionPosX, _heightStep * 9 + _offsetY);
 
-	_progressionMeter.setSize(sf::Vector2f(_widthStep * 2, _heightStep));
+	_progressionMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
 	_progressionMeter.setOrigin(_widthStep, _heightStep);
 	_progressionMeter.setPosition(_progressionPosX, _heightStep * 90 + _offsetY);
 
