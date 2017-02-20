@@ -41,7 +41,7 @@ namespace GFX
 		GLfloat _width;
 		GLfloat _height;
 
-		std::unique_ptr<VertexArrayObject> _screenQuad;
+		//std::unique_ptr<VertexArrayObject> _screenQuad;
 
 		ModelAsset _lightVolume;
 

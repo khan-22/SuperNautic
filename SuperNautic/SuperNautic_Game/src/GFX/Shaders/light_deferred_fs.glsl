@@ -60,6 +60,7 @@ void main()
 
 	lightingResult.rgb = calculatePointLight(fragPos, diffuseTex, normal, viewDir);
 
+	//outColor = vec4(1.0);
 	//outColor = vec4(diffuseTex, 1.0);
 	outColor = lightingResult;
 }

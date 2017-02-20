@@ -3,7 +3,6 @@
 using namespace GFX;
 
 DeferredRenderer::DeferredRenderer()
-	: _screenQuad(nullptr)
 {
 
 }
@@ -44,9 +43,9 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	GLfloat screenX2 = (_x + _width)  * 2.f - 1.f;
 	GLfloat screenY2 = (_y + _height) * 2.f - 1.f;
 
-	_lightVolume = ModelCache::get("lightbound.blend"); //TODO: update to KMF
+	_lightVolume = ModelCache::get("lightbound.kmf"); //TODO: update to KMF
 
-	glm::vec3 positions[] =
+	/*glm::vec3 positions[] =
 	{
 		{ screenX1, screenY1, 0.0 },
 		{ screenX1, screenY2, 0.0 },
@@ -83,7 +82,7 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	_screenQuad->addIndexBuffer(sizeIndicesInBytes, GL_STATIC_DRAW);
 	_screenQuad->sendDataToIndexBuffer(0, sizeIndicesInBytes, &indices[0]);
 
-	_screenQuad->setDrawCount(6);
+	_screenQuad->setDrawCount(6);*/
 }
 
 void DeferredRenderer::pushPointLight(PointLight & pointLight)
