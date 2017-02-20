@@ -32,6 +32,8 @@ public:
 
 	Camera* getCamera();
 
+	void setProgression(float progression);
+
 private:
 	int							_playerId;
 	Input						_input;
