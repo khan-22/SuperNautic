@@ -5,7 +5,7 @@
 
 
 #include <memory>
-#include <list>
+#include <vector>
 
 
 #include "SFML/Graphics/Transformable.hpp"
@@ -21,21 +21,21 @@ class GuiContainer : public GuiElement
 public:
     GuiContainer(sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
 
-    GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
+    GuiContainer(std::vector<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
     ~GuiContainer();
 
     void update();
     virtual bool bIsActivatable() const override;
     virtual void insert(std::unique_ptr<GuiElement>& element);
-    virtual void insert(std::list<std::unique_ptr<GuiElement>>& elements);
+    virtual void insert(std::vector<std::unique_ptr<GuiElement>>& elements);
     sf::FloatRect getBoundingRect() const override;
     void setBackground(sf::Color fillColor, sf::Color outlineColor = sf::Color::White, float outlineThickness = 0.f);
 
     void setOnElementSelect(const std::function<void(GuiElement*)>& func);
 
 protected:
-    std::list<std::unique_ptr<GuiElement>> _elements;
-    std::list<std::unique_ptr<GuiElement>>::iterator _selection;
+    std::vector<std::unique_ptr<GuiElement>> _elements;
+    std::vector<std::unique_ptr<GuiElement>>::iterator _selection;
     sf::RectangleShape _background;
 
     virtual void onElementSelect();

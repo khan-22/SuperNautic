@@ -17,7 +17,7 @@ GuiContainer::GuiContainer(sf::Keyboard::Key nextKey, sf::Keyboard::Key previous
     _background.setFillColor(sf::Color::Transparent);
 }
 
-GuiContainer::GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey, sf::Keyboard::Key previousKey)
+GuiContainer::GuiContainer(std::vector<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey, sf::Keyboard::Key previousKey)
 : _selection(_elements.end())
 , _nextKey(nextKey)
 , _previousKey(previousKey)
@@ -206,7 +206,7 @@ void GuiContainer::insert(std::unique_ptr<GuiElement>& element)
     updateSize();
 }
 
-void GuiContainer::insert(std::list<std::unique_ptr<GuiElement>>& elements)
+void GuiContainer::insert(std::vector<std::unique_ptr<GuiElement>>& elements)
 {
     if(!elements.empty())
     {
