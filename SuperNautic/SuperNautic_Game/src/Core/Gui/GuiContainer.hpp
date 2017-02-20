@@ -35,17 +35,19 @@ public:
 
 protected:
     std::list<std::unique_ptr<GuiElement>> _elements;
+    std::list<std::unique_ptr<GuiElement>>::iterator _selection;
+    sf::RectangleShape _background;
+
+    virtual void onElementSelect();
 
 private:
-    std::list<std::unique_ptr<GuiElement>>::iterator _selection;
     std::function<void(GuiElement*)> _onElementSelectCallback = [](GuiElement*){};
     sf::FloatRect _bounds;
-    sf::RectangleShape _background;
     sf::Keyboard::Key _nextKey;
     sf::Keyboard::Key _previousKey;
 
     void handleEventCurrent(const sf::Event& event) override;
-    void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
+    virtual void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
 
     void updateSize();
     void selectNext();

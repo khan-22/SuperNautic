@@ -120,6 +120,7 @@ void GuiContainer::activateSelection()
 
 void GuiContainer::selectNext()
 {
+    auto previousSelection = _selection;
     if(!_elements.empty())
     {
         if(_selection != _elements.end() && (*_selection)->bIsSelected())
@@ -148,10 +149,16 @@ void GuiContainer::selectNext()
 
         (*_selection)->toggleSelection();
     }
+
+    if(previousSelection != _selection)
+    {
+        onElementSelect();
+    }
 }
 
 void GuiContainer::selectPrevious()
 {
+    auto previousSelection = _selection;
     if(!_elements.empty())
     {
         if(_selection != _elements.end() && (*_selection)->bIsSelected())
@@ -177,6 +184,11 @@ void GuiContainer::selectPrevious()
 
 
         (*_selection)->toggleSelection();
+    }
+
+    if(previousSelection != _selection)
+    {
+        onElementSelect();
     }
 }
 
@@ -277,4 +289,9 @@ void GuiContainer::deactivate()
 bool GuiContainer::bIsActivatable() const
 {
     return true;
+}
+
+void GuiContainer::onElementSelect()
+{
+    _onElementSelectCallback(_selection->get());
 }
