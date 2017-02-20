@@ -13,7 +13,7 @@
 
 PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context, int numberOfPlayers)
 	: ApplicationState(stack, context)
-	, _segmentHandler("Segments/segmentinfos2.txt", "Segments/ConnectionTypes.txt")
+	, _segmentHandler("Segments/segmentinfos3.txt", "Segments/ConnectionTypes.txt")
 	, _track(&_segmentHandler)
 	, _world(context, &_track, numberOfPlayers)
 {
