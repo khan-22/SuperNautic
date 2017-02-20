@@ -59,6 +59,7 @@ public:
 	float		_jumpCooldown;			// Cooldown when jump is activated
 	float		_currentJumpCooldown;	// Current cooldown
 	float		_engineTemperature;
+	float		_engineCooldown;
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
 

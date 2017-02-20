@@ -42,7 +42,8 @@ Ship::Ship()
 		_straighteningForce{ 3.0f },
 		_steerStraighteningForce{ 15.0f },
 		_speedResistance{ 0.005f },
-		_preferredHeight{ 4.0f }
+		_preferredHeight{ 4.0f },
+		_engineCooldown{ 0 }
 {
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 	setOrigin(glm::vec3{ 0.0f, 0.25f, 0.0f });
@@ -68,6 +69,8 @@ void Ship::update(float dt)
 
 	// Update intersection timer
 	_timeSinceIntersection += dt;
+
+	_engineCooldown -= dt;
 
 	// Reset ship if escaped
 	if (_timeSinceIntersection > 0.4f)
@@ -108,6 +111,11 @@ void Ship::update(float dt)
 
 	// Update engine temperature
 	_engineTemperature = ((_accelerationFactor + _velocity) / 2);
+
+	if (_engineTemperature > 85)
+	{
+		_engineCooldown = 5;
+	}
 
 	// Rotate ship forward towards track forward
 	glm::vec3 rotateTowards = glm::normalize(_trackForward - glm::dot(_trackForward, _upDirection) * _upDirection);
@@ -241,7 +249,10 @@ void Ship::setTurning(float turnFactor)
 
 void Ship::setAcceleration(float accelerationFactor)
 {
-	_accelerationFactor = clamp(accelerationFactor, -1.0f, 1.0f);
+	if (_engineCooldown < 0)
+	{
+		_accelerationFactor = clamp(accelerationFactor, -1.0f, 1.0f);
+	}
 }
 
 float Ship::getEngineTemperature()

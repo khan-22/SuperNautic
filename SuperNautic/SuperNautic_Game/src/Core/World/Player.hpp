@@ -37,6 +37,7 @@ public:
 
 private:
 	int							_playerId;
+
 	Input						_input;
 	Ship						_ship;
 	HUD							_hud;
