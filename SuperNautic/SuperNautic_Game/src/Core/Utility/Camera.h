@@ -24,6 +24,7 @@ public:
 	void setViewDirAged(const glm::vec3 & newDir);
 	void setFOV(float newFOV);
 	void changeFOV(float deltaFOV);
+	void setAspectRatio(int width, int height);
 
 protected:
 	Camera();

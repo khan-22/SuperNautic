@@ -16,3 +16,8 @@ bool ApplicationState::bIsTransparent()
 {
     return true;
 }
+
+void ApplicationState::initialize()
+{
+
+}

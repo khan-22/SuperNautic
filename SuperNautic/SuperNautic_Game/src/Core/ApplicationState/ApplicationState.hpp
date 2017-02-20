@@ -34,6 +34,8 @@ class ApplicationState
         // Return false to prevent rendering of states further down the stack.
         virtual bool bIsTransparent();
 
+		virtual void initialize();
+
     protected:
         ApplicationStateStack&  _stack;
         ApplicationContext&     _context;

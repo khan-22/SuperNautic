@@ -1,17 +1,10 @@
 #include "Core/World/Player.hpp"
 
-Player::Player() :
-	_playerId(0),
-	_input(0),
-	_hud(1280, 720)
-{
-	_audio.playAudio(PlayerAudio::Sounds::engine);
-}
-
 Player::Player(int id) :
 	_playerId(id),
 	_input(id),
-	_hud(1280, 720)
+	_hud(1280, 720),
+	_camera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 })
 {
 }
 Player::Player(const Player& other) : Player{ other._playerId }
@@ -23,7 +16,6 @@ Player::~Player()
 {
 }
 
-
 void Player::render(GFX::DeferredRenderer& renderer)
 {
 	renderer.render(_ship);
@@ -33,6 +25,13 @@ const sf::Drawable& Player::getHud() const
 {
     return _hud;
 }
+
+void Player::setScreenSize(int screenWidth, int screenHeight, int offsetX, int offsetY)
+{
+	_camera.setAspectRatio(screenWidth, screenHeight);
+	_hud.setScreenSize(screenWidth, screenHeight, offsetX, offsetY);
+}
+
 
 void Player::update(float dt)
 {
@@ -80,9 +79,18 @@ void Player::update(float dt)
 
     _ship.update(dt);
 
+	_camera.setPos(_ship.getMeshPosition() - _ship.getCameraForward() * 12.0f + _ship.getCameraUp() * 2.0f);
+	_camera.setUp(_ship.getCameraUp());
+	_camera.setViewDir(_ship.getCameraForward());
+
     _hud.setHeat(_ship.getEngineTemperature() / 100);
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 
 	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 100 + 1);
+}
+
+Camera* Player::getCamera()
+{
+	return &_camera;
 }

@@ -10,7 +10,6 @@ std::string SegmentHandler::basePath = "res/models/";
 // Loads SegmentInfos and connections from file (relative to res/models)
 SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connectionInfoPath)
 {
-	//segmentInfoPath = "segmentinfos.txt";
 	// Read SegmentInfos
 	std::ifstream infoFile { basePath + segmentInfoPath };
 	if (!infoFile.is_open())
@@ -38,13 +37,17 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 		startConnection = segmentDataName[segmentDataName.size() - 8];
 		endConnection = segmentDataName[segmentDataName.size() - 7];
 
-		// Metadata about segment
-		int probability, minInRow, maxInRow, rotationOffset;
-		infoFile >> probability >> minInRow >> maxInRow >> rotationOffset;
+		// Low curviness data
+		int probability1, minInRow1, maxInRow1, rotationOffset1;
+		infoFile >> probability1 >> minInRow1 >> maxInRow1 >> rotationOffset1;
+		// High curviness data
+		int probability2, minInRow2, maxInRow2, rotationOffset2;
+		infoFile >> probability2 >> minInRow2 >> maxInRow2 >> rotationOffset2;
 
 		// Add SegmentInfo to vector
 		_segmentInfos.push_back(SegmentInfo{ std::move(segmentDataName), std::move(segmentVisualName)
-			, startConnection, endConnection, probability, minInRow, maxInRow, rotationOffset });
+			, startConnection, endConnection, probability1, probability2, minInRow1, minInRow2
+			, maxInRow1, maxInRow2, rotationOffset1, rotationOffset2 });
 
 		// Skip rest of line
 		infoFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -54,14 +57,10 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 	infoFile >> amount;
 	for (unsigned int i = 0; i < amount; i++)
 	{
-		int probability, minInRow, maxInRow, temp, pieces;
-		bool aAllowNegativRot = false;
-		infoFile >> probability >> minInRow >> maxInRow >> temp >> pieces;
-		if (temp == 1)
-		{
-			aAllowNegativRot = true;
-		}
-		_structures.push_back(Structure(probability, minInRow, maxInRow, aAllowNegativRot));
+		float curviness;
+		int probability1, probability2, minInRow, maxInRow, pieces;
+		infoFile >> curviness >> probability1 >> probability2 >> minInRow >> maxInRow >> pieces;
+		_structures.push_back(Structure(curviness, probability1, probability2, minInRow, maxInRow));
 		for (unsigned int j = 0; j < pieces; j++)
 		{
 			int index, minRotation, maxRotation;
@@ -71,6 +70,9 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 		// Skip rest of line
 		infoFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
+	int test = _structures[0].getProbability(0.4);
+	int test2 = _structures[0].getProbability(1.0);
+	int test3 = _structures[0].getProbability(0.7);
 
 	infoFile.close();
 
@@ -80,7 +82,7 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 	if (!infoFile.is_open())
 	{
 		// File could not be opened
-		LOG_ERROR("Could not open SegmentInfo file ", basePath + connectionInfoPath);
+		LOG_ERROR("Could not open ConnectionInfo file ", basePath + connectionInfoPath);
 		return;
 	}
 

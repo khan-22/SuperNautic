@@ -10,11 +10,11 @@
 #include "Core/Audio/PlayerAudio.hpp"
 #include "Core/World/Ship.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
+#include "Core/Utility/Camera.h"
 
 class Player
 {
 public:
-	Player();
 	Player(int id);
 	~Player();
 	Player(const Player& other);
@@ -23,17 +23,22 @@ public:
 	void render(GFX::DeferredRenderer& renderer);
     const sf::Drawable& getHud() const;
 
+	void setScreenSize(int screenWidth, int screenHeight, int offsetX, int offsetY);
+
 	Ship& getShip()
 	{
 		return _ship;
 	}
 
+	Camera* getCamera();
+
 private:
-	int			_playerId;
-	Input		_input;
-	Ship		_ship;
-	HUD			_hud;
-	PlayerAudio _audio;
+	int							_playerId;
+	Input						_input;
+	Ship						_ship;
+	HUD							_hud;
+	PlayerAudio					_audio;
+	Camera						_camera;
 
 };
 
