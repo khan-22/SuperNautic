@@ -304,3 +304,8 @@ const glm::vec3& Ship::getMeshPosition() const
 {
 	return _meshPosition();
 }
+
+const glm::vec3 & Ship::getMeshForward() const
+{
+	return _meshForwardDirection();
+}
