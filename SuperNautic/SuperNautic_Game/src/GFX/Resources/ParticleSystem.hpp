@@ -28,17 +28,25 @@ namespace GFX
 	protected:
 
 	private:
-		struct Particle
+		struct ParticlePositionData
 		{
-			glm::vec3 pos		= glm::vec3(0.f);
+			glm::vec3 pos = glm::vec3(0.f);
+		};
+
+		struct ParticlePhysicsData
+		{
 			glm::vec3 velocity  = glm::vec3(0.f);
 			glm::vec3 color		= glm::vec3(1.f);
 			float	  life		= 0.f;
 		};
 
-		std::vector<Particle> _particles;
+		std::vector<ParticlePhysicsData>	_physParticles;
+		std::vector<ParticlePositionData>	_renderParticles;
+
 		GLfloat		_turbulence;
 		GLfloat		_maxSpread;
+
+		GLsizei		_sizeInBytes;
 		
 		VertexArrayObject _vao;
 	};
