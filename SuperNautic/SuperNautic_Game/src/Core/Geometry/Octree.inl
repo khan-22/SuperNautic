@@ -59,6 +59,37 @@ bool Octree<ElementT>::bInsertIfNoCollision(const CollisionMesh& mesh, const Ele
     return true;
 }
 
+
+template<typename ElementT>
+bool Octree<ElementT>::bInsertIf(const CollisionMesh& mesh, const ElementT& element, const std::function<bool(const std::vector<ElementT*>&)>& predicate)
+{
+    std::vector<Node*> nodes;
+    _root.getIntersectingLeafNodes(mesh, nodes);
+    assert(!nodes.empty());
+
+    std::vector<ElementT*> collisions;
+    for(const typename Node::ElementPtr& nodeElement : getUniqueElements(nodes))
+    {
+        if(mesh.testCollision(nodeElement->first) == CollisionMesh::CollisionResult::COLLISION)
+        {
+            collisions.push_back(&nodeElement->second);
+        }
+    }
+
+    if(!predicate(collisions))
+    {
+        return false;
+    }
+
+    typename Node::ElementPtr nodeElement(new std::pair<CollisionMesh, ElementT>(mesh, element));
+    for(Node* node : nodes)
+    {
+        node->insert(nodeElement);
+    }
+
+    return true;
+}
+
 template<typename ElementT>
 std::vector<ElementT*> Octree<ElementT>::getCollisions(const CollisionMesh& mesh) const
 {
@@ -244,3 +275,4 @@ unsigned int Octree<ElementT>::Node::getSize() const
 {
     return _elements.size();
 }
+

@@ -30,8 +30,8 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     auto button1 = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.pop();
-        auto playState = std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context));
-        _stack.push(playState);
+        auto playState = std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context, _playersActive));
+        _stack.push(std::move(playState));
 
     }));
 
@@ -59,6 +59,18 @@ void MainMenuApplicationState::render()
 
 bool MainMenuApplicationState::bUpdate(float dtSeconds)
 {
+	int playersFound = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		if (sf::Joystick::isConnected(i)) {
+			playersFound++;
+		}
+	}
+	_playersActive = playersFound;
+	if (_playersActive == 0)
+	{
+		_playersActive = 1;
+	}
     return true;
 }
 

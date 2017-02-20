@@ -11,7 +11,7 @@
 class PlayApplicationState : public ApplicationState
 {
 public:
-    PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context);
+    PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context, int numberOfPlayers);
 
     void render() override;
     bool bUpdate(float dtSeconds) override;

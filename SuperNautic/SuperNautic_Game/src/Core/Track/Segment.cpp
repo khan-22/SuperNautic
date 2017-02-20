@@ -132,74 +132,46 @@ const RayIntersection Segment::rayIntersectionTest(const Ray& ray) const
 	}
 }
 
-// Finds indices of the two waypoints closest to a position (position is relative to segment's local origin)
-std::pair<WaypointInfo, WaypointInfo> Segment::findClosestWaypoints(const glm::vec3& position) const
+// Finds position of and distance to the waypoint closest to a position (position is relative to segment's local origin)
+WaypointInfo Segment::findClosestWaypoint(const glm::vec3& position) const
 {
-	// Will hold the closest two vectors, initialize to first two waypoints
-	// First is closer than second
-	std::pair<unsigned, unsigned> closest { 0, 1 };
+	// Info about closest waypoint that is behind position
+	WaypointInfo closest;
+	closest.found = false;
 
-	float firstDistance = glm::distance(_waypoints[closest.first], position);
-	float secondDistance = glm::distance(_waypoints[closest.second], position);
-
-	// Swap if second is closer than first
-	if (secondDistance < firstDistance)
+	// Find the closest waypoint
+	for (unsigned i = 0; i < _waypoints.size(); ++i)
 	{
-		std::swap(closest.first, closest.second);
-		std::swap(firstDistance, secondDistance);
-	}
+		// Find direction of the waypoint that will be checked
+		glm::vec3 currentDirection;
 
-	// Check rest of waypoints
-	for (unsigned i = 2; i < _waypoints.size(); ++i)
-	{
-		float testDistance = glm::distance(_waypoints[i], position);
-
-		if (testDistance < secondDistance)
+		// This is not the last waypoint
+		if (i < _waypoints.size() - 1)
 		{
-			// This is the closest waypoint so far, first becomes second, _waypoints[i] becomes first
-			if (testDistance < firstDistance)
-			{
-				// Set first to second
-				closest.second = closest.first;
-				secondDistance = firstDistance;
+			currentDirection = glm::normalize(_waypoints[i + 1] - _waypoints[i]);
+		}
+		// Last waypoint, direction points towards segment end point
+		else
+		{
+			currentDirection = glm::normalize(glm::vec3{ getEndMatrix() * glm::vec4{0, 0, 0, 1} } -_waypoints[i]);
+		}
 
-				// Set test to first
-				closest.first = i;
-				firstDistance = testDistance;
-			}
-			// Second closest so far
-			else
-			{
-				// Set test to second
-				closest.second = i;
-				secondDistance = testDistance;
-			}
+		// Find distance to waypoint
+		float testDot = glm::dot(currentDirection, position - _waypoints[i]);
+		float testDistance = glm::distance(position, _waypoints[i]);
+
+		// If waypoint is closer and behind position, update closest
+		if (testDot >= 0.0f && (!closest.found || testDistance < closest.distance))
+		{
+			closest.found = true;
+			closest.distance = testDistance;
+			closest.direction = currentDirection;
+			closest.position = _waypoints[i];
+			closest.index = i;
 		}
 	}
 
-	// Make sure that first < second
-	if (closest.first > closest.second)
-	{
-		std::swap(closest.first, closest.second);
-		std::swap(firstDistance, secondDistance);
-	}
-
-	glm::vec3 firstDirection{ glm::normalize(_waypoints[closest.second] - _waypoints[closest.first]) };
-	glm::vec3 secondDirection;
-
-	// This is the last waypoint of the segment
-	if (closest.second >= _waypoints.size() - 1)
-	{
-		glm::vec3 endPoint{ getEndMatrix() * glm::vec4{0, 0, 0, 1} };
-
-		secondDirection = glm::normalize(endPoint - _waypoints[closest.second]);
-	}
-	else
-	{
-		secondDirection = glm::normalize(_waypoints[closest.second + 1] - _waypoints[closest.second]);
-	}
-
-	return std::make_pair(WaypointInfo{ _waypoints[closest.first], firstDirection, firstDistance }, WaypointInfo{ _waypoints[closest.second], secondDirection, secondDistance });
+	return closest;
 }
 
 // Renders the segment at the position of an instance

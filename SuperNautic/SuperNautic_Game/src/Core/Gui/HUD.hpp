@@ -21,9 +21,10 @@ public:
 	~HUD();
 
 	void setHeat(float heat);
-	void changeHeat(float change);
 	void setSpeed(float speed);
 	void setPosition(int position);
+	void setProgression(float progression);
+	void setScreenSize(int width, int height, int offsetX, int offsetY);
 
 	void updateCurrent() override;
 	void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
@@ -31,21 +32,28 @@ public:
 private:
 	float				_widthStep;
 	float				_heightStep;
+	int					_offsetX;
+	int					_offsetY;
+	float				_sizeY;
 	float				_heat;
 	float				_speed;
 	int					_position;
+	float				_progression;
+	float				_progressionPosX;
+	float				_heatSizeY;
+	float				_heatSizeX;
+	float				_heatPosY;
+	float				_heatPosX;
 
 	Asset<sf::Font>		_font;
 	Asset<sf::Texture>	_texture;
-	sf::RectangleShape	_badRect;
-	sf::RectangleShape	_warningRect;
-	sf::RectangleShape	_closeRect;
-	sf::RectangleShape	_safeRect;
+
+	sf::RectangleShape	_progressionOutline;
+	sf::RectangleShape	_progressionMeter;
 
 	sf::RectangleShape	_heatOutline;
 	sf::RectangleShape	_heatMeter;
 
-	sf::Sprite			_spriteHeat;
 	sf::Text			_tSpeed;
 	sf::Text			_tPosition;
 

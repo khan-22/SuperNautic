@@ -11,17 +11,16 @@
 #include "Core/ApplicationState/TrackGenerationApplicationState.h"
 
 
-PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
+PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context, int numberOfPlayers)
 	: ApplicationState(stack, context)
 	, _segmentHandler("Segments/segmentinfos2.txt", "Segments/ConnectionTypes.txt")
 	, _track(&_segmentHandler)
-	, _world(context)
+	, _world(context, &_track, numberOfPlayers)
 {
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
-	_track.setCurviness(2);
-	_track.setSeed("FritjofÄrBäst");
-	_track.setLength(20000);
-	_world.setTrack(&_track);
+	_track.setCurviness(3);
+	_track.setSeed("1");
+	_track.setLength(40000);
 }
 
 void PlayApplicationState::initialize()
@@ -40,8 +39,7 @@ bool PlayApplicationState::bUpdate(float dtSeconds)
 
 	if (_world.bHasWon())
 	{
-		auto victoryState = std::unique_ptr<ApplicationState>(new VictoryApplicationState(_stack, _context));
-		_stack.push(victoryState);
+		_stack.push(std::unique_ptr<ApplicationState>(new VictoryApplicationState(_stack, _context)));
 	}
 
     return true;
@@ -55,8 +53,7 @@ bool PlayApplicationState::bHandleEvent(const sf::Event& event)
         {
         case sf::Keyboard::Escape:
         {
-            auto pauseMenu = std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context));
-            _stack.push(pauseMenu);
+            _stack.push(std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context)));
             return true;
             break;
 

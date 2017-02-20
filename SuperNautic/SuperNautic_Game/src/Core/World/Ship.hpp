@@ -50,7 +50,7 @@ public:
 	const glm::vec3& getMeshPosition() const;
 
 
-private:
+public:
 	bool		_destroyed;
 	bool		_stopped;
 	float		_turningFactor;
@@ -62,17 +62,19 @@ private:
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
 
-	glm::vec3				_trackForward;			// Forward direction of track
-	glm::vec3				_shipForward;			// Current forward direction of ship
-	glm::vec3				_upDirection;			// Current up direction
-	glm::vec3				_returnPos;				// Respawn position of ship
+	glm::vec3					_trackForward;			// Forward direction of track
+	glm::vec3					_shipForward;			// Current forward direction of ship
+	glm::vec3					_upDirection;			// Current up direction
+	glm::vec3					_returnPos;				// Respawn position of ship
 
-	SpringRotatedVector		_meshForwardDirection;	// Current facing direction
-	SpringRotatedVector		_meshUpDirection;		// Up direction of ship mesh
-	SpringRotatedVector		_cameraUpDirection;
-	SpringRotatedVector		_cameraForwardDirection;
+	SpringRotatedVector	_meshForwardDirection;	// Current facing direction
+	SpringRotatedVector			_meshUpDirection;		// Up direction of ship mesh
+	SpringRotatedVector			_cameraUpDirection;
+	SpringRotatedVector	_cameraForwardDirection;
 
-	SpringTranslatedVector _meshPosition;			// Global position of ship mesh
+	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
+	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
+
 
 	glm::mat4	_meshMatrix;
 

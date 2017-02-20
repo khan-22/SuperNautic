@@ -26,6 +26,13 @@ public:
     // Return true if element is inserted.
     bool bInsertIfNoCollision(const CollisionMesh& mesh, const ElementT& element);
 
+    // Insert element along with a collision mesh if
+    // predicate returns true. The predicate's parameter
+    // contains all elements that collide with the given
+    // collision mesh.
+    // Returns true if element is inserted.
+    bool bInsertIf(const CollisionMesh& mesh, const ElementT& element, const std::function<bool(const std::vector<ElementT*>&)>& predicate);
+
     // Get all elements that collide with a collision mesh.
     std::vector<ElementT*> getCollisions(const CollisionMesh& mesh) const;
 
