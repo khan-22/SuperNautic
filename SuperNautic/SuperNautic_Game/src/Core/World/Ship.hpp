@@ -48,6 +48,7 @@ public:
 	void setReturnPos(const glm::vec3& returnPos);
 	const glm::vec3& getCameraForward() const;
 	const glm::vec3& getMeshPosition() const;
+	const glm::vec3& getMeshForward() const;
 
 
 public:

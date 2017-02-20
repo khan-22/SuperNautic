@@ -4,9 +4,13 @@ Player::Player(int id) :
 	_playerId(id),
 	_input(id),
 	_hud(1280, 720),
-	_camera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 })
+	_camera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
+	_fpCamera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 })
 {
+	_bIsFirstPerson = false;
+	_currentCamera = &_camera;
 }
+
 Player::Player(const Player& other) : Player{ other._playerId }
 {
 
@@ -84,9 +88,20 @@ void Player::update(float dt)
 
     _ship.update(dt);
 
-	_camera.setPos(_ship.getMeshPosition() - _ship.getCameraForward() * 12.0f + _ship.getCameraUp() * 2.0f);
-	_camera.setUp(_ship.getCameraUp());
-	_camera.setViewDir(_ship.getCameraForward());
+	if (_bIsFirstPerson)
+	{
+		//First person
+		_currentCamera->setPos(_ship.getMeshPosition() - _ship.getCameraForward() + _ship.getCameraUp() * 2.0f);
+		_currentCamera->setUp(_ship.getCameraUp());
+		_currentCamera->setViewDir(_ship.getMeshForward());
+	}
+	else
+	{
+		//Third person
+		_currentCamera->setPos(_ship.getMeshPosition() - _ship.getCameraForward() * 12.0f + _ship.getCameraUp() * 2.0f);
+		_currentCamera->setUp(_ship.getCameraUp());
+		_currentCamera->setViewDir(_ship.getCameraForward());
+	}
 
     _hud.setHeat(_ship.getEngineTemperature() / 100);
     _hud.setSpeed(_ship.getSpeed());
@@ -97,7 +112,7 @@ void Player::update(float dt)
 
 Camera* Player::getCamera()
 {
-	return &_camera;
+	return _currentCamera;
 }
 
 void Player::setProgression(float progression)
