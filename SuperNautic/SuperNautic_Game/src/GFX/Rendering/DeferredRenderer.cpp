@@ -43,46 +43,8 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	GLfloat screenX2 = (_x + _width)  * 2.f - 1.f;
 	GLfloat screenY2 = (_y + _height) * 2.f - 1.f;
 
-	_lightVolume = ModelCache::get("lightbound.kmf"); //TODO: update to KMF
+	_lightVolume = ModelCache::get("lightbound.kmf");
 
-	/*glm::vec3 positions[] =
-	{
-		{ screenX1, screenY1, 0.0 },
-		{ screenX1, screenY2, 0.0 },
-		{ screenX2, screenY1, 0.0 },
-		{ screenX2, screenY2, 0.0 },
-	};
-
-	glm::vec2 texCoords[] =
-	{
-		{ 0.0, 0.0 },
-		{ 0.0, 1.0 },
-		{ 1.0, 0.0 },
-		{ 1.0, 1.0 },
-	};
-
-	GLuint indices[] =
-	{
-		0, 1, 2,
-		1, 3, 2,
-	};
-
-	_screenQuad.reset(new VertexArrayObject());
-
-	GLsizei sizePositionsInBytes = sizeof(positions[0]) * 4;
-	GLsizei sizeTexCoordsInBytes = sizeof(texCoords[0]) * 4;
-	_screenQuad->addVertexBuffer(sizePositionsInBytes + sizeTexCoordsInBytes, GL_STATIC_DRAW);
-
-	_screenQuad->sendDataToBuffer(0, 0, 0,
-		sizePositionsInBytes, &positions[0], 3, GL_FLOAT);
-	_screenQuad->sendDataToBuffer(0, 1, sizePositionsInBytes,
-		sizeTexCoordsInBytes, &texCoords[0], 2, GL_FLOAT);
-
-	GLsizei sizeIndicesInBytes = sizeof(indices[0]) * 6;
-	_screenQuad->addIndexBuffer(sizeIndicesInBytes, GL_STATIC_DRAW);
-	_screenQuad->sendDataToIndexBuffer(0, sizeIndicesInBytes, &indices[0]);
-
-	_screenQuad->setDrawCount(6);*/
 }
 
 void DeferredRenderer::pushPointLight(PointLight & pointLight)
@@ -171,12 +133,11 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	RenderStates states{ &camera , glm::mat4(1.f), _lightPassShader.get() };
 	for (auto& pointLight : _pointLights)
 	{
-		//Awful, make this shit better
-		glm::vec3 pos = pointLight->getPosition();
-		glm::vec3 color = pointLight->getLightProperties().diffuseColor;
-		GLfloat intensity = pointLight->getLightProperties().intensity;
-		glm::vec3 attenuation = glm::vec3(pointLight->getLightProperties().constant, pointLight->getLightProperties().linear, pointLight->getLightProperties().quadratic);
-		/////////////////////////////////
+		PointLightProperties lightData = pointLight->getLightProperties();
+		glm::vec3 pos = lightData.position;
+		glm::vec3 color = lightData.diffuseColor;
+		GLfloat intensity = lightData.intensity;
+		glm::vec3 attenuation = glm::vec3(lightData.constant, lightData.linear, lightData.quadratic);
 
 		glm::mat4 modelMat = glm::translate(pos) * glm::scale(glm::vec3{ pointLight->getLightRadius() });
 		//glm::mat4 modelMat = glm::translate(pos) * glm::scale(glm::vec3{3.0f, 3.0f, 3.0f});
