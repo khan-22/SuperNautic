@@ -107,13 +107,12 @@ bool Track::bGenerate()
 	{
 		bInsertNormalSegment(0, false);
 	}
-
+	int failedRecently = 0;
 	// Create random path
 	while (_generatedLength - _lengthAfterLastCall < _progressionLength)
 	{
 		// Randomize segment index
-		int index;
-		int inRow;
+		int index, inRow;
 		index = getIndex();
 		// Normal segment placement
 		if (index < _segmentHandler->infos().size())
@@ -125,9 +124,21 @@ bool Track::bGenerate()
 			{
 				if (!bInsertNormalSegment(index, true))
 				{
-					deleteSegments(300);
+					failedRecently += 300;
+					deleteSegments(failedRecently);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					break;
+				}
+				else
+				{
+					if (failedRecently > 0)
+					{
+						failedRecently -= _lastSegment->getLength();
+						if (failedRecently < 0)
+						{
+							failedRecently = 0;
+						}
+					}
 				}
 			}
 		}
@@ -150,6 +161,7 @@ bool Track::bGenerate()
 			}
 			else
 			{
+				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 				_endConnection = _track.back()->getParent()->getEnd();
 				_prevIndex = index;
 				_lastSegment = _track.back()->getParent();
@@ -420,7 +432,7 @@ void Track::insertStructure(const int index)
 				if (tempInstance->bTestCollision(*_track[i]))
 				{
 					delete tempInstance;
-					deleteSegments(_generatedLength - startLength);
+					deleteSegments(_generatedLength - startLength + 300);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					return;
 				}
