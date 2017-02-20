@@ -9,8 +9,8 @@ class SpringRotatedVector
 {
 public:
 	SpringRotatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& backupAxis, float springConstant, float dampingConstant);
-	virtual ~SpringRotatedVector() {};
-	virtual void update(float dt);
+	~SpringRotatedVector() {};
+	void update(float dt);
 
 	const glm::vec3& operator()() const;
 
