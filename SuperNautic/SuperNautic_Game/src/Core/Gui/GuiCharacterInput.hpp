@@ -39,7 +39,7 @@ class GuiCharacterInput : public GuiElement
         unsigned char _currentDigit = 0;
         std::vector<CharacterFlags> _characterLists;
         unsigned char _currentCharacterListIndex = 0;
-        std::function<void(char)> _onChangeCallback;
+        std::function<void(char)> _onChangeCallback = [](char){};
 
         void handleEventCurrent(const sf::Event& event) override;
         void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;

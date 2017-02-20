@@ -25,7 +25,7 @@ class GuiTextInput : public GuiContainer
     private:
         std::vector<GuiCharacterInput*> _characters;
         std::string _text;
-        std::function<void(const std::string&)> _onChangeCallback;
+        std::function<void(const std::string&)> _onChangeCallback = [](const std::string&){};
 
         void select() override;
         void deselect() override;
