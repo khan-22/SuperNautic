@@ -10,16 +10,14 @@
 
 
 GuiContainer::GuiContainer(sf::Keyboard::Key nextKey, sf::Keyboard::Key previousKey)
-: _selection(_elements.end())
-, _nextKey(nextKey)
+: _nextKey(nextKey)
 , _previousKey(previousKey)
 {
     _background.setFillColor(sf::Color::Transparent);
 }
 
 GuiContainer::GuiContainer(std::vector<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey, sf::Keyboard::Key previousKey)
-: _selection(_elements.end())
-, _nextKey(nextKey)
+: _nextKey(nextKey)
 , _previousKey(previousKey)
 {
     _background.setFillColor(sf::Color::Transparent);
@@ -48,6 +46,11 @@ void GuiContainer::renderCurrent(sf::RenderTarget& target, sf::RenderStates stat
     }
 }
 
+bool GuiContainer::bHasSelection() const
+{
+    return _selection < _elements.size();
+}
+
 void GuiContainer::handleEventCurrent(const sf::Event& event)
 {
     if(_elements.empty())
@@ -55,12 +58,11 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
         return;
     }
 
-
     if(event.type == sf::Event::KeyPressed)
     {
-        if(_selection != _elements.end() && (*_selection)->bIsActive())
+        if(bHasSelection() && getSelection().bIsActive())
         {
-            (*_selection)->handleEvent(event);
+            getSelection().handleEvent(event);
             return;
         }
 
@@ -86,13 +88,14 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
                 {
                     selectPrevious();
                 }
-                else if(_selection != _elements.end())
+                else if(bHasSelection())
                 {
-                    if(!(*_selection)->bIsSelected())
+                    GuiElement& selection = getSelection();
+                    if(!selection.bIsSelected())
                     {
-                        (*_selection)->toggleSelection();
+                        selection.toggleSelection();
                     }
-                    (*_selection)->handleEvent(event);
+                    selection.handleEvent(event);
                 }
                 break;
         }
@@ -101,54 +104,59 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
     }
 }
 
+GuiElement& GuiContainer::getSelection()
+{
+    assert(bHasSelection());
+    return *_elements[_selection];
+}
+
 void GuiContainer::activateSelection()
 {
-    if(_elements.empty() || _selection == _elements.end())
+    if(!bHasSelection())
     {
         return;
     }
 
-    if((*_selection)->bIsActivatable())
+    GuiElement& selection = getSelection();
+
+    if(selection.bIsActivatable())
     {
-        if(!(*_selection)->bIsSelected())
+        if(!selection.bIsSelected())
         {
-            (*_selection)->toggleSelection();
+            selection.toggleSelection();
         }
-        (*_selection)->toggleActivation();
+        selection.toggleActivation();
     }
 }
 
 void GuiContainer::selectNext()
 {
-    auto previousSelection = _selection;
-    if(!_elements.empty())
+    if(_elements.empty())
     {
-        if(_selection != _elements.end() && (*_selection)->bIsSelected())
-        {
-            (*_selection)->toggleSelection();
-        }
-
-        unsigned int iteration = 1;
-        do
-        {
-            if(_selection == _elements.end())
-            {
-                _selection = _elements.begin();
-            }
-            else
-            {
-                _selection++;
-                if(_selection == _elements.end())
-                {
-                    _selection = _elements.begin();
-                }
-            }
-
-            iteration++;
-        } while(!(*_selection)->bIsSelectable() && iteration < _elements.size());
-
-        (*_selection)->toggleSelection();
+        return;
     }
+
+    if(!bHasSelection())
+    {
+        _selection = 0;
+        getSelection().toggleSelection();
+        onElementSelect();
+        return;
+    }
+
+
+    getSelection().toggleSelection();
+
+    size_t previousSelection = _selection;
+    unsigned int iteration = 1;
+    do
+    {
+        _selection = (_selection + 1) % _elements.size();
+        iteration++;
+    } while(!getSelection().bIsSelectable() && iteration < _elements.size());
+
+    getSelection().toggleSelection();
+
 
     if(previousSelection != _selection)
     {
@@ -158,33 +166,29 @@ void GuiContainer::selectNext()
 
 void GuiContainer::selectPrevious()
 {
-    auto previousSelection = _selection;
-    if(!_elements.empty())
+    if(_elements.empty())
     {
-        if(_selection != _elements.end() && (*_selection)->bIsSelected())
-        {
-            (*_selection)->toggleSelection();
-        }
-
-        unsigned int iteration = 1;
-        do
-        {
-            if(_selection == _elements.begin())
-            {
-                _selection = _elements.end();
-                _selection--;
-            }
-            else
-            {
-                _selection--;
-            }
-
-            iteration++;
-        } while(!(*_selection)->bIsSelectable() && iteration < _elements.size());
-
-
-        (*_selection)->toggleSelection();
+        return;
     }
+
+    if(!bHasSelection())
+    {
+        _selection = _elements.size() - 1;
+        getSelection().toggleSelection();
+        onElementSelect();
+        return;
+    }
+
+    getSelection().toggleSelection();
+
+    size_t previousSelection = _selection;
+    unsigned int iteration = 1;
+    do
+    {
+        _selection = std::min(_elements.size() - 1, _selection - 1);
+        iteration++;
+    } while(!getSelection().bIsSelectable() && iteration < _elements.size());
+    getSelection().toggleSelection();
 
     if(previousSelection != _selection)
     {
@@ -203,7 +207,7 @@ void GuiContainer::insert(std::unique_ptr<GuiElement>& element)
 //
 //    _selection = _elements.end();
 //    selectNext();
-    updateSize();
+    updateSize(0, _elements.size());
 }
 
 void GuiContainer::insert(std::vector<std::unique_ptr<GuiElement>>& elements)
@@ -222,7 +226,7 @@ void GuiContainer::insert(std::vector<std::unique_ptr<GuiElement>>& elements)
 //
 //        _selection = _elements.end();
 //        selectNext();
-        updateSize();
+        updateSize(0, _elements.size());
     }
 
 }
@@ -233,13 +237,16 @@ void GuiContainer::setOnElementSelect(const std::function<void(GuiElement*)>& fu
 }
 
 
-void GuiContainer::updateSize()
+void GuiContainer::updateSize(size_t startIndex, size_t endIndex)
 {
     sf::Vector2f min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
     sf::Vector2f max(std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
 
-    for(std::unique_ptr<GuiElement>& element : _elements)
+    assert(startIndex < _elements.size());
+    assert(endIndex <= _elements.size());
+    for(size_t i = startIndex; i < endIndex; i++)
     {
+        const auto& element = _elements[i];
         sf::FloatRect bounds = element->getBoundingRect();
 
 
@@ -272,17 +279,17 @@ void GuiContainer::setBackground(sf::Color fillColor, sf::Color outlineColor, fl
 
 void GuiContainer::activate()
 {
-    if(_selection != _elements.end())
+    if(bHasSelection())
     {
-        (*_selection)->toggleSelection();
+        getSelection().toggleSelection();
     }
 }
 
 void GuiContainer::deactivate()
 {
-    if(_selection != _elements.end())
+    if(bHasSelection())
     {
-        (*_selection)->toggleSelection();
+        getSelection().toggleSelection();
     }
 }
 
@@ -293,5 +300,5 @@ bool GuiContainer::bIsActivatable() const
 
 void GuiContainer::onElementSelect()
 {
-    _onElementSelectCallback(_selection->get());
+    _onElementSelectCallback(&getSelection());
 }

@@ -35,10 +35,13 @@ public:
 
 protected:
     std::vector<std::unique_ptr<GuiElement>> _elements;
-    std::vector<std::unique_ptr<GuiElement>>::iterator _selection;
+    size_t _selection = -1;
     sf::RectangleShape _background;
 
     virtual void onElementSelect();
+    void updateSize(size_t startIndex, size_t endIndex);
+    bool bHasSelection() const;
+    GuiElement& getSelection();
 
 private:
     std::function<void(GuiElement*)> _onElementSelectCallback = [](GuiElement*){};
@@ -49,7 +52,6 @@ private:
     void handleEventCurrent(const sf::Event& event) override;
     virtual void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    void updateSize();
     void selectNext();
     void selectPrevious();
     void activateSelection();
