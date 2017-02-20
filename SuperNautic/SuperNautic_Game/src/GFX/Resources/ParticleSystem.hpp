@@ -13,13 +13,13 @@
 namespace GFX
 {
 
-	class ParticleSystem : Renderable3D
+	class ParticleSystem : public Renderable3D
 	{
 	public:
 		ParticleSystem();
 		~ParticleSystem();
 
-		void init(GLuint particleCount, glm::vec3 position, glm::vec3 velocity, GLfloat spread, GLfloat turbulence);
+		void init(GLuint particleCount, glm::vec3 position, glm::vec3 velocity, GLfloat maxLifetime, GLfloat spread, GLfloat turbulence);
 
 		void update(float dt, glm::vec3 position, glm::vec3 velocity);
 
@@ -28,27 +28,35 @@ namespace GFX
 	protected:
 
 	private:
-		struct ParticlePositionData
+		struct ParticleRenderData
 		{
-			glm::vec3 pos = glm::vec3(0.f);
+			std::vector<glm::vec3>	positions;
+			std::vector<glm::vec3>	colors;
+			std::vector<GLfloat>	sizes;
 		};
 
 		struct ParticlePhysicsData
 		{
 			glm::vec3 velocity  = glm::vec3(0.f);
-			glm::vec3 color		= glm::vec3(1.f);
-			float	  life		= 0.f;
+			//glm::vec3 color		= glm::vec3(1.f);
+			double	  life		= 0.f;
 		};
 
 		std::vector<ParticlePhysicsData>	_physParticles;
-		std::vector<ParticlePositionData>	_renderParticles;
+		ParticleRenderData	_renderParticles;
 
+		GLuint		_particleCount;
 		GLfloat		_turbulence;
+		glm::vec3	_previousTurbulence;
 		GLfloat		_maxSpread;
+		GLfloat		_maxLifetime;
 
 		GLsizei		_sizeInBytes;
+		GLsizei		_positionsSizeInBytes;
+		GLsizei		_colorsSizeInBytes;
+		GLsizei		_sizesSizeInBytes;
 		
-		VertexArrayObject _vao;
+		std::unique_ptr<VertexArrayObject> _vao;
 	};
 
 }
