@@ -150,7 +150,7 @@ void HUD::updateCurrent()
 
 void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) const
 {
-	target.draw(_tSpeed);
+	//target.draw(_tSpeed);
 	target.draw(_tPosition);
 	target.draw(_heatOutline);
 	target.draw(_heatMeter);

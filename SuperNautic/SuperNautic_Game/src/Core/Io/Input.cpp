@@ -28,7 +28,7 @@ Input::~Input()
 
 void Input::update()
 {
-	const int thresh = 50;
+	const int thresh = 20;
 
 	if (checkActive())
 	{
