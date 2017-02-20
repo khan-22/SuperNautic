@@ -108,8 +108,8 @@ GuiCharacterInput::CharacterFlags GuiCharacterInput::getCurrentCharacterList() c
 
 void GuiCharacterInput::stepCharacter(bool bForward)
 {
-    static constexpr int NUM_LETTERS = 'z' - 'a';
-    static constexpr int NUM_DIGITS = '9' - '0';
+    static constexpr int NUM_LETTERS = 'z' - 'a' + 1;
+    static constexpr int NUM_DIGITS = '9' - '0' + 1;
     CharacterFlags list = getCurrentCharacterList();
     switch(list)
     {
