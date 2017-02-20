@@ -11,7 +11,7 @@
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler)
 	: _segmentHandler(segmentHandler)
-	, _octree(glm::vec3(0, 0, 0), 100000)
+	, _octree(glm::vec3(0, 0, 0), 10000)
 	, _seed("1")
 	, _curviness(0)
 	, _targetLength(10000)
@@ -124,7 +124,11 @@ bool Track::bGenerate()
 			{
 				if (!bInsertNormalSegment(index, true))
 				{
-					failedRecently += 300;
+					if (failedRecently != 0)
+					{
+						failedRecently += 400;
+					}
+					failedRecently += 500;
 					deleteSegments(failedRecently);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					break;
@@ -480,7 +484,7 @@ bool Track::bEndTrack()
 	{
 		if (!bInsertNormalSegment(0, true))
 		{
-			deleteSegments(_endMargin + 200);
+			deleteSegments(_endMargin + 400);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 			return false;
 		}
