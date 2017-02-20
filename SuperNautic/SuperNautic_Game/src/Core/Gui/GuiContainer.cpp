@@ -9,14 +9,18 @@
 #include "Core/Gui/GuiElement.hpp"
 
 
-GuiContainer::GuiContainer()
+GuiContainer::GuiContainer(sf::Keyboard::Key nextKey, sf::Keyboard::Key previousKey)
 : _selection(_elements.end())
+, _nextKey(nextKey)
+, _previousKey(previousKey)
 {
     _background.setFillColor(sf::Color::Transparent);
 }
 
-GuiContainer::GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements)
+GuiContainer::GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey, sf::Keyboard::Key previousKey)
 : _selection(_elements.end())
+, _nextKey(nextKey)
+, _previousKey(previousKey)
 {
     _background.setFillColor(sf::Color::Transparent);
     insert(elements);
@@ -46,41 +50,70 @@ void GuiContainer::renderCurrent(sf::RenderTarget& target, sf::RenderStates stat
 
 void GuiContainer::handleEventCurrent(const sf::Event& event)
 {
-    if(!_elements.empty() && !(*_selection)->bIsActive())
+    if(_elements.empty())
     {
-        if(event.type == sf::Event::KeyPressed)
-        {
-            if(!_elements.empty())
-            {
-                switch(event.key.code)
-                {
-                    case sf::Keyboard::Return:
-					case sf::Keyboard::A:
-                        activate();
-                        break;
-                    case sf::Keyboard::Down:
-                        selectNext();
-                        break;
-                    case sf::Keyboard::Up:
-                        selectPrevious();
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
+        return;
     }
-    else
+
+
+    if(event.type == sf::Event::KeyPressed)
     {
-        (*_selection)->handleEvent(event);
+        if(_selection != _elements.end() && (*_selection)->bIsActive())
+        {
+            (*_selection)->handleEvent(event);
+            return;
+        }
+
+
+        switch(event.key.code)
+        {
+            case sf::Keyboard::Return:
+            case sf::Keyboard::A:
+                activateSelection();
+                break;
+
+            case sf::Keyboard::Escape:
+            case sf::Keyboard::B:
+                toggleActivation();
+                break;
+
+            default:
+                if(event.key.code == _nextKey)
+                {
+                    selectNext();
+                }
+                else if(event.key.code == _previousKey)
+                {
+                    selectPrevious();
+                }
+                else if(_selection != _elements.end())
+                {
+                    if(!(*_selection)->bIsSelected())
+                    {
+                        (*_selection)->toggleSelection();
+                    }
+                    (*_selection)->handleEvent(event);
+                }
+                break;
+        }
+
+        return;
     }
 }
 
-void GuiContainer::activate()
+void GuiContainer::activateSelection()
 {
-    if(!_elements.empty() && (*_selection)->bIsActivatable())
+    if(_elements.empty() || _selection == _elements.end())
     {
+        return;
+    }
+
+    if((*_selection)->bIsActivatable())
+    {
+        if(!(*_selection)->bIsSelected())
+        {
+            (*_selection)->toggleSelection();
+        }
         (*_selection)->toggleActivation();
     }
 }
@@ -89,7 +122,7 @@ void GuiContainer::selectNext()
 {
     if(!_elements.empty())
     {
-        if(_selection != _elements.end())
+        if(_selection != _elements.end() && (*_selection)->bIsSelected())
         {
             (*_selection)->toggleSelection();
         }
@@ -121,7 +154,7 @@ void GuiContainer::selectPrevious()
 {
     if(!_elements.empty())
     {
-        if(_selection != _elements.end())
+        if(_selection != _elements.end() && (*_selection)->bIsSelected())
         {
             (*_selection)->toggleSelection();
         }
@@ -151,13 +184,13 @@ void GuiContainer::insert(std::unique_ptr<GuiElement>& element)
 {
     _elements.push_back(std::move(element));
 
-    if(_selection != _elements.end())
-    {
-        (*_selection)->toggleSelection();
-    }
-
-    _selection = _elements.end();
-    selectNext();
+//    if(_selection != _elements.end())
+//    {
+//        (*_selection)->toggleSelection();
+//    }
+//
+//    _selection = _elements.end();
+//    selectNext();
     updateSize();
 }
 
@@ -170,13 +203,13 @@ void GuiContainer::insert(std::list<std::unique_ptr<GuiElement>>& elements)
             _elements.push_back(std::move(element));
         }
 
-        if(_selection != _elements.end())
-        {
-            (*_selection)->toggleSelection();
-        }
-
-        _selection = _elements.end();
-        selectNext();
+//        if(_selection != _elements.end())
+//        {
+//            (*_selection)->toggleSelection();
+//        }
+//
+//        _selection = _elements.end();
+//        selectNext();
         updateSize();
     }
 
@@ -217,4 +250,25 @@ void GuiContainer::setBackground(sf::Color fillColor, sf::Color outlineColor, fl
     _background.setFillColor(fillColor);
     _background.setOutlineColor(outlineColor);
     _background.setOutlineThickness(outlineThickness);
+}
+
+void GuiContainer::activate()
+{
+    if(_selection != _elements.end())
+    {
+        (*_selection)->toggleSelection();
+    }
+}
+
+void GuiContainer::deactivate()
+{
+    if(_selection != _elements.end())
+    {
+        (*_selection)->toggleSelection();
+    }
+}
+
+bool GuiContainer::bIsActivatable() const
+{
+    return true;
 }

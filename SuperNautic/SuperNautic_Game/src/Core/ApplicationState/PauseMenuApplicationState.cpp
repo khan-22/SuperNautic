@@ -37,8 +37,7 @@ PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stac
     auto quit = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.clear();
-        auto mainMenu = std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context));
-        _stack.push(mainMenu);
+        _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
     }));
 
     quit->move(0.f, resume->getBoundingRect().height * 1.5f);
