@@ -11,7 +11,7 @@
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler)
 	: _segmentHandler(segmentHandler)
-	, _seed(1)
+	, _seed("1")
 	, _curviness(0)
 	, _targetLength(10000)
 	, _generatedLength(0)
@@ -52,16 +52,21 @@ void Track::setLength(const unsigned int length)
 }
 
 // Set randomization seed
-void Track::setSeed(const unsigned int seed)
+void Track::setSeed(const std::string& seed)
 {
-	if (seed == 1)
+	if (seed.length() == 1 && seed[0] == '1')
 	{
 		srand(time(NULL));
 	}
 	else
 	{
 		_seed = seed;
-		srand(_seed);
+		unsigned int intSeed = 0;
+		for (unsigned int i = 0; i < seed.length(); i++)
+		{
+			intSeed += (unsigned int)((seed[i] - 65) * powf(10, i));
+		}
+		srand(intSeed);
 	}
 }
 

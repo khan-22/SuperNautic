@@ -19,7 +19,7 @@ public:
 	int getTargetLength() const;
 	int getGeneratedLength() const;
 	void setLength(const unsigned int length);
-	void setSeed(const unsigned int seed);
+	void setSeed(const std::string& seed);
 	void setCurviness(const unsigned int curviness);
 	void startNewTrack();
 	bool bGenerate();
@@ -41,7 +41,7 @@ private:
 
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance*>	_track;
-	unsigned int					_seed;
+	std::string						_seed;
 	float							_curviness;
 	int								_targetLength;
 	int								_generatedLength;

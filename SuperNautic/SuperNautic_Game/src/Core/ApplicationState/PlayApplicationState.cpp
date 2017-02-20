@@ -19,7 +19,7 @@ PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, Applica
 {
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
 	_track.setCurviness(2);
-	_track.setSeed(2);
+	_track.setSeed("FritjofÄrBäst");
 	_track.setLength(20000);
 	_world.setTrack(&_track);
 }
