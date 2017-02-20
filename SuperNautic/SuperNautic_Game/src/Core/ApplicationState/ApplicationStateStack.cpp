@@ -24,18 +24,27 @@ void ApplicationStateStack::render()
 {
     applyPendingRequests();
 
-    for(std::unique_ptr<ApplicationState>& state : _stack)
+    std::list<ApplicationState*> visibleStates;
+    for(auto it = _stack.rbegin(); it != _stack.rend(); it++)
     {
-        if(!state->bRender())
+        visibleStates.push_front((*it).get());
+        if(!(*it)->bIsTransparent())
         {
             break;
         }
     }
 
     applyPendingRequests();
+
+    for(ApplicationState* visibleState : visibleStates)
+    {
+        visibleState->render();
+    }
+
+    applyPendingRequests();
 }
 
-void ApplicationStateStack::push(std::unique_ptr<ApplicationState>& state)
+void ApplicationStateStack::push(std::unique_ptr<ApplicationState>&& state)
 {
     _pushQueue.push(std::move(state));
     _requestQueue.push(Push);
@@ -79,6 +88,7 @@ void ApplicationStateStack::applyPendingRequests()
         {
             case Push:
                 _stack.push_back(std::move(_pushQueue.front()));
+				_stack.back()->initialize();
                 _pushQueue.pop();
                 break;
 

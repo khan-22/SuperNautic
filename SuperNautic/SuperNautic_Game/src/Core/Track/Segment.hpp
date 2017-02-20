@@ -21,17 +21,17 @@
 
 struct WaypointInfo
 {
+	bool found{ false };
 	glm::vec3 position;
 	glm::vec3 direction;
 	float distance;
+	unsigned index;	// index in _waypoints
 };
 
 // Uninstantiated version of a track segment
 class Segment
 {
 public:
-	const SegmentInfo*	_segmentInfo;
-
 	// Loads a segment from an fbx file
 	Segment(const SegmentInfo* segmentInfo);
 
@@ -57,25 +57,9 @@ public:
 		return _segmentInfo->_endConnection;
 	}
 
-	// Returns "probability"
-	int getProbability() const
+	const SegmentInfo * getInfo() const
 	{
-		return _segmentInfo->_probability;
-	}
-
-	int getMinInRow() const
-	{
-		return _segmentInfo->_minInRow;
-	}
-
-	int getMaxInRow() const
-	{
-		return _segmentInfo->_maxInRow;
-	}
-
-	int getRotationOffset() const
-	{
-		return _segmentInfo->_rotationOffset;
+		return _segmentInfo;
 	}
 
 	// Returns approximate segment length
@@ -94,9 +78,8 @@ public:
 		return _waypoints;
 	}
 
-	// Finds positions of and distance to the two waypoints closest to a position (position is relative to segment's local origin)
-	// First in pair is before second
-	std::pair<WaypointInfo, WaypointInfo> findClosestWaypoints(const glm::vec3& position) const;
+	// Finds position of and distance to the waypoint closest to a position (position is relative to segment's local origin)
+	WaypointInfo findClosestWaypoint(const glm::vec3& position) const;
 
 	GFX::TexturedModel getVisualModel() const
 	{
@@ -104,6 +87,8 @@ public:
 	}
 
 private:
+	const SegmentInfo*	_segmentInfo;
+
 	// The loaded scene data
 	RawMeshAsset _scene;
 

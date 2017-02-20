@@ -116,8 +116,7 @@ bool Game::bInitialize()
 	//_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 	_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 
-	std::unique_ptr<ApplicationState> mainMenu(new MainMenuApplicationState(_stateStack, _context));
-	_stateStack.push(mainMenu);
+	_stateStack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stateStack, _context)));
 
 
 	_pointLights.push_back(PointLight({ 0.f,-2.f,0.f }, { 1.f, 1.f, 1.f }, 2.0f));

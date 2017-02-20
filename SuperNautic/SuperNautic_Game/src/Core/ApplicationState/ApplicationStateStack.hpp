@@ -17,6 +17,31 @@ namespace sf
 class ApplicationStateStack
 {
 public:
+    // Ctor...
+    ApplicationStateStack();
+
+    // Update all states with a timestep.
+    void update(float dtSeconds);
+
+    // Render all states.
+    void render();
+
+    // Handle input event for all states.
+    void handleEvent(const sf::Event& event);
+
+    // Push a state onto the top of the stack.
+    void push(std::unique_ptr<ApplicationState>&& state);
+
+    // Pop the state on the top of the stack.
+    void pop();
+
+    // Pop all states from the stack.
+    void clear();
+
+    // Return true if stack contains no states.
+    bool bIsEmpty() const;
+
+private:
     enum Request
     {
         Push,
@@ -24,21 +49,9 @@ public:
         Clear,
     };
 
-    ApplicationStateStack();
-
-    void update(float dtSeconds);
-    void render();
-    void handleEvent(const sf::Event& event);
-
-    void push(std::unique_ptr<ApplicationState>& state);
-    void pop();
-    void clear();
-    bool bIsEmpty() const;
-
-private:
-    std::list<std::unique_ptr<ApplicationState>> _stack;
-    std::queue<std::unique_ptr<ApplicationState>> _pushQueue;
-    std::queue<Request> _requestQueue;
+    std::list<std::unique_ptr<ApplicationState>>    _stack;
+    std::queue<std::unique_ptr<ApplicationState>>   _pushQueue;
+    std::queue<Request>                             _requestQueue;
 
     void applyPendingRequests();
 };

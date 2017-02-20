@@ -14,6 +14,12 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_widthStep = windowWidth / 100.f;
 	_heightStep = windowHeight / 100.f;
 
+	_heatSizeX = _widthStep * 2;
+	_heatSizeY = _heightStep * 80;
+
+	_heatPosX = _widthStep * 3 + _offsetX;
+	_heatPosY = _heightStep * 90 + _offsetY;
+
 	_badRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 5));
 	_badRect.setOutlineColor(sf::Color::Red);
 	_badRect.setFillColor(sf::Color::Transparent);
@@ -85,6 +91,54 @@ void HUD::setPosition(int position)
 	_position = position;
 }
 
+void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
+{
+	_widthStep = width / 100.f;
+	_heightStep = height / 100.f;
+
+	_offsetX = offsetX;
+	_offsetY = offsetY;
+
+	_heatSizeX = _widthStep * 2;
+	_heatSizeY = _heightStep * 80;
+
+	_heatPosX = _widthStep * 3 + _offsetX; 
+	_heatPosY = _heightStep * 90 + _offsetY;
+
+	_badRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 5));
+	_badRect.setOutlineThickness(_heightStep);
+	_badRect.setPosition(_widthStep * 2 + _offsetX, _heightStep * 10 + _offsetY);
+
+	_warningRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 15));
+	_warningRect.setOutlineThickness(_heightStep);
+	_warningRect.setPosition(_widthStep * 2 + _offsetX, _heightStep * 16 + _offsetY);
+
+	_closeRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 20));
+	_closeRect.setOutlineThickness(_heightStep);
+	_closeRect.setPosition(_widthStep * 2 + _offsetX, _heightStep * 32 + _offsetY);
+
+	_safeRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 40));
+	_safeRect.setOutlineThickness(_heightStep);
+	_safeRect.setPosition(_widthStep * 2 + _offsetX, _heightStep * 53 + _offsetY);
+
+	_heatOutline.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 80));
+	_heatOutline.setOutlineThickness(_heightStep);
+	_heatOutline.setPosition(_widthStep * 2 + _offsetX, _heightStep * 9 + _offsetY);
+
+	_heatMeter.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 50));
+	_heatMeter.setOrigin(_widthStep, _heightStep);
+	_heatMeter.setPosition(_widthStep * 2 + _offsetX, _heightStep * 90 + _offsetY);
+
+	_spriteHeat.setScale(_widthStep * 2, _heightStep * 8);
+	_spriteHeat.setPosition(_widthStep * 2 + _offsetX, _heightStep * 10 + _offsetY);
+
+	_tSpeed.setCharacterSize(_widthStep * 5);
+	_tSpeed.setPosition(_widthStep * 75 + _offsetX, _heightStep + _offsetY);
+
+	_tPosition.setCharacterSize(_widthStep * 5);
+	_tPosition.setPosition(_widthStep * 50 - _widthStep * 5 + _offsetX, 0 + _offsetY);
+}
+
 void HUD::updateCurrent()
 {
 	if (_heat < .40)
@@ -103,12 +157,13 @@ void HUD::updateCurrent()
 	{
 		_heatMeter.setFillColor(sf::Color::Red);
 	}
-	float size = _heat * _heightStep * 80;
-	_heatMeter.setSize(sf::Vector2f(_widthStep * 2, size));
-	_heatMeter.setPosition(_widthStep * 3, _heightStep * 90 - size);
+
+	_sizeY = _heat * _heatSizeY;
+	_heatMeter.setSize(sf::Vector2f(_heatSizeX, _sizeY));
+	_heatMeter.setPosition(_heatPosX, _heatPosY - _sizeY);
 
 	_tSpeed.setString("Speed: " + std::to_string(_speed));
-	_tPosition.setString("#" + std::to_string(_position));
+	_tPosition.setString(std::to_string(_position));
 }
 
 void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) const

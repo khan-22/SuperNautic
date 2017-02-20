@@ -15,7 +15,7 @@ class VictoryApplicationState : public ApplicationState
 public:
 	VictoryApplicationState(ApplicationStateStack& stack, ApplicationContext& context);
 
-    bool bRender() override;
+    void render() override;
     bool bUpdate(float dtSeconds) override;
     bool bHandleEvent(const sf::Event& event) override;
 
@@ -23,6 +23,8 @@ private:
     GuiContainer _guiContainer;
     Input _input;
     Asset<sf::Font> _font;
+
+	int _playersActive;
 };
 
 

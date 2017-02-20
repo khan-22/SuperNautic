@@ -31,16 +31,14 @@ VictoryApplicationState::VictoryApplicationState(ApplicationStateStack& stack, A
     auto playAgain = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.clear();
-		auto playState = std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context));
-		_stack.push(playState);
+		_stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context, _playersActive)));
     }));
 
     text.setString("Go to main menu");
     auto quit = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.clear();
-        auto mainMenu = std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context));
-        _stack.push(mainMenu);
+        _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
     }));
 
     quit->move(0.f, playAgain->getBoundingRect().height * 1.5f);
@@ -51,16 +49,27 @@ VictoryApplicationState::VictoryApplicationState(ApplicationStateStack& stack, A
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
 }
 
-bool VictoryApplicationState::bRender()
+void VictoryApplicationState::render()
 {
     GFX::SfmlRenderer renderer;
     renderer.render(_guiContainer);
     renderer.display(_context.window);
-    return true;
 }
 
 bool VictoryApplicationState::bUpdate(float dtSeconds)
 {
+	int playersFound = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		if (sf::Joystick::isConnected(i)) {
+			playersFound++;
+		}
+	}
+	_playersActive = playersFound;
+	if (_playersActive == 0)
+	{
+		_playersActive = 1;
+	}
     return false;
 }
 

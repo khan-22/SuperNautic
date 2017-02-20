@@ -8,19 +8,29 @@
 #include "Core/ApplicationState/PauseMenuApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
+#include "Core/ApplicationState/TrackGenerationApplicationState.h"
 
 
-PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
-: ApplicationState(stack, context)
-, _world(context)
+PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context, int numberOfPlayers)
+	: ApplicationState(stack, context)
+	, _segmentHandler("Segments/segmentinfos2.txt", "Segments/ConnectionTypes.txt")
+	, _track(&_segmentHandler)
+	, _world(context, &_track, numberOfPlayers)
 {
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
+	_track.setCurviness(3);
+	_track.setSeed(1);
+	_track.setLength(40000);
 }
 
-bool PlayApplicationState::bRender()
+void PlayApplicationState::initialize()
+{
+	_stack.push(std::unique_ptr<ApplicationState>(new TrackGenerationApplicationState(_stack, _context, &_track)));
+}
+
+void PlayApplicationState::render()
 {
     _world.render();
-    return true;
 }
 
 bool PlayApplicationState::bUpdate(float dtSeconds)
@@ -29,8 +39,7 @@ bool PlayApplicationState::bUpdate(float dtSeconds)
 
 	if (_world.bHasWon())
 	{
-		auto victoryState = std::unique_ptr<ApplicationState>(new VictoryApplicationState(_stack, _context));
-		_stack.push(victoryState);
+		_stack.push(std::unique_ptr<ApplicationState>(new VictoryApplicationState(_stack, _context)));
 	}
 
     return true;
@@ -44,8 +53,7 @@ bool PlayApplicationState::bHandleEvent(const sf::Event& event)
         {
         case sf::Keyboard::Escape:
         {
-            auto pauseMenu = std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context));
-            _stack.push(pauseMenu);
+            _stack.push(std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context)));
             return true;
             break;
 
