@@ -5,10 +5,10 @@ Player::Player(int id) :
 	_input(id),
 	_hud(1280, 720),
 	_camera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
-	_fpCamera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 })
+	_fpCamera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
+	_currentCamera(&_camera)
 {
 	_bIsFirstPerson = false;
-	_currentCamera = &_camera;
 }
 
 Player::Player(const Player& other) : Player{ other._playerId }
