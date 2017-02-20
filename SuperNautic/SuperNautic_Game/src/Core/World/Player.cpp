@@ -20,12 +20,9 @@ Player::~Player()
 {
 }
 
-void Player::render(GFX::DeferredRenderer& renderer)
+void Player::render(GFX::DeferredRenderer& renderer) //OBSOLETE?
 {
-	if (!_bIsFirstPerson)
-	{
-		renderer.render(_ship);
-	}
+	renderer.render(_ship);
 }
 
 const sf::Drawable& Player::getHud() const

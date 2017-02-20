@@ -180,9 +180,14 @@ void World::render()
 
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		for (Player& player : _players)
+		//Do not render the player's own ship if they are in first person, but render all other ships as normal
+		for(int j = 0; j < _players.size(); j++)
 		{
-			_playerRTs[i].render(player.getShip());
+			if (!(i == j && _players[j]._bIsFirstPerson))
+			{
+				_playerRTs[i].render(_players[j].getShip());
+
+			}
 		}
 	}
 	for (Player& player : _players)
