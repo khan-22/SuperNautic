@@ -38,7 +38,7 @@ Ship::Ship()
 		_speedResistance{ 0.005f },
 		_preferredHeight{ 4.0f }
 {
-	_shipModel = GFX::TexturedModel(ModelCache::get("ship.fbx"), MaterialCache::get("test.mat"));
+	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 	setOrigin(glm::vec3{ 0.0f, 0.25f, 0.0f });
 }
 

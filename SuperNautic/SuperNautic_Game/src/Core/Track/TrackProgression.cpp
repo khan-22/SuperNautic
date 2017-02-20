@@ -28,7 +28,7 @@ float TrackProgression::getProgression() const
 	return _progress;
 }
 
-void TrackProgression::update(float lengthInSegment)
+float TrackProgression::update(float lengthInSegment)
 {
-	_progress = (_accumulatedLength + lengthInSegment) / _track->getGeneratedLength();
+	return _progress = (_accumulatedLength + lengthInSegment) / _track->getGeneratedLength();
 }

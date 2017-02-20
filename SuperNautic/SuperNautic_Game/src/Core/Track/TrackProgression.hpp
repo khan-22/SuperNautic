@@ -14,7 +14,7 @@ public:
 
 	float getProgression() const;
 
-	void update(float lengthInSegment);
+	float update(float lengthInSegment);
 private:
 	unsigned _currentSegment;
 
