@@ -59,6 +59,7 @@ void Player::update(float dt)
 					_ship.jump();
 					break;
 				case sf::Keyboard::Y:
+					swapPerspective();
 					break;
 				default:
 					break;
