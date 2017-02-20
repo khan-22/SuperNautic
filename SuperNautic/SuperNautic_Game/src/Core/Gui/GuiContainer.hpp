@@ -11,25 +11,21 @@
 #include "SFML/Graphics/Transformable.hpp"
 #include "SFML/Graphics/Drawable.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
-namespace sf
-{
-    class Event;
-}
+#include "SFML/Window/Event.hpp"
+
+#include "Core/Gui/GuiElement.hpp"
 
 
-class GuiElement;
-#include "Core/Gui/SceneNode.hpp"
-
-
-class GuiContainer : public SceneNode
+class GuiContainer : public GuiElement
 {
 public:
-    GuiContainer();
+    GuiContainer(sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
 
-    GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements);
+    GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
     ~GuiContainer();
 
     void update();
+    virtual bool bIsActivatable() const override;
     void insert(std::unique_ptr<GuiElement>& element);
     void insert(std::list<std::unique_ptr<GuiElement>>& elements);
     sf::FloatRect getBoundingRect() const override;
@@ -40,6 +36,8 @@ private:
     std::list<std::unique_ptr<GuiElement>>::iterator _selection;
     sf::FloatRect _bounds;
     sf::RectangleShape _background;
+    sf::Keyboard::Key _nextKey;
+    sf::Keyboard::Key _previousKey;
 
     void handleEventCurrent(const sf::Event& event) override;
     void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
@@ -47,7 +45,9 @@ private:
     void updateSize();
     void selectNext();
     void selectPrevious();
-    virtual void activate();
+    void activateSelection();
+    virtual void activate() override;
+    virtual void deactivate() override;
 };
 
 

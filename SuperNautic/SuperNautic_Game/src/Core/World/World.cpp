@@ -99,6 +99,7 @@ void World::update(float dt, sf::Window& window)
 			// Update progression
 			_playerProgression[i].setCurrentSegment(segmentIndex);
 			_playerProgression[i].update(lengthInSegment);
+			_players[i].setProgression(_playerProgression[i].getProgression());
 
 			// LOG("PROGRESSION: ", _playerProgression[i].getProgression());
 
@@ -139,6 +140,19 @@ void World::update(float dt, sf::Window& window)
 			_players[i].getShip().setSegments(instances);
 
 			_players[i].update(dt);
+		}
+
+		for (unsigned i = 0; i < _players.size(); ++i)
+		{
+			int k = 1;
+			for (unsigned j = 0; j < _players.size(); ++j)
+			{
+				if (_playerProgression[i].getProgression() < _playerProgression[j].getProgression())
+				{
+					k++;
+				}
+			}
+			_players[i].setPosition(k);
 		}
 		_camera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
 		_camera.setUp(_players[0].getShip().getCameraUp());

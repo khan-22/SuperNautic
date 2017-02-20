@@ -13,7 +13,7 @@
 
 PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context, int numberOfPlayers)
 	: ApplicationState(stack, context)
-	, _segmentHandler("Segments/segmentinfos2.txt", "Segments/ConnectionTypes.txt")
+	, _segmentHandler("Segments/segmentinfos3.txt", "Segments/ConnectionTypes.txt")
 	, _track(&_segmentHandler)
 	, _world(context, &_track, numberOfPlayers)
 {
@@ -39,8 +39,7 @@ bool PlayApplicationState::bUpdate(float dtSeconds)
 
 	if (_world.bHasWon())
 	{
-		auto victoryState = std::unique_ptr<ApplicationState>(new VictoryApplicationState(_stack, _context));
-		_stack.push(victoryState);
+		_stack.push(std::unique_ptr<ApplicationState>(new VictoryApplicationState(_stack, _context)));
 	}
 
     return true;
@@ -54,8 +53,7 @@ bool PlayApplicationState::bHandleEvent(const sf::Event& event)
         {
         case sf::Keyboard::Escape:
         {
-            auto pauseMenu = std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context));
-            _stack.push(pauseMenu);
+            _stack.push(std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context)));
             return true;
             break;
 

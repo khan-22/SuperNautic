@@ -8,7 +8,23 @@
 
 #include "Core/Io/Log.hpp"
 
-namespace GFX {
+using namespace GFX;
+
+struct Header
+{
+public:
+	uint32_t magicNumber = 149;
+	uint32_t numMeshes = 0;
+	uint32_t numCameras = 0;
+	uint32_t numLights = 0;
+};
+
+struct MeshHeader
+{
+	uint32_t numVertices = 0;
+	uint32_t numFaces = 0;
+	uint32_t nameLength = 0;
+};
 
 VertexDataImporter::VertexDataImporter(const std::string& rootPath)
 	: _rootPath(rootPath)
@@ -22,102 +38,81 @@ VertexDataImporter::~VertexDataImporter()
 
 RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 {
-	RawMeshCollection* collection = nullptr;
+
 
 	filepath = _rootPath + filepath;
 
 	LOG("Started loading file: " + filepath);
 
-	const aiScene* importedData = aiImportFile(filepath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
-	if (importedData == nullptr)
+	if (filepath.find(".fbx", 0) != std::string::npos)
 	{
+		LOG(">>> STOP! NO FBX ALLOWED!");
+		return nullptr;
+	}
+	else if (filepath.find(".blend", 0) != std::string::npos)
+	{
+		LOG(">>> STOP! NO BLEND ALLOWED!");
+		return nullptr;
+	}
+
+	RawMeshCollection* collection = nullptr;
+
+	FILE* in = nullptr;
+
+	fopen_s(&in, filepath.c_str(), "rb");
+
+	if(in == nullptr)
+	{
+		LOG(">>> Failed to find file!");
 		return nullptr;
 	}
 
 	collection = new RawMeshCollection();
 
-	// Import meshes
-	for (int i = 0; i < importedData->mNumMeshes; i++)
-	{
-		aiMesh* mesh = importedData->mMeshes[i];
+	Header header;
 
+	fread_s(&header, sizeof(Header), sizeof(Header), 1, in);
+
+	for (int i = 0; i < header.numMeshes; i++)
+	{
 		collection->meshes.emplace_back();
-		RawVertexData& data = collection->meshes.back();
+		RawVertexData& currentMesh = collection->meshes.back();
+	
+		MeshHeader meshHeader;
+		fread_s(&meshHeader, sizeof(MeshHeader), sizeof(MeshHeader), 1, in);
 
-		data.vertices.resize(mesh->mNumVertices);
-		data.texCoords.resize(mesh->mNumVertices);
-		data.normals.resize(mesh->mNumVertices);
-		data.faces.resize(mesh->mNumFaces);
+		currentMesh.name.resize(meshHeader.nameLength);
+		currentMesh.vertices.resize(meshHeader.numVertices);
+		currentMesh.texCoords.resize(meshHeader.numVertices);
+		currentMesh.normals.resize(meshHeader.numVertices);
+		currentMesh.faces.resize(meshHeader.numFaces);
+		currentMesh.indices.resize(meshHeader.numFaces * 3);
 
-		data.indices.reserve(mesh->mNumFaces * 3);
-
-		memcpy(&data.vertices[0], &mesh->mVertices[0], sizeof(mesh->mVertices[0]) * mesh->mNumVertices);
-		memcpy(&data.texCoords[0], &mesh->mTextureCoords[0][0], sizeof(mesh->mTextureCoords[0][0]) * mesh->mNumVertices);
-		memcpy(&data.normals[0], &mesh->mNormals[0], sizeof(mesh->mNormals[0]) * mesh->mNumVertices);
-		//memcpy(&data.faces[0], &mesh->mFaces[0], sizeof(mesh->mFaces[0].mIndices[0]) * 3 * mesh->mNumFaces);
-
-		// Faces must be copied manually
-		data.largestIndex = 0U;
-		for (int i = 0; i < mesh->mNumFaces; i++)
-		{
-			aiFace currentFace = mesh->mFaces[i];
-			if (currentFace.mNumIndices != 3)
-			{
-				LOG_ERROR("Found a face with != 3 indices! This is not allowed.");
-			}
-			data.faces[i] = glm::uvec3(currentFace.mIndices[0], currentFace.mIndices[1], currentFace.mIndices[2]);
-			data.indices.push_back(data.faces[i].x);
-			data.indices.push_back(data.faces[i].y);
-			data.indices.push_back(data.faces[i].z);
-			GLuint largest = std::max(data.faces[i].x, std::max(data.faces[i].y, data.faces[i].z));
-			if (largest > data.largestIndex)
-			{
-				data.largestIndex = largest;
-			}
-		}
-
-		data.textureIndex = mesh->mMaterialIndex;
+		fread_s(&currentMesh.name[0], currentMesh.name.size() * sizeof(currentMesh.name[0]), sizeof(currentMesh.name[0]), currentMesh.name.size(), in);
+		fread_s(&currentMesh.vertices[0], currentMesh.vertices.size() * sizeof(currentMesh.vertices[0]), sizeof(currentMesh.vertices[0]), currentMesh.vertices.size(), in);
+		fread_s(&currentMesh.texCoords[0], currentMesh.texCoords.size() * sizeof(currentMesh.texCoords[0]), sizeof(currentMesh.texCoords[0]), currentMesh.texCoords.size(), in);
+		fread_s(&currentMesh.normals[0], currentMesh.normals.size() * sizeof(currentMesh.normals[0]), sizeof(currentMesh.normals[0]), currentMesh.normals.size(), in);
+		fread_s(&currentMesh.faces[0], currentMesh.faces.size() * sizeof(currentMesh.faces[0]), sizeof(currentMesh.faces[0]), currentMesh.faces.size(), in);
 		
-		data.name = mesh->mName.C_Str();
+		// Go back to read index data again
+		fseek(in, -(int)(currentMesh.faces.size() * sizeof(currentMesh.faces[0])), SEEK_CUR);
+
+		fread_s(&currentMesh.indices[0], currentMesh.indices.size() * sizeof(currentMesh.indices[0]), sizeof(currentMesh.indices[0]), currentMesh.indices.size(), in);
 	}
 
-	// Import cameras...
-	for (int i = 0; i < importedData->mNumCameras; i++)
+	for (int i = 0; i < header.numCameras; i++)
 	{
-		aiMatrix4x4 cameraMatrix;
+		collection->cameras.emplace_back();
+		glm::mat4& cameraMat = collection->cameras.back();
 
-		//importedData->mCameras[i]->
-		aiCamera* cam = importedData->mCameras[i];
-		glm::vec4 pos({ cam->mPosition.x, cam->mPosition.y, cam->mPosition.z, 1.f });
-		glm::vec4 dir({ cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z, 1.f });
-		glm::vec4 up({ cam->mUp.x, cam->mUp.y, cam->mUp.z, 0.f });
-
-		aiNode* rootNode = importedData->mRootNode;
-		aiNode* cameraNode = rootNode->FindNode(cam->mName);
-		aiMatrix4x4 aiCamTrans = cameraNode->mTransformation;
-
-		glm::mat4 transMat = { aiCamTrans.a1, aiCamTrans.b1, aiCamTrans.c1, aiCamTrans.d1,
-							aiCamTrans.a2, aiCamTrans.b2, aiCamTrans.c2, aiCamTrans.d2,
-							aiCamTrans.a3, aiCamTrans.b3, aiCamTrans.c3, aiCamTrans.d3,
-							aiCamTrans.a4, aiCamTrans.b4, aiCamTrans.c4, aiCamTrans.d4 };
-
-		pos = transMat * pos;
-		dir = transMat * dir;
-		up = transMat * up;
-
-		glm::vec3 realPos = glm::vec3(pos.x, pos.z, -pos.y);
-		glm::vec3 realDir = glm::vec3(dir.x, dir.z, -dir.y);
-		glm::vec3 realUp = glm::vec3(up.x, up.z, -up.y);
-
-		glm::mat4 endMatrix = glm::inverse(glm::lookAt(realPos - glm::normalize(realDir) * 0.1f, realDir, realUp));
-
-
-		collection->cameras.push_back(endMatrix);
+		fread_s(&cameraMat[0][0], sizeof(cameraMat), sizeof(cameraMat), 1, in);
 	}
 
-	LOG("Loaded ", collection->meshes.size(), " meshes...");
+	fclose(in);
+
+	LOG("Finished loading: ", filepath);
 
 	return collection;
 }
 
-}
+
