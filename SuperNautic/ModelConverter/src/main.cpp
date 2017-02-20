@@ -7,6 +7,7 @@
 #include <assimp/postprocess.h>
 
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 
 #include <GL/glew.h>
 
@@ -19,7 +20,12 @@
 // Globals
 HANDLE gConsoleHandle;
 CONSOLE_SCREEN_BUFFER_INFO gPreviousState;
-
+//bool gTransformCoordinates;
+glm::mat4 gCoordinateTransform = glm::mat4(
+	1.f, 0.f, 0.f, 0.f,
+	0.f, 0.f, 1.f, 0.f,
+	0.f, -1.f, 0.f, 0.f,
+	0.f, 0.f, 0.f, 1.f);
 
 enum LogColor : WORD
 {
@@ -48,11 +54,16 @@ void processPositions(std::vector<glm::vec3>& positions, const aiMesh* importedM
 {
 	log(YELLOW) << "Positions: 0%";
 	positions.reserve(positions.capacity() + importedMesh->mNumVertices);
-	for (int i = 0; i < importedMesh->mNumVertices; i++)
+	for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
 	{
 		glm::vec3 pos = toGLM(importedMesh->mVertices[i]);
 		glm::vec3 transformedPos = glm::vec3(transform * glm::vec4(pos, 1.f));
 		positions.push_back(transformedPos);
+
+		//if (gTransformCoordinates)
+		//{
+		//	transformedPos = glm::vec3(gCoordinateTransform * glm::vec4(transformedPos, 1.f));
+		//}
 
 		if (i >= importedMesh->mNumVertices / 2)
 		{
@@ -68,7 +79,7 @@ void processTexCoords(std::vector<glm::vec3>& texCoords, const aiMesh* importedM
 	if (importedMesh->mTextureCoords[0] != nullptr)
 	{
 		log(YELLOW) << "TexCoord: 0%";
-		for (int i = 0; i < importedMesh->mNumVertices; i++)
+		for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
 		{
 			glm::vec3 uvw = toGLM(importedMesh->mTextureCoords[0][i]);
 			uvw.z = (float)(importedMesh->mMaterialIndex) + 0.1f;
@@ -83,7 +94,7 @@ void processTexCoords(std::vector<glm::vec3>& texCoords, const aiMesh* importedM
 	else
 	{
 		log(YELLOW) << "The mesh should have texture coordinates. All are set to 0." << std::endl;
-		for (int i = 0; i < importedMesh->mNumVertices; i++)
+		for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
 		{
 			texCoords.push_back({ 0.f, 0.f, 0.f });
 		}
@@ -95,10 +106,16 @@ void processNormals(std::vector<glm::vec3>& normals, const aiMesh* importedMesh,
 {
 	log(YELLOW) << "Normals: 0%";
 	normals.reserve(normals.capacity() + importedMesh->mNumVertices);
-	for (int i = 0; i < importedMesh->mNumVertices; i++)
+	for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
 	{
 		glm::vec3 normal = toGLM(importedMesh->mNormals[i]);
 		glm::vec3 transformedNormal = glm::normalize(glm::vec3(transform * glm::vec4(normal, 0.f)));
+
+		//if (gTransformCoordinates)
+		//{
+		//	transformedNormal = glm::vec3(gCoordinateTransform * glm::vec4(transformedNormal, 1.f));
+		//}
+
 		normals.push_back(transformedNormal);
 
 		if (i >= importedMesh->mNumVertices / 2)
@@ -114,7 +131,7 @@ void processIndices(std::vector<glm::uvec3>& faces, std::vector<GLuint>& indices
 	log(YELLOW) << "Indices: 0%";
 	faces.reserve(faces.capacity() + importedMesh->mNumFaces);
 	indices.reserve(indices.capacity() + importedMesh->mNumFaces * 3);
-	for (int i = 0; i < importedMesh->mNumFaces; i++)
+	for (unsigned int i = 0; i < importedMesh->mNumFaces; i++)
 	{
 		// We assume all faces only have 3 vertices.
 		glm::uvec3 face;
@@ -210,19 +227,39 @@ void processNodeCameras(const aiScene* scene, std::vector<Camera>& cameras)
 		log(YELLOW) << "The converter can currently not handle more than one camera.\nShould there really be more than one?" << std::endl;
 	}
 
-	const aiNode* cameraNode = scene->mRootNode->FindNode(scene->mCameras[0]->mName);
+	const aiCamera* camera	 = scene->mCameras[0];
+	const aiNode* cameraNode = scene->mRootNode->FindNode(camera->mName);
+
 
 	log(GREEN) << "-- Processing Camera: " << cameraNode->mName.C_Str() << std::endl;
 	
-	glm::mat4 cameraTransform = glm::inverse(toGLM(cameraNode->mTransformation));
+	glm::mat4 cameraTransform = toGLM(cameraNode->mTransformation);
+	/*
+	glm::vec3 pos	 = glm::vec3( cameraTransform * glm::vec4(toGLM(camera->mPosition), 1.f));
+	glm::vec3 lookAt = glm::vec3( cameraTransform * glm::vec4(toGLM(camera->mLookAt), 0.f));
+	glm::vec3 up	 = glm::vec3( cameraTransform * glm::vec4(toGLM(camera->mUp), 0.f));
+	*/
+	
+	glm::vec3 pos	 = toGLM(camera->mPosition) / 100.f;
+	glm::vec3 lookAt = toGLM(camera->mLookAt);
+	glm::vec3 up	 = toGLM(camera->mUp);
 
-	Camera camera;
-	camera.transform = cameraTransform;
+	glm::mat4 endMatrix = glm::inverse(glm::lookAt(pos, pos + glm::normalize(lookAt), up));
 
-	glm::vec4 camPos = camera.transform * glm::vec4(0.f, 0.f, 0.f, 1.f);
+	/*if (gTransformCoordinates)
+	{
+		cameraTransform = gCoordinateTransform * cameraTransform;
+	}*/
+	glm::vec3 temp = glm::normalize(lookAt);
+	log(GREEN) << "Camera lookAt: " << temp.x << ", " << temp.y << ", " << temp.z << ", " << " " << std::endl;
+
+	Camera finalCamera;
+	finalCamera.transform = endMatrix;
+
+	glm::vec4 camPos = finalCamera.transform * glm::vec4(0.f, 0.f, 0.f, 1.f);
 	log(GREEN) << "Camera location: " << camPos.x << ", " << camPos.y << ", " << camPos.z << ", " << camPos.w << " " << std::endl;
 	
-	cameras.push_back(camera);
+	cameras.push_back(finalCamera);
 }
 
 bool convertFile(char* filePath)
@@ -276,9 +313,9 @@ bool convertFile(char* filePath)
 	}
 	
 	Header header;
-	header.numMeshes  = meshes.size();
-	header.numLights  = lights.size();
-	header.numCameras = cameras.size();
+	header.numMeshes  = static_cast<uint32_t>(meshes.size());
+	header.numLights  = static_cast<uint32_t>(lights.size());
+	header.numCameras = static_cast<uint32_t>(cameras.size());
 
 	writeHeader(&header, file);
 
@@ -288,9 +325,9 @@ bool convertFile(char* filePath)
 		Mesh& current = meshes[i];
 
 		MeshHeader meshHeader;
-		meshHeader.numVertices	= current.positions.size();
-		meshHeader.numFaces		= current.faces.size();
-		meshHeader.nameLength	= current.name.size();
+		meshHeader.numVertices	= static_cast<uint32_t>(current.positions.size());
+		meshHeader.numFaces		= static_cast<uint32_t>(current.faces.size());
+		meshHeader.nameLength	= static_cast<uint32_t>(current.name.size());
 
 		writeHeader(&meshHeader, file);
 		writeData(&current, file);
@@ -350,7 +387,7 @@ void testRead(const char* fileName)
 
 	fread_s(&header, sizeof(Header), sizeof(Header), 1, in);
 
-	for (int i = 0; i < header.numMeshes; i++)
+	for (unsigned int i = 0; i < header.numMeshes; i++)
 	{
 		MeshHeader meshHeader;
 		
@@ -378,7 +415,7 @@ void testRead(const char* fileName)
 		read_buffer(current.indices);
 	}
 
-	for (int i = 0; i < header.numLights; i++)
+	for (unsigned int i = 0; i < header.numLights; i++)
 	{
 		lights.emplace_back();
 		Light& current = lights.back();
@@ -386,7 +423,7 @@ void testRead(const char* fileName)
 		// Does nothing yet...
 	}
 
-	for (int i = 0; i < header.numCameras; i++)
+	for (unsigned int i = 0; i < header.numCameras; i++)
 	{
 		cameras.emplace_back();
 		Camera& current = cameras.back();
@@ -425,7 +462,12 @@ int main(int argc, char* argv[])
 		for (int i = 1; i < argc; i++)
 		{
 			log(GREEN) << "-------- Beginning work on: " << getNameOfFile(argv[i]) << " --------" << std::endl;
-			
+
+			if (strstr(argv[i], ".blend") != nullptr)
+			{
+				log(RED) << "Warning! .blend files may not be correctly converted!" << std::endl;
+			}
+
 			if (convertFile(argv[i]))
 			{
 				successCount++;
@@ -448,7 +490,8 @@ int main(int argc, char* argv[])
 	else
 	{
 #if _DEBUG
-		convertFile("testmayafile.fbx");
+		convertFile("s03_10degbend_helper_aa.fbx");
+		//gTransformCoordinates = true;
 #endif
 
 		log(RED) << "No file was given as input" << std::endl;
