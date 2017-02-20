@@ -30,7 +30,7 @@ public:
     void handleEvent(const sf::Event& event);
 
     // Push a state onto the top of the stack.
-    void push(std::unique_ptr<ApplicationState>& state);
+    void push(std::unique_ptr<ApplicationState>&& state);
 
     // Pop the state on the top of the stack.
     void pop();

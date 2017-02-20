@@ -44,7 +44,7 @@ void ApplicationStateStack::render()
     applyPendingRequests();
 }
 
-void ApplicationStateStack::push(std::unique_ptr<ApplicationState>& state)
+void ApplicationStateStack::push(std::unique_ptr<ApplicationState>&& state)
 {
     _pushQueue.push(std::move(state));
     _requestQueue.push(Push);

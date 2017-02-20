@@ -27,7 +27,7 @@ ModelLoader::~ModelLoader()
 {
 }
 
-Model* GFX::ModelLoader::loadModel(std::string filePath)
+Model* ModelLoader::loadModel(std::string filePath)
 {
 	RawMeshAsset rawModel = RawMeshCache::get(filePath);
 	
@@ -38,7 +38,39 @@ Model* GFX::ModelLoader::loadModel(std::string filePath)
 
 	LOG("Beginning processing on model: ", filePath);
 
-	std::vector<ModelLoader::Grouping> groupings = generateGroupings(rawModel.get());
+	Model* newModel = new Model();
+	std::vector<RawVertexData>& rawMeshes = rawModel.get()->meshes;
+	for (auto& rawMesh : rawMeshes)
+	{
+		GLsizei positionSize = rawMesh.vertices.size() * sizeof(rawMesh.vertices[0]);
+		GLsizei texCoordSize = rawMesh.texCoords.size() * sizeof(rawMesh.texCoords[0]);
+		GLsizei normalSize	 = rawMesh.normals.size() * sizeof(rawMesh.normals[0]);
+		GLsizei totalVertexSize = positionSize + texCoordSize + normalSize;
+
+		GLsizei totalIndexSize =
+			rawMesh.indices.size() * sizeof(rawMesh.indices[0]);
+
+		VertexArrayObject& newMesh = newModel->addMesh().getVertexArrayObject();
+		newMesh.addVertexBuffer(totalVertexSize, GL_STATIC_DRAW);
+		newMesh.addIndexBuffer(totalIndexSize, GL_STATIC_DRAW);
+
+		newMesh.sendDataToIndexBuffer(0, totalIndexSize, rawMesh.indices.data());
+		newMesh.setDrawCount(rawMesh.indices.size());
+
+		GLsizei currentOffset = 0U;
+		newMesh.sendDataToBuffer(0, 0, currentOffset, positionSize, rawMesh.vertices.data(), 3, GL_FLOAT);
+		currentOffset += positionSize;
+
+		newMesh.sendDataToBuffer(0, 1, currentOffset, texCoordSize, rawMesh.texCoords.data(), 3, GL_FLOAT);
+		currentOffset += texCoordSize;
+
+		newMesh.sendDataToBuffer(0, 2, currentOffset, normalSize, rawMesh.normals.data(), 3, GL_FLOAT);
+		currentOffset += normalSize;
+
+	}
+
+
+	/*std::vector<ModelLoader::Grouping> groupings = generateGroupings(rawModel.get());
 
 	LOG("Model was grouped into ", groupings.size(), " group(s).");
 
@@ -109,9 +141,9 @@ Model* GFX::ModelLoader::loadModel(std::string filePath)
 
 			LOG("Sent ", rawMesh.normals.size(), " normals to vertex buffer.");
 		}
-	}
+	}*/
 	
-	return model;
+	return newModel;
 }
 
 std::vector<ModelLoader::Grouping> GFX::ModelLoader::generateGroupings(RawMeshCollection * rawModel)

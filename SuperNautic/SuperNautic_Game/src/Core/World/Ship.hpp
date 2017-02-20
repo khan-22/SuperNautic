@@ -13,7 +13,6 @@
 #include "GFX/Resources/TexturedModel.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
 #include "Core/Utility/SpringRotatedVector.hpp"
-#include "Core/Utility/DampedSpringRotatedVector.hpp"
 #include "Core/Utility/SpringTranslatedVector.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
