@@ -20,6 +20,9 @@ namespace sf
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 
+#include "GFX/Rendering/ParticleRenderer.hpp"
+#include "GFX/Resources/ParticleSystem.hpp"
+
 class ApplicationContext;
 
 class World
@@ -53,6 +56,9 @@ private:
 
 	Camera						_camera;
 	bool						_bDebugging;
+
+	GFX::ParticleSystem		_testParticles;
+	GFX::ParticleRenderer	_particleRenderer;
 };
 
 #endif //WORLD_HPP

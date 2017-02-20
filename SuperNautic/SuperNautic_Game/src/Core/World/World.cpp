@@ -16,6 +16,9 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	, _track(track)
 	, _playerRTs(numberOfPlayers)
 {
+	_particleRenderer.initialize(&context.window, 0.0, 0.0, 1.0, 1.0);
+	_testParticles.init(500, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 0.2f, 15.f, 50.f);
+
 
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
@@ -158,6 +161,15 @@ void World::update(float dt, sf::Window& window)
 
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
+
+	static glm::vec3 currentPos = _players[0].getShip().getPosition();
+	static glm::vec3 previousPos = currentPos;
+	currentPos = _players[0].getShip().getPosition();
+
+	//_testParticles.update(dt, currentPos, glm::vec3(0.f));
+	_testParticles.update(dt, currentPos, currentPos - previousPos);
+
+	previousPos = currentPos;
 }
 
 void World::render()
@@ -209,6 +221,9 @@ void World::render()
 	{
 		_playerRTs[0].display(_camera);
 	}
+
+	_particleRenderer.render(_testParticles);
+	_particleRenderer.display(_camera);
 
 	GFX::SfmlRenderer sfml;
 	for (Player& player : _players)
