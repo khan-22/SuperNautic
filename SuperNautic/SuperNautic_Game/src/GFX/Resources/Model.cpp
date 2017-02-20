@@ -3,6 +3,7 @@
 using namespace GFX;
 
 Model::Model()
+	: _tempModelMat(1.f)
 {
 }
 

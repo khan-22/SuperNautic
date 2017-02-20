@@ -31,7 +31,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     {
         _stack.pop();
         auto playState = std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context, _playersActive));
-        _stack.push(playState);
+        _stack.push(std::move(playState));
 
     }));
 
