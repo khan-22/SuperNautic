@@ -45,6 +45,7 @@ private:
 
 	SegmentHandler *				_segmentHandler;
 	std::vector<SegmentInstance*>	_track;
+	Octree<SegmentInstance*>		_octree;
 	std::string						_seed;
 	float							_curviness;
 	int								_targetLength;

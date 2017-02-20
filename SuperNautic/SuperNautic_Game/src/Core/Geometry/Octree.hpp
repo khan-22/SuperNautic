@@ -38,6 +38,11 @@ public:
     // Get all elements that collide with a collision mesh.
     std::vector<ElementT*> getCollisions(const CollisionMesh& mesh) const;
 
+	bool bTestCollision(const CollisionMesh& mesh) const
+	{
+		return _bounds.testCollision(mesh) == CollisionMesh::CollisionResult::COLLISION;
+	}
+
 private:
     class Node
     {

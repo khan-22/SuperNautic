@@ -11,6 +11,7 @@
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler)
 	: _segmentHandler(segmentHandler)
+	, _octree(glm::vec3(0, 0, 0), 100000)
 	, _seed("1")
 	, _curviness(0)
 	, _targetLength(10000)
@@ -174,7 +175,7 @@ SegmentInstance* Track::getInstance(int index)
 	return _track[index];
 }
 
-// Get the track progression in percent
+// Get the track progression in percent [0-1];
 float Track::getProgression() const
 {
 	return _totalProgress;
