@@ -124,3 +124,8 @@ void Player::setPosition(int position)
 {
 	_hud.setPosition(position);
 }
+
+void Player::swapPerspective()
+{
+	_bIsFirstPerson = !_bIsFirstPerson;
+}

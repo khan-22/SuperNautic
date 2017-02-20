@@ -37,6 +37,8 @@ public:
 
 	bool _bIsFirstPerson;
 
+	void swapPerspective();
+
 private:
 	int				_playerId;
 	Input			_input;
