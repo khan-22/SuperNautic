@@ -215,6 +215,12 @@ void GuiContainer::insert(std::list<std::unique_ptr<GuiElement>>& elements)
 
 }
 
+void GuiContainer::setOnElementSelect(const std::function<void(GuiElement*)>& func)
+{
+    _onElementSelectCallback = func;
+}
+
+
 void GuiContainer::updateSize()
 {
     sf::Vector2f min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());

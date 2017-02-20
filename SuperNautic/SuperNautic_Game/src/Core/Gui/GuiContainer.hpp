@@ -31,9 +31,14 @@ public:
     sf::FloatRect getBoundingRect() const override;
     void setBackground(sf::Color fillColor, sf::Color outlineColor = sf::Color::White, float outlineThickness = 0.f);
 
+    void setOnElementSelect(const std::function<void(GuiElement*)>& func);
+
+
+
 private:
     std::list<std::unique_ptr<GuiElement>> _elements;
     std::list<std::unique_ptr<GuiElement>>::iterator _selection;
+    std::function<void(GuiElement*)> _onElementSelectCallback = [](GuiElement*){};
     sf::FloatRect _bounds;
     sf::RectangleShape _background;
     sf::Keyboard::Key _nextKey;
