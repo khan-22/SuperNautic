@@ -33,10 +33,10 @@ public:
 
     void setOnElementSelect(const std::function<void(GuiElement*)>& func);
 
-
+protected:
+    std::list<std::unique_ptr<GuiElement>> _elements;
 
 private:
-    std::list<std::unique_ptr<GuiElement>> _elements;
     std::list<std::unique_ptr<GuiElement>>::iterator _selection;
     std::function<void(GuiElement*)> _onElementSelectCallback = [](GuiElement*){};
     sf::FloatRect _bounds;
