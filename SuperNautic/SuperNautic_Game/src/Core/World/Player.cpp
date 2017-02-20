@@ -54,6 +54,9 @@ void Player::update(float dt)
 				{
 				case sf::Keyboard::A:
 					_ship.jump();
+					break;
+				case sf::Keyboard::Y:
+					break;
 				default:
 					break;
 				}
