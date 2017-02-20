@@ -6,6 +6,8 @@
 #include "glm/glm.hpp"
 #include <vector>
 #include <memory>
+#include <set>
+#include <functional>
 
 #include "Core/Geometry/CollisionMesh.hpp"
 
