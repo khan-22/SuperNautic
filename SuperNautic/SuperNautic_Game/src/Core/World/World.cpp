@@ -98,7 +98,7 @@ void World::update(float dt, sf::Window& window)
 
 			// Update progression
 			_playerProgression[i].setCurrentSegment(segmentIndex);
-			_playerProgression[i].update(lengthInSegment);
+			_players[i].setProgression(_playerProgression[i].update(lengthInSegment));
 
 			// LOG("PROGRESSION: ", _playerProgression[i].getProgression());
 

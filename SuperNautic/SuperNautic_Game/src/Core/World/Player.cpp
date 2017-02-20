@@ -94,3 +94,8 @@ Camera* Player::getCamera()
 {
 	return &_camera;
 }
+
+void Player::setProgression(float progression)
+{
+	_hud.setProgression(progression);
+}
