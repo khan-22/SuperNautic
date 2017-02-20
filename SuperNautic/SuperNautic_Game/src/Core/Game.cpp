@@ -140,7 +140,7 @@ void Game::run()
 
 		if(_stateStack.bIsEmpty())
         {
-        //    _window.close();
+            _window.close();
         }
 
 		deltaTime = clock.restart();
@@ -171,11 +171,11 @@ void Game::update(float dt)
 {
     _fps = _fps * 0.9f + 0.1f / dt;
 
-	_debugCamera.update(dt, _window);
+	//_debugCamera.update(dt, _window);
 
-	static float t = 0.0;
-	t += dt;
-	_pointLights[0].setPosition(glm::vec3(5.f * sinf(t*2.f), 2.f, 5.f * cosf(t*2.f)));
+	//static float t = 0.0;
+	//t += dt;
+	//_pointLights[0].setPosition(glm::vec3(5.f * sinf(t*2.f), 2.f, 5.f * cosf(t*2.f)));
 
     _stateStack.update(dt);
 }
