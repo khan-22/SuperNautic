@@ -10,6 +10,8 @@ PlayerAudio::PlayerAudio() :
 	loadFromBuffers();
 
 	_sEngine.setLoop(true);
+
+	playAudio(Sounds::engine);
 }
 
 PlayerAudio::~PlayerAudio()

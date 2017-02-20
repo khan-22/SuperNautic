@@ -187,7 +187,7 @@ void World::render()
 	}
 	for (Player& player : _players)
 	{
-		shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
+		shipLights.push_back(PointLight(player.getShip().getMeshPosition(), { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
 	}
 
 	for (int i = 0; i < _playerRTs.size(); i++)

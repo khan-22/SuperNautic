@@ -41,18 +41,23 @@ void Player::update(float dt)
 {
 	_input.update();
 
-	if (_input.bGetAValue())
+	if (_input.checkActive())
 	{
-		_audio.playAudio(PlayerAudio::Sounds::hit);
-	}
+		_ship.setTurning(_input.getLeftStickXValue());
+		_ship.setAcceleration(_input.getTriggersValue());
 
-    if(_input.checkActive())
-    {
-        _ship.setTurning(_input.getLeftStickXValue());
-        _ship.setAcceleration(_input.getTriggersValue());
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		for each (sf::Event event in _input.getEvents())
 		{
-			_ship.jump();
+			if (event.type == sf::Event::KeyPressed)
+			{
+				switch (event.key.code)
+				{
+				case sf::Keyboard::A:
+					_ship.jump();
+				default:
+					break;
+				}
+			}
 		}
     }
     else
