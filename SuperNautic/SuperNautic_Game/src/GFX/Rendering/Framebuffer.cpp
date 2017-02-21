@@ -27,7 +27,7 @@ Framebuffer::~Framebuffer()
 	glDeleteFramebuffers(1, &_fbo);
 }
 
-void GFX::Framebuffer::initialize(GLuint width, GLuint height, GLuint numColorAttachments, DepthType depthType)
+void GFX::Framebuffer::initialize(GLuint width, GLuint height, GLuint numColorAttachments, GLuint colorChannels[], DepthType depthType)
 {
 	assert(numColorAttachments <= MAX_COLOR_ATTACHMENTS);
 
@@ -46,8 +46,37 @@ void GFX::Framebuffer::initialize(GLuint width, GLuint height, GLuint numColorAt
 
 	for (int i = 0; i < numColorAttachments; i++)
 	{
+		GLuint channelCount = colorChannels[i];
+		
+		GLenum channelInternalFormat;
+		GLenum channelFormat;
+
+		switch (channelCount)
+		{
+		case 1:
+			channelInternalFormat = GL_R32F;
+			channelFormat = GL_R;
+			break;
+		case 2:
+			channelInternalFormat = GL_RG32F;
+			channelFormat = GL_RG;
+			break;
+		case 3:
+			channelInternalFormat = GL_RGB32F;
+			channelFormat = GL_RGB;
+			break;
+		case 4:
+			channelInternalFormat = GL_RGBA32F;
+			channelFormat = GL_RGBA;
+			break;
+		default:
+			LOG_ERROR("Invalid amount of color channels!");
+			break;
+
+		}
+
 		glBindTexture(GL_TEXTURE_2D, _textures[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _width, _height, 0, GL_RGB, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, channelInternalFormat, _width, _height, 0, channelFormat, GL_FLOAT, nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, _textures[i], 0);

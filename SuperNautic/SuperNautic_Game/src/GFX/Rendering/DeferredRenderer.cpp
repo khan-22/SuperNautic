@@ -36,7 +36,7 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
 
-	_frameBuffer.initialize(_width * windowWidth, _height * windowHeight, 3);
+	_frameBuffer.initialize(_width * windowWidth, _height * windowHeight, {4, 3, 3, 3}, 4);
 
 	GLfloat screenX1 = _x * 2.f - 1.f;
 	GLfloat screenY1 = _y * 2.f - 1.f;
