@@ -40,7 +40,8 @@ Ship::Ship()
 		_engineCooldown{ 0 },
 		_engineOverload{ 0 },
 		_engineFlashTime{ 0 },
-		_bEngineFlash{ false }
+		_bEngineFlash{ false },
+		_bEngineOverload { false }
 {
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 	setOrigin(glm::vec3{ 0.0f, 0.1f, 0.0f });
@@ -115,6 +116,7 @@ void Ship::update(float dt)
 		if (rand() % 500 + 1 < _engineOverload)
 		{
 			_engineCooldown = _engineOverload * _engineTemperature / 50;
+			_bEngineOverload = true;
 		}
 	}
 	else
@@ -314,6 +316,17 @@ bool Ship::getOverload(float dt)
 		isWhite = _bEngineFlash;
 	}
 	return isWhite;
+}
+
+bool Ship::isEngineOverload()
+{
+	bool isOverload = false;
+	if (_bEngineOverload)
+	{
+		isOverload = true;
+		_bEngineOverload = false;
+	}
+	return isOverload;
 }
 
 void Ship::setForward(const glm::vec3& forwardDirection)

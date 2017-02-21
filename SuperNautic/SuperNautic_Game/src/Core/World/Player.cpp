@@ -92,6 +92,11 @@ void Player::update(float dt)
 
     _ship.update(dt);
 
+	if (_ship.isEngineOverload())
+	{
+		_audio.playAudio(_audio.overheat);
+	}
+
 	if (_bIsFirstPerson)
 	{
 		//First person

@@ -40,6 +40,7 @@ public:
 	float getEngineTemperature();
 	float getSpeed();
 	bool getOverload(float dt);
+	bool isEngineOverload();
 	// Sets the direction that counts as forward
 	void setForward(const glm::vec3& forwardDirection);
 	glm::vec3 getCameraUp();
@@ -65,6 +66,7 @@ private:
 	float		_engineOverload;
 	float		_engineFlashTime;
 	bool		_bEngineFlash;
+	bool		_bEngineOverload;
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
 
