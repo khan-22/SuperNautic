@@ -1,4 +1,5 @@
 #include <string>
+#include <algorithm>
 
 #include "Core/Gui/HUD.hpp"
 #include "Core/Asset/AssetCache.hpp"
@@ -36,7 +37,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 
 	_progressionOutline.setSize(sf::Vector2f(_widthStep, _heightStep * 80));
 	_progressionOutline.setOutlineColor(sf::Color(0, 50, 100, 100));
-	_progressionOutline.setFillColor(sf::Color(50, 0, 100, 100));
+	_progressionOutline.setFillColor(sf::Color(0, 50, 100, 100));
 	//_progressionOutline.setOutlineThickness(_heightStep);
 	_progressionOutline.setPosition(_progressionPosX, _heightStep * 9 + _offsetY);
 
@@ -133,10 +134,8 @@ void HUD::updateCurrent()
 	else
 	{
 		int red = 0, green = 0;
-
-		red = static_cast<int>(_heat * 255.f);
-		green = static_cast<int>((1 - _heat) * 255.f);
-
+		red = static_cast<int>(((std::max(std::min(_heat, 0.5f), 0.2f) - 0.2f) / 0.3f) * 255.f);
+		green = static_cast<int>((1 - ((std::max(std::min(_heat, 0.8f), 0.5f) - 0.5f) / 0.3f)) * 255);
 		_heatMeter.setFillColor(sf::Color(red, green, 0, 255));
 	}
 	/*else if (_heat < .40)
