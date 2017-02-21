@@ -1,6 +1,7 @@
 #include <glm\gtx\transform.hpp>
 #include <time.h>
 #include <assert.h>
+#include <functional>
 
 #include "Core/Track/Track.hpp"
 #include "Core/Track/SegmentInfo.hpp"
@@ -11,7 +12,6 @@
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler)
 	: _segmentHandler(segmentHandler)
-	, _octree(glm::vec3(0, 0, 0), 10000)
 	, _seed("1")
 	, _curviness(0)
 	, _targetLength(10000)
@@ -20,7 +20,7 @@ Track::Track(SegmentHandler * segmentHandler)
 	, _endMargin(400)
 	, _endMatrix(glm::mat4())
 {
-	
+	//_octrees.push_back(Octree<SegmentInstance*>(glm::vec3(0, 0, 0), 10000));
 }
 
 // Destructor
@@ -93,6 +93,7 @@ void Track::startNewTrack()
 	_endConnection = 'a';
 	_prevIndex = -1;
 	_lastSegment = nullptr;
+	_octrees.clear();
 	for (unsigned int i = 0; i < _track.size(); i++)
 	{
 		delete _track[i];
@@ -386,6 +387,19 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
 	if (testCollision)
 	{
+		//						const std::function<bool(const std::vector<ElementT*>&)>& predicate
+		/*auto predicate = [this](const std::function<bool(const std::vector<SegmentInstance*>&)>& segments)
+		{
+			
+		};
+		for (size_t i = 0; i < _octrees.size(); i++)
+		{
+			if (_octrees[i].bInsertIf(tempInstance->getGlobalBoundingBoxes()[0], tempInstance, predicate))
+			{
+
+			}
+		}*/
+
 		for (unsigned int i = 0; i < _track.size() - 2; i++)
 		{
 			if (tempInstance->bTestCollision(*_track[i]))

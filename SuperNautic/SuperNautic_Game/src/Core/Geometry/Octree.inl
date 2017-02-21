@@ -66,7 +66,8 @@ bool Octree<ElementT>::bInsertIfNoCollision(const CollisionMesh& mesh, const Ele
 
 
 template<typename ElementT>
-bool Octree<ElementT>::bInsertIf(const CollisionMesh& mesh, const ElementT& element, const std::function<bool(const std::vector<ElementT*>&)>& predicate)
+bool Octree<ElementT>::bInsertIf(const CollisionMesh& mesh, const ElementT& element
+	, const std::function<bool(const std::vector<ElementT*>&)>& predicate)
 {
 	if (_bounds.testCollision(mesh) != CollisionMesh::CollisionResult::COLLISION)
 	{

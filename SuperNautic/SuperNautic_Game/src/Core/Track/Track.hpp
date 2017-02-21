@@ -43,21 +43,21 @@ private:
 	void deleteSegments(const int lengthToDelete);
 	bool bEndTrack();
 
-	SegmentHandler *				_segmentHandler;
-	std::vector<SegmentInstance*>	_track;
-	Octree<SegmentInstance*>		_octree;
-	std::string						_seed;
-	float							_curviness;
-	int								_targetLength;
-	int								_generatedLength;
-	float							_totalProgress;
-	int								_lengthAfterLastCall;
-	int								_progressionLength;
-	const int						_endMargin;
-	glm::mat4						_endMatrix;
-	char							_endConnection;
-	int								_prevIndex;
-	const Segment *					_lastSegment;
+	SegmentHandler *						_segmentHandler;
+	std::vector<SegmentInstance*>			_track;
+	std::vector<Octree<SegmentInstance*>>	_octrees;
+	std::string								_seed;
+	float									_curviness;
+	int										_targetLength;
+	int										_generatedLength;
+	float									_totalProgress;
+	int										_lengthAfterLastCall;
+	int										_progressionLength;
+	const int								_endMargin;
+	glm::mat4								_endMatrix;
+	char									_endConnection;
+	int										_prevIndex;
+	const Segment *							_lastSegment;
 };
 
 #endif // !TRACK_HPP
