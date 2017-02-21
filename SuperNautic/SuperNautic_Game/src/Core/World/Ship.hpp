@@ -13,7 +13,6 @@
 #include "GFX/Resources/TexturedModel.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
 #include "Core/Utility/SpringRotatedVector.hpp"
-#include "Core/Utility/DampedSpringRotatedVector.hpp"
 #include "Core/Utility/SpringTranslatedVector.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
@@ -49,6 +48,7 @@ public:
 	void setReturnPos(const glm::vec3& returnPos);
 	const glm::vec3& getCameraForward() const;
 	const glm::vec3& getMeshPosition() const;
+	const glm::vec3& getMeshForward() const;
 
 
 public:
@@ -60,6 +60,7 @@ public:
 	float		_jumpCooldown;			// Cooldown when jump is activated
 	float		_currentJumpCooldown;	// Current cooldown
 	float		_engineTemperature;
+	float		_engineCooldown;
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
 

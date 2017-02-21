@@ -8,6 +8,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_heat(10),
 	_speed(0),
 	_position(0),
+	_progression(0),
 	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf")),
 	_texture(AssetCache<sf::Texture, std::string>::get("heatchart.png"))
 {
@@ -20,31 +21,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_heatPosX = _widthStep * 3 + _offsetX;
 	_heatPosY = _heightStep * 90 + _offsetY;
 
-	_badRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 5));
-	_badRect.setOutlineColor(sf::Color::Red);
-	_badRect.setFillColor(sf::Color::Transparent);
-	_badRect.setOutlineThickness(_heightStep);
-	_badRect.setPosition(_widthStep * 2, _heightStep * 10);
-
-	_warningRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 15));
-	_warningRect.setOutlineColor(sf::Color::Yellow);
-	_warningRect.setFillColor(sf::Color::Transparent);
-	_warningRect.setOutlineThickness(_heightStep);
-	_warningRect.setPosition(_widthStep * 2, _heightStep * 16);
-
-	_closeRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 20));
-	_closeRect.setOutlineColor(sf::Color::Blue);
-	_closeRect.setFillColor(sf::Color::Transparent);
-	_closeRect.setOutlineThickness(_heightStep);
-	_closeRect.setPosition(_widthStep * 2, _heightStep * 32);
-
-	_safeRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 40));
-	_safeRect.setOutlineColor(sf::Color::Green);
-	_safeRect.setFillColor(sf::Color::Transparent);
-	_safeRect.setOutlineThickness(_heightStep);
-	_safeRect.setPosition(_widthStep * 2, _heightStep * 53);
-
-
+	_progressionPosX = windowWidth - _widthStep * 4 + _offsetX;
 
 	_heatOutline.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 80));
 	_heatOutline.setOutlineColor(sf::Color(0, 50, 100, 100));
@@ -57,9 +34,16 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_heatMeter.setOrigin(_widthStep, _heightStep);
 	_heatMeter.setPosition(_widthStep * 2, _heightStep * 90);
 
-	_spriteHeat.setTexture(*_texture.get());
-	_spriteHeat.setPosition(_widthStep * 2, _heightStep * 10);
-	_spriteHeat.setScale(windowWidth / 50, windowHeight / 12.5);
+	_progressionOutline.setSize(sf::Vector2f(_widthStep, _heightStep * 80));
+	_progressionOutline.setOutlineColor(sf::Color(0, 50, 100, 100));
+	_progressionOutline.setFillColor(sf::Color(50, 0, 100, 100));
+	//_progressionOutline.setOutlineThickness(_heightStep);
+	_progressionOutline.setPosition(_progressionPosX, _heightStep * 9 + _offsetY);
+
+	_progressionMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
+	_progressionMeter.setFillColor(sf::Color(200, 200, 200, 255));
+	_progressionMeter.setOrigin(_widthStep, _heightStep);
+	_progressionMeter.setPosition(_progressionPosX, _heightStep * 90 + _offsetY);
 
 	_tSpeed.setFont(*_font.get());
 	_tSpeed.setFillColor(sf::Color::Red);
@@ -91,6 +75,11 @@ void HUD::setPosition(int position)
 	_position = position;
 }
 
+void HUD::setProgression(float progression)
+{
+	_progression = progression;
+}
+
 void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 {
 	_widthStep = width / 100.f;
@@ -105,21 +94,7 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_heatPosX = _widthStep * 3 + _offsetX; 
 	_heatPosY = _heightStep * 90 + _offsetY;
 
-	_badRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 5));
-	_badRect.setOutlineThickness(_heightStep);
-	_badRect.setPosition(_widthStep * 2 + _offsetX, _heightStep * 10 + _offsetY);
-
-	_warningRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 15));
-	_warningRect.setOutlineThickness(_heightStep);
-	_warningRect.setPosition(_widthStep * 2 + _offsetX, _heightStep * 16 + _offsetY);
-
-	_closeRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 20));
-	_closeRect.setOutlineThickness(_heightStep);
-	_closeRect.setPosition(_widthStep * 2 + _offsetX, _heightStep * 32 + _offsetY);
-
-	_safeRect.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 40));
-	_safeRect.setOutlineThickness(_heightStep);
-	_safeRect.setPosition(_widthStep * 2 + _offsetX, _heightStep * 53 + _offsetY);
+	_progressionPosX = width - (_widthStep * 4 + _offsetX);
 
 	_heatOutline.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 80));
 	_heatOutline.setOutlineThickness(_heightStep);
@@ -129,8 +104,13 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_heatMeter.setOrigin(_widthStep, _heightStep);
 	_heatMeter.setPosition(_widthStep * 2 + _offsetX, _heightStep * 90 + _offsetY);
 
-	_spriteHeat.setScale(_widthStep * 2, _heightStep * 8);
-	_spriteHeat.setPosition(_widthStep * 2 + _offsetX, _heightStep * 10 + _offsetY);
+	_progressionOutline.setSize(sf::Vector2f(_widthStep, _heightStep * 80));
+	//_progressionOutline.setOutlineThickness(_heightStep);
+	_progressionOutline.setPosition(_progressionPosX, _heightStep * 9 + _offsetY);
+
+	_progressionMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
+	_progressionMeter.setOrigin(_widthStep, _heightStep);
+	_progressionMeter.setPosition(_progressionPosX, _heightStep * 90 + _offsetY);
 
 	_tSpeed.setCharacterSize(_widthStep * 5);
 	_tSpeed.setPosition(_widthStep * 75 + _offsetX, _heightStep + _offsetY);
@@ -162,19 +142,18 @@ void HUD::updateCurrent()
 	_heatMeter.setSize(sf::Vector2f(_heatSizeX, _sizeY));
 	_heatMeter.setPosition(_heatPosX, _heatPosY - _sizeY);
 
+	_progressionMeter.setPosition(_progressionPosX, _heightStep * 90 + _offsetY  - (_progression * _heightStep * 80));
+
 	_tSpeed.setString("Speed: " + std::to_string(_speed));
 	_tPosition.setString(std::to_string(_position));
 }
 
 void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) const
 {
-	//target.draw(_spriteHeat);
-	target.draw(_tSpeed);
+	//target.draw(_tSpeed);
 	target.draw(_tPosition);
-	//target.draw(_badRect);
-	//target.draw(_warningRect);
-	//target.draw(_closeRect);
-	//target.draw(_safeRect);
 	target.draw(_heatOutline);
 	target.draw(_heatMeter);
+	target.draw(_progressionOutline);
+	target.draw(_progressionMeter);
 }

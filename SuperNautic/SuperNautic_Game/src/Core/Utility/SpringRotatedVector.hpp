@@ -8,9 +8,9 @@
 class SpringRotatedVector
 {
 public:
-	SpringRotatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& backupAxis, float springConstant, float dampingConstant);
-	virtual ~SpringRotatedVector() {};
-	virtual void update(float dt);
+	SpringRotatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& backupAxis, float springConstant, float dampingConstant, bool locked);
+	~SpringRotatedVector() {};
+	void update(float dt);
 
 	const glm::vec3& operator()() const;
 
@@ -40,6 +40,9 @@ protected:
 	float _springConstant;
 	// Force of damping, linear to velocity
 	float _dampingConstant;
+
+	// If true, only allow _vector to be orthogonal to and rotate around _backupAxis
+	bool  _lockedToAxis;
 };
 
 #endif

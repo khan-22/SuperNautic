@@ -20,10 +20,7 @@ WorldAudio::~WorldAudio()
 }
 
 void WorldAudio::play() {
-	if (sf::SoundBufferRecorder::isAvailable())
-	{
-		_music.play();
-	}
+	_music.play();
 }
 
 void WorldAudio::stop() {
