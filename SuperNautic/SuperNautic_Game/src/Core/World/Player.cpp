@@ -46,7 +46,7 @@ void Player::update(float dt)
 		_ship.setTurning(_input.getLeftStickXValue());
 		_ship.setAcceleration(_input.getTriggersValue());
 
-		for each (sf::Event event in _input.getEvents())
+		for(sf::Event event : _input.getEvents())
 		{
 			if (event.type == sf::Event::KeyPressed)
 			{

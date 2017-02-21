@@ -5,7 +5,7 @@
 
 
 #include <memory>
-#include <list>
+#include <vector>
 
 
 #include "SFML/Graphics/Transformable.hpp"
@@ -21,28 +21,39 @@ class GuiContainer : public GuiElement
 public:
     GuiContainer(sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
 
-    GuiContainer(std::list<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
+    GuiContainer(std::vector<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
     ~GuiContainer();
 
     void update();
     virtual bool bIsActivatable() const override;
-    void insert(std::unique_ptr<GuiElement>& element);
-    void insert(std::list<std::unique_ptr<GuiElement>>& elements);
+    virtual void insert(std::unique_ptr<GuiElement>& element);
+    virtual void insert(std::vector<std::unique_ptr<GuiElement>>& elements);
     sf::FloatRect getBoundingRect() const override;
     void setBackground(sf::Color fillColor, sf::Color outlineColor = sf::Color::White, float outlineThickness = 0.f);
 
-private:
-    std::list<std::unique_ptr<GuiElement>> _elements;
-    std::list<std::unique_ptr<GuiElement>>::iterator _selection;
-    sf::FloatRect _bounds;
+    void setOnElementSelect(const std::function<void(GuiElement*)>& func);
+
+protected:
+    std::vector<std::unique_ptr<GuiElement>> _elements;
+    size_t _selection = -1;
     sf::RectangleShape _background;
+    sf::FloatRect _bounds;
+
+    virtual void onElementSelect();
+    virtual void updateSize();
+    bool bHasSelection() const;
+    GuiElement& getSelection();
+    virtual void select() override;
+    virtual void deselect() override;
+
+private:
+    std::function<void(GuiElement*)> _onElementSelectCallback = [](GuiElement*){};
     sf::Keyboard::Key _nextKey;
     sf::Keyboard::Key _previousKey;
 
     void handleEventCurrent(const sf::Event& event) override;
-    void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
+    virtual void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    void updateSize();
     void selectNext();
     void selectPrevious();
     void activateSelection();

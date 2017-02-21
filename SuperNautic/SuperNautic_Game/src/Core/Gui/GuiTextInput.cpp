@@ -30,11 +30,13 @@ void GuiTextInput::onChange(const std::function<void(const std::string&)>& callb
 
 void GuiTextInput::select()
 {
+    GuiContainer::select();
     setScale(1.2f, 1.2f);
 }
 
 void GuiTextInput::deselect()
 {
+    GuiContainer::deselect();
     setScale(1.0f, 1.0f);
 }
 

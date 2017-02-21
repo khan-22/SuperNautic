@@ -6,7 +6,9 @@ GuiButton::GuiButton(const sf::Text& text, std::function<void()> callback)
 : _text(text)
 , _callback(callback)
 {
-    sf::FloatRect textBounds = _text.getLocalBounds();
+    _text.setOrigin(_text.getLocalBounds().left, _text.getLocalBounds().top);
+    _text.setPosition(0.f, 0.f);
+    sf::FloatRect textBounds = _text.getGlobalBounds();
     setOrigin(textBounds.width / 2.f, textBounds.height / 2.f);
     _text.setFillColor(sf::Color::Black);
 }
@@ -46,5 +48,5 @@ bool GuiButton::bIsSelectable() const
 
 sf::FloatRect GuiButton::getBoundingRect() const
 {
-    return getWorldTransform().transformRect(_text.getLocalBounds());
+    return getWorldTransform().transformRect(_text.getGlobalBounds());
 }
