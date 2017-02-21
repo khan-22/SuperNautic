@@ -51,7 +51,7 @@ public:
 	const glm::vec3& getMeshForward() const;
 
 
-public:
+private:
 	bool		_destroyed;
 	bool		_stopped;
 	float		_turningFactor;
@@ -69,10 +69,10 @@ public:
 	glm::vec3					_upDirection;			// Current up direction
 	glm::vec3					_returnPos;				// Respawn position of ship
 
-	SpringRotatedVector	_meshForwardDirection;	// Current facing direction
+	SpringRotatedVector			_meshForwardDirection;	// Current facing direction
 	SpringRotatedVector			_meshUpDirection;		// Up direction of ship mesh
 	SpringRotatedVector			_cameraUpDirection;
-	SpringRotatedVector	_cameraForwardDirection;
+	SpringRotatedVector			_cameraForwardDirection;
 
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions

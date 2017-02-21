@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <vector>
-
+#include <functional>
 
 #include "SFML/Graphics/Transformable.hpp"
 #include "SFML/Graphics/Drawable.hpp"
