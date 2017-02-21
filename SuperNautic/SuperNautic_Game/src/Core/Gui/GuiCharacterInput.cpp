@@ -11,12 +11,13 @@ GuiCharacterInput::GuiCharacterInput(CharacterFlags flags)
 , _characterLists(generateCharacterLists(flags))
 {
     updateText();
+    _text.setOrigin(_text.getLocalBounds().left, _text.getLocalBounds().top);
+    _text.setPosition(0.f, 0.f);
     sf::FloatRect textBounds = _text.getLocalBounds();
-    setOrigin(textBounds.width / 2.f, textBounds.height / 2.f);
     _text.setFillColor(sf::Color::Black);
 }
 
-void GuiCharacterInput::onChange(const std::function<void(char)>& callback)
+void GuiCharacterInput::setOnChange(const std::function<void(char)>& callback)
 {
     _onChangeCallback = callback;
 }
@@ -68,7 +69,7 @@ bool GuiCharacterInput::bIsSelectable() const
 
 sf::FloatRect GuiCharacterInput::getBoundingRect() const
 {
-    return getWorldTransform().transformRect(_text.getLocalBounds());
+    return getWorldTransform().transformRect(_text.getGlobalBounds());
 }
 
 void GuiCharacterInput::selectNextCharacter()

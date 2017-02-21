@@ -28,11 +28,12 @@ Input::~Input()
 
 void Input::update()
 {
-	const int thresh = 50;
+	const int thresh = 20;
 
 	if (checkActive())
 	{
 		_bButtonA = sf::Joystick::isButtonPressed(_controllerId, 0);
+		_bButtonY = sf::Joystick::isButtonPressed(_controllerId, 3);
 		_bButtonStart = sf::Joystick::isButtonPressed(_controllerId, 7);
 		_leftStickX = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::X);
 		_leftStickY = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Y);
@@ -63,6 +64,19 @@ void Input::update()
 		if (!_bButtonA)
 		{
 			_bAWasDormant = true;
+		}
+		if (_bButtonY && _bYWasDormant)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::Y;
+			_events.push_back(event);
+			_bButtonY = true;
+			_bYWasDormant = false;
+			LOG("Y pressed");
+		}
+		if (!_bButtonY)
+		{
+			_bYWasDormant = true;
 		}
 		if (_bButtonStart && _bStartWasDormant)
 		{

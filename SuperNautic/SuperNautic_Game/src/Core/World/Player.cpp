@@ -5,10 +5,10 @@ Player::Player(int id) :
 	_input(id),
 	_hud(1280, 720),
 	_camera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
-	_fpCamera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 })
+	_fpCamera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
+	_currentCamera(&_camera)
 {
 	_bIsFirstPerson = false;
-	_currentCamera = &_camera;
 }
 
 Player::Player(const Player& other) : Player{ other._playerId }
@@ -20,7 +20,7 @@ Player::~Player()
 {
 }
 
-void Player::render(GFX::DeferredRenderer& renderer)
+void Player::render(GFX::DeferredRenderer& renderer) //OBSOLETE?
 {
 	renderer.render(_ship);
 }
@@ -46,7 +46,7 @@ void Player::update(float dt)
 		_ship.setTurning(_input.getLeftStickXValue());
 		_ship.setAcceleration(_input.getTriggersValue());
 
-		for each (sf::Event event in _input.getEvents())
+		for(sf::Event event : _input.getEvents())
 		{
 			if (event.type == sf::Event::KeyPressed)
 			{
@@ -54,6 +54,10 @@ void Player::update(float dt)
 				{
 				case sf::Keyboard::A:
 					_ship.jump();
+					break;
+				case sf::Keyboard::Y:
+					swapPerspective();
+					break;
 				default:
 					break;
 				}
@@ -123,4 +127,9 @@ void Player::setProgression(float progression)
 void Player::setPosition(int position)
 {
 	_hud.setPosition(position);
+}
+
+void Player::swapPerspective()
+{
+	_bIsFirstPerson = !_bIsFirstPerson;
 }

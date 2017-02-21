@@ -46,6 +46,7 @@ PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stac
 
     sf::Vector2u windowSize = _context.window.getSize();
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
+    _guiContainer.toggleSelection();
 }
 
 void PauseMenuApplicationState::render()
