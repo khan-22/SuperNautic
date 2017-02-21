@@ -39,6 +39,7 @@ public:
 	// [0..1]
 	float getEngineTemperature();
 	float getSpeed();
+	bool getOverload(float dt);
 	// Sets the direction that counts as forward
 	void setForward(const glm::vec3& forwardDirection);
 	glm::vec3 getCameraUp();
@@ -49,7 +50,7 @@ public:
 	const glm::vec3& getCameraForward() const;
 	const glm::vec3& getMeshPosition() const;
 	const glm::vec3& getMeshForward() const;
-
+	SurfaceType getSurfaceType() const;
 
 private:
 	bool		_destroyed;
@@ -61,6 +62,9 @@ private:
 	float		_currentJumpCooldown;	// Current cooldown
 	float		_engineTemperature;
 	float		_engineCooldown;
+	float		_engineOverload;
+	float		_engineFlashTime;
+	bool		_bEngineFlash;
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
 
@@ -77,6 +81,7 @@ private:
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
 
+	SurfaceType _currentSurface{ SurfaceType::normal };
 
 	glm::mat4	_meshMatrix;
 

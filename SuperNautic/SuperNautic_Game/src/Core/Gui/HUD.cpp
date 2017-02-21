@@ -119,9 +119,25 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_tPosition.setPosition(_widthStep * 50 - _widthStep * 5 + _offsetX, 0 + _offsetY);
 }
 
+void HUD::setHeatWhite(bool isWhite)
+{
+	_bWhiteHeat = isWhite;
+}
+
 void HUD::updateCurrent()
 {
-	if (_heat < .40)
+	if (_bWhiteHeat)
+	{
+		_heatMeter.setFillColor(sf::Color::White);
+	}
+	else
+	{
+		int red = 0, green = 0;
+		red = ((_heat)) * 255.f;
+		green = ((1 - _heat)) * 255;
+		_heatMeter.setFillColor(sf::Color(red, green, 0, 255));
+	}
+	/*else if (_heat < .40)
 	{
 		_heatMeter.setFillColor(sf::Color::Green);
 	}
@@ -136,7 +152,7 @@ void HUD::updateCurrent()
 	else
 	{
 		_heatMeter.setFillColor(sf::Color::Red);
-	}
+	}*/
 
 	_sizeY = _heat * _heatSizeY;
 	_heatMeter.setSize(sf::Vector2f(_heatSizeX, _sizeY));

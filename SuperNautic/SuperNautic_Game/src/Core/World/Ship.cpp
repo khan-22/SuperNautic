@@ -16,7 +16,7 @@ Ship::Ship()
 		_turningFactor{ 0.0f },
 		_currentTurningAngle{ 0.0f },
 		_accelerationFactor{ 0.5f },
-		_jumpCooldown{ 0.5f },
+		_jumpCooldown{ 1.5f },
 		_currentJumpCooldown{ 0.0f },
 		_engineTemperature{ 0.0f },
 		_velocity{ 0.0f },
@@ -168,6 +168,9 @@ void Ship::update(float dt)
 		// Reset hit timer
 		_timeSinceIntersection = 0.0f;
 
+		// Set current surface
+		_currentSurface = atShipIntersection._surface;
+
 		// Update local directions
 		_upDirection = atShipIntersection._normal;
 		_shipForward = glm::normalize(aheadOfShipIntersection._position - atShipIntersection._position);
@@ -257,6 +260,48 @@ float Ship::getSpeed()
 	return _velocity;
 }
 
+bool Ship::getOverload(float dt)
+{
+	bool isWhite = false;
+
+	if (_engineCooldown > 0)
+	{
+		if (_engineFlashTime < 0)
+		{
+			float denominator = 1.f;
+
+			if (_engineCooldown > 1.f)
+			{
+				denominator = _engineCooldown;
+			}
+
+			_engineFlashTime = 0.5f / denominator;
+			_bEngineFlash = !_bEngineFlash;
+		}
+		_engineFlashTime -= dt;
+		isWhite = _bEngineFlash;
+	}
+	else if (_engineOverload > 0)
+	{
+		float denominator = 1.f;
+
+		if (_engineOverload > 1.f)
+		{
+			denominator = _engineOverload;
+		}
+
+		if (_engineFlashTime > 0.2f / denominator || _engineFlashTime < 0)
+		{
+			_engineFlashTime = 0.2f / denominator;
+			_bEngineFlash = !_bEngineFlash;
+		}
+
+		_engineFlashTime -= dt;
+		isWhite = _bEngineFlash;
+	}
+	return isWhite;
+}
+
 void Ship::setForward(const glm::vec3& forwardDirection)
 {
 	_trackForward = forwardDirection;
@@ -307,4 +352,9 @@ const glm::vec3& Ship::getMeshPosition() const
 const glm::vec3 & Ship::getMeshForward() const
 {
 	return _meshForwardDirection();
+}
+
+SurfaceType Ship::getSurfaceType() const
+{
+	return _currentSurface;
 }
