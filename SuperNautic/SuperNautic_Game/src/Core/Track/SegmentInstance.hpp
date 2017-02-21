@@ -33,6 +33,12 @@ public:
 	bool bTestCollision(const SegmentInstance& other) const;
 
 private:
+	struct ObstacleInstance
+	{
+		glm::vec3		_pos;
+		glm::vec3		_forwardDir;
+	};
+
     const Segment *		_parent;
 	glm::mat4			_model;
 	std::vector<BoundingBox> _globalBoundingBoxes;

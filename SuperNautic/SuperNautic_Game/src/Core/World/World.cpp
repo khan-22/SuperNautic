@@ -11,6 +11,8 @@
 World::World(ApplicationContext& context, Track* track, const int numberOfPlayers)
 	: _context{ context }
 	, _camera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
+	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
+	, _bDebugging{ false }
 	, _bHasWon(false)
 	, _timer(1280, 720)
 	, _track(track)
@@ -146,10 +148,12 @@ void World::update(float dt, sf::Window& window)
 	}
 	else
 	{
+		_debugCamera.update(dt, window);
 	}
 	if (!_bDebugging && sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
 		_bDebugging = true;
+		_debugCamera.setPos(_players[0].getCamera()->getPosition());
 	}
 	if (_bDebugging && sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
 	{
@@ -207,7 +211,7 @@ void World::render()
 	}
 	else
 	{
-		_playerRTs[0].display(_camera);
+		_playerRTs[0].display(_debugCamera);
 	}
 
 	GFX::SfmlRenderer sfml;

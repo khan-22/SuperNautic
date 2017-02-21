@@ -52,6 +52,7 @@ private:
 	std::vector<GFX::DeferredRenderer> _playerRTs;
 
 	Camera						_camera;
+	DebugCamera					_debugCamera;
 	bool						_bDebugging;
 };
 
