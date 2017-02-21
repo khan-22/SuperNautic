@@ -134,8 +134,8 @@ void HUD::updateCurrent()
 	else
 	{
 		int red = 0, green = 0;
-		red = ((std::max(std::min(_heat, 0.5f), 0.2f) - 0.2f) / 0.3f) * 255.f;
-		green = (1 - ((std::max(std::min(_heat, 0.8f), 0.5f) - 0.5f) / 0.3f)) * 255;
+		red = static_cast<int>(((std::max(std::min(_heat, 0.5f), 0.2f) - 0.2f) / 0.3f) * 255.f);
+		green = static_cast<int>((1 - ((std::max(std::min(_heat, 0.8f), 0.5f) - 0.5f) / 0.3f)) * 255);
 		_heatMeter.setFillColor(sf::Color(red, green, 0, 255));
 	}
 	/*else if (_heat < .40)
