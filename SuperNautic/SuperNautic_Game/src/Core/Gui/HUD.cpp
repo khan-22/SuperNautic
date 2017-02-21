@@ -1,4 +1,5 @@
 #include <string>
+#include <algorithm>
 
 #include "Core/Gui/HUD.hpp"
 #include "Core/Asset/AssetCache.hpp"
@@ -133,8 +134,8 @@ void HUD::updateCurrent()
 	else
 	{
 		int red = 0, green = 0;
-		red = ((_heat)) * 255.f;
-		green = ((1 - _heat)) * 255;
+		red = ((std::max(std::min(_heat, 0.5f), 0.2f) - 0.2f) / 0.3f) * 255.f;
+		green = (1 - ((std::max(std::min(_heat, 0.8f), 0.5f) - 0.5f) / 0.3f)) * 255;
 		_heatMeter.setFillColor(sf::Color(red, green, 0, 255));
 	}
 	/*else if (_heat < .40)
