@@ -11,7 +11,7 @@ GuiTextInput::GuiTextInput(size_t numCharacters, GuiCharacterInput::CharacterFla
         GuiCharacterInput* character = new GuiCharacterInput(flags);
         _characters.push_back(character);
         _text.push_back(character->getCharacter());
-        character->onChange([i, this](char c)
+        character->setOnChange([i, this](char c)
         {
             updateCharacter(i, c);
         });
@@ -23,7 +23,7 @@ GuiTextInput::GuiTextInput(size_t numCharacters, GuiCharacterInput::CharacterFla
     }
 }
 
-void GuiTextInput::onChange(const std::function<void(const std::string&)>& callback)
+void GuiTextInput::setOnChange(const std::function<void(const std::string&)>& callback)
 {
     _onChangeCallback = callback;
 }

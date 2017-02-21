@@ -28,7 +28,7 @@ class GuiCharacterInput : public GuiElement
         bool bIsSelectable() const override;
         sf::FloatRect getBoundingRect() const override;
 
-        void onChange(const std::function<void(char)>& callback);
+        void setOnChange(const std::function<void(char)>& callback);
         char getCharacter() const;
 
 
