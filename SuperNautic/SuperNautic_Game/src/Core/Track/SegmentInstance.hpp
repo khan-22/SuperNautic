@@ -45,6 +45,9 @@ private:
 	std::vector<Sphere> _globalBoundingSpheres;
 	bool				_bHasLighting;
 
+	// temperatures[i] contains temperature of zone i
+	std::vector<SurfaceType> temperatures;
+
 	SegmentInstance();
 	void updateGlobalBounds();
 	bool bTestCollisionSphere(const SegmentInstance& other) const;

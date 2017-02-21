@@ -100,7 +100,8 @@ void World::update(float dt, sf::Window& window)
 
 			// Update progression
 			_playerProgression[i].setCurrentSegment(segmentIndex);
-			_players[i].setProgression(_playerProgression[i].update(lengthInSegment));
+			_playerProgression[i].update(lengthInSegment);
+			_players[i].setProgression(_playerProgression[i].getProgression());
 
 			// LOG("PROGRESSION: ", _playerProgression[i].getProgression());
 
@@ -142,6 +143,19 @@ void World::update(float dt, sf::Window& window)
 
 			_players[i].update(dt);
 		}
+
+		for (unsigned i = 0; i < _players.size(); ++i)
+		{
+			int k = 1;
+			for (unsigned j = 0; j < _players.size(); ++j)
+			{
+				if (_playerProgression[i].getProgression() < _playerProgression[j].getProgression())
+				{
+					k++;
+				}
+			}
+			_players[i].setPosition(k);
+		}
 		_camera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
 		_camera.setUp(_players[0].getShip().getCameraUp());
 		_camera.setViewDir(_players[0].getShip().getCameraForward());
@@ -170,14 +184,19 @@ void World::render()
 
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		for (Player& player : _players)
+		//Do not render the player's own ship if they are in first person, but render all other ships as normal
+		for(int j = 0; j < _players.size(); j++)
 		{
-			_playerRTs[i].render(player.getShip());
+			if (!(i == j && _players[j]._bIsFirstPerson))
+			{
+				_playerRTs[i].render(_players[j].getShip());
+
+			}
 		}
 	}
 	for (Player& player : _players)
 	{
-		shipLights.push_back(PointLight(player.getShip().getPosition(), { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
+		shipLights.push_back(PointLight(player.getShip().getMeshPosition(), { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
 	}
 
 	for (int i = 0; i < _playerRTs.size(); i++)

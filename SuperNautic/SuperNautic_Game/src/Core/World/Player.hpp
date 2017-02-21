@@ -33,15 +33,21 @@ public:
 	Camera* getCamera();
 
 	void setProgression(float progression);
+	void setPosition(int position);
+
+	bool _bIsFirstPerson;
+
+	void swapPerspective();
 
 private:
-	int							_playerId;
-	Input						_input;
-	Ship						_ship;
-	HUD							_hud;
-	PlayerAudio					_audio;
-	Camera						_camera;
-
+	int				_playerId;
+	Input			_input;
+	Ship			_ship;
+	HUD				_hud;
+	PlayerAudio		_audio;
+	Camera			_camera;
+	Camera			_fpCamera;
+	Camera*			_currentCamera;
 };
 
 #endif // !PLAYER_HPP

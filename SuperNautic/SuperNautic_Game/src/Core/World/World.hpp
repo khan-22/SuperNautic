@@ -20,7 +20,7 @@ namespace sf
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 
-class ApplicationContext;
+struct ApplicationContext;
 
 class World
 {

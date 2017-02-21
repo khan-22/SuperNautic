@@ -39,6 +39,7 @@ public:
 	// [0..1]
 	float getEngineTemperature();
 	float getSpeed();
+	bool getOverload(float dt);
 	// Sets the direction that counts as forward
 	void setForward(const glm::vec3& forwardDirection);
 	glm::vec3 getCameraUp();
@@ -48,9 +49,10 @@ public:
 	void setReturnPos(const glm::vec3& returnPos);
 	const glm::vec3& getCameraForward() const;
 	const glm::vec3& getMeshPosition() const;
+	const glm::vec3& getMeshForward() const;
+	SurfaceType getSurfaceType() const;
 
-
-public:
+private:
 	bool		_destroyed;
 	bool		_stopped;
 	float		_turningFactor;
@@ -59,6 +61,10 @@ public:
 	float		_jumpCooldown;			// Cooldown when jump is activated
 	float		_currentJumpCooldown;	// Current cooldown
 	float		_engineTemperature;
+	float		_engineCooldown;
+	float		_engineOverload;
+	float		_engineFlashTime;
+	bool		_bEngineFlash;
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
 
@@ -67,14 +73,15 @@ public:
 	glm::vec3					_upDirection;			// Current up direction
 	glm::vec3					_returnPos;				// Respawn position of ship
 
-	SpringRotatedVector	_meshForwardDirection;	// Current facing direction
+	SpringRotatedVector			_meshForwardDirection;	// Current facing direction
 	SpringRotatedVector			_meshUpDirection;		// Up direction of ship mesh
 	SpringRotatedVector			_cameraUpDirection;
-	SpringRotatedVector	_cameraForwardDirection;
+	SpringRotatedVector			_cameraForwardDirection;
 
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
 
+	SurfaceType _currentSurface{ SurfaceType::normal };
 
 	glm::mat4	_meshMatrix;
 

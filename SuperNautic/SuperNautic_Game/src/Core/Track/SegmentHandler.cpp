@@ -22,7 +22,7 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 	// Load segments
 	int amount;
 	infoFile >> amount;
-	for (unsigned int i = 0; i < amount; i++)
+	for (int i = 0; i < amount; i++)
 	{
 		// File names
 		std::string segmentDataName, segmentVisualName;
@@ -34,8 +34,8 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 		// blah_aa.blend
 		//      ^^
 		// size - 8, size - 7 contains connection info
-		startConnection = segmentDataName[segmentDataName.size() - 8];
-		endConnection = segmentDataName[segmentDataName.size() - 7];
+		startConnection = segmentDataName[segmentDataName.size() - 6];
+		endConnection = segmentDataName[segmentDataName.size() - 5];
 
 		// Low curviness data
 		int probability1, minInRow1, maxInRow1, rotationOffset1;
@@ -55,13 +55,13 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 
 	// Load structures
 	infoFile >> amount;
-	for (unsigned int i = 0; i < amount; i++)
+	for (int i = 0; i < amount; i++)
 	{
 		float curviness;
 		int probability1, probability2, minInRow, maxInRow, pieces;
 		infoFile >> curviness >> probability1 >> probability2 >> minInRow >> maxInRow >> pieces;
 		_structures.push_back(Structure(curviness, probability1, probability2, minInRow, maxInRow));
-		for (unsigned int j = 0; j < pieces; j++)
+		for (int j = 0; j < pieces; j++)
 		{
 			int index, minRotation, maxRotation;
 			infoFile >> index >> minRotation >> maxRotation;
@@ -70,9 +70,9 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 		// Skip rest of line
 		infoFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
-	int test = _structures[0].getProbability(0.4);
-	int test2 = _structures[0].getProbability(1.0);
-	int test3 = _structures[0].getProbability(0.7);
+	int test = _structures[0].getProbability(0.4f);
+	int test2 = _structures[0].getProbability(1.0f);
+	int test3 = _structures[0].getProbability(0.7f);
 
 	infoFile.close();
 
@@ -89,7 +89,7 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 	char type;
 	int rotation;
 	infoFile >> amount;
-	for (unsigned int i = 0; i < amount; i++)
+	for (int i = 0; i < amount; i++)
 	{
 		infoFile >> type;
 		infoFile >> rotation;
@@ -144,7 +144,7 @@ const SegmentHandler::Structure * SegmentHandler::getStructure(const unsigned in
 
 const int SegmentHandler::getNrOfStructures() const
 {
-	return _structures.size();
+	return static_cast<int>(_structures.size());
 }
 
 // Returns rotation info about connection type 'type'

@@ -18,12 +18,6 @@ public:
 	uint32_t numMeshes	= 0;
 	uint32_t numCameras = 0;
 	uint32_t numLights	= 0;
-	/*
-	uint32_t numVertices	= 0;
-	uint32_t numFaces		= 0;
-	uint32_t nameLength		= 0;*/
-
-private:
 };
 
 struct MeshHeader
