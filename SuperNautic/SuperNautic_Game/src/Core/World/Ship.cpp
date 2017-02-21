@@ -16,7 +16,7 @@ Ship::Ship()
 		_turningFactor{ 0.0f },
 		_currentTurningAngle{ 0.0f },
 		_accelerationFactor{ 0.5f },
-		_jumpCooldown{ 0.5f },
+		_jumpCooldown{ 1.5f },
 		_currentJumpCooldown{ 0.0f },
 		_engineTemperature{ 0.0f },
 		_velocity{ 0.0f },
@@ -168,6 +168,9 @@ void Ship::update(float dt)
 		// Reset hit timer
 		_timeSinceIntersection = 0.0f;
 
+		// Set current surface
+		_currentSurface = atShipIntersection._surface;
+
 		// Update local directions
 		_upDirection = atShipIntersection._normal;
 		_shipForward = glm::normalize(aheadOfShipIntersection._position - atShipIntersection._position);
@@ -307,4 +310,9 @@ const glm::vec3& Ship::getMeshPosition() const
 const glm::vec3 & Ship::getMeshForward() const
 {
 	return _meshForwardDirection();
+}
+
+SurfaceType Ship::getSurfaceType() const
+{
+	return _currentSurface;
 }

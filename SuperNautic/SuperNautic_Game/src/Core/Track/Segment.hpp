@@ -36,7 +36,8 @@ public:
 	Segment(const SegmentInfo* segmentInfo);
 
 	// Tests a ray collision against all collision surfaces of the segment. Returns collision information
-	const RayIntersection rayIntersectionTest(const Ray& ray) const;
+	// temperatures[i] holds temperature of temperature zone i
+	const RayIntersection rayIntersectionTest(const Ray& ray, const std::vector<SurfaceType>& temperatures) const;
 
 	// Renders the segment at the position of an instance
 	// TODO
@@ -77,6 +78,8 @@ public:
 	{
 		return _waypoints;
 	}
+
+	unsigned getNumZones() const;
 
 	// Finds position of and distance to the waypoint closest to a position (position is relative to segment's local origin)
 	WaypointInfo findClosestWaypoint(const glm::vec3& position) const;

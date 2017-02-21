@@ -68,7 +68,7 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 }
 
 // Tests a ray collision against all collision surfaces of the segment. Returns collision information
-const RayIntersection Segment::rayIntersectionTest(const Ray& ray) const
+const RayIntersection Segment::rayIntersectionTest(const Ray& ray, const std::vector<SurfaceType>& temperatures) const
 {
 	// Get distance to largest box
 	float firstBoxDistance = _octTree.rayIntersection(ray);
@@ -113,7 +113,7 @@ const RayIntersection Segment::rayIntersectionTest(const Ray& ray) const
 				modelIndices.push_back(_baseCollision);
 
 				// Test intersection with geometry
-				RayIntersection intersection = boxesToTest.begin()->second->triangleRayIntersection(ray, modelIndices, _scene);
+				RayIntersection intersection = boxesToTest.begin()->second->triangleRayIntersection(ray, modelIndices, temperatures, _scene);
 
 				if (intersection)
 				{
@@ -783,4 +783,9 @@ unsigned Segment::findChildIndex(size_t currentModel, unsigned index, glm::vec3 
 	}
 
 	return targetChild;
+}
+
+unsigned Segment::getNumZones() const
+{
+	return _temperatureZoneCollisions.size();
 }

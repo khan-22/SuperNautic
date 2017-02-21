@@ -5,7 +5,7 @@
 
 #include <array>
 
-#include "glm\vec3.hpp"
+#include "glm/vec3.hpp"
 
 // Bounding box enclosing a segment
 struct BoundingBox
