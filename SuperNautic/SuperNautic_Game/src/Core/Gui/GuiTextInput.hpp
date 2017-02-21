@@ -19,7 +19,7 @@ class GuiTextInput : public GuiContainer
         bool bIsActivatable() const override;
         bool bIsSelectable() const override;
 
-        void onChange(const std::function<void(const std::string&)>& callback);
+        void setOnChange(const std::function<void(const std::string&)>& callback);
 
 
     private:

@@ -17,7 +17,7 @@ GuiCharacterInput::GuiCharacterInput(CharacterFlags flags)
     _text.setFillColor(sf::Color::Black);
 }
 
-void GuiCharacterInput::onChange(const std::function<void(char)>& callback)
+void GuiCharacterInput::setOnChange(const std::function<void(char)>& callback)
 {
     _onChangeCallback = callback;
 }
