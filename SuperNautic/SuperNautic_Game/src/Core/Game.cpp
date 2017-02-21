@@ -23,7 +23,7 @@
 
 
 Game::Game()
-	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Default, sf::ContextSettings(24U, 0U, 0U, 4U, 0U))
+	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Default, sf::ContextSettings(24U, 8U, 0U, 4U, 0U))
 	, _context(_window)
 	, _quitTimer(0.f)
 	, _fps(60.f)
@@ -184,10 +184,12 @@ void Game::update(float dt)
 	static glm::vec3 prevPos	= currentPos;
 	currentPos = glm::vec3(5.f * sinf(t*2.f), 2.f, 5.f * cosf(t*2.f));;
 
-	/*_testParticles.update(
-		dt, 
-		currentPos, 
-		(currentPos - prevPos) * 20.f);*/
+	//ModelArray[1].getModelAsset().get()->setModelMatrix(glm::translate(glm::vec3(100.f)));
+
+	//_testParticles.update(
+	//	dt, 
+	//	currentPos, 
+	//	(currentPos - prevPos) * 20.f);
 
 	prevPos = currentPos;
 

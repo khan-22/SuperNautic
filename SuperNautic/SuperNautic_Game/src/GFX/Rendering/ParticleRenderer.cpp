@@ -40,6 +40,9 @@ void ParticleRenderer::display(Camera& camera)
 
 	glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
 	_shader.get()->bind();
 
 	_shader.get()->setUniform("uView", camera.getView());
@@ -50,6 +53,7 @@ void ParticleRenderer::display(Camera& camera)
 
 		drawCall->render(states);
 	}
+	glDisable(GL_BLEND);
 
 	_drawCalls.clear();
 	glViewport(0, 0, windowWidth, windowHeight);

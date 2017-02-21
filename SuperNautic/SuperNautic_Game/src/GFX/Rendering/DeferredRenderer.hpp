@@ -26,6 +26,8 @@ namespace GFX
 
 		void render(Renderable3D& renderable);
 		void display(Camera& camera);
+
+		void blitDepthOnto(Framebuffer& framebuffer);
 	protected:
 
 	private:
@@ -41,6 +43,11 @@ namespace GFX
 		GLfloat _y;
 		GLfloat _width;
 		GLfloat _height;
+
+		GLsizei _actualX;
+		GLsizei _actualY;
+		GLsizei _actualWidth;
+		GLsizei _actualHeight;
 
 		std::unique_ptr<VertexArrayObject> _screenQuad;
 

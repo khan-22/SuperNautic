@@ -98,7 +98,7 @@ void World::update(float dt, sf::Window& window)
 			unsigned segmentIndex = _playerProgression[i].getCurrentSegment();
 			float lengthInSegment = 0.0f;
 			glm::vec3 forward = _track->findForward(_players[i].getShip().getPosition(), segmentIndex, returnPos, lengthInSegment);
-
+			
 			// Update progression
 			_playerProgression[i].setCurrentSegment(segmentIndex);
 			_players[i].setProgression(_playerProgression[i].update(lengthInSegment));
@@ -221,6 +221,9 @@ void World::render()
 	{
 		_playerRTs[0].display(_camera);
 	}
+
+	// Should be done for each player before drawing particles.
+	_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 
 	_particleRenderer.render(_testParticles);
 	_particleRenderer.display(_camera);
