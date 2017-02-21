@@ -17,6 +17,7 @@ class GuiSlider : public GuiElement
         bool bIsSelectable() const override;
 
         void setOnChange(const std::function<void(float)>& callback);
+        sf::FloatRect getBoundingRect() const override;
 
 
         void setValue(float value);

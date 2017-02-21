@@ -23,7 +23,6 @@ GuiSlider::GuiSlider(float min, float max, float sliderWidth, size_t numSteps, c
     _rightLabel.setPosition(_slider.getPosition().x, 0.f);
     _rightLabel.move(_sliderWidth, 0.f);
 
-
     _slider.setFillColor(sf::Color::Blue);
     setValue(0.f);
 }
@@ -96,4 +95,16 @@ void GuiSlider::setOnChange(const std::function<void(float)>& callback)
     _onChangeCallback = callback;
 }
 
+
+sf::FloatRect GuiSlider::getBoundingRect() const
+{
+    sf::FloatRect bounds;
+    sf::Vector2f lPos = _leftLabel.getPosition();
+    sf::FloatRect rBounds = _rightLabel.getGlobalBounds();
+    bounds.left = lPos.x;
+    bounds.top = lPos.y;
+    bounds.width = rBounds.left + rBounds.width - lPos.x;
+    bounds.height = rBounds.top + rBounds.height - lPos.y;
+    return getWorldTransform().transformRect(bounds);
+}
 
