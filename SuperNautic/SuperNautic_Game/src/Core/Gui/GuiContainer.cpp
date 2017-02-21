@@ -129,6 +129,31 @@ void GuiContainer::activateSelection()
     }
 }
 
+void GuiContainer::select()
+{
+    if(_elements.empty())
+    {
+        return;
+    }
+
+    if(!bHasSelection())
+    {
+        selectNext();
+    }
+    else if(!getSelection().bIsSelected())
+    {
+        getSelection().toggleSelection();
+    }
+}
+
+void GuiContainer::deselect()
+{
+    if(bHasSelection() && getSelection().bIsSelected())
+    {
+        getSelection().toggleSelection();
+    }
+}
+
 void GuiContainer::selectNext()
 {
     if(_elements.empty())
@@ -199,15 +224,7 @@ void GuiContainer::selectPrevious()
 void GuiContainer::insert(std::unique_ptr<GuiElement>& element)
 {
     _elements.push_back(std::move(element));
-
-//    if(_selection != _elements.end())
-//    {
-//        (*_selection)->toggleSelection();
-//    }
-//
-//    _selection = _elements.end();
-//    selectNext();
-    updateSize(0, _elements.size());
+    updateSize();
 }
 
 void GuiContainer::insert(std::vector<std::unique_ptr<GuiElement>>& elements)
@@ -218,15 +235,7 @@ void GuiContainer::insert(std::vector<std::unique_ptr<GuiElement>>& elements)
         {
             _elements.push_back(std::move(element));
         }
-
-//        if(_selection != _elements.end())
-//        {
-//            (*_selection)->toggleSelection();
-//        }
-//
-//        _selection = _elements.end();
-//        selectNext();
-        updateSize(0, _elements.size());
+        updateSize();
     }
 
 }
@@ -237,16 +246,13 @@ void GuiContainer::setOnElementSelect(const std::function<void(GuiElement*)>& fu
 }
 
 
-void GuiContainer::updateSize(size_t startIndex, size_t endIndex)
+void GuiContainer::updateSize()
 {
     sf::Vector2f min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
     sf::Vector2f max(std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
 
-    assert(startIndex < _elements.size());
-    assert(endIndex <= _elements.size());
-    for(size_t i = startIndex; i < endIndex; i++)
+    for(const auto& element : _elements)
     {
-        const auto& element = _elements[i];
         sf::FloatRect bounds = element->getBoundingRect();
 
 
@@ -260,6 +266,7 @@ void GuiContainer::updateSize(size_t startIndex, size_t endIndex)
     sf::Vector2f pos = min;
     sf::Vector2f size = max - min;
     _bounds = sf::FloatRect(pos, size);
+    move(size / 2.f - getOrigin());
     setOrigin(size / 2.f);
     _background.setSize(size * 1.1f);
     _background.setPosition(pos - size * 0.05f);
@@ -267,7 +274,7 @@ void GuiContainer::updateSize(size_t startIndex, size_t endIndex)
 
 sf::FloatRect GuiContainer::getBoundingRect() const
 {
-    return getTransform().transformRect(_bounds);
+    return getWorldTransform().transformRect(_bounds);
 }
 
 void GuiContainer::setBackground(sf::Color fillColor, sf::Color outlineColor, float outlineThickness)

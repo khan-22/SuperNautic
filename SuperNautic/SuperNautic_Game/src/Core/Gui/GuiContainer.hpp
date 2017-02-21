@@ -37,15 +37,17 @@ protected:
     std::vector<std::unique_ptr<GuiElement>> _elements;
     size_t _selection = -1;
     sf::RectangleShape _background;
+    sf::FloatRect _bounds;
 
     virtual void onElementSelect();
-    void updateSize(size_t startIndex, size_t endIndex);
+    virtual void updateSize();
     bool bHasSelection() const;
     GuiElement& getSelection();
+    virtual void select() override;
+    virtual void deselect() override;
 
 private:
     std::function<void(GuiElement*)> _onElementSelectCallback = [](GuiElement*){};
-    sf::FloatRect _bounds;
     sf::Keyboard::Key _nextKey;
     sf::Keyboard::Key _previousKey;
 
