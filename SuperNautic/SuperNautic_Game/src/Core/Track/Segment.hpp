@@ -39,55 +39,28 @@ public:
 	// temperatures[i] holds temperature of temperature zone i
 	const RayIntersection rayIntersectionTest(const Ray& ray, const std::vector<SurfaceType>& temperatures) const;
 
-	// Renders the segment at the position of an instance
-	// TODO
-
 	// Returns bounding boxes
-	const std::vector<BoundingBox>& getBoundingBoxes() const
-	{
-		return _boundingBoxes;
-	}
+	const std::vector<BoundingBox>& getBoundingBoxes() const;
 
 	// Returns connection names
-	char getStart() const
-	{
-		return _segmentInfo->_startConnection;
-	}
-	char getEnd() const
-	{
-		return _segmentInfo->_endConnection;
-	}
+	char getStart() const;
+	char getEnd() const;
 
-	const SegmentInfo * getInfo() const
-	{
-		return _segmentInfo;
-	}
+	const SegmentInfo * getInfo() const;
 
 	// Returns approximate segment length
-	float getLength() const
-	{
-		return _length;
-	}
+	float getLength() const;
 
-	const glm::mat4x4& getEndMatrix() const
-	{
-		return _scene.get()->cameras[0];
-	}
+	const glm::mat4x4& getEndMatrix() const;
 
-	const std::vector<glm::vec3>& getWaypoints() const
-	{
-		return _waypoints;
-	}
+	const std::vector<glm::vec3>& getWaypoints() const;
 
 	unsigned getNumZones() const;
 
 	// Finds position of and distance to the waypoint closest to a position (position is relative to segment's local origin)
 	WaypointInfo findClosestWaypoint(const glm::vec3& position) const;
 
-	GFX::TexturedModel getVisualModel() const
-	{
-		return _visual;
-	}
+	GFX::TexturedModel getVisualModel() const;
 
 private:
 	const SegmentInfo*	_segmentInfo;
@@ -148,15 +121,6 @@ private:
 
 	// Create a vector with average positions of a vector of mesh indices, insert (0, 0, 0) at index 0
 	void createAverageWaypoints(std::vector<unsigned>& meshIndices);
-
-	// Find the center of mesh _scene->meshes[meshIndex]
-	glm::vec3 findMeshCenter(unsigned meshIndex) const;
-
-	// Helper function for createBoundingBoxes(). Finds the third half-distance of a box
-	float findThirdHalfDistance(unsigned boundingBoxMeshIndex, const BoundingBox& box) const;
-
-	// Helper function for createBoundingBoxes(). Finds three directions and two half-lengths of a box using the first face of the box mesh
-	void findTwoDirections(unsigned boundingBoxMeshIndex, BoundingBox& box) const;
 
 	// Divides the collision geometry of this segment into an oct-tree
 	void createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions);
