@@ -37,10 +37,7 @@ Ship::Ship()
 		_steerStraighteningForce{ 15.0f },
 		_speedResistance{ 0.005f },
 		_preferredHeight{ 2.0f },
-		_engineCooldown{ 0 },
-		_engineOverload { 0 },
-		_engineFlashTime { 0 },
-		_bEngineFlash { false }
+		_engineCooldown{ 0 }
 {
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 	setOrigin(glm::vec3{ 0.0f, 0.1f, 0.0f });
@@ -108,21 +105,10 @@ void Ship::update(float dt)
 
 	// Update engine temperature
 	_engineTemperature = ((_accelerationFactor + _velocity) / 2);
-	
-	if (_engineTemperature > 80)
+
+	if (_engineTemperature > 85)
 	{
-		_engineOverload += (_engineTemperature / 100.f) * dt;
-		if (rand() % 500 + 1 < _engineOverload)
-		{
-			_engineCooldown = _engineOverload * _engineTemperature / 50;
-		}
-	}
-	else
-	{
-		if (_engineOverload > 0)
-		{
-			_engineOverload -= (100 - _engineTemperature) * dt;
-		}
+		_engineCooldown = 5;
 	}
 
 	// Rotate ship forward towards track forward
