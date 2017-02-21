@@ -133,8 +133,8 @@ void HUD::updateCurrent()
 	else
 	{
 		int red = 0, green = 0;
-		red = ((_heat)) * 255;
-		green = ((1 - (_heat))) * 255;
+		red = ((_heat)) * 255.f;
+		green = ((1 - _heat)) * 255;
 		_heatMeter.setFillColor(sf::Color(red, green, 0, 255));
 	}
 	/*else if (_heat < .40)
