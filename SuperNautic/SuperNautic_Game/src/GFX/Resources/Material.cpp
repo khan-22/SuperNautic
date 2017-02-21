@@ -17,6 +17,7 @@ void Material::bind(unsigned int groupId) const
     }
 
     const Group& group = _groups[groupId];
+	group.illumination.get()->bind(3);
     group.normal.get()->bind(2);
     group.specular.get()->bind(1);
     group.diffuse.get()->bind(0);
@@ -30,9 +31,10 @@ void Material::unbind(unsigned int groupId) const
     }
 
     const Group& group = _groups[groupId];
+	group.illumination.get()->unbind(3);
     group.normal.get()->unbind(2);
     group.specular.get()->unbind(1);
-    group.diffuse.get()->unbind(0);
+	group.diffuse.get()->unbind(0);
 }
 
 size_t Material::getNumGroups() const
@@ -44,9 +46,10 @@ size_t Material::getNumGroups() const
 /////////////////////////
 // Material::Group
 /////////////////////////
-Material::Group::Group(TextureAsset& diffuse, TextureAsset& specular, TextureAsset& normal)
+Material::Group::Group(TextureAsset& diffuse, TextureAsset& specular, TextureAsset& normal, TextureAsset& illumination)
 : diffuse(diffuse)
 , specular(specular)
 , normal(normal)
+, illumination(illumination)
 {
 }

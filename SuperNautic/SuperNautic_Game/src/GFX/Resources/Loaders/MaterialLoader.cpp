@@ -16,7 +16,8 @@ std::shared_ptr<Material> MaterialLoader::load(const std::string& filePath)
 
     std::vector<TextureAsset> diffuses;
     std::vector<TextureAsset> speculars;
-    std::vector<TextureAsset> normals;
+	std::vector<TextureAsset> normals;
+	std::vector<TextureAsset> illuminations;
     while(file.good())
     {
         std::string type;
@@ -35,6 +36,10 @@ std::shared_ptr<Material> MaterialLoader::load(const std::string& filePath)
         {
             typeContainer = &normals;
         }
+		else if (type == "ILLUM")
+		{
+			typeContainer = &illuminations;
+		}
         else
         {
             LOG_ERROR("Failed to read material file at \"", filePath, "\". Expected valid type, got \"", type, "\".");
@@ -76,7 +81,7 @@ std::shared_ptr<Material> MaterialLoader::load(const std::string& filePath)
         typeContainer->at(id) = texture;
     }
 
-    if(diffuses.size() != speculars.size() || speculars.size() != normals.size())
+    if(diffuses.size() != speculars.size() || speculars.size() != normals.size())// || normals.size() != illuminations.size())
     {
         LOG_ERROR("Failed to read material file at \"", filePath, "\". Texture count cannot vary.");
         return nullptr;
@@ -106,11 +111,19 @@ std::shared_ptr<Material> MaterialLoader::load(const std::string& filePath)
             return nullptr;
         }
     }
+	for (const TextureAsset& a : illuminations)
+	{
+		if (a.get() == nullptr)
+		{
+			LOG_ERROR("Failed to read material file at \"", filePath, "\". Texture ID range must be [0...n].");
+			return nullptr;
+		}
+	}
 
     std::vector<Material::Group> groups;
     for(size_t i = 0; i < diffuses.size(); i++)
     {
-        groups.emplace_back(diffuses[i], speculars[i], normals[i]);
+		groups.emplace_back(diffuses[i], speculars[i], normals[i]);// , illuminations[i]);
     }
 
     return std::make_shared<Material>(groups);
