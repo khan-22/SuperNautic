@@ -118,7 +118,7 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	lpShader->bind();
 
 	lpShader->setUniform("uViewPos", camera.getPosition());
-	lpShader->setUniform("screenSize", glm::vec2(width, height));
+	lpShader->setUniform("screenSize", glm::vec2(width * _width, height * _height));
 
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
@@ -128,7 +128,7 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-	glViewport(0, 0, width, height);
+	glViewport(_x * width, _y * height, _width * width, _height * height);
 
 	RenderStates states{ &camera , glm::mat4(1.f), _lightPassShader.get() };
 	for (auto& pointLight : _pointLights)
