@@ -53,6 +53,13 @@ public:
 	const glm::vec3& getMeshForward() const;
 	SurfaceType getSurfaceType() const;
 
+	// TEST
+	glm::mat4 getMatrix()
+	{
+		return _transformMatrix;
+	}
+	///////
+
 private:
 	bool		_destroyed;
 	bool		_stopped;
@@ -86,6 +93,7 @@ private:
 	SurfaceType _currentSurface{ SurfaceType::normal };
 
 	glm::mat4	_meshMatrix;
+	glm::mat4	_transformMatrix;
 
 	const float _minAcceleration;
 	const float _maxAcceleration;
