@@ -5,7 +5,7 @@
 
 #include "SFML/Graphics/Text.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
-
+#include <functional>
 
 #include "Core/Gui/GuiElement.hpp"
 
