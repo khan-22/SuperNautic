@@ -112,10 +112,11 @@ void Ship::update(float dt)
 
 	if (_engineTemperature > 80)
 	{
-		_engineOverload += (_engineTemperature / 100.f) * dt;
-		if (rand() % 500 + 1 < _engineOverload)
+		_engineOverload += ((_engineTemperature - 80.f) / 20.f) * dt;
+		if (rand() % 1000 + 1 < _engineOverload)
 		{
-			_engineCooldown = _engineOverload * _engineTemperature / 50;
+			_engineCooldown = _engineOverload * _engineTemperature / 100;
+			_bEngineFlash = true;
 			_bEngineOverload = true;
 		}
 	}
@@ -124,6 +125,10 @@ void Ship::update(float dt)
 		if (_engineOverload > 0)
 		{
 			_engineOverload -= (100 - _engineTemperature) * dt;
+			if (_engineOverload < 0)
+			{
+				_engineOverload = 0;
+			}
 		}
 	}
 
