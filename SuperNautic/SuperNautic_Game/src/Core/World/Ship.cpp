@@ -229,7 +229,7 @@ void Ship::update(float dt)
 
 	// Move ship mesh to correct forward/right position, keep up position
 	_meshPosition.setVector(_meshPosition() + (_meshXZPosition() - _meshPosition()) - glm::dot(_upDirection, (_meshXZPosition() - _meshPosition())) * _upDirection);
-		
+
 	// Create mesh rotation matrix from mesh up and forward directions
 	_meshMatrix = { glm::vec4{ glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection())), 0.0f },
 						  glm::vec4{ glm::normalize(_meshUpDirection() - glm::dot(_meshUpDirection(), _meshForwardDirection()) * _meshForwardDirection()), 0.0f },	// The part of _meshUpDirection that is orthogonal to _meshForwardDirection
