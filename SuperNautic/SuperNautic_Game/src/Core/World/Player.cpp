@@ -109,6 +109,7 @@ void Player::update(float dt)
 
     _hud.setHeat(_ship.getEngineTemperature() / 100);
     _hud.setSpeed(_ship.getSpeed());
+	_hud.setHeatWhite(_ship.getOverload(dt));
 	_hud.update();
 
 	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 100 + 1);
