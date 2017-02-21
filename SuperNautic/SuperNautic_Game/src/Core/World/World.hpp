@@ -23,7 +23,7 @@ namespace sf
 #include "GFX/Rendering/ParticleRenderer.hpp"
 #include "GFX/Resources/ParticleSystem.hpp"
 
-class ApplicationContext;
+struct ApplicationContext;
 
 class World
 {

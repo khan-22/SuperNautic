@@ -1,11 +1,18 @@
+#include <algorithm>
+
 #include "SpringRotatedVector.hpp"
 #include "Utilities.hpp"
 #include "glm/gtx/vector_angle.hpp"
 
-SpringRotatedVector::SpringRotatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& backupAxis, float springConstant, float dampingConstant)
-	: _vector{ glm::normalize(vector) }, _target{ glm::normalize(target) }, _backupAxis{ glm::normalize(backupAxis) }, _springConstant { springConstant }, _dampingConstant{ dampingConstant }
+SpringRotatedVector::SpringRotatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& backupAxis, float springConstant, float dampingConstant, bool locked)
+	: _vector{ glm::normalize(vector) }, _target{ glm::normalize(target) }, _backupAxis{ glm::normalize(backupAxis) }, 
+	  _springConstant { springConstant }, _dampingConstant{ dampingConstant }, _lockedToAxis{ locked }
 {
-
+	if (_lockedToAxis)
+	{
+		// Force orthogonalization of target via setTarget function
+		setTarget(glm::normalize(target));
+	}
 }
 
 void SpringRotatedVector::update(float dt)
@@ -34,6 +41,11 @@ void SpringRotatedVector::update(float dt)
 	{
 		// Update rotation axis and velocity (represented by length)
 		_axis += glm::normalize(newAxis) * angleBetween * angleBetween * _springConstant * dt;
+
+		if (_lockedToAxis)
+		{
+			_axis = glm::dot(_axis, _backupAxis) * _backupAxis;
+		}
 	}
 
 	// Reduce velocity (represented by axis length) using damping constant
@@ -42,9 +54,18 @@ void SpringRotatedVector::update(float dt)
 	// Rotate vector
 	if (!bAlmostEqual(_axis, glm::vec3{ 0, 0, 0 }))
 	{
-		glm::mat4 rotation = glm::rotate(glm::length(_axis) * dt, glm::normalize(_axis));
+		float len = glm::length(_axis);
+		float angle = len * dt;
+		glm::vec3 normalized = glm::normalize(_axis);
 
-		_vector = rotation * glm::vec4{ _vector, 0.0f };
+		glm::mat4 rotation = glm::rotate(angle, normalized);
+
+		_vector = glm::normalize(rotation * glm::vec4{ _vector, 0.0f });
+
+		if (_lockedToAxis)
+		{
+			_vector -= glm::dot(_vector, _backupAxis) * _backupAxis;
+		}
 	}
 }
 
@@ -60,7 +81,14 @@ const glm::vec3& SpringRotatedVector::getVector() const
 
 void SpringRotatedVector::setTarget(const glm::vec3& target)
 {
-	_target = glm::normalize(target);
+	if (!_lockedToAxis)
+	{
+		_target = glm::normalize(target);
+	}
+	else
+	{
+		_target = glm::normalize(target - glm::dot(target, _backupAxis) * _backupAxis);
+	}
 }
 
 void SpringRotatedVector::setBackupAxis(const glm::vec3& backupAxis)

@@ -5,7 +5,8 @@
 
 #include <array>
 
-#include "glm\vec3.hpp"
+#include "glm/vec3.hpp"
+#include "GFX/Resources/Loaders/VertexDataImporter.hpp"
 
 // Bounding box enclosing a segment
 struct BoundingBox
@@ -25,9 +26,18 @@ struct BoundingBox
 	{
 	}
 
+	// Create a bounding box from a mesh
+	BoundingBox(const GFX::RawVertexData& model);
+
 	BoundingBox() : center{ glm::vec3{} },
 		halfLengths{ -1.0f, -1.0f, -1.0f }
 	{ }
+
+private:
+	// Helper funcitons for BoundingBox(const GFX::RawVertexData& model)
+	void findMeshCenter(const GFX::RawVertexData& model);
+	void findTwoDirections(const GFX::RawVertexData& model);
+	void findThirdHalfDistance(const GFX::RawVertexData& model);
 };
 
 #endif

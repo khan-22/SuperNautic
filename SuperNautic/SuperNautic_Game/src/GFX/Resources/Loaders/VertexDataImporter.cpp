@@ -57,11 +57,15 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 
 	RawMeshCollection* collection = nullptr;
 
-	FILE* in = nullptr;
+//	FILE* in = nullptr;
 
-	fopen_s(&in, filepath.c_str(), "rb");
+	std::ifstream in(filepath, std::ios::binary);
 
-	if(in == nullptr)
+
+//	fopen_s(&in, filepath.c_str(), "rb");
+
+    if(!in.good())
+//	if(in == nullptr)
 	{
 		LOG(">>> Failed to find file!");
 		return nullptr;
@@ -71,15 +75,17 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 
 	Header header;
 
-	fread_s(&header, sizeof(Header), sizeof(Header), 1, in);
+	in.read((char*)&header, sizeof(Header));
+//	fread_s(&header, sizeof(Header), sizeof(Header), 1, in);
 
 	for (int i = 0; i < header.numMeshes; i++)
 	{
 		collection->meshes.emplace_back();
 		RawVertexData& currentMesh = collection->meshes.back();
-	
+
 		MeshHeader meshHeader;
-		fread_s(&meshHeader, sizeof(MeshHeader), sizeof(MeshHeader), 1, in);
+		in.read((char*)&meshHeader, sizeof(MeshHeader));
+//		fread_s(&meshHeader, sizeof(MeshHeader), sizeof(MeshHeader), 1, in);
 
 		currentMesh.name.resize(meshHeader.nameLength);
 		currentMesh.vertices.resize(meshHeader.numVertices);
@@ -88,16 +94,23 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		currentMesh.faces.resize(meshHeader.numFaces);
 		currentMesh.indices.resize(meshHeader.numFaces * 3);
 
-		fread_s(&currentMesh.name[0], currentMesh.name.size() * sizeof(currentMesh.name[0]), sizeof(currentMesh.name[0]), currentMesh.name.size(), in);
-		fread_s(&currentMesh.vertices[0], currentMesh.vertices.size() * sizeof(currentMesh.vertices[0]), sizeof(currentMesh.vertices[0]), currentMesh.vertices.size(), in);
-		fread_s(&currentMesh.texCoords[0], currentMesh.texCoords.size() * sizeof(currentMesh.texCoords[0]), sizeof(currentMesh.texCoords[0]), currentMesh.texCoords.size(), in);
-		fread_s(&currentMesh.normals[0], currentMesh.normals.size() * sizeof(currentMesh.normals[0]), sizeof(currentMesh.normals[0]), currentMesh.normals.size(), in);
-		fread_s(&currentMesh.faces[0], currentMesh.faces.size() * sizeof(currentMesh.faces[0]), sizeof(currentMesh.faces[0]), currentMesh.faces.size(), in);
-		
-		// Go back to read index data again
-		fseek(in, -(int)(currentMesh.faces.size() * sizeof(currentMesh.faces[0])), SEEK_CUR);
+		in.read((char*)&currentMesh.name[0], currentMesh.name.size() * sizeof(currentMesh.name[0]));
+		in.read((char*)&currentMesh.vertices[0], currentMesh.vertices.size() * sizeof(currentMesh.vertices[0]));
+		in.read((char*)&currentMesh.texCoords[0], currentMesh.texCoords.size() * sizeof(currentMesh.texCoords[0]));
+		in.read((char*)&currentMesh.normals[0], currentMesh.normals.size() * sizeof(currentMesh.normals[0]));
+		in.read((char*)&currentMesh.faces[0], currentMesh.faces.size() * sizeof(currentMesh.faces[0]));
+//		fread_s(&currentMesh.name[0], currentMesh.name.size() * sizeof(currentMesh.name[0]), sizeof(currentMesh.name[0]), currentMesh.name.size(), in);
+//		fread_s(&currentMesh.vertices[0], currentMesh.vertices.size() * sizeof(currentMesh.vertices[0]), sizeof(currentMesh.vertices[0]), currentMesh.vertices.size(), in);
+//		fread_s(&currentMesh.texCoords[0], currentMesh.texCoords.size() * sizeof(currentMesh.texCoords[0]), sizeof(currentMesh.texCoords[0]), currentMesh.texCoords.size(), in);
+//		fread_s(&currentMesh.normals[0], currentMesh.normals.size() * sizeof(currentMesh.normals[0]), sizeof(currentMesh.normals[0]), currentMesh.normals.size(), in);
+//		fread_s(&currentMesh.faces[0], currentMesh.faces.size() * sizeof(currentMesh.faces[0]), sizeof(currentMesh.faces[0]), currentMesh.faces.size(), in);
 
-		fread_s(&currentMesh.indices[0], currentMesh.indices.size() * sizeof(currentMesh.indices[0]), sizeof(currentMesh.indices[0]), currentMesh.indices.size(), in);
+		// Go back to read index data again
+		in.seekg(-(int)(currentMesh.faces.size() * sizeof(currentMesh.faces[0])), in.cur);
+//		fseek(in, -(int)(currentMesh.faces.size() * sizeof(currentMesh.faces[0])), SEEK_CUR);
+
+        in.read((char*)&currentMesh.indices[0], currentMesh.indices.size() * sizeof(currentMesh.indices[0]));
+//		fread_s(&currentMesh.indices[0], currentMesh.indices.size() * sizeof(currentMesh.indices[0]), sizeof(currentMesh.indices[0]), currentMesh.indices.size(), in);
 	}
 
 	for (int i = 0; i < header.numCameras; i++)
@@ -105,10 +118,12 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 		collection->cameras.emplace_back();
 		glm::mat4& cameraMat = collection->cameras.back();
 
-		fread_s(&cameraMat[0][0], sizeof(cameraMat), sizeof(cameraMat), 1, in);
+		in.read((char*)&cameraMat[0][0], sizeof(cameraMat));
+//		fread_s(&cameraMat[0][0], sizeof(cameraMat), sizeof(cameraMat), 1, in);
 	}
 
-	fclose(in);
+	in.close();
+//	fclose(in);
 
 	LOG("Finished loading: ", filepath);
 
