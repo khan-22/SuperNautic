@@ -16,7 +16,7 @@ Ship::Ship()
 		_turningFactor{ 0.0f },
 		_currentTurningAngle{ 0.0f },
 		_accelerationFactor{ 0.5f },
-		_jumpCooldown{ 0.5f },
+		_jumpCooldown{ 1.5f },
 		_currentJumpCooldown{ 0.0f },
 		_engineTemperature{ 0.0f },
 		_velocity{ 0.0f },
@@ -37,10 +37,7 @@ Ship::Ship()
 		_steerStraighteningForce{ 15.0f },
 		_speedResistance{ 0.005f },
 		_preferredHeight{ 2.0f },
-		_engineCooldown{ 0 },
-		_engineOverload { 0 },
-		_engineFlashTime { 0 },
-		_bEngineFlash { false }
+		_engineCooldown{ 0 }
 {
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 	setOrigin(glm::vec3{ 0.0f, 0.1f, 0.0f });
@@ -108,21 +105,10 @@ void Ship::update(float dt)
 
 	// Update engine temperature
 	_engineTemperature = ((_accelerationFactor + _velocity) / 2);
-	
-	if (_engineTemperature > 80)
+
+	if (_engineTemperature > 85)
 	{
-		_engineOverload += (_engineTemperature / 100.f) * dt;
-		if (rand() % 500 + 1 < _engineOverload)
-		{
-			_engineCooldown = _engineOverload * _engineTemperature / 50;
-		}
-	}
-	else
-	{
-		if (_engineOverload > 0)
-		{
-			_engineOverload -= (100 - _engineTemperature) * dt;
-		}
+		_engineCooldown = 5;
 	}
 
 	// Rotate ship forward towards track forward
@@ -181,6 +167,9 @@ void Ship::update(float dt)
 	{
 		// Reset hit timer
 		_timeSinceIntersection = 0.0f;
+
+		// Set current surface
+		_currentSurface = atShipIntersection._surface;
 
 		// Update local directions
 		_upDirection = atShipIntersection._normal;
@@ -363,4 +352,9 @@ const glm::vec3& Ship::getMeshPosition() const
 const glm::vec3 & Ship::getMeshForward() const
 {
 	return _meshForwardDirection();
+}
+
+SurfaceType Ship::getSurfaceType() const
+{
+	return _currentSurface;
 }

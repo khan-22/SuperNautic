@@ -50,7 +50,7 @@ public:
 	const glm::vec3& getCameraForward() const;
 	const glm::vec3& getMeshPosition() const;
 	const glm::vec3& getMeshForward() const;
-
+	SurfaceType getSurfaceType() const;
 
 private:
 	bool		_destroyed;
@@ -81,6 +81,7 @@ private:
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
 
+	SurfaceType _currentSurface{ SurfaceType::normal };
 
 	glm::mat4	_meshMatrix;
 

@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include "glm\vec3.hpp"
+#include "glm/vec3.hpp"
 #include "Core/Geometry/Ray.hpp"
 #include "Core/Geometry/RayIntersection.hpp"
 
@@ -49,7 +49,7 @@ struct AABB
 	}
 
 	// Test if a ray intersects any geometry in this box
-	RayIntersection triangleRayIntersection(const Ray& ray, const std::vector<unsigned>& modelIndices, const RawMeshAsset& scene) const
+	RayIntersection triangleRayIntersection(const Ray& ray, const std::vector<unsigned>& modelIndices, const std::vector<SurfaceType>& temperatures, const RawMeshAsset& scene) const
 	{
 		// Will hold final intersection
 		RayIntersection intersection{ false };
@@ -112,7 +112,23 @@ struct AABB
 				{
 					intersection._length = t;
 					intersection._hit = true;
-					intersection._surface = SurfaceType::normal;
+
+					// Return surface type using temperatures vector
+					if (i < modelIndices.size() - 1) // The last model is the base, others are temperature zones
+					{
+						if (temperatures.size() != modelIndices.size() - 1)
+						{
+							LOG_ERROR("Temperatures vector size does not correspond to number of temperature zone models!");
+							abort();
+						}
+
+						intersection._surface = temperatures[i];
+					}
+					else
+					{
+						intersection._surface = SurfaceType::normal;
+					}
+
 					intersection._position = v0 * (1.0f - u - v) + v1 * u + v2 * v;
 					intersection._normal = scene.get()->meshes[currentModel].normals[faces[j].x] * (1.0f - u - v) +
 										   scene.get()->meshes[currentModel].normals[faces[j].y] * u +
