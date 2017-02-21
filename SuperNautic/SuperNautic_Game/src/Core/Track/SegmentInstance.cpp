@@ -51,7 +51,7 @@ glm::mat4 SegmentInstance::getModelMatrix() const
 
 const int SegmentInstance::getLength() const
 {
-	return _parent->getLength();
+	return static_cast<int>(_parent->getLength());
 }
 
 const int SegmentInstance::getIndex() const

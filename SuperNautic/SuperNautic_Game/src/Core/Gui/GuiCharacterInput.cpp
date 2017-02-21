@@ -88,7 +88,7 @@ void GuiCharacterInput::selectPreviousCharacterList()
     _currentCharacterListIndex--;
     if(_currentCharacterListIndex > _characterLists.size())
     {
-        _currentCharacterListIndex = _characterLists.size() - 1;
+        _currentCharacterListIndex = static_cast<unsigned char>(_characterLists.size() - 1);
     }
     updateText();
 }

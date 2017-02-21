@@ -112,11 +112,11 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_progressionMeter.setOrigin(_widthStep, _heightStep);
 	_progressionMeter.setPosition(_progressionPosX, _heightStep * 90 + _offsetY);
 
-	_tSpeed.setCharacterSize(_widthStep * 5);
+	_tSpeed.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
 	_tSpeed.setPosition(_widthStep * 75 + _offsetX, _heightStep + _offsetY);
 
-	_tPosition.setCharacterSize(_widthStep * 5);
-	_tPosition.setPosition(_widthStep * 50 - _widthStep * 5 + _offsetX, 0 + _offsetY);
+	_tPosition.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
+	_tPosition.setPosition(static_cast<float>(_widthStep * 50 - _widthStep * 5 + _offsetX), static_cast<float>(0 + _offsetY));
 }
 
 void HUD::setHeatWhite(bool isWhite)
@@ -133,8 +133,8 @@ void HUD::updateCurrent()
 	else
 	{
 		int red = 0, green = 0;
-		red = ((_heat)) * 255;
-		green = ((1 - (_heat))) * 255;
+		red = static_cast<int>(_heat * 255);
+		green = static_cast<int>((1 - _heat) * 255);
 		_heatMeter.setFillColor(sf::Color(red, green, 0, 255));
 	}
 	/*else if (_heat < .40)
