@@ -186,13 +186,19 @@ void World::render()
 			if (!(i == j && _players[j]._bIsFirstPerson))
 			{
 				_playerRTs[i].render(_players[j].getShip());
-
 			}
 		}
 	}
 	for (Player& player : _players)
 	{
-		shipLights.push_back(PointLight(player.getShip().getMeshPosition(), { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
+		//shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 3.0f, { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
+
+		// TEST
+		shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{ 2,0,0,1 } }, { 1.f,0.5f,0.f }, 1.f));
+		shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{ -2,0,0,1 } }, { 0.f,0.5f,1.f }, 1.f));
+		shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{ 0,0,0,1 } } +player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,1.f }, 1.f));
+		shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{0,0,0,1} } - player.getShip().getMeshForward() * 2.0f, { 1.f,0.0f,0.f }, 1.f));
+		///////
 	}
 
 	for (int i = 0; i < _playerRTs.size(); i++)
