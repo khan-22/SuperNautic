@@ -665,7 +665,7 @@ unsigned Segment::findChildIndex(size_t currentModel, unsigned index, glm::vec3 
 
 unsigned Segment::getNumZones() const
 {
-	return _temperatureZoneCollisions.size();
+	return static_cast<unsigned>(_temperatureZoneCollisions.size());
 }
 
 // Returns bounding boxes

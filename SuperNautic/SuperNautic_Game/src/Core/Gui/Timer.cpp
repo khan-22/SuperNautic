@@ -10,7 +10,8 @@ Timer::Timer(int windowWidth, int windowHeight) :
 	_tTime.setFont(*_font.get());
 	_tTime.setFillColor(sf::Color::Cyan);
 	_tTime.setString("00:00:00");
-	_tTime.setPosition((windowWidth / 2) - 60 - (_tTime.getLocalBounds().width / 2), windowHeight / 10 * 9);
+	_tTime.setPosition(static_cast<float>((windowWidth / 2) - 60 - (_tTime.getLocalBounds().width / 2)), 
+					   static_cast<float>(windowHeight / 10 * 9));
 	_tTime.setCharacterSize(windowWidth / 20);
 
 	_time = 0;

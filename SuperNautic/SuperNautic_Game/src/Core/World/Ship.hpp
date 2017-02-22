@@ -40,6 +40,7 @@ public:
 	float getEngineTemperature();
 	float getSpeed();
 	bool getOverload(float dt);
+	bool isEngineOverload();
 	// Sets the direction that counts as forward
 	void setForward(const glm::vec3& forwardDirection);
 	glm::vec3 getCameraUp();
@@ -51,6 +52,13 @@ public:
 	const glm::vec3& getMeshPosition() const;
 	const glm::vec3& getMeshForward() const;
 	SurfaceType getSurfaceType() const;
+
+	// TEST
+	glm::mat4 getMatrix()
+	{
+		return _transformMatrix;
+	}
+	///////
 
 private:
 	bool		_destroyed;
@@ -65,6 +73,7 @@ private:
 	float		_engineOverload;
 	float		_engineFlashTime;
 	bool		_bEngineFlash;
+	bool		_bEngineOverload;
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
 
@@ -84,6 +93,7 @@ private:
 	SurfaceType _currentSurface{ SurfaceType::normal };
 
 	glm::mat4	_meshMatrix;
+	glm::mat4	_transformMatrix;
 
 	const float _minAcceleration;
 	const float _maxAcceleration;
