@@ -11,7 +11,7 @@
 struct Camera2D
 {
     float near = 0.1f;
-    glm::mat4 perspective = glm::perspective(glm::radians(90.f), 1280.f / 720.f, near, 10000.f);
+    glm::mat4 perspective = glm::infinitePerspective(glm::radians(90.f), 1280.f / 720.f, near);
 
     glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);
     glm::vec3 dir = glm::vec3(0.f, 0.f, -1.f);
@@ -38,19 +38,12 @@ void Line::render(RenderStates& states)
     GFX::Shader* shader = _shader.get();
     shader->bind();
 
-//    Camera* camera = states.camera;
-//	shader->setUniform("uView", camera->getView());
-//	shader->setUniform("uPerspective", _screenTranslation * camera->getPerspective());
-//	shader->setUniform("uModel", _modelMatrix);
-
 	shader->setUniform("uView", glm::mat4(1.f));
 	shader->setUniform("uPerspective", _screenPerspectiveMatrix);
 	shader->setUniform("uModel", _modelMatrix);
 
     _vao->bind();
-    LOG_GL_ERRORS();
     glDrawElements(GL_POINTS, _numPoints, GL_UNSIGNED_INT, 0);
-    LOG_GL_ERRORS();
     _vao->unbind();
 
 
@@ -111,7 +104,6 @@ std::shared_ptr<GFX::VertexArrayObject> Line::generateVao(const std::vector<glm:
         colors.back() = glm::vec3(255.f, 0.f, 0.f);
     }
     std::vector<float> sizes(points.size(), 50.f);
-//    std::vector<float> sizes(points.size(), 0.1f);
     auto vao = std::make_shared<GFX::VertexArrayObject>();
     size_t indicesSize = sizeof(indices[0]) * indices.size();
     size_t pointsSize = sizeof(points[0]) * points.size();
@@ -132,7 +124,6 @@ std::shared_ptr<GFX::VertexArrayObject> Line::generateVao(const std::vector<glm:
     vao->sendDataToBuffer(0, 2, offset, sizesSize, (void*)sizes.data(), 1, GL_FLOAT);
 
     vao->setDrawCount(indices.size());
-    LOG_GL_ERRORS();
     return vao;
 }
 
