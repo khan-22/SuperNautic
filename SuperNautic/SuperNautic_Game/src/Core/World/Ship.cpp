@@ -315,7 +315,26 @@ void Ship::handleCooldowns(float dt)
 void Ship::handleTemperature(float dt)
 {
 	// Update engine temperature
-	_engineTemperature = ((_accelerationFactor + _velocity) / 2);
+	float fieldAddition = 1.0;
+
+	switch (getSurfaceType())
+	{
+	case SurfaceType::cold:
+		fieldAddition = 0.9;
+		break;
+	case SurfaceType::hot:
+		fieldAddition = 1.1;
+		break;
+	default:
+		break;
+	}
+
+	if (1)
+	{
+
+	}
+
+	_engineTemperature = (((_accelerationFactor + _velocity) * fieldAddition / 2));
 
 	if (_engineTemperature > 80)
 	{
@@ -331,7 +350,7 @@ void Ship::handleTemperature(float dt)
 	{
 		if (_engineOverload > 0)
 		{
-			_engineOverload -= (100 - _engineTemperature) * dt;
+			_engineOverload -= (100 - _engineTemperature) / 100 * dt;
 			if (_engineOverload < 0)
 			{
 				_engineOverload = 0;
