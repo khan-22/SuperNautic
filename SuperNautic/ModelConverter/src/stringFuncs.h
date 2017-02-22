@@ -7,7 +7,7 @@
 
 const char* const reservedNames[] =
 {
-	"CM", "WP", "PL", "BB", "WPEnd", "VM"
+	"CM", "WP", "PL", "BB", "WPEnd", "VM", "Z"
 };
 
 
