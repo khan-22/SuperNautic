@@ -329,12 +329,16 @@ void Ship::handleTemperature(float dt)
 		break;
 	}
 
-	if (1)
+	float enginePower = ((_accelerationFactor + _velocity) / 2) * fieldAddition;
+
+	if (enginePower > _engineTemperature)
 	{
-
+		_engineTemperature = (_engineTemperature * 24 + enginePower) / 25;
 	}
-
-	_engineTemperature = (((_accelerationFactor + _velocity) * fieldAddition / 2));
+	else
+	{
+		_engineTemperature = (_engineTemperature * 49 + enginePower) / 50;
+	}
 
 	if (_engineTemperature > 80)
 	{
