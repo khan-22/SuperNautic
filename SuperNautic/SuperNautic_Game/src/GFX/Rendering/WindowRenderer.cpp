@@ -16,7 +16,7 @@ WindowRenderer::~WindowRenderer()
 
 void WindowRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
 {
-	_shader = ShaderCache::get("forward");
+	_shader = ShaderCache::get("window_forward");
 	_shader.get()->bind();
     _shader.get()->setSampler("uDiffuse", 0);
     _shader.get()->setSampler("uSpecular", 1);
