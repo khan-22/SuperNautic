@@ -53,6 +53,8 @@ public:
 	const glm::vec3& getCameraForward() const;
 	const glm::vec3& getMeshPosition() const;
 	const glm::vec3& getMeshForward() const;
+	const glm::vec3& getMeshUp() const;
+	const glm::vec3& getVelocity() const;
 	SurfaceType getSurfaceType() const;
 	const BoundingBox& getBoundingBox() const;
 	void obstacleCollision();

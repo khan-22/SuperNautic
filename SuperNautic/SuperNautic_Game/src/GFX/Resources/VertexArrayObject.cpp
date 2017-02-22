@@ -90,10 +90,29 @@ void VertexArrayObject::setDrawCount(GLuint drawCount)
 	_drawCount = drawCount;
 }
 
+void GFX::VertexArrayObject::updateDataInBuffer(GLubyte bufferIndex, GLubyte attributeIndex, GLuint offset, GLsizei size, GLvoid * data)
+{
+	bind();
+	VertexBuffer& buffer = *_vertexBuffers[bufferIndex].get();
+	buffer.bind();
+
+	buffer.sendData(offset, size, data);
+
+	unbind();
+	buffer.unbind();
+}
+
 void VertexArrayObject::render()
 {
 	bind();
 	glDrawElements(GL_TRIANGLES, _drawCount, GL_UNSIGNED_INT, 0);
+	unbind();
+}
+
+void GFX::VertexArrayObject::renderPoints()
+{
+	bind();
+	glDrawArrays(GL_POINTS, 0, _drawCount);
 	unbind();
 }
 

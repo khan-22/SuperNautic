@@ -16,7 +16,7 @@ namespace GFX
 		enum DepthType
 		{	
 			INT16		= GL_DEPTH_COMPONENT16,
-			INT24		= GL_DEPTH_COMPONENT24,
+			INT24		= GL_DEPTH24_STENCIL8,
 			INT32		= GL_DEPTH_COMPONENT32,
 			FLOAT32		= GL_DEPTH_COMPONENT32F,
 		};
@@ -25,7 +25,7 @@ namespace GFX
 		Framebuffer();
 		~Framebuffer();
 		
-		void initialize(GLuint width, GLuint height, GLuint numColorAttachments, DepthType depthType = FLOAT32);
+		void initialize(GLuint width, GLuint height, GLuint numColorAttachments, DepthType depthType = INT24);
 
 		void bindWrite() const;
 		void bindRead() const;

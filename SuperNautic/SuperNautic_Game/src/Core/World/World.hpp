@@ -20,6 +20,9 @@ namespace sf
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 
+#include "GFX/Rendering/ParticleRenderer.hpp"
+#include "GFX/Resources/ParticleSystem.hpp"
+
 struct ApplicationContext;
 
 class World
@@ -50,9 +53,14 @@ private:
 	//GFX::DeferredRenderer		_renderer;
 
 	std::vector<GFX::DeferredRenderer> _playerRTs;
+	std::vector<GFX::ParticleRenderer> _playerParticleRenderers;
+	std::vector<GFX::ParticleSystem>	_playerParticles;
 
 	Camera						_camera;
 	bool						_bDebugging;
+
+
+	//GFX::ParticleRenderer	_particleRenderer;
 };
 
 #endif //WORLD_HPP
