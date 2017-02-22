@@ -58,6 +58,9 @@ void Player::update(float dt)
 				case sf::Keyboard::Y:
 					swapPerspective();
 					break;
+				case sf::Keyboard::Escape:
+					//Player paused game
+					break;
 				default:
 					break;
 				}
