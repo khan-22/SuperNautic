@@ -13,11 +13,12 @@ public:
 
 	void play();
 	void stop();
+	void loadSound(std::string filename);
 protected:
 
 private:
-	sf::Sound _buttonClick;
-	sf::Music _music;
+	sf::SoundBuffer _musicbuffer;
+	sf::Sound _music;
 
 };
 

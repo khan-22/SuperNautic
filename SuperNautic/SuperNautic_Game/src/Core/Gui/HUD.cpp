@@ -38,7 +38,6 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_progressionOutline.setSize(sf::Vector2f(_widthStep, _heightStep * 80));
 	_progressionOutline.setOutlineColor(sf::Color(0, 50, 100, 100));
 	_progressionOutline.setFillColor(sf::Color(0, 50, 100, 100));
-	//_progressionOutline.setOutlineThickness(_heightStep);
 	_progressionOutline.setPosition(_progressionPosX, _heightStep * 9 + _offsetY);
 
 	_progressionMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
@@ -95,7 +94,7 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_heatPosX = _widthStep * 3 + _offsetX; 
 	_heatPosY = _heightStep * 90 + _offsetY;
 
-	_progressionPosX = width - (_widthStep * 4 + _offsetX);
+	_progressionPosX = width - _widthStep * 4 + _offsetX;
 
 	_heatOutline.setSize(sf::Vector2f(_widthStep * 2, _heightStep * 80));
 	_heatOutline.setOutlineThickness(_heightStep);
@@ -106,7 +105,6 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_heatMeter.setPosition(_widthStep * 2 + _offsetX, _heightStep * 90 + _offsetY);
 
 	_progressionOutline.setSize(sf::Vector2f(_widthStep, _heightStep * 80));
-	//_progressionOutline.setOutlineThickness(_heightStep);
 	_progressionOutline.setPosition(_progressionPosX, _heightStep * 9 + _offsetY);
 
 	_progressionMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
@@ -138,22 +136,6 @@ void HUD::updateCurrent()
 		green = static_cast<int>((1 - ((std::max(std::min(_heat, 0.8f), 0.5f) - 0.5f) / 0.3f)) * 255);
 		_heatMeter.setFillColor(sf::Color(red, green, 0, 255));
 	}
-	/*else if (_heat < .40)
-	{
-		_heatMeter.setFillColor(sf::Color::Green);
-	}
-	else if (_heat < .60)
-	{
-		_heatMeter.setFillColor(sf::Color::Blue);
-	}
-	else if (_heat < .80)
-	{
-		_heatMeter.setFillColor(sf::Color::Yellow);
-	}
-	else
-	{
-		_heatMeter.setFillColor(sf::Color::Red);
-	}*/
 
 	_sizeY = _heat * _heatSizeY;
 	_heatMeter.setSize(sf::Vector2f(_heatSizeX, _sizeY));
