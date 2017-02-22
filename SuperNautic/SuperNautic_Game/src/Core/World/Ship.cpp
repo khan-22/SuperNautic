@@ -395,6 +395,11 @@ const glm::vec3 & Ship::getMeshUp() const
 	return _meshUpDirection();
 }
 
+const glm::vec3 & Ship::getVelocity() const
+{
+	return _velocity * _meshForwardDirection();
+}
+
 SurfaceType Ship::getSurfaceType() const
 {
 	return _currentSurface;
