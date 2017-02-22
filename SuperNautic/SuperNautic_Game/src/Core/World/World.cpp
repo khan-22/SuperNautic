@@ -107,6 +107,7 @@ void World::update(float dt, sf::Window& window)
 {
 	if (!_bDebugging)
 	{
+		// Update players
 		for (unsigned i = 0; i < _players.size(); ++i)
 		{
 			// Finds forward vector of ship and updates segment index
@@ -159,6 +160,8 @@ void World::update(float dt, sf::Window& window)
 			}
 			_players[i].setPosition(k);
 		}
+
+		// Update debug camera
 		_camera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
 		_camera.setUp(_players[0].getShip().getCameraUp());
 		_camera.setViewDir(_players[0].getShip().getCameraForward());
