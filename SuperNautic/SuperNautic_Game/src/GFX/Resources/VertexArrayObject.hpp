@@ -28,8 +28,10 @@ namespace GFX
 		void sendDataToBuffer(GLubyte bufferIndex, GLubyte attributeIndex, GLuint offset, GLsizei size, GLvoid* data, GLubyte count, GLenum type);
 		void sendDataToIndexBuffer(GLuint offset, GLsizei size, GLvoid* data);
 		void setDrawCount(GLuint drawCount);
+		void updateDataInBuffer(GLubyte bufferIndex, GLubyte attributeIndex, GLuint offset, GLsizei size, GLvoid* data);
 
 		void render();
+		void renderPoints();
 
 		void bind() const;
 		static void unbind();

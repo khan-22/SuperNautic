@@ -16,11 +16,12 @@ namespace GFX
 	    using TextureAsset = Asset<GFX::Texture>;
         struct Group
         {
-            Group(TextureAsset& diffuse, TextureAsset& specular, TextureAsset& normal);
+            Group(TextureAsset& diffuse, TextureAsset& specular, TextureAsset& normal, TextureAsset& illumination);
 
             TextureAsset diffuse;
             TextureAsset specular;
-            TextureAsset normal;
+			TextureAsset normal;
+			TextureAsset illumination;
         };
 
         Material(const std::vector<Group>& groups);

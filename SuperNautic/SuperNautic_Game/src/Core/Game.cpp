@@ -23,7 +23,7 @@
 
 
 Game::Game()
-	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Default, sf::ContextSettings(24U, 0U, 0U, 4U, 0U))
+	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Default, sf::ContextSettings(24U, 8U, 0U, 4U, 0U))
 	, _context(_window)
 	, _quitTimer(0.f)
 	, _fps(60.f)
@@ -123,6 +123,10 @@ bool Game::bInitialize()
 	//_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f }, 2.0f));
 	//_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 0.f, 1.f }, 2.0f));
 
+	_particleRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
+	//_testParticles.init(50, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 5.f, 50.f);
+	_testParticles.init(500, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 0.01f, 5.f, 50.f);
+
 	return true;
 }
 
@@ -172,9 +176,22 @@ void Game::update(float dt)
 
 	//_debugCamera.update(dt, _window);
 
-	//static float t = 0.0;
-	//t += dt;
+	static float t = 0.0;
+	t += dt;
 	//_pointLights[0].setPosition(glm::vec3(5.f * sinf(t*2.f), 2.f, 5.f * cosf(t*2.f)));
+
+	static glm::vec3 currentPos = glm::vec3(5.f * sinf(t*2.f), 2.f, 5.f * cosf(t*2.f));
+	static glm::vec3 prevPos	= currentPos;
+	currentPos = glm::vec3(5.f * sinf(t*2.f), 2.f, 5.f * cosf(t*2.f));;
+
+	//ModelArray[1].getModelAsset().get()->setModelMatrix(glm::translate(glm::vec3(100.f)));
+
+	//_testParticles.update(
+	//	dt, 
+	//	currentPos, 
+	//	(currentPos - prevPos) * 20.f);
+
+	prevPos = currentPos;
 
     _stateStack.update(dt);
 }
@@ -190,6 +207,7 @@ void Game::render()
 	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
 	_camera.setViewDir(glm::vec3(0.f, 0.f, 1.f));
 
+	
 
 	//for (auto& pointLight : _pointLights)
 	//{
@@ -201,13 +219,16 @@ void Game::render()
 	//	_deferredRenderer.render(model);
 	//}
 
-	//glm::vec3 pos = _debugCamera.getPosition();
-	//std::string title = "( " + std::to_string((int)pos.x) + ", " + std::to_string((int)pos.y) + ", " + std::to_string((int)pos.z) + " )";
-	//_window.setTitle(title);
+	////glm::vec3 pos = _debugCamera.getPosition();
+	////std::string title = "( " + std::to_string((int)pos.x) + ", " + std::to_string((int)pos.y) + ", " + std::to_string((int)pos.z) + " )";
+	////_window.setTitle(std::to_string(_fps));
 
 	////_deferredRenderer.render(_texturedModel);
 
 	//_deferredRenderer.display(_debugCamera);
+
+	//_particleRenderer.render(_testParticles);
+	//_particleRenderer.display(_debugCamera);
 
 	//_window.display();
 	//return;

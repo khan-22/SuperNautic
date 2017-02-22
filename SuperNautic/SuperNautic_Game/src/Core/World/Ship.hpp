@@ -14,6 +14,8 @@
 #include "GFX/Rendering/Renderable3D.hpp"
 #include "Core/Utility/SpringRotatedVector.hpp"
 #include "Core/Utility/SpringTranslatedVector.hpp"
+#include "Core/Geometry/BoundingBox.hpp"
+#include "Core/Utility/CollisionUtility.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 {
@@ -40,6 +42,7 @@ public:
 	float getEngineTemperature();
 	float getSpeed();
 	bool getOverload(float dt);
+	bool isEngineOverload();
 	// Sets the direction that counts as forward
 	void setForward(const glm::vec3& forwardDirection);
 	glm::vec3 getCameraUp();
@@ -50,7 +53,18 @@ public:
 	const glm::vec3& getCameraForward() const;
 	const glm::vec3& getMeshPosition() const;
 	const glm::vec3& getMeshForward() const;
+	const glm::vec3& getMeshUp() const;
+	const glm::vec3& getVelocity() const;
 	SurfaceType getSurfaceType() const;
+	const BoundingBox& getBoundingBox() const;
+	void obstacleCollision();
+
+	// TEST
+	glm::mat4 getMatrix()
+	{
+		return _transformMatrix;
+	}
+	///////
 
 private:
 	bool		_destroyed;
@@ -65,6 +79,7 @@ private:
 	float		_engineOverload;
 	float		_engineFlashTime;
 	bool		_bEngineFlash;
+	bool		_bEngineOverload;
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
 
@@ -83,7 +98,10 @@ private:
 
 	SurfaceType _currentSurface{ SurfaceType::normal };
 
+	BoundingBox _boundingBox;
+
 	glm::mat4	_meshMatrix;
+	glm::mat4	_transformMatrix;
 
 	const float _minAcceleration;
 	const float _maxAcceleration;
@@ -96,6 +114,17 @@ private:
 	const float _rayHeight{ 5.0f };			// Height above ship of the origin of the rays used for intersection
 	const float _rayAheadDistance{ 2.0f };	// Distance ahead of ship the second ray starts
 
+	const float _cooldownOnObstacleCollision;
+
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
+
+	// Helper functions for update()
+	void handleInputs(float dt);
+	void handleCooldowns(float dt);
+	void handleTemperature(float dt);
+	void rotateTowardTrackForward(float dt);
+	void updateDirectionsAndPositions(float dt);
+	void trackSurface();
+	void checkObstacleCollision();
 };
 #endif // SHIP_HPP

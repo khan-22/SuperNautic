@@ -5,10 +5,8 @@
 
 WorldAudio::WorldAudio()
 {
-	std::string folder = "./res/audio/music/";
-	if (!_music.openFromFile(folder + "Stranger Danger - Haste(Repeat).ogg"))
-	{
-	}
+	loadSound("Stranger Danger - Haste(Repeat).ogg");
+	_music.setBuffer(_musicbuffer);
 
 	_music.setLoop(true);
 	play();
@@ -28,4 +26,10 @@ void WorldAudio::play() {
 
 void WorldAudio::stop() {
 	_music.stop();
+}
+
+void WorldAudio::loadSound(std::string filename)
+{
+	std::string folder = "./res/audio/music/";
+	_musicbuffer.loadFromFile(folder + filename);
 }

@@ -56,10 +56,11 @@ vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3
 
 void main()
 {
-	vec3 fragPos	= texture(uPosition, fs_in.uv).rgb;
-	vec3 diffuseTex = texture(uDiffuse, fs_in.uv).rgb;
-	vec3 normal		= texture(uNormal, fs_in.uv).rgb;
-	vec3 viewDir	= normalize(uViewPos - fragPos);
+	vec3 fragPos		= texture(uPosition, fs_in.uv).rgb;
+	vec3 diffuseTex		= texture(uDiffuse, fs_in.uv).rgb;
+	vec3 normal			= texture(uNormal, fs_in.uv).rgb;
+	float illumination  = texture(uDiffuse, fs_in.uv).a;
+	vec3 viewDir		= normalize(uViewPos - fragPos);
 
 	vec4 lightingResult = vec4(0, 0, 0, 1);
 
@@ -68,8 +69,8 @@ void main()
 		lightingResult.rgb += calculatePointLight(i, fragPos, diffuseTex, normal, viewDir);
 	}
 
-	outColor = vec4(diffuseTex, 1.0);
-	//outColor = lightingResult;
+	//outColor = vec4(diffuseTex, 1.0);
+	outColor = mix(lightingResult, vec4(diffuseTex, 1.0), illumination);
 }
 
 //vec3 lightDir = vec3(-0.2, -0.2, -0.2);
