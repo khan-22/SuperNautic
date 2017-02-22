@@ -42,3 +42,8 @@ void TrackPreview::update(float dtSeconds)
 {
     _track.rotate(glm::vec3(0.f, 0.1f * dtSeconds, 0.f));
 }
+
+void TrackPreview::move(const glm::vec2& xy)
+{
+    _track.move(xy);
+}

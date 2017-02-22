@@ -18,6 +18,7 @@ public:
 
     void update(float dtSeconds);
     void setTrack(Track& track);
+    void move(const glm::vec2& xy);
 
 private:
     GFX::Line _track;
