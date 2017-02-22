@@ -9,6 +9,7 @@
 #include "Core/World/Ship.hpp"
 #include "Core/Geometry/Ray.hpp"
 #include "Core/Geometry/RayIntersection.hpp"
+#include "Core/Utility/CollisionUtility.hpp"
 
 Ship::Ship()
 	:	_destroyed{ false },
@@ -37,7 +38,9 @@ Ship::Ship()
 		_steerStraighteningForce{ 15.0f },
 		_speedResistance{ 0.005f },
 		_preferredHeight{ 2.0f },
-		_engineCooldown{ 0 }
+		_engineCooldown{ 0 },
+		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
+		_cooldownOnObstacleCollision{ 2.0f }
 {
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 	setOrigin(glm::vec3{ 0.0f, 0.1f, 0.0f });
@@ -220,6 +223,13 @@ void Ship::update(float dt)
 						  glm::vec4{ _meshForwardDirection(), 0.0f },
 						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 
+	_boundingBox.center = _meshPosition();
+	_boundingBox.directions[0] = glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection()));
+	_boundingBox.directions[1] = _meshUpDirection();
+	_boundingBox.directions[2] = _meshForwardDirection();
+
+	checkObstacleCollision();
+
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
 	_accelerationFactor = 0.0f;
@@ -357,4 +367,32 @@ const glm::vec3 & Ship::getMeshForward() const
 SurfaceType Ship::getSurfaceType() const
 {
 	return _currentSurface;
+}
+
+void Ship::checkObstacleCollision()
+{
+	// Check every relevant instance
+	for (SegmentInstance* segment : _segmentsToTest)
+	{
+		// For every obstacle
+		for (unsigned i = 0; i < segment->getObstacles().size(); ++i)
+		{
+			// For every bounding box in this obstacle
+			for (unsigned j = 0; j < segment->getObstacles()[i].getBoundingBoxes().size(); ++j)
+			{
+				if (bTestCollision(_boundingBox, segment->getObstacles()[i].getBoundingBoxes()[j]))
+				{
+					obstacleCollision();
+				}
+			}
+		}
+	}
+}
+
+void Ship::obstacleCollision()
+{
+	if (_cooldownOnObstacleCollision > _engineCooldown)
+	{
+		_engineCooldown = _cooldownOnObstacleCollision;
+	}
 }

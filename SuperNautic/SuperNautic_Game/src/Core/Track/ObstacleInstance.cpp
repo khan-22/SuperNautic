@@ -35,3 +35,8 @@ void ObstacleInstance::render(GFX::RenderStates & states)
 	_parent->getModel().getModelAsset().get()->setModelMatrix(_modelMat);
 	_parent->getModel().render(states);
 }
+
+std::vector<BoundingBox>& ObstacleInstance::getBoundingBoxes() const
+{
+	return _parent->_boxes;
+}

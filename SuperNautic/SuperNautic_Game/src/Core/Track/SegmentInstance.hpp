@@ -27,6 +27,7 @@ public:
 	void update(const float dt);
 	void render(GFX::RenderStates& states) override;
 	const RayIntersection rayIntersectionTest(const Ray& ray) const;
+	const std::vector<ObstacleInstance>& getObstacles() const;
 
 	const Segment* getParent()
 	{
@@ -50,8 +51,6 @@ private:
 	void updateGlobalBounds();
 	bool bTestCollisionSphere(const SegmentInstance& other) const;
 	bool bTestCollisionBox(const SegmentInstance& other) const;
-
-
 };
 
 #endif // !SEGMENTINSTANCE_HPP

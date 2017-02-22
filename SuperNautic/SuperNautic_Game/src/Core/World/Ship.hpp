@@ -83,6 +83,8 @@ private:
 
 	SurfaceType _currentSurface{ SurfaceType::normal };
 
+	BoundingBox _boundingBox;
+
 	glm::mat4	_meshMatrix;
 
 	const float _minAcceleration;
@@ -96,6 +98,10 @@ private:
 	const float _rayHeight{ 5.0f };			// Height above ship of the origin of the rays used for intersection
 	const float _rayAheadDistance{ 2.0f };	// Distance ahead of ship the second ray starts
 
+	const float _cooldownOnObstacleCollision;
+
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
+	void checkObstacleCollision();
+	void obstacleCollision();
 };
 #endif // SHIP_HPP
