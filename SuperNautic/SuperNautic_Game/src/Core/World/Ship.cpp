@@ -36,16 +36,16 @@ Ship::Ship()
 		_straighteningForce{ 3.0f },
 		_steerStraighteningForce{ 15.0f },
 		_speedResistance{ 0.005f },
-		_preferredHeight{ 1.0f },
+		_preferredHeight{ 1.5f },
 		_engineCooldown{ 0 },
 		_engineOverload{ 0 },
 		_engineFlashTime{ 0 },
 		_bEngineFlash{ false },
 		_bEngineOverload { false },
-		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } }
+		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
+		_cooldownOnObstacleCollision{ 2.0f }
 {
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
-	setOrigin(glm::vec3{ 0.0f, 0.0f, 0.0f });
 }
 
 
@@ -66,7 +66,6 @@ void Ship::update(float dt)
 {
 	dt = clamp(dt, 0.0f, 1.0f / 30.0f);
 
-
 	handleInputs(dt);
 	handleCooldowns(dt);
 	handleTemperature(dt);
@@ -75,9 +74,11 @@ void Ship::update(float dt)
 	trackSurface();
 	updateDirectionsAndPositions(dt);
 
+	checkObstacleCollision();
+
 	// Create mesh rotation matrix from mesh up and forward directions
 	_meshMatrix = { glm::vec4{ glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection())), 0.0f },
-						  glm::vec4{ _meshUpDirection(), 0.0f },	// The part of _meshUpDirection that is orthogonal to _meshForwardDirection
+						  glm::vec4{ _meshUpDirection(), 0.0f },
 						  glm::vec4{ _meshForwardDirection(), 0.0f },
 						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 
@@ -255,11 +256,11 @@ const BoundingBox & Ship::getBoundingBox() const
 	return _boundingBox;
 }
 
-void Ship::setEngineCooldown(float cooldown)
+void Ship::obstacleCollision()
 {
-	if (cooldown > _engineCooldown)
+	if (_cooldownOnObstacleCollision > _engineCooldown)
 	{
-		_engineCooldown = cooldown;
+		_engineCooldown = _cooldownOnObstacleCollision;
 	}
 }
 
@@ -449,4 +450,21 @@ void Ship::trackSurface()
 		// Move up/down to the correct track height
 		move(_upDirection * (_preferredHeight - (((atShipIntersection._length + aheadOfShipIntersection._length) / 2.0f) - _rayHeight)));
 	}
+}
+
+void Ship::checkObstacleCollision()
+{
+	//for (SegmentInstance* segment : _segmentsToTest)
+	//{
+	//	for (every obstacle)
+	//	{
+	//		for (boxes in obstacle)
+	//		{
+	//			if (bTestCollision(_boundingBox, /*segment's bounding boxes*/))
+	//			{
+	//				obstacleCollision();
+	//			}
+	//		}
+	//	}
+	//}
 }

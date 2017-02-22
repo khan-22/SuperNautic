@@ -38,29 +38,26 @@ public:
 	void setTrack(Track * track);
 
 private:
-	Track*							_track;
-	std::vector<Player>				_players;
-	std::vector<PointLight>			_pointLights;
-	bool							_bHasWon;
+	Track*									_track;
+	std::vector<Player>						_players;	
+	std::vector<std::vector<PointLight>>	_playerPointLights;
+	bool									_bHasWon;
 
-	Timer							_timer;
+	Timer									_timer;
 
-	const ApplicationContext&		_context;
+	const ApplicationContext&				_context;
 
 	// Keeps track of indices and progress of players
 	std::vector<TrackProgression>	_playerProgression;
 
-	//GFX::DeferredRenderer		_renderer;
-
-	std::vector<GFX::DeferredRenderer> _playerRTs;
-	std::vector<GFX::ParticleRenderer> _playerParticleRenderers;
+	std::vector<GFX::DeferredRenderer>	_playerRTs;
+	std::vector<GFX::ParticleRenderer>	_playerParticleRenderers;
 	std::vector<GFX::ParticleSystem>	_playerParticles;
 
-	Camera						_camera;
-	bool						_bDebugging;
+	DebugCamera						_debugCamera;
+	bool							_bDebugging;
 
-
-	//GFX::ParticleRenderer	_particleRenderer;
+	void updateLightPos(const TrackProgression& playerProgression, int playerIndex);
 };
 
 #endif //WORLD_HPP

@@ -10,25 +10,27 @@
 
 World::World(ApplicationContext& context, Track* track, const int numberOfPlayers)
 	: _context{ context }
-	, _camera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
+	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
 	, _track(track)
 	, _playerRTs(numberOfPlayers)
 	, _playerParticleRenderers(numberOfPlayers)
 	, _playerParticles(numberOfPlayers)
+	, _playerPointLights(numberOfPlayers)
 {
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
 		_playerParticles[i].init(500, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
 	}
 
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
-	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
+	for (int i = 0; i < numberOfPlayers; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			_playerPointLights[i].push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
+		}
+	}
 
 	// Create one player
 	for (int i = 0; i < 5; i++)
@@ -105,6 +107,7 @@ void World::update(float dt, sf::Window& window)
 {
 	if (!_bDebugging)
 	{
+		// Update players
 		for (unsigned i = 0; i < _players.size(); ++i)
 		{
 			// Finds forward vector of ship and updates segment index
@@ -139,20 +142,6 @@ void World::update(float dt, sf::Window& window)
 				_bHasWon = true;
 			}
 
-			std::vector<SegmentInstance*> instancesForLights;
-			for (long j = static_cast<long>(_playerProgression[i].getCurrentSegment()); j <= static_cast<long>(_playerProgression[i].getCurrentSegment()) + 5; ++j)
-			{
-				if (j >= 0 && j < _track->getNrOfSegments())
-				{
-					instancesForLights.push_back(_track->getInstance(static_cast<int>(j)));
-				}
-			}
-
-			for (int k = 0; k < instancesForLights.size(); k++)
-			{
-				_pointLights[k].setPosition(instancesForLights[k]->getModelMatrix() * glm::vec4(instancesForLights[k]->getParent()->getWaypoints()[0], 1.f));
-			}
-
 			// Set relevant segments
 			_players[i].getShip().setSegments(instances);
 
@@ -171,12 +160,15 @@ void World::update(float dt, sf::Window& window)
 			}
 			_players[i].setPosition(k);
 		}
-		_camera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
-		_camera.setUp(_players[0].getShip().getCameraUp());
-		_camera.setViewDir(_players[0].getShip().getCameraForward());
+
+		// Update debug camera
+		_debugCamera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
+		_debugCamera.setUp(_players[0].getShip().getCameraUp());
+		_debugCamera.setViewDir(_players[0].getShip().getCameraForward());
 	}
 	else
 	{
+		_debugCamera.update(dt, _context.window);
 	}
 	if (!_bDebugging && sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
@@ -222,7 +214,7 @@ void World::render()
 	for (Player& player : _players)
 	{
 		//shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 3.0f, { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
-		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,0.f }, 1.f));
+		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,0.f }, 1.5f));
 
 		// TEST
 		//shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{ -2,0,0,1 } }, { 0.f,0.5f,1.f }, 1.f));
@@ -247,9 +239,11 @@ void World::render()
 
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		for (int j = 0; j < _pointLights.size(); j++)
+		updateLightPos(_playerProgression[i], i);
+
+		for (int j = 0; j < _playerPointLights[i].size(); j++)
 		{
-			_playerRTs[i].pushPointLight(_pointLights[j]);
+			_playerRTs[i].pushPointLight(_playerPointLights[i][j]);
 		}
 	}
 
@@ -263,7 +257,7 @@ void World::render()
 	}
 	else
 	{
-		_playerRTs[0].display(_camera);
+		_playerRTs[0].display(_debugCamera);
 		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 	}
 
@@ -278,9 +272,6 @@ void World::render()
 	}
 
 	// Should be done for each player before drawing particles.
-
-	//_particleRenderer.render(_testParticles);
-	//_particleRenderer.display(*_players[0].getCamera());
 
 	GFX::SfmlRenderer sfml;
 	for (Player& player : _players)
@@ -301,4 +292,21 @@ bool World::bHasWon()
 void World::setTrack(Track * track)
 {
 	_track = track;
+}
+
+void World::updateLightPos(const TrackProgression& playerProgression, int playerIndex)
+{
+	std::vector<SegmentInstance*> instancesForLights;
+	for (long j = static_cast<long>(playerProgression.getCurrentSegment()); j <= static_cast<long>(playerProgression.getCurrentSegment()) + 5; ++j)
+	{
+		if (j >= 0 && j < _track->getNrOfSegments())
+		{
+			instancesForLights.push_back(_track->getInstance(static_cast<int>(j)));
+		}
+	}
+
+	for (int k = 0; k < instancesForLights.size(); k++)
+	{
+		_playerPointLights[playerIndex][k].setPosition(instancesForLights[k]->getModelMatrix() * glm::vec4(instancesForLights[k]->getParent()->getWaypoints()[0], 1.f));
+	}
 }
