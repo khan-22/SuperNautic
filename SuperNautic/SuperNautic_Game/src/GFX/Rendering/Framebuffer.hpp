@@ -25,7 +25,7 @@ namespace GFX
 		Framebuffer();
 		~Framebuffer();
 		
-		void initialize(GLuint width, GLuint height, GLuint numColorAttachments, DepthType depthType = INT24);
+		void initialize(GLuint width, GLuint height, GLuint colorChannels[], GLuint numColorAttachments, DepthType depthType = INT24);
 
 		void bindWrite() const;
 		void bindRead() const;

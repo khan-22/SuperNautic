@@ -27,7 +27,7 @@ Framebuffer::~Framebuffer()
 	glDeleteFramebuffers(1, &_fbo);
 }
 
-void GFX::Framebuffer::initialize(GLuint width, GLuint height, GLuint numColorAttachments, GLuint colorChannels[], DepthType depthType)
+void GFX::Framebuffer::initialize(GLuint width, GLuint height, GLuint colorChannels[], GLuint numColorAttachments, DepthType depthType)
 {
 	assert(numColorAttachments <= MAX_COLOR_ATTACHMENTS);
 
