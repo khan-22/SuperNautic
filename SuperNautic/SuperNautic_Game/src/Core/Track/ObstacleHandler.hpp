@@ -39,14 +39,31 @@ public:
 		{
 			return _maxRotSpeed1;
 		}
+		float getRandomRotSpeed(float diff) const
+		{
+			int min = getMinRotSpeed(diff);
+			int max = getMaxRotSpeed(diff);
+			double scaled = (double)rand() / RAND_MAX;
+			float rotDir = 1;
+			if (rand() % 2 == 0)
+			{
+				rotDir = -1;
+			}
+			return ((max - min + 1) * scaled + min) * rotDir;
+		}
+		GFX::TexturedModel getModel() const
+		{
+			return _model;
+		}
 	};
 
-	ObstacleHandler(const std::string& filename);
+	ObstacleHandler(const std::string& infoFileName);
 	virtual ~ObstacleHandler();
+	Obstacle* getRandomObstacle();
 
 private:
 	std::vector<Obstacle*>		_obstacles;
-	static std::string			_basePath;
+	static std::string			_basePathObstacles;
 };
 
 #endif // !OBSTACLEHANDLER_H

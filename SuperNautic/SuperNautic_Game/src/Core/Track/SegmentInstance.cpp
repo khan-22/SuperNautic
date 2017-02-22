@@ -59,6 +59,11 @@ const int SegmentInstance::getIndex() const
 	return _parent->getInfo()->loadedIndex;
 }
 
+void SegmentInstance::addObstacle(ObstacleInstance newObstacle)
+{
+	_obstacles.push_back(newObstacle);
+}
+
 bool SegmentInstance::bTestCollisionSphere(const SegmentInstance& other) const
 {
     for(const Sphere& a : _globalBoundingSpheres)
@@ -137,10 +142,22 @@ void SegmentInstance::updateGlobalBounds()
 }
 
 
+void SegmentInstance::update(const float dt)
+{
+	for (size_t i = 0; i < _obstacles.size(); i++)
+	{
+		_obstacles[i].update(dt);
+	}
+}
+
 void SegmentInstance::render(GFX::RenderStates & states)
 {
 	_parent->getVisualModel().getModelAsset().get()->setModelMatrix(_model);
 	_parent->getVisualModel().render(states);
+	for (size_t i = 0; i < _obstacles.size(); i++)
+	{
+		_obstacles[i].render(states);
+	}
 }
 
 const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const

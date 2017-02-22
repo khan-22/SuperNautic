@@ -11,11 +11,12 @@
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "Core/Geometry/Octree.hpp"
+#include "Core/Track/ObstacleHandler.hpp"
 
 class Track
 {
 public:
-	Track(SegmentHandler * segmentHandler);
+	Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler);
 	virtual ~Track();
 	int getTargetLength() const;
 	int getGeneratedLength() const;
@@ -28,6 +29,7 @@ public:
 	int getNrOfSegments() const;
 	SegmentInstance* getInstance(int index);
 	float getProgression() const;
+	void update(const float dt);
 	void render(GFX::DeferredRenderer& renderer, const int shipIndex);
 
 	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos and length from start of segment
@@ -42,8 +44,10 @@ private:
 	void insertStructure(const int index);
 	void deleteSegments(const int lengthToDelete);
 	bool bEndTrack();
+	void placeObstacles();
 
 	SegmentHandler *						_segmentHandler;
+	ObstacleHandler *						_obstacleHandler;
 	std::vector<SegmentInstance*>			_track;
 	std::vector<Octree<SegmentInstance*>>	_octrees;
 	std::string								_seed;

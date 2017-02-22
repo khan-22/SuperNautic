@@ -174,6 +174,8 @@ void World::update(float dt, sf::Window& window)
 		_bDebugging = false;
 	}
 
+	_track->update(dt);
+
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
 }

@@ -10,8 +10,9 @@
 #include "GFX/Resources/Model.hpp"
 
 // Real costructor
-Track::Track(SegmentHandler * segmentHandler)
+Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	: _segmentHandler(segmentHandler)
+	, _obstacleHandler(obstacleHandler)
 	, _seed("1")
 	, _curviness(0)
 	, _targetLength(10000)
@@ -161,6 +162,7 @@ bool Track::bGenerate()
 		{
 			if (bEndTrack())
 			{
+				placeObstacles();
 				return true;
 				LOG("Track generated. Length: ", _generatedLength);
 			}
@@ -508,16 +510,64 @@ bool Track::bEndTrack()
 	return true;
 }
 
+// Places obstacles in the finished track
+void Track::placeObstacles()
+{
+	int lengthForPrevious = 0;
+
+	for (size_t i = 1; i < _track.size(); i++)
+	{
+		const std::vector<glm::vec3>& waypoints = _track[i]->getParent()->getWaypoints();
+		assert(waypoints.size() > 0);
+		float targetDepth = 1.f; //rand() % (_track[i]->getLength() - 1) + 1;
+
+		std::vector<glm::vec3> distanceVectors;
+		distanceVectors.reserve(waypoints.size() - 1);
+		for (size_t i = 0; i + 1 < waypoints.size(); i++)
+		{
+			distanceVectors.push_back(waypoints[i + 1] - waypoints[i]);
+		}
+
+		size_t distanceIndex = 0;
+		float depth = 0.f;
+		while (depth < targetDepth && distanceIndex < distanceVectors.size())
+		{
+			depth += glm::length(distanceVectors[distanceIndex]);
+			distanceIndex++;
+		}
+
+		assert(distanceIndex > 0);
+		distanceIndex--;
+		const glm::vec3& finalDistance = distanceVectors[distanceIndex];
+		float finalDistanceLength = glm::length(finalDistance);
+		depth -= finalDistanceLength;
+		float remainderDepth = targetDepth - depth;
+
+		glm::vec3 pos = waypoints[distanceIndex] + finalDistance * (remainderDepth / finalDistanceLength);
+		ObstacleHandler::Obstacle * obstacle = _obstacleHandler->getRandomObstacle();
+
+		_track[i]->addObstacle(ObstacleInstance(pos, finalDistance, _track[i]->getModelMatrix(), obstacle, 1.f));
+	}
+}
+
 // Render the track
 void Track::render(GFX::DeferredRenderer& renderer, const int shipIndex)
 {
-	for (int i = -2; i < 300; i++)
+	for (int i = -2; i < 30; i++)
 	{
 		int index = shipIndex + i;
 		if (index >= 0 && index < _track.size())
 		{
 			renderer.render(*_track[index]);
 		}
+	}
+}
+
+void Track::update(const float dt)
+{
+	for (size_t i = 0; i < _track.size(); i++)
+	{
+		_track[i]->update(dt);
 	}
 }
 
