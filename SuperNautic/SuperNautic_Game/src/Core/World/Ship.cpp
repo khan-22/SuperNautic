@@ -36,7 +36,7 @@ Ship::Ship()
 		_straighteningForce{ 3.0f },
 		_steerStraighteningForce{ 15.0f },
 		_speedResistance{ 0.005f },
-		_preferredHeight{ 2.0f },
+		_preferredHeight{ 1.0f },
 		_engineCooldown{ 0 },
 		_engineOverload{ 0 },
 		_engineFlashTime{ 0 },
@@ -44,7 +44,7 @@ Ship::Ship()
 		_bEngineOverload { false }
 {
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
-	setOrigin(glm::vec3{ 0.0f, 0.1f, 0.0f });
+	setOrigin(glm::vec3{ 0.0f, 0.0f, 0.0f });
 }
 
 
@@ -56,7 +56,7 @@ Ship::Ship(glm::vec3 position) : Ship{}
 void Ship::render(GFX::RenderStates& states)
 {
 	// Update model's matrix
-	_shipModel.getModelAsset().get()->setModelMatrix(glm::translate(_meshPosition()) * _meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin()));
+	_shipModel.getModelAsset().get()->setModelMatrix(_transformMatrix);
 
 	_shipModel.render(states);
 }
@@ -112,10 +112,11 @@ void Ship::update(float dt)
 
 	if (_engineTemperature > 80)
 	{
-		_engineOverload += (_engineTemperature / 100.f) * dt;
-		if (rand() % 500 + 1 < _engineOverload)
+		_engineOverload += ((_engineTemperature - 80.f) / 20.f) * dt;
+		if (rand() % 1000 + 1 < _engineOverload)
 		{
-			_engineCooldown = _engineOverload * _engineTemperature / 50;
+			_engineCooldown = _engineOverload * _engineTemperature / 100;
+			_bEngineFlash = true;
 			_bEngineOverload = true;
 		}
 	}
@@ -124,6 +125,10 @@ void Ship::update(float dt)
 		if (_engineOverload > 0)
 		{
 			_engineOverload -= (100 - _engineTemperature) * dt;
+			if (_engineOverload < 0)
+			{
+				_engineOverload = 0;
+			}
 		}
 	}
 
@@ -229,12 +234,16 @@ void Ship::update(float dt)
 
 	// Move ship mesh to correct forward/right position, keep up position
 	_meshPosition.setVector(_meshPosition() + (_meshXZPosition() - _meshPosition()) - glm::dot(_upDirection, (_meshXZPosition() - _meshPosition())) * _upDirection);
+	//_meshPosition.setVector(getPosition());
 
 	// Create mesh rotation matrix from mesh up and forward directions
 	_meshMatrix = { glm::vec4{ glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection())), 0.0f },
-						  glm::vec4{ glm::normalize(_meshUpDirection() - glm::dot(_meshUpDirection(), _meshForwardDirection()) * _meshForwardDirection()), 0.0f },	// The part of _meshUpDirection that is orthogonal to _meshForwardDirection
+						  glm::vec4{ _meshUpDirection(), 0.0f },	// The part of _meshUpDirection that is orthogonal to _meshForwardDirection
 						  glm::vec4{ _meshForwardDirection(), 0.0f },
 						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+
+	// Update matrix
+	_transformMatrix = glm::translate(_meshPosition()) * _meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin());
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;

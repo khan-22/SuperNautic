@@ -37,7 +37,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 
 	_progressionOutline.setSize(sf::Vector2f(_widthStep, _heightStep * 80));
 	_progressionOutline.setOutlineColor(sf::Color(0, 50, 100, 100));
-	_progressionOutline.setFillColor(sf::Color(50, 0, 100, 100));
+	_progressionOutline.setFillColor(sf::Color(0, 50, 100, 100));
 	//_progressionOutline.setOutlineThickness(_heightStep);
 	_progressionOutline.setPosition(_progressionPosX, _heightStep * 9 + _offsetY);
 
