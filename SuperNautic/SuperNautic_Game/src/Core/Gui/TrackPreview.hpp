@@ -16,16 +16,11 @@ public:
 
     void render(GFX::RenderStates& states) override;
 
+    void update(float dtSeconds);
     void setTrack(Track& track);
-
-    void setSize(float size);
-    void setModelMatrix(const glm::mat4& matrix);
 
 private:
     GFX::Line _track;
-    glm::vec3 _center;
-    float _radius = 0.f;
-    glm::mat4 _modelMatrix;
 };
 
 
