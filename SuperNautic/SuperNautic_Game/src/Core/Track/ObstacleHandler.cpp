@@ -34,11 +34,11 @@ ObstacleHandler::ObstacleHandler(const std::string& infoFileName)
 			boxes.push_back(BoundingBox(asset.get()->meshes[n]));
 		}
 
-		int prob1, padding;
+		int prob1, padding1;
 		float minRotSpeed1, maxRotSpeed1;
-		in >> prob1 >> minRotSpeed1 >> maxRotSpeed1 >> padding;
+		in >> prob1 >> minRotSpeed1 >> maxRotSpeed1 >> padding1;
 
-		_obstacles.push_back(new Obstacle(model, boxes, prob1, minRotSpeed1, maxRotSpeed1, padding));
+		_obstacles.push_back(new Obstacle(model, boxes, prob1, minRotSpeed1, maxRotSpeed1, padding1));
 	}
 	in.close();
 }

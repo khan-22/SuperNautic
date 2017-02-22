@@ -22,13 +22,13 @@ public:
 		Obstacle(const GFX::TexturedModel& model
 			, const std::vector<BoundingBox>& boxes
 			, int prob1, float minRotSpeed1, float maxRotSpeed1
-			, int padding)
+			, int padding1)
 			: _model(model)
 			, _boxes(boxes)
 			, _probability1(prob1)
 			, _minRotSpeed1(minRotSpeed1)
 			, _maxRotSpeed1(maxRotSpeed1)
-			, _padding1(padding)
+			, _padding1(padding1)
 		{ }
 		int getProbability(float diff) const
 		{

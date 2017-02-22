@@ -513,7 +513,7 @@ bool Track::bEndTrack()
 // Places obstacles in the finished track
 void Track::placeObstacles()
 {
-	int lengthForPrevious = 0;
+	//const int startLength ;
 
 	for (size_t i = 1; i < _track.size(); i++)
 	{
