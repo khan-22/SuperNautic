@@ -197,13 +197,8 @@ void World::update(float dt, sf::Window& window)
 	//_testParticles.update(dt, currentPos, currentPos - previousPos);
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
-		// Ugly solution to an ugly problem.
-		static glm::vec3 previousPos[4] = { glm::vec3(0,0,0) ,glm::vec3(0,0,0) ,glm::vec3(0,0,0) ,glm::vec3(0,0,0) };
-
 		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 2.0f;
-		_playerParticles[i].update(dt, particlePos, particlePos - previousPos[i]);
-
-		previousPos[i] = particlePos;
+		_playerParticles[i].update(dt, particlePos);
 	}
 
 	//previousPos = currentPos;

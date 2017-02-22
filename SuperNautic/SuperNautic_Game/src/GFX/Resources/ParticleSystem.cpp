@@ -39,15 +39,16 @@ void GFX::ParticleSystem::init(GLuint particleCount, glm::vec3 position, glm::ve
 	_renderParticles.colors.resize(particleCount);
 	_renderParticles.sizes.resize(particleCount);
 	
-	_particleCount = particleCount;
-	_maxLifetime = maxLifetime;
-	_maxSpread	= spread;
-	_turbulence = turbulence;
+	_particleCount	  = particleCount;
+	_maxLifetime	  = maxLifetime;
+	_maxSpread		  = spread;
+	_turbulence		  = turbulence;
+	_previousPosition = position;
 
 	_positionsSizeInBytes = particleCount * sizeof(glm::vec3);
-	_colorsSizeInBytes = particleCount * sizeof(glm::vec3);
-	_sizesSizeInBytes = particleCount * sizeof(GLfloat);
-	_sizeInBytes = _positionsSizeInBytes + _sizesSizeInBytes + _colorsSizeInBytes;
+	_colorsSizeInBytes	  = particleCount * sizeof(glm::vec3);
+	_sizesSizeInBytes	  = particleCount * sizeof(GLfloat);
+	_sizeInBytes		  = _positionsSizeInBytes + _sizesSizeInBytes + _colorsSizeInBytes;
 
 	_previousTurbulence = (randomVector() * _turbulence) * 0.1f;
 
@@ -69,10 +70,10 @@ void GFX::ParticleSystem::init(GLuint particleCount, glm::vec3 position, glm::ve
 		phys.life = -1.f;
 	}
 
-	update(0.f, position, velocity);
+	update(0.f, position);
 }
 
-void GFX::ParticleSystem::update(float dt, glm::vec3 position, glm::vec3 velocity)
+void GFX::ParticleSystem::update(float dt, glm::vec3 position)
 {
 	//const float 
 
@@ -93,6 +94,8 @@ void GFX::ParticleSystem::update(float dt, glm::vec3 position, glm::vec3 velocit
 		else
 		{
 			glm::vec3 spread = randomVector() * _maxSpread * (float)(rand() % 10) * 0.1f;
+			
+			glm::vec3 velocity = (position - _previousPosition);
 			phys.velocity = velocity + spread;
 			
 			double randomFactor = double(rand() % (int)(_particleCount)) / (double)(_particleCount);
@@ -107,6 +110,8 @@ void GFX::ParticleSystem::update(float dt, glm::vec3 position, glm::vec3 velocit
 		_renderParticles.colors[i]	   = lerp(phys.life / _maxLifetime, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
 		_renderParticles.sizes[i]	   = lerp(phys.life / _maxLifetime, 0.0f, 0.5f);
 	}
+
+	_previousPosition = position;
 }
 
 void GFX::ParticleSystem::render(RenderStates & states)

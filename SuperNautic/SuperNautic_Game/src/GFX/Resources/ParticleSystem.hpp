@@ -21,7 +21,7 @@ namespace GFX
 
 		void init(GLuint particleCount, glm::vec3 position, glm::vec3 velocity, GLfloat maxLifetime, GLfloat spread, GLfloat turbulence);
 
-		void update(float dt, glm::vec3 position, glm::vec3 velocity);
+		void update(float dt, glm::vec3 position);
 
 		void render(RenderStates& states) override;
 
@@ -55,6 +55,8 @@ namespace GFX
 		GLsizei		_positionsSizeInBytes;
 		GLsizei		_colorsSizeInBytes;
 		GLsizei		_sizesSizeInBytes;
+
+		glm::vec3	_previousPosition;
 		
 		std::unique_ptr<VertexArrayObject> _vao;
 	};
