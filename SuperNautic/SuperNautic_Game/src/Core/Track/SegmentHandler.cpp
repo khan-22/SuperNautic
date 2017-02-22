@@ -31,9 +31,9 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 
 		// Connection types
 		char startConnection, endConnection;
-		// blah_aa.blend
+		// blah_aa.kmf
 		//      ^^
-		// size - 8, size - 7 contains connection info
+		// size - 6, size - 5 contains connection info
 		startConnection = segmentDataName[segmentDataName.size() - 6];
 		endConnection = segmentDataName[segmentDataName.size() - 5];
 

@@ -15,6 +15,7 @@
 #include "Core/Utility/SpringRotatedVector.hpp"
 #include "Core/Utility/SpringTranslatedVector.hpp"
 #include "Core/Geometry/BoundingBox.hpp"
+#include "Core/Utility/CollisionUtility.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 {
@@ -54,7 +55,7 @@ public:
 	const glm::vec3& getMeshForward() const;
 	SurfaceType getSurfaceType() const;
 	const BoundingBox& getBoundingBox() const;
-	void setEngineCooldown(float cooldown);
+	void obstacleCollision();
 
 	// TEST
 	glm::mat4 getMatrix()
@@ -111,6 +112,8 @@ private:
 	const float _rayHeight{ 5.0f };			// Height above ship of the origin of the rays used for intersection
 	const float _rayAheadDistance{ 2.0f };	// Distance ahead of ship the second ray starts
 
+	const float _cooldownOnObstacleCollision;
+
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
 
 	// Helper functions for update()
@@ -120,5 +123,6 @@ private:
 	void rotateTowardTrackForward(float dt);
 	void updateDirectionsAndPositions(float dt);
 	void trackSurface();
+	void checkObstacleCollision();
 };
 #endif // SHIP_HPP
