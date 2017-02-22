@@ -93,10 +93,10 @@ void GFX::ParticleSystem::update(float dt, glm::vec3 position, glm::vec3 velocit
 		else
 		{
 			glm::vec3 spread = randomVector() * _maxSpread * (float)(rand() % 10) * 0.1f;
+			phys.velocity = velocity + spread;
 			
 			double randomFactor = double(rand() % (int)(_particleCount)) / (double)(_particleCount);
 			phys.life = _maxLifetime * (0.8f + 0.3f * randomFactor);
-			phys.velocity = velocity + spread;
 
 			//phys.color = lerp(phys.life / 5.f, glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 0.f, 0.f));
 

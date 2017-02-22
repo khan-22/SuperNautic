@@ -15,9 +15,9 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	, _timer(1280, 720)
 	, _track(track)
 	, _playerRTs(numberOfPlayers)
+	, _playerParticleRenderers(numberOfPlayers)
 {
-	_particleRenderer.initialize(&context.window, 0.0, 0.0, 1.0, 1.0);
-	_testParticles.init(500, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 0.2f, 15.f, 50.f);
+	_testParticles.init(500, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 5.f, 50.f);
 
 
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
@@ -48,33 +48,44 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	if (_players.size() == 1)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 		_players[0].setScreenSize(1280, 720, 0, 0);
 	}
 	else if (_players.size() == 2)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_players[0].setScreenSize(1280, 360, 0, 0);
+
 		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
+		_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
 		_players[1].setScreenSize(1280, 360, 0, 360);
 	}
 	else if (_players.size() == 3)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_players[0].setScreenSize(1280, 360, 0, 0);
 		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_players[1].setScreenSize(640, 360, 0, 360);
 		_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_players[2].setScreenSize(640, 360, 640, 360);
 	}
 	else if (_players.size() == 4)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
+		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_players[0].setScreenSize(640, 360, 0, 0);
 		_playerRTs[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_players[1].setScreenSize(640, 360, 640, 0);
 		_playerRTs[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_players[2].setScreenSize(640, 360, 0, 360);
 		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_playerParticleRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_players[3].setScreenSize(640, 360, 640, 360);
 	}
 
@@ -178,9 +189,11 @@ void World::update(float dt, sf::Window& window)
 
 	static glm::vec3 currentPos = _players[0].getShip().getPosition();
 	static glm::vec3 previousPos = currentPos;
-	currentPos = _players[0].getShip().getPosition();
+	currentPos = glm::vec3{ _players[0].getShip().getMatrix() * glm::vec4{ 0.f,0.f,0.f,1.f } } - _players[0].getShip().getMeshForward() * 2.0f;//_players[0].getShip().getPosition();
+	//currentPos = _players[0].getShip().getMeshPosition();
 
 	//_testParticles.update(dt, currentPos, glm::vec3(0.f));
+	//_testParticles.update(dt, currentPos + _players[0].getShip().getMeshUp() * 2.f, glm::vec3(0.f));//currentPos - previousPos);
 	_testParticles.update(dt, currentPos, currentPos - previousPos);
 
 	previousPos = currentPos;
@@ -240,18 +253,26 @@ void World::render()
 		for (int i = 0; i < _players.size(); i++)
 		{
 			_playerRTs[i].display(*_players[i].getCamera());
+			_playerRTs[i].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 		}
 	}
 	else
 	{
 		_playerRTs[0].display(_camera);
+		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
+	}
+
+
+	for (int i = 0; i < _playerParticleRenderers.size(); i++)
+	{
+		_playerParticleRenderers[i].render(_testParticles);
+		_playerParticleRenderers[i].display(*_players[i].getCamera());
 	}
 
 	// Should be done for each player before drawing particles.
-	_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 
-	_particleRenderer.render(_testParticles);
-	_particleRenderer.display(_camera);
+	//_particleRenderer.render(_testParticles);
+	//_particleRenderer.display(*_players[0].getCamera());
 
 	GFX::SfmlRenderer sfml;
 	for (Player& player : _players)

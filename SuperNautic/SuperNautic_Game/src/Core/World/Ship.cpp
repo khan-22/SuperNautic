@@ -83,7 +83,7 @@ void Ship::update(float dt)
 		_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.3f) * dt;
 		// abs to preserve sign of _currentTurningAngle
 		_currentTurningAngle -= _steerStraighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
-
+		
 		// Update velocity
 		_velocity += (_minAcceleration + _accelerationFactor * (_maxAcceleration - _minAcceleration)) * dt;
 		_velocity -= (_velocity * _velocity * _speedResistance) * dt;
@@ -388,6 +388,11 @@ const glm::vec3& Ship::getMeshPosition() const
 const glm::vec3 & Ship::getMeshForward() const
 {
 	return _meshForwardDirection();
+}
+
+const glm::vec3 & Ship::getMeshUp() const
+{
+	return _meshUpDirection();
 }
 
 SurfaceType Ship::getSurfaceType() const

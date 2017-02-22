@@ -51,6 +51,7 @@ public:
 	const glm::vec3& getCameraForward() const;
 	const glm::vec3& getMeshPosition() const;
 	const glm::vec3& getMeshForward() const;
+	const glm::vec3& getMeshUp() const;
 	SurfaceType getSurfaceType() const;
 
 	// TEST
