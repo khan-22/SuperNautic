@@ -16,9 +16,12 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	, _track(track)
 	, _playerRTs(numberOfPlayers)
 	, _playerParticleRenderers(numberOfPlayers)
+	, _playerParticles(numberOfPlayers)
 {
-	_testParticles.init(500, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 5.f, 50.f);
-
+	for (int i = 0; i < _playerParticles.size(); i++)
+	{
+		_playerParticles[i].init(500, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	}
 
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 	_pointLights.push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
@@ -187,16 +190,23 @@ void World::update(float dt, sf::Window& window)
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
 
-	static glm::vec3 currentPos = _players[0].getShip().getPosition();
-	static glm::vec3 previousPos = currentPos;
-	currentPos = glm::vec3{ _players[0].getShip().getMatrix() * glm::vec4{ 0.f,0.f,0.f,1.f } } - _players[0].getShip().getMeshForward() * 2.0f;//_players[0].getShip().getPosition();
-	//currentPos = _players[0].getShip().getMeshPosition();
+	//static glm::vec3 currentPos = _players[0].getShip().getPosition();
+	//static glm::vec3 previousPos = currentPos;
+	//currentPos = glm::vec3{ _players[0].getShip().getMatrix() * glm::vec4{ 0.f,0.f,0.f,1.f } } - _players[0].getShip().getMeshForward() * 2.0f;//_players[0].getShip().getPosition();
+	
+	//_testParticles.update(dt, currentPos, currentPos - previousPos);
+	for (int i = 0; i < _playerParticles.size(); i++)
+	{
+		// Ugly solution to an ugly problem.
+		static glm::vec3 previousPos[4] = { glm::vec3(0,0,0) ,glm::vec3(0,0,0) ,glm::vec3(0,0,0) ,glm::vec3(0,0,0) };
 
-	//_testParticles.update(dt, currentPos, glm::vec3(0.f));
-	//_testParticles.update(dt, currentPos + _players[0].getShip().getMeshUp() * 2.f, glm::vec3(0.f));//currentPos - previousPos);
-	_testParticles.update(dt, currentPos, currentPos - previousPos);
+		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 2.0f;
+		_playerParticles[i].update(dt, particlePos, particlePos - previousPos[i]);
 
-	previousPos = currentPos;
+		previousPos[i] = particlePos;
+	}
+
+	//previousPos = currentPos;
 }
 
 void World::render()
@@ -265,8 +275,11 @@ void World::render()
 
 	for (int i = 0; i < _playerParticleRenderers.size(); i++)
 	{
-		_playerParticleRenderers[i].render(_testParticles);
-		_playerParticleRenderers[i].display(*_players[i].getCamera());
+		for (int j = 0; j < _players.size(); j++)
+		{
+			_playerParticleRenderers[i].render(_playerParticles[j]);
+			_playerParticleRenderers[i].display(*_players[i].getCamera());
+		}
 	}
 
 	// Should be done for each player before drawing particles.

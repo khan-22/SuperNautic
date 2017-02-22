@@ -54,12 +54,13 @@ private:
 
 	std::vector<GFX::DeferredRenderer> _playerRTs;
 	std::vector<GFX::ParticleRenderer> _playerParticleRenderers;
+	std::vector<GFX::ParticleSystem>	_playerParticles;
 
 	Camera						_camera;
 	bool						_bDebugging;
 
-	GFX::ParticleSystem		_testParticles;
-	GFX::ParticleRenderer	_particleRenderer;
+
+	//GFX::ParticleRenderer	_particleRenderer;
 };
 
 #endif //WORLD_HPP
