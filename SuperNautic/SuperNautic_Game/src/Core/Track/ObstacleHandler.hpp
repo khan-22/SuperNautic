@@ -17,15 +17,18 @@ public:
 		int							_probability1;
 		float						_minRotSpeed1;
 		float						_maxRotSpeed1;
+		int							_padding1;
 
 		Obstacle(const GFX::TexturedModel& model
 			, const std::vector<BoundingBox>& boxes
-			, int prob1, float minRotSpeed1, float maxRotSpeed1)
+			, int prob1, float minRotSpeed1, float maxRotSpeed1
+			, int padding)
 			: _model(model)
 			, _boxes(boxes)
 			, _probability1(prob1)
 			, _minRotSpeed1(minRotSpeed1)
 			, _maxRotSpeed1(maxRotSpeed1)
+			, _padding1(padding)
 		{ }
 		int getProbability(float diff) const
 		{
@@ -54,6 +57,10 @@ public:
 		GFX::TexturedModel getModel() const
 		{
 			return _model;
+		}
+		int getPadding(float diff) const
+		{
+			return _padding1;
 		}
 	};
 
