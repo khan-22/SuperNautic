@@ -174,7 +174,7 @@ void Game::update(float dt)
 {
     _fps = _fps * 0.9f + 0.1f / dt;
 
-	_debugCamera.update(dt, _window);
+	//_debugCamera.update(dt, _window);
 
 	static float t = 0.0;
 	t += dt;

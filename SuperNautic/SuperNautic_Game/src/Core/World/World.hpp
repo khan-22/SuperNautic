@@ -54,8 +54,8 @@ private:
 	std::vector<GFX::ParticleRenderer>	_playerParticleRenderers;
 	std::vector<GFX::ParticleSystem>	_playerParticles;
 
-	Camera						_camera;
-	bool						_bDebugging;
+	DebugCamera						_debugCamera;
+	bool							_bDebugging;
 
 	void updateLightPos(const TrackProgression& playerProgression, int playerIndex);
 };

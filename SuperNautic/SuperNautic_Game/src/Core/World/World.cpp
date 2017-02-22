@@ -10,7 +10,7 @@
 
 World::World(ApplicationContext& context, Track* track, const int numberOfPlayers)
 	: _context{ context }
-	, _camera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
+	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
 	, _track(track)
@@ -162,12 +162,13 @@ void World::update(float dt, sf::Window& window)
 		}
 
 		// Update debug camera
-		_camera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
-		_camera.setUp(_players[0].getShip().getCameraUp());
-		_camera.setViewDir(_players[0].getShip().getCameraForward());
+		_debugCamera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
+		_debugCamera.setUp(_players[0].getShip().getCameraUp());
+		_debugCamera.setViewDir(_players[0].getShip().getCameraForward());
 	}
 	else
 	{
+		_debugCamera.update(dt, _context.window);
 	}
 	if (!_bDebugging && sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
@@ -256,7 +257,7 @@ void World::render()
 	}
 	else
 	{
-		_playerRTs[0].display(_camera);
+		_playerRTs[0].display(_debugCamera);
 		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 	}
 
