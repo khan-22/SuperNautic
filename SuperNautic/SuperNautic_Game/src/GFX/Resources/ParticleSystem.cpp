@@ -100,11 +100,11 @@ void GFX::ParticleSystem::update(float dt, glm::vec3 position, glm::vec3 velocit
 
 			//phys.color = lerp(phys.life / 5.f, glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 0.f, 0.f));
 
-			_renderParticles.positions[i] = position + (velocity * (float)randomFactor);
+			_renderParticles.positions[i] = position - (velocity * (float)randomFactor);
 		}
 
 		_renderParticles.positions[i] += (phys.velocity) * dt;
-		_renderParticles.colors[i]	   = lerp(phys.life / _maxLifetime, glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 0.f));
+		_renderParticles.colors[i]	   = lerp(phys.life / _maxLifetime, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
 		_renderParticles.sizes[i]	   = lerp(phys.life / _maxLifetime, 0.0f, 0.5f);
 	}
 }
