@@ -39,6 +39,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         seed->setOnChange([](const std::string& str)
         {
             LOG("Seed: \"", str, "\"");
+
         });
         seed->setText(std::string(5, 'A' + i));
         auto seedPtr = std::unique_ptr<GuiElement>(seed);
@@ -50,15 +51,16 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     guiElements.emplace_back(seedList);
 
     GuiTextInput* length = new GuiTextInput(6, GuiCharacterInput::CharacterFlags::DIGITS);
-    length->setOnChange([length](const std::string& str)
+    length->setOnChange([this, length](const std::string& str)
     {
         std::stringstream sstream(str);
         size_t c;
         sstream >> c;
         size_t remainder = c % 500;
+        c -= remainder;
         if(remainder != 0)
         {
-            std::string text = std::to_string(c - remainder);
+            std::string text = std::to_string(c);
             if(text.size() < str.size())
             {
                 text.insert(0, std::string(str.size() - text.size(), '0'));
@@ -66,6 +68,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
             length->setText(text);
         }
         LOG("Length: ", c);
+        _trackGenerator.setLength(c);
     });
     length->setOrigin(length->getBoundingRect().width / 2.f, length->getBoundingRect().height / 2.f);
 
