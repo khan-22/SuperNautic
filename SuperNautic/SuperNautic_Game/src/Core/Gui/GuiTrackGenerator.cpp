@@ -6,6 +6,11 @@ GuiTrackGenerator::GuiTrackGenerator()
     _track.reset(new Track(&_segmentHandler));
     _preview.reset(new TrackPreview());
 
+	for(size_t i = 0; i < _segmentHandler.infos().size(); i++)
+    {
+        _segmentHandler.loadSegment(i);
+    }
+
     generate();
 }
 
@@ -27,24 +32,24 @@ void GuiTrackGenerator::render(GFX::RenderStates& states)
 
 void GuiTrackGenerator::update(float dtSeconds)
 {
-//    if(_generation.valid() && _generation.wait_for(std::chrono::milliseconds::zero()) == std::future_status::ready)
-//    {
-//        auto pair = _generation.get();
-//        _track.swap(pair.first);
-//        _preview->setTrack(*_track);
-//    }
+    if(_generation.valid() && _generation.wait_for(std::chrono::milliseconds::zero()) == std::future_status::ready)
+    {
+        auto pair = _generation.get();
+        _track.swap(pair.first);
+        _preview->setTrack(*_track);
+    }
 
     _preview->update(dtSeconds);
 }
 
 void GuiTrackGenerator::generate()
 {
-//    if(_generation.valid())
-//    {
-//        _bDoAbortGenerate = true;
-//        _generation.get();
-//        _bDoAbortGenerate = false;
-//    }
+    if(_generation.valid())
+    {
+        _bDoAbortGenerate = true;
+        _generation.get();
+        _bDoAbortGenerate = false;
+    }
 
     auto generationFunc = [this]()
     {
@@ -77,10 +82,10 @@ void GuiTrackGenerator::generate()
 
     // Multithreading not safe as of this moment
     // because Track does OpenGL operations.
-//    _generation = std::async(std::launch::async, );
-    auto pair = generationFunc();
-    _track.swap(pair.first);
-    _preview->setTrack(*_track);
+    _generation = std::async(std::launch::async, generationFunc);
+//    auto pair = generationFunc();
+//    _track.swap(pair.first);
+//    _preview->setTrack(*_track);
 }
 
 void GuiTrackGenerator::setTrackAttributes()
@@ -92,18 +97,18 @@ void GuiTrackGenerator::setTrackAttributes()
 
 void GuiTrackGenerator::setLength(unsigned int length)
 {
-    _track->setLength(length);
+    _length = length;
     generate();
 }
 
 void GuiTrackGenerator::setSeed(unsigned int seed)
 {
-    _track->setSeed(seed);
+    _seed = seed;
     generate();
 }
 
 void GuiTrackGenerator::setCurviness(unsigned int curviness)
 {
-    _track->setCurviness(curviness);
+    _curviness = curviness;
     generate();
 }
