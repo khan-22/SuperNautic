@@ -326,7 +326,7 @@ void Ship::handleCooldowns(float dt)
 	if (_timeSinceIntersection > 0.4f)
 	{
 		setPosition(_returnPos);
-		_velocity -= 0.01f * dt;
+		_velocity -= 0.1f * dt;
 	}
 
 	// Update jump cooldown
