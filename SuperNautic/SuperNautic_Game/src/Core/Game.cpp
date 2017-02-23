@@ -116,6 +116,14 @@ bool Game::bInitialize()
 	//_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 	_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 
+    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt"));
+	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
+
+	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
+    {
+        _context.segmentHandler->loadSegment(i);
+    }
+
 	_stateStack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stateStack, _context)));
 
 
@@ -187,8 +195,8 @@ void Game::update(float dt)
 	//ModelArray[1].getModelAsset().get()->setModelMatrix(glm::translate(glm::vec3(100.f)));
 
 	//_testParticles.update(
-	//	dt, 
-	//	currentPos, 
+	//	dt,
+	//	currentPos,
 	//	(currentPos - prevPos) * 20.f);
 
 	prevPos = currentPos;
@@ -207,7 +215,7 @@ void Game::render()
 	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
 	_camera.setViewDir(glm::vec3(0.f, 0.f, 1.f));
 
-	
+
 
 	//for (auto& pointLight : _pointLights)
 	//{
