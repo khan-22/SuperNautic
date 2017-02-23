@@ -1,7 +1,7 @@
 #include "Core/Gui/GuiTrackGenerator.hpp"
 
 GuiTrackGenerator::GuiTrackGenerator()
-: _segmentHandler("Segments/segmentinfos3.txt", "Segments/ConnectionTypes.txt")
+: _segmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt")
 {
     _track.reset(new Track(&_segmentHandler));
     _preview.reset(new TrackPreview());
