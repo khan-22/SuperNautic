@@ -16,6 +16,7 @@
 
 #include "Core/Gui/GuiTextInput.hpp"
 #include "Core/Gui/GuiHorizontalList.hpp"
+#include "Core/Gui/GuiSlider.hpp"
 
 PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
@@ -66,8 +67,25 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         }
         LOG("Length: ", c);
     });
+    length->setOrigin(length->getBoundingRect().width / 2.f, length->getBoundingRect().height / 2.f);
 
     guiElements.emplace_back(length);
+
+    GuiSlider* curviness = new GuiSlider
+    (
+        0.f, 5.f,
+        50.f,
+        6,
+        sf::Text("Curviness  Low", *_font.get()),
+        sf::Text("High", *_font.get())
+    );
+    curviness->setOnChange([&](float c)
+    {
+        LOG("Curviness: ", (int)c);
+        _trackGenerator.setCurviness(c);
+    });
+//    curviness->setOrigin(curviness->getBoundingRect().width / 2.f, curviness->getBoundingRect().height / 2.f);
+    guiElements.emplace_back(curviness);
 
     sf::Vector2f pos(0.f, 0.f);
     for(const std::unique_ptr<GuiElement>& e : guiElements)
@@ -76,7 +94,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         pos.y += e->getBoundingRect().height * 2.f;
     }
 
-    _guiContainer.setBackground(sf::Color::Magenta);
+    _guiContainer.setBackground(sf::Color(255, 255, 255, 50));
 //    sf::Text text;
 //    text.setFont(*_font.get());
 //    text.setFillColor(sf::Color::White);
