@@ -9,7 +9,7 @@
 #include "Core/Asset/LoadAssetFunctions.hpp"
 #include "GFX/Lighting/PointLight.hpp"
 #include "GFX/Rendering/Framebuffer.hpp"
-
+#include "GFX/Rendering/TestRenderPass.hpp"
 
 namespace GFX
 {
@@ -36,7 +36,8 @@ namespace GFX
 		ShaderAsset	_geometryPassShader;
 		ShaderAsset	_lightPassShader;
 
-		Framebuffer _frameBuffer;
+		Framebuffer _geometryFrameBuffer;
+		Framebuffer _postFrameBuffer;
 
 		sf::RenderWindow* _window;
 		GLfloat _x;
@@ -53,6 +54,9 @@ namespace GFX
 
 		void geometryPass(Camera& camera, GLsizei width, GLsizei height);
 		void lightPass(Camera& camera, GLsizei width, GLsizei height);
+		void testPass();
+
+		TestRenderPass	_testRenderPass;
 
 	};
 }

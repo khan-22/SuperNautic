@@ -42,8 +42,11 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	_actualWidth  = _width  * windowWidth;
 	_actualHeight = _height * windowHeight;
 
-	GLuint colorChannels[] = { 3, 4, 3 };
-	_frameBuffer.initialize(_width * windowWidth, _height * windowHeight, colorChannels, sizeof(colorChannels) / sizeof(colorChannels[0]));
+	GLuint geoColorChannels[] = { 3, 4, 3 };
+	_geometryFrameBuffer.initialize(_actualWidth, _actualHeight, geoColorChannels, sizeof(geoColorChannels) / sizeof(geoColorChannels[0]));
+
+	GLuint postColorChannels[] = { 3 };
+	_postFrameBuffer.initialize(_actualWidth, _actualHeight, postColorChannels, sizeof(postColorChannels) / sizeof(postColorChannels[0]));
 
 	GLfloat screenX1 = _x * 2.f - 1.f;
 	GLfloat screenY1 = _y * 2.f - 1.f;
@@ -88,6 +91,8 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	_screenQuad->sendDataToIndexBuffer(0, sizeIndicesInBytes, &indices[0]);
 
 	_screenQuad->setDrawCount(6);
+
+	_testRenderPass.initialize(_window, _x, _y, _width, _height);
 }
 
 void DeferredRenderer::pushPointLight(PointLight & pointLight)
@@ -115,6 +120,7 @@ void DeferredRenderer::display(Camera& camera)
 
 	geometryPass(camera, windowWidth, windowHeight);
 	lightPass(camera, windowWidth, windowHeight);
+	testPass();
 
 	Framebuffer::DEFAULT.bindBoth();
 }
@@ -122,7 +128,7 @@ void DeferredRenderer::display(Camera& camera)
 void GFX::DeferredRenderer::blitDepthOnto(Framebuffer& framebuffer)
 {
 	LOG_GL_ERRORS();
-	_frameBuffer.bindRead();
+	_geometryFrameBuffer.bindRead();
 	framebuffer.bindWrite();
 	LOG_GL_ERRORS();
 
@@ -144,7 +150,7 @@ void DeferredRenderer::geometryPass(Camera& camera, GLsizei width, GLsizei heigh
 	//*************** GEOMETRY PASS *******************//
 	//*************************************************//
 
-	_frameBuffer.bindWrite();
+	_geometryFrameBuffer.bindWrite();
 
 	//glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
 	glViewport(0, 0, _width * width, _height * height);
@@ -172,9 +178,9 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	//*************** LIGHT PASS *******************//
 	//**********************************************//
 
-	Framebuffer::DEFAULT.bindWrite();
-	_frameBuffer.bindRead();
-	_frameBuffer.bindColorTextures();
+	_postFrameBuffer.bindWrite();
+	_geometryFrameBuffer.bindRead();
+	_geometryFrameBuffer.bindColorTextures();
 	
 	Shader* lpShader = _lightPassShader.get();
 	lpShader->bind();
@@ -243,5 +249,17 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 
 	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
+
+
+}
+
+void GFX::DeferredRenderer::testPass()
+{
+	Framebuffer::DEFAULT.bindWrite();
+	_postFrameBuffer.bindRead();
+	_postFrameBuffer.bindColorTextures();
+
+	_testRenderPass.perform();
+
 
 }
