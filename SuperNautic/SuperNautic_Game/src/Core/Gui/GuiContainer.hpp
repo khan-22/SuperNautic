@@ -24,7 +24,6 @@ public:
     GuiContainer(std::vector<std::unique_ptr<GuiElement>>& elements, sf::Keyboard::Key nextKey = sf::Keyboard::Down, sf::Keyboard::Key previousKey = sf::Keyboard::Up);
     ~GuiContainer();
 
-    void update();
     virtual bool bIsActivatable() const override;
     virtual void insert(std::unique_ptr<GuiElement>& element);
     virtual void insert(std::vector<std::unique_ptr<GuiElement>>& elements);
@@ -53,6 +52,7 @@ private:
 
     void handleEventCurrent(const sf::Event& event) override;
     virtual void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
+    virtual void updateCurrent() override;
 
     void selectNext();
     void selectPrevious();
