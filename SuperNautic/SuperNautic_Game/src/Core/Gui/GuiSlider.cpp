@@ -8,9 +8,10 @@ GuiSlider::GuiSlider(float min, float max, float sliderWidth, size_t numSteps, c
 : _leftLabel(leftLabel)
 , _rightLabel(rightLabel)
 , _sliderWidth(sliderWidth)
-, _stepWidth((sliderWidth / float(numSteps - 1)) / sliderWidth)
+, _stepWidth(sliderWidth / float(numSteps - 1))
 , _min(min)
 , _valueSize(max - min)
+, _step(_valueSize / float(numSteps - 1))
 {
     deselect();
 
@@ -28,20 +29,23 @@ GuiSlider::GuiSlider(float min, float max, float sliderWidth, size_t numSteps, c
     _slider.setFillColor(sf::Color::Blue);
 
     setOrigin(_slider.getPosition() + sf::Vector2f(_sliderWidth, _SLIDER_HEIGHT) / 2.f);
-    setValue(0.f);
+    setValue(_min);
 }
 
 
 void GuiSlider::setValue(float value)
 {
     float previousValue = _value;
-    _value = clamp(value, 0.f, 1.f);
+    _value = clamp(value, _min, _min + _valueSize);
 
-    _slider.setSize(sf::Vector2f(_sliderWidth * _value, _SLIDER_HEIGHT));
+    size_t numSteps = std::fabs(_value / _step);
+    _value = _step * numSteps;
+
+    _slider.setSize(sf::Vector2f(_stepWidth * numSteps, _SLIDER_HEIGHT));
 
     if(!bIsFloatEq(previousValue, _value))
     {
-        _onChangeCallback(_min + _value * _valueSize);
+        _onChangeCallback(_value);
     }
 }
 
@@ -79,10 +83,10 @@ void GuiSlider::handleEventCurrent(const sf::Event& event)
         switch(event.key.code)
         {
             case sf::Keyboard::Left:
-                setValue(_value - _stepWidth);
+                setValue(_value - _step);
                 break;
             case sf::Keyboard::Right:
-                setValue(_value + _stepWidth);
+                setValue(_value + _step);
                 break;
             default:
                 break;
