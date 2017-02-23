@@ -59,7 +59,7 @@ void Input::update()
 			_events.push_back(event);
 			_bButtonA = true;
 			_bAWasDormant = false;
-			LOG("A pressed");
+			//LOG("A pressed");
 		}
 		if (!_bButtonA)
 		{
@@ -72,7 +72,7 @@ void Input::update()
 			_events.push_back(event);
 			_bButtonY = true;
 			_bYWasDormant = false;
-			LOG("Y pressed");
+			//LOG("Y pressed");
 		}
 		if (!_bButtonY)
 		{
@@ -85,7 +85,7 @@ void Input::update()
 			_events.push_back(event);
 			_bButtonStart = true;
 			_bStartWasDormant = false;
-			LOG("Start pressed");
+			//LOG("Start pressed");
 		}
 		if (!_bButtonStart)
 		{
@@ -97,7 +97,7 @@ void Input::update()
 			event.key.code = sf::Keyboard::Up;
 			_events.push_back(event);
 			_bLeftStickDormant = false;
-			LOG("Stick up ", _leftStickY);
+			//LOG("Stick up ", _leftStickY);
 		}
 		else if (_leftStickY > thresh && _bLeftStickDormant)
 		{
@@ -105,7 +105,7 @@ void Input::update()
 			event.key.code = sf::Keyboard::Down;
 			_events.push_back(event);
 			_bLeftStickDormant = false;
-			LOG("Stick downs ", _leftStickY);
+			//LOG("Stick downs ", _leftStickY);
 		}
 		else if (_leftStickX > thresh && _bLeftStickDormant)
 		{
@@ -113,7 +113,7 @@ void Input::update()
 			event.key.code = sf::Keyboard::Right;
 			_events.push_back(event);
 			_bLeftStickDormant = false;
-			LOG("Stick right ", _leftStickX);
+			//LOG("Stick right ", _leftStickX);
 		}
 		else if (_leftStickX < -thresh && _bLeftStickDormant)
 		{
@@ -121,7 +121,7 @@ void Input::update()
 			event.key.code = sf::Keyboard::Left;
 			_events.push_back(event);
 			_bLeftStickDormant = false;
-			LOG("Stick left ", _leftStickX);
+			//LOG("Stick left ", _leftStickX);
 		}
 		else if (_leftStickX > -thresh && _leftStickX < thresh && _leftStickY > -thresh && _leftStickY < thresh)
 		{

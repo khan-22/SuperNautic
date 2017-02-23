@@ -56,6 +56,8 @@ private:
 	sf::RectangleShape	_heatOutline;
 	sf::RectangleShape	_heatMeter;
 
+	sf::RectangleShape	_speedMeter;
+
 	sf::Text			_tSpeed;
 	sf::Text			_tPosition;
 

@@ -100,6 +100,7 @@ void Track::startNewTrack()
 	{
 		delete _track[i];
 	}
+	_track.clear();
 }
 
 // Generates the track
@@ -279,7 +280,7 @@ int Track::getIndex() const
 	{
 		return 0;
 	}
-	
+
 	//This should never ever run!
 	assert(true);
 
@@ -334,7 +335,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 		// Update ship's current segment
 		segmentIndex = closestIndex;
 	}
-	
+
 	// Find direction and position of next waypoint
 	WaypointInfo next = findNextWaypointInfo(closest, closestIndex);
 
@@ -347,7 +348,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 	}
 
 	// Project globalPosition onto the plane defined by closest.direction and closest.position
-	// Cast a ray from this position in the direction of closest.direction and find 
+	// Cast a ray from this position in the direction of closest.direction and find
 	//     intersection with plane defined by next.direction and next.distance
 	// The length of the ray is used to find interpolation value between waypoint normals
 	glm::vec3 projectedGlobalPos{ globalPosition - glm::dot(closest.direction, globalPosition - closest.position) * closest.direction };
@@ -421,6 +422,10 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
 	_generatedLength += static_cast<int>(segment->getLength());
+	if (segment->bHasWindow())
+	{
+		_segmentWindows.push_back({ segment->getWindowModel(), static_cast<unsigned int>(_track.size()), tempInstance->getModelMatrix() });
+	}
 	_track.push_back(tempInstance);
 	return true;
 }
@@ -593,7 +598,7 @@ void Track::update(const float dt)
 }
 
 // Render the track
-void Track::render(GFX::DeferredRenderer& renderer, const int shipIndex)
+void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowRenderer, const int shipIndex)
 {
 	for (int i = -2; i < 7; i++)
 	{
@@ -601,6 +606,18 @@ void Track::render(GFX::DeferredRenderer& renderer, const int shipIndex)
 		if (index >= 0 && index < _track.size())
 		{
 			renderer.render(*_track[index]);
+		}
+	}
+
+	int lowestIndex = shipIndex - 2;
+	int largestIndex = shipIndex + 30;
+
+	for (auto& window : _segmentWindows)
+	{
+		int windowIndex = static_cast<int>(window.segmentIndex);
+		if (windowIndex >= lowestIndex && windowIndex < largestIndex)
+		{
+			windowRenderer.render(window);
 		}
 	}
 }

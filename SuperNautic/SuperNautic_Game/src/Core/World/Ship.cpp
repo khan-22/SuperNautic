@@ -17,7 +17,7 @@ Ship::Ship()
 		_turningFactor{ 0.0f },
 		_currentTurningAngle{ 0.0f },
 		_accelerationFactor{ 0.5f },
-		_jumpCooldown{ 1.5f },
+		_jumpCooldown{ .8f },
 		_currentJumpCooldown{ 0.0f },
 		_engineTemperature{ 0.0f },
 		_velocity{ 0.0f },
@@ -32,11 +32,11 @@ Ship::Ship()
 		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 10.0f },
 		_meshXZPosition{ glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 0, 0 }, 100.0f },
 		_minAcceleration{ 0.0f },
-		_maxAcceleration{ 200.0f },
+		_maxAcceleration{ 100.0f },
 		_maxTurningSpeed{ 8.0f },
 		_straighteningForce{ 3.0f },
 		_steerStraighteningForce{ 15.0f },
-		_speedResistance{ 0.005f },
+		_speedResistance{ 0.001f },
 		_preferredHeight{ 1.5f },
 		_engineCooldown{ 0 },
 		_engineOverload{ 0 },
@@ -156,6 +156,8 @@ bool Ship::getOverload(float dt)
 		}
 		_engineFlashTime -= dt;
 		isWhite = _bEngineFlash;
+
+		//_velocity *= 0.9999f * dt;
 	}
 	else if (_engineOverload > 0)
 	{
@@ -320,9 +322,13 @@ void Ship::handleInputs(float dt)
 		_velocity -= 0.9f * _velocity * dt;
 	}
 
-	if (_velocity < 20)
+	if (_velocity < 50)
 	{
-		_velocity = 20;
+		_velocity = 50;
+	}
+	else if (_velocity > 200)
+	{
+		_velocity = 200;
 	}
 }
 
@@ -337,7 +343,7 @@ void Ship::handleCooldowns(float dt)
 	if (_timeSinceIntersection > 0.4f)
 	{
 		setPosition(_returnPos);
-		_velocity = 0.0f;
+		_velocity -= 0.01f * dt;
 	}
 
 	// Update jump cooldown
@@ -350,7 +356,44 @@ void Ship::handleCooldowns(float dt)
 void Ship::handleTemperature(float dt)
 {
 	// Update engine temperature
-	_engineTemperature = ((_accelerationFactor + _velocity) / 2);
+	float fieldAddition = 1.0f;
+
+	switch (getSurfaceType())
+	{
+	case SurfaceType::cold:
+		fieldAddition = 0.9f;
+		break;
+	case SurfaceType::hot:
+		fieldAddition = 1.1f;
+		break;
+	default:
+		break;
+	}
+
+	float enginePower = ((_accelerationFactor + _velocity) / 2) * fieldAddition;
+
+	if (enginePower > _engineTemperature)
+	{
+		if (enginePower > _engineTemperature + 1)
+		{
+			_engineTemperature = (_engineTemperature * 24 + enginePower) / 25;
+		}
+		else
+		{
+			_engineTemperature += 1.f * dt;
+		}
+	}
+	else
+	{
+		if (enginePower < _engineTemperature - 1)
+		{
+			_engineTemperature = (_engineTemperature * 49 + enginePower) / 50;
+		}
+		else
+		{
+			_engineTemperature -= 1.f * dt;
+		}
+	}
 
 	if (_engineTemperature > 80)
 	{
@@ -366,7 +409,7 @@ void Ship::handleTemperature(float dt)
 	{
 		if (_engineOverload > 0)
 		{
-			_engineOverload -= (100 - _engineTemperature) * dt;
+			_engineOverload -= (100 - _engineTemperature) / 100 * dt;
 			if (_engineOverload < 0)
 			{
 				_engineOverload = 0;
@@ -412,6 +455,7 @@ void Ship::updateDirectionsAndPositions(float dt)
 {
 	// Move forward
 	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _shipForward, 0.0f };
+	glm::vec3 visualTurningDirection = glm::rotate(_currentTurningAngle * 0.5f, _upDirection) * glm::vec4{ _shipForward, 0.0f };
 	move(velocityDirection * _velocity * dt);
 
 	// Update mesh position
@@ -419,13 +463,13 @@ void Ship::updateDirectionsAndPositions(float dt)
 	_meshPosition.update(dt);
 
 	// Update mesh forward direction
-	_meshForwardDirection.setTarget(velocityDirection);
+	_meshForwardDirection.setTarget(visualTurningDirection);
 	_meshForwardDirection.setBackupAxis(_upDirection);
 	_meshForwardDirection.update(dt);
 
 	// Update mesh up direction
 	_meshUpDirection.setBackupAxis(_meshForwardDirection());
-	_meshUpDirection.setTarget(glm::rotate(-_currentTurningAngle * 1.5f, _shipForward) * glm::vec4{ _upDirection, 0.0f });
+	_meshUpDirection.setTarget(glm::rotate(-_currentTurningAngle * 1.0f, _shipForward) * glm::vec4{ _upDirection, 0.0f });
 	_meshUpDirection.update(dt);
 
 	// Update camera up direction

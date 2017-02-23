@@ -29,7 +29,7 @@ GuiContainer::~GuiContainer()
     _elements.clear();
 }
 
-void GuiContainer::update()
+void GuiContainer::updateCurrent()
 {
     for(std::unique_ptr<GuiElement>& element : _elements)
     {
@@ -266,8 +266,6 @@ void GuiContainer::updateSize()
     sf::Vector2f pos = min;
     sf::Vector2f size = max - min;
     _bounds = sf::FloatRect(pos, size);
-    move(size / 2.f - getOrigin());
-    setOrigin(size / 2.f);
     _background.setSize(size * 1.1f);
     _background.setPosition(pos - size * 0.05f);
 }

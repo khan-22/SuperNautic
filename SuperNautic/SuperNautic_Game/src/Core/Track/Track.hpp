@@ -10,6 +10,8 @@
 #include "Core/Track/SegmentInstance.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
+#include "GFX/Rendering/WindowRenderer.hpp"
+#include "GFX/Resources/Window.hpp"
 #include "Core/Geometry/Octree.hpp"
 #include "Core/Track/ObstacleHandler.hpp"
 
@@ -29,8 +31,8 @@ public:
 	int getNrOfSegments() const;
 	SegmentInstance* getInstance(int index);
 	float getProgression() const;
+	void render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowRenderer, const int shipIndex);
 	void update(const float dt);
-	void render(GFX::DeferredRenderer& renderer, const int shipIndex);
 
 	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos and length from start of segment
 	glm::vec3 findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos, float& lengthInSegment);
@@ -47,6 +49,7 @@ private:
 	void placeObstacles();
 	size_t findTrackIndex(const float totalLength, float & lastFullSegmentLength) const;
 
+	std::vector<GFX::Window>				_segmentWindows;
 	SegmentHandler *						_segmentHandler;
 	ObstacleHandler *						_obstacleHandler;
 	std::vector<SegmentInstance*>			_track;

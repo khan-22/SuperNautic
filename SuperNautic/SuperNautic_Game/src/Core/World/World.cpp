@@ -16,6 +16,7 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	, _track(track)
 	, _playerRTs(numberOfPlayers)
 	, _playerParticleRenderers(numberOfPlayers)
+	, _playerWindowRenderers(numberOfPlayers)
 	, _playerParticles(numberOfPlayers)
 	, _playerPointLights(numberOfPlayers)
 {
@@ -54,43 +55,53 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 		_players[0].setScreenSize(1280, 720, 0, 0);
 	}
 	else if (_players.size() == 2)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_players[0].setScreenSize(1280, 360, 0, 0);
 
 		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
 		_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
+		_playerWindowRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
 		_players[1].setScreenSize(1280, 360, 0, 360);
 	}
 	else if (_players.size() == 3)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_players[0].setScreenSize(1280, 360, 0, 0);
 		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_playerWindowRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_players[1].setScreenSize(640, 360, 0, 360);
 		_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_players[2].setScreenSize(640, 360, 640, 360);
 	}
 	else if (_players.size() == 4)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
+		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_players[0].setScreenSize(640, 360, 0, 0);
 		_playerRTs[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_playerWindowRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_players[1].setScreenSize(640, 360, 640, 0);
 		_playerRTs[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_players[2].setScreenSize(640, 360, 0, 360);
 		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_playerWindowRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_players[3].setScreenSize(640, 360, 640, 360);
 	}
 }
@@ -193,7 +204,7 @@ void World::update(float dt, sf::Window& window)
 	//_testParticles.update(dt, currentPos, currentPos - previousPos);
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
-		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 2.0f;
+		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 1.9f;
 		_playerParticles[i].update(dt, particlePos);
 	}
 
@@ -237,7 +248,7 @@ void World::render()
 	
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		_track->render(_playerRTs[i], _playerProgression[i].getCurrentSegment());
+		_track->render(_playerRTs[i], _playerWindowRenderers[i], _playerProgression[i].getCurrentSegment());
 	}
 
 
@@ -266,6 +277,11 @@ void World::render()
 				_playerParticleRenderers[i].display(*_players[i].getCamera());
 			}
 		}
+
+		for (int i = 0; i < _playerWindowRenderers.size(); i++)
+		{
+			_playerWindowRenderers[i].display(*_players[i].getCamera());
+		}
 	}
 	else
 	{
@@ -277,7 +293,16 @@ void World::render()
 			_playerParticleRenderers[0].render(_playerParticles[j]);
 			_playerParticleRenderers[0].display(_debugCamera);
 		}
+
+		for (int i = 0; i < _playerWindowRenderers.size(); i++)
+		{
+			_playerWindowRenderers[i].display(*_players[i].getCamera());
+		}
 	}
+
+
+	
+
 
 	// Should be done for each player before drawing particles.
 

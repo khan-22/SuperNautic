@@ -40,15 +40,15 @@ void Model::setAttributes(RenderStates& states) const
 
 	//glm::mat4 model			= glm::rotate(time, glm::vec3(0.f, 1.f, 0.f));
 
-	glm::mat4 view			= states.camera->getView();
-	glm::mat4 perspective	= states.camera->getPerspective();
+	glm::mat4 VP			= states.camera->getVP();
+	//glm::mat4 perspective	= states.camera->getPerspective();
 
 	Shader* shader = states.shader;
 	//shader->setUniform("uView",	view);
 	shader->setUniform("uModel", _tempModelMat);
 	//shader->setUniform("uProjection", perspective);
 
-	glm::mat4 MVP			= perspective * view * _tempModelMat;
+	glm::mat4 MVP			= VP * _tempModelMat;
 	shader->setUniform("uMVP", MVP);
 
 	// TEMP

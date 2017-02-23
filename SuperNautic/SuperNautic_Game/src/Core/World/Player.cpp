@@ -58,6 +58,9 @@ void Player::update(float dt)
 				case sf::Keyboard::Y:
 					swapPerspective();
 					break;
+				case sf::Keyboard::Escape:
+					//Player paused game
+					break;
 				default:
 					break;
 				}
@@ -102,7 +105,7 @@ void Player::update(float dt)
 		//First person
 		_currentCamera->setPos(_ship.getMeshPosition() - _ship.getCameraForward() + _ship.getCameraUp() * 2.0f);
 		_currentCamera->setUp(_ship.getCameraUp());
-		_currentCamera->setViewDir(_ship.getMeshForward());
+		_currentCamera->setViewDir(_ship.getCameraForward());
 	}
 	else
 	{
