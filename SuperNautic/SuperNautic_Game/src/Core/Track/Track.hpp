@@ -10,6 +10,8 @@
 #include "Core/Track/SegmentInstance.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
+#include "GFX/Rendering/WindowRenderer.hpp"
+#include "GFX/Resources/Window.hpp"
 
 class Track
 {
@@ -26,7 +28,7 @@ public:
 	int getNrOfSegments() const;
 	SegmentInstance* getInstance(int index);
 	float getProgression() const;
-	void render(GFX::DeferredRenderer& renderer, const int shipIndex);
+	void render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowRenderer, const int shipIndex);
 
 	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos and length from start of segment
 	glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos, float& lengthInSegment, glm::vec3& directionDifference);
@@ -55,6 +57,7 @@ private:
 	char							_endConnection;
 	int								_prevIndex;
 	const Segment *					_lastSegment;
+	std::vector<GFX::Window>		_segmentWindows;
 };
 
 #endif // !TRACK_HPP

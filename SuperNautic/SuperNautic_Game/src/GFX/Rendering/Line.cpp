@@ -38,9 +38,8 @@ void Line::render(RenderStates& states)
     GFX::Shader* shader = _shader.get();
     shader->bind();
 
-	shader->setUniform("uView", glm::mat4(1.f));
+	shader->setUniform("uView", _modelMatrix);
 	shader->setUniform("uPerspective", _screenPerspectiveMatrix);
-	shader->setUniform("uModel", _modelMatrix);
 
     _vao->bind();
     glDrawElements(GL_POINTS, _numPoints, GL_UNSIGNED_INT, 0);

@@ -19,6 +19,7 @@ namespace sf
 #include "Core/Gui/Timer.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
+#include "GFX/Rendering/WindowRenderer.hpp"
 
 #include "GFX/Rendering/ParticleRenderer.hpp"
 #include "GFX/Resources/ParticleSystem.hpp"
@@ -52,6 +53,7 @@ private:
 
 	std::vector<GFX::DeferredRenderer>	_playerRTs;
 	std::vector<GFX::ParticleRenderer>	_playerParticleRenderers;
+	std::vector<GFX::WindowRenderer>	_playerWindowRenderers;
 	std::vector<GFX::ParticleSystem>	_playerParticles;
 
 	DebugCamera						_debugCamera;
