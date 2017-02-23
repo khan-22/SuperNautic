@@ -84,3 +84,13 @@ const std::string& GuiTextInput::getText() const
 {
     return _text;
 }
+
+void GuiTextInput::handleEventCurrent(const sf::Event& event)
+{
+    if(!bIsActive())
+    {
+        return;
+    }
+
+    GuiContainer::handleEventCurrent(event);
+}

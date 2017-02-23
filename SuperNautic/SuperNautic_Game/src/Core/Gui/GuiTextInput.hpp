@@ -36,6 +36,9 @@ class GuiTextInput : public GuiContainer
 
         void updateCharacter(size_t index, char character);
 
+        virtual void handleEventCurrent(const sf::Event& event) override;
+
+
 };
 
 #endif //GUI_TEXT_INPUT_HPP
