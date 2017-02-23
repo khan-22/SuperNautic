@@ -373,6 +373,10 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
 	_generatedLength += static_cast<int>(segment->getLength());
+	if (segment->bHasWindow())
+	{
+		_segmentWindows.push_back({ segment->getWindowModel(), static_cast<unsigned int>(_track.size()), tempInstance->getModelMatrix() });
+	}
 	_track.push_back(tempInstance);
 	return true;
 }
@@ -464,7 +468,7 @@ bool Track::bEndTrack()
 }
 
 // Render the track
-void Track::render(GFX::DeferredRenderer& renderer, const int shipIndex)
+void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowRenderer, const int shipIndex)
 {
 	for (int i = -2; i < 30; i++)
 	{
@@ -472,6 +476,18 @@ void Track::render(GFX::DeferredRenderer& renderer, const int shipIndex)
 		if (index >= 0 && index < _track.size())
 		{
 			renderer.render(*_track[index]);
+		}
+	}
+
+	int lowestIndex = shipIndex - 2;
+	int largestIndex = shipIndex + 30;
+
+	for (auto& window : _segmentWindows)
+	{
+		int windowIndex = static_cast<int>(window.segmentIndex);
+		if (windowIndex >= lowestIndex && windowIndex < largestIndex)
+		{
+			windowRenderer.render(window);
 		}
 	}
 }

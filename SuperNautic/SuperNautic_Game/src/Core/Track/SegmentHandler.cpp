@@ -25,9 +25,10 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 	for (int i = 0; i < amount; i++)
 	{
 		// File names
-		std::string segmentDataName, segmentVisualName;
+		std::string segmentDataName, segmentVisualName, segmentWindowName;
 		infoFile >> segmentDataName;
 		infoFile >> segmentVisualName;
+		infoFile >> segmentWindowName;
 
 		// Connection types
 		char startConnection, endConnection;
@@ -45,7 +46,7 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 		infoFile >> probability2 >> minInRow2 >> maxInRow2 >> rotationOffset2;
 
 		// Add SegmentInfo to vector
-		_segmentInfos.push_back(SegmentInfo{ std::move(segmentDataName), std::move(segmentVisualName)
+		_segmentInfos.push_back(SegmentInfo{ std::move(segmentDataName), std::move(segmentVisualName), std::move(segmentWindowName)
 			, startConnection, endConnection, probability1, probability2, minInRow1, minInRow2
 			, maxInRow1, maxInRow2, rotationOffset1, rotationOffset2 });
 

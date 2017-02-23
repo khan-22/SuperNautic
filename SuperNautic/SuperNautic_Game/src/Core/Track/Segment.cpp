@@ -34,6 +34,16 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 	_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get("test3pipe.mat"));
 		//ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_visualFileName);
 
+	if (_segmentInfo->_windowFileName != "E")
+	{
+		_window = ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_windowFileName);
+		_bHasWindow = true;
+	}
+	else
+	{
+		_bHasWindow = false;
+	}
+
 	if (_scene.get()->cameras.size() < 1)
 	{
 		LOG_ERROR("No camera found in scene. A camera representing the end point is required");
@@ -708,4 +718,14 @@ const std::vector<glm::vec3>& Segment::getWaypoints() const
 GFX::TexturedModel Segment::getVisualModel() const
 {
 	return _visual;
+}
+
+ModelAsset Segment::getWindowModel() const
+{
+	return _window;
+}
+
+bool Segment::bHasWindow() const
+{
+	return _bHasWindow;
 }
