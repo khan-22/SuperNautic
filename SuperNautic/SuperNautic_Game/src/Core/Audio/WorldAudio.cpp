@@ -5,7 +5,7 @@
 
 WorldAudio::WorldAudio()
 {
-	loadSound("Stranger Danger - Haste(Repeat).ogg");
+	loadSound("Stranger Danger - Mellow Business.ogg");
 	_music.setBuffer(_musicbuffer);
 
 	_music.setLoop(true);
