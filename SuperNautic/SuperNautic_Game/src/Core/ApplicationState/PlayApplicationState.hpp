@@ -7,6 +7,7 @@
 #include "Core/Track/SegmentHandler.hpp"
 #include "Core/Track/Track.hpp"
 #include "Core/World/World.hpp"
+#include "Core/Track/ObstacleHandler.hpp"
 
 class PlayApplicationState : public ApplicationState
 {
@@ -20,6 +21,7 @@ public:
 
 private:
 	SegmentHandler	_segmentHandler;
+	ObstacleHandler	_obstacleHandler;
 	Track			_track;
     World			_world;
 };

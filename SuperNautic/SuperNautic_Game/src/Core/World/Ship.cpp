@@ -9,6 +9,7 @@
 #include "Core/World/Ship.hpp"
 #include "Core/Geometry/Ray.hpp"
 #include "Core/Geometry/RayIntersection.hpp"
+#include "Core/Utility/CollisionUtility.hpp"
 
 Ship::Ship()
 	:	_destroyed{ false },
@@ -78,8 +79,6 @@ void Ship::update(float dt)
 	trackSurface(dt);
 	updateDirectionsAndPositions(dt);
 
-	checkObstacleCollision();
-
 	// Create mesh rotation matrix from mesh up and forward directions
 	_meshMatrix = { glm::vec4{ glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection())), 0.0f },
 						  glm::vec4{ _meshUpDirection(), 0.0f },
@@ -92,12 +91,18 @@ void Ship::update(float dt)
 	// Update bounding box
 	_boundingBox.center = _meshPosition();
 	_boundingBox.directions[0] = glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection()));
-	_boundingBox.directions[1] = _meshUpDirection();
-	_boundingBox.directions[2] = _meshForwardDirection();
+	_boundingBox.directions[1] = glm::normalize(_meshUpDirection());
+	_boundingBox.directions[2] = glm::normalize(_meshForwardDirection());
 
 	// Update slope
 	_surfaceSlope.setTarget(glm::dot(_waypointDifference, _upDirection));
 	_surfaceSlope.update(dt);
+
+	float dot1 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[1]);
+	float dot2 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[2]);
+	float dot3 = glm::dot(_boundingBox.directions[2], _boundingBox.directions[1]);
+
+	checkObstacleCollision();
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -266,6 +271,36 @@ SurfaceType Ship::getSurfaceType() const
 	return _currentSurface;
 }
 
+void Ship::checkObstacleCollision()
+{
+	// Check every relevant instance
+	for (SegmentInstance* segment : _segmentsToTest)
+	{
+		// For every obstacle
+		for (unsigned i = 0; i < segment->getObstacles().size(); ++i)
+		{
+			// For every bounding box in this obstacle
+			for (unsigned j = 0; j < segment->getObstacles()[i].getBoundingBoxes().size(); ++j)
+			{
+				BoundingBox& localBox = segment->getObstacles()[i].getBoundingBoxes()[j];
+
+				// Transform the bounding box to global space
+				BoundingBox globalBox;
+				globalBox.halfLengths = localBox.halfLengths;
+				globalBox.center = segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.center, 1.0f };
+				globalBox.directions[0] = glm::normalize(glm::vec3{ segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.directions[0], 0.0f } });
+				globalBox.directions[1] = glm::normalize(glm::vec3{ segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.directions[1], 0.0f } });
+				globalBox.directions[2] = glm::normalize(glm::vec3{ segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.directions[2], 0.0f } });
+
+				// Test ship bounding box against obstacle's bounding box in global space
+				if (bTestCollision(_boundingBox, globalBox))
+				{
+					obstacleCollision();
+				}
+			}
+		}
+	}
+}
 const BoundingBox & Ship::getBoundingBox() const
 {
 	return _boundingBox;
@@ -512,21 +547,4 @@ void Ship::trackSurface(float dt)
 		// Move up/down to the correct track height
 		move(_upDirection * (_preferredHeight - (((atShipIntersection._length + aheadOfShipIntersection._length) / 2.0f) - _rayHeight)));
 	}
-}
-
-void Ship::checkObstacleCollision()
-{
-	//for (SegmentInstance* segment : _segmentsToTest)
-	//{
-	//	for (every obstacle)
-	//	{
-	//		for (boxes in obstacle)
-	//		{
-	//			if (bTestCollision(_boundingBox, /*segment's bounding boxes*/))
-	//			{
-	//				obstacleCollision();
-	//			}
-	//		}
-	//	}
-	//}
 }
