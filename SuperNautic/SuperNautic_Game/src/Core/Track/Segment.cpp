@@ -10,7 +10,7 @@
 const std::string Segment::baseVisualName					{ "VM" };
 const std::string Segment::baseCollisionName				{ "CM" };
 const std::string Segment::temperatureZoneVisualName		{ "zoneVisual" };
-const std::string Segment::temperatureZoneCollisionName		{ "zoneCollision" };
+const std::string Segment::temperatureZoneCollisionName		{ "Z" };
 const std::string Segment::boundingBoxName					{ "BB" };
 const std::string Segment::waypointsName					{ "WP" };
 

@@ -18,7 +18,9 @@
 #include "Core/Track/Segment.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
+#include "GFX/Rendering/ParticleRenderer.hpp"
 #include "GFX/Resources/TexturedModel.hpp"
+#include "GFX/Resources/ParticleSystem.hpp"
 
 #include <vector>
 
@@ -60,6 +62,9 @@ private:
 
 	GFX::ForwardRenderer	_forwardRenderer;
 	GFX::DeferredRenderer	_deferredRenderer;
+	GFX::ParticleRenderer	_particleRenderer;
+
+	GFX::ParticleSystem		_testParticles;
 
 	Camera					_camera;
 	DebugCamera				_debugCamera;

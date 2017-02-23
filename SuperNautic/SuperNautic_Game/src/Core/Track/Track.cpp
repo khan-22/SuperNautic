@@ -22,6 +22,7 @@ Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	, _endMatrix(glm::mat4())
 {
 	//_octrees.push_back(Octree<SegmentInstance*>(glm::vec3(0, 0, 0), 10000));
+	_difficulty = 1.f;
 }
 
 // Destructor
@@ -513,13 +514,19 @@ bool Track::bEndTrack()
 // Places obstacles in the finished track
 void Track::placeObstacles()
 {
-	//const int startLength ;
-
-	for (size_t i = 1; i < _track.size(); i++)
+	const unsigned int endLength = 400;
+	unsigned int currentLength = 400;
+	size_t index = findTrackIndex(0, currentLength);
+	int previousPadding = 0;
+	while (currentLength < _generatedLength - endLength)
 	{
-		const std::vector<glm::vec3>& waypoints = _track[i]->getParent()->getWaypoints();
+		ObstacleHandler::Obstacle * newObstacle = _obstacleHandler->getRandomObstacle();
+		int lengthToNextObstacle = 50;
+		index = findTrackIndex(index, lengthToNextObstacle);
+
+		const std::vector<glm::vec3>& waypoints = _track[index]->getParent()->getWaypoints();
 		assert(waypoints.size() > 0);
-		float targetDepth = 1.f; //rand() % (_track[i]->getLength() - 1) + 1;
+		float targetDepth = static_cast<float>(currentLength - lengthToNextObstacle);
 
 		std::vector<glm::vec3> distanceVectors;
 		distanceVectors.reserve(waypoints.size() - 1);
@@ -530,7 +537,7 @@ void Track::placeObstacles()
 
 		size_t distanceIndex = 0;
 		float depth = 0.f;
-		while (depth < targetDepth && distanceIndex < distanceVectors.size())
+		while (depth < lengthToNextObstacle && distanceIndex < distanceVectors.size())
 		{
 			depth += glm::length(distanceVectors[distanceIndex]);
 			distanceIndex++;
@@ -541,13 +548,28 @@ void Track::placeObstacles()
 		const glm::vec3& finalDistance = distanceVectors[distanceIndex];
 		float finalDistanceLength = glm::length(finalDistance);
 		depth -= finalDistanceLength;
-		float remainderDepth = targetDepth - depth;
+		float remainderDepth = lengthToNextObstacle - depth;
 
 		glm::vec3 pos = waypoints[distanceIndex] + finalDistance * (remainderDepth / finalDistanceLength);
-		ObstacleHandler::Obstacle * obstacle = _obstacleHandler->getRandomObstacle();
 
-		_track[i]->addObstacle(ObstacleInstance(pos, finalDistance, _track[i]->getModelMatrix(), obstacle, 1.f));
+		_track[index]->addObstacle(ObstacleInstance(pos, finalDistance, _track[index]->getModelMatrix(), newObstacle, _difficulty));
+
+		currentLength += lengthToNextObstacle;
+		previousPadding = newObstacle->getPadding(_difficulty);
 	}
+}
+
+size_t Track::findTrackIndex(const size_t lastIndex, const unsigned int lengthFromLast) const
+{
+	unsigned int traversedLength = 0;
+	size_t index = lastIndex;
+	while (traversedLength < lengthFromLast)
+	{
+		int l = _track[index]->getLength();
+		traversedLength += l;
+		index++;
+	}
+	return index - 1;
 }
 
 // Render the track

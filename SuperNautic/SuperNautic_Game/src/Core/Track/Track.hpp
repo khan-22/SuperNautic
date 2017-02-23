@@ -45,6 +45,7 @@ private:
 	void deleteSegments(const int lengthToDelete);
 	bool bEndTrack();
 	void placeObstacles();
+	size_t findTrackIndex(size_t lastIndex, const unsigned int lengthFromLast) const;
 
 	SegmentHandler *						_segmentHandler;
 	ObstacleHandler *						_obstacleHandler;
@@ -52,6 +53,7 @@ private:
 	std::vector<Octree<SegmentInstance*>>	_octrees;
 	std::string								_seed;
 	float									_curviness;
+	float									_difficulty;
 	int										_targetLength;
 	int										_generatedLength;
 	float									_totalProgress;
