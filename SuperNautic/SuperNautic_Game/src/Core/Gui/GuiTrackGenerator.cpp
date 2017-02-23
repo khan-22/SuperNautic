@@ -2,8 +2,9 @@
 
 GuiTrackGenerator::GuiTrackGenerator()
 : _segmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt")
+, _obstacleHandler("obstacleinfo.txt")
 {
-    _track.reset(new Track(&_segmentHandler));
+    _track.reset(new Track(&_segmentHandler, &_obstacleHandler));
     _preview.reset(new TrackPreview());
 
 	for(size_t i = 0; i < _segmentHandler.infos().size(); i++)
@@ -18,7 +19,7 @@ GuiTrackGenerator::GuiTrackGenerator()
 std::unique_ptr<Track> GuiTrackGenerator::takeTrack()
 {
     std::unique_ptr<Track> ret = std::move(_track);
-    _track.reset(new Track(&_segmentHandler));
+    _track.reset(new Track(&_segmentHandler, &_obstacleHandler));
 
 
     return std::move(ret);
@@ -56,7 +57,7 @@ void GuiTrackGenerator::generate()
         auto nullReturn = std::make_pair(std::unique_ptr<Track>(nullptr), std::unique_ptr<TrackPreview>(nullptr));
 
         std::cout << "Generating... " << std::endl;
-        auto track = std::unique_ptr<Track>(new Track(&_segmentHandler));
+        auto track = std::unique_ptr<Track>(new Track(&_segmentHandler, &_obstacleHandler));
         track->setCurviness(_curviness);
         track->setSeed(_seed);
         track->setLength(_length);
@@ -101,7 +102,7 @@ void GuiTrackGenerator::setLength(unsigned int length)
     generate();
 }
 
-void GuiTrackGenerator::setSeed(unsigned int seed)
+void GuiTrackGenerator::setSeed(const std::string& seed)
 {
     _seed = seed;
     generate();

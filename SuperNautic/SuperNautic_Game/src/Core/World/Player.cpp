@@ -110,7 +110,7 @@ void Player::update(float dt)
 	else
 	{
 		//Third person
-		_currentCamera->setPos(_ship.getMeshPosition() - _ship.getCameraForward() * 12.0f + _ship.getCameraUp() * 3.0f);
+		_currentCamera->setPos(_ship.getCameraPosition());
 		_currentCamera->setUp(_ship.getCameraUp());
 		_currentCamera->setViewDir(glm::normalize(_ship.getCameraForward() - _ship.getCameraUp() * 0.1f));
 	}

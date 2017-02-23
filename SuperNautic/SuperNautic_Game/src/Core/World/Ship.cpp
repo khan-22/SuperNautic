@@ -9,6 +9,7 @@
 #include "Core/World/Ship.hpp"
 #include "Core/Geometry/Ray.hpp"
 #include "Core/Geometry/RayIntersection.hpp"
+#include "Core/Utility/CollisionUtility.hpp"
 
 Ship::Ship()
 	:	_destroyed{ false },
@@ -26,9 +27,9 @@ Ship::Ship()
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 200.0f, 6.0f, false},
 		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 100.0f, 6.0f, true },
-		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 15.0f, 10.0f, true },
+		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
 		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
-		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 10.0f },
+		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 5.0f },
 		_meshXZPosition{ glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 0, 0 }, 100.0f },
 		_minAcceleration{ 0.0f },
 		_maxAcceleration{ 100.0f },
@@ -43,8 +44,12 @@ Ship::Ship()
 		_bEngineFlash{ false },
 		_bEngineOverload { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
-		_cooldownOnObstacleCollision{ 2.0f }
+		_cooldownOnObstacleCollision{ 2.0f },
+		_surfaceSlope{ 0.0f, 0.0f, 3.0f },
+		_rayHeight{ 5.0f },
+		_rayAheadDistance{ 5.0f }
 {
+	setPosition(0, 0, 1);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 }
 
@@ -71,10 +76,8 @@ void Ship::update(float dt)
 	handleTemperature(dt);
 	rotateTowardTrackForward(dt);
 
-	trackSurface();
+	trackSurface(dt);
 	updateDirectionsAndPositions(dt);
-
-	checkObstacleCollision();
 
 	// Create mesh rotation matrix from mesh up and forward directions
 	_meshMatrix = { glm::vec4{ glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection())), 0.0f },
@@ -88,8 +91,18 @@ void Ship::update(float dt)
 	// Update bounding box
 	_boundingBox.center = _meshPosition();
 	_boundingBox.directions[0] = glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection()));
-	_boundingBox.directions[1] = _meshUpDirection();
-	_boundingBox.directions[2] = _meshForwardDirection();
+	_boundingBox.directions[1] = glm::normalize(_meshUpDirection());
+	_boundingBox.directions[2] = glm::normalize(_meshForwardDirection());
+
+	// Update slope
+	_surfaceSlope.setTarget(glm::dot(_waypointDifference, _upDirection));
+	_surfaceSlope.update(dt);
+
+	float dot1 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[1]);
+	float dot2 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[2]);
+	float dot3 = glm::dot(_boundingBox.directions[2], _boundingBox.directions[1]);
+
+	checkObstacleCollision();
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -223,9 +236,9 @@ void Ship::setReturnPos(const glm::vec3& returnPos)
 	_returnPos = returnPos;
 }
 
-const glm::vec3& Ship::getCameraForward() const
+const glm::vec3 Ship::getCameraForward() const
 {
-	return _cameraForwardDirection();
+	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope());
 }
 
 const glm::vec3& Ship::getMeshPosition() const
@@ -243,9 +256,14 @@ const glm::vec3 & Ship::getMeshUp() const
 	return _meshUpDirection();
 }
 
-const glm::vec3 & Ship::getVelocity() const
+const glm::vec3 Ship::getVelocity() const
 {
 	return _velocity * _meshForwardDirection();
+}
+
+const glm::vec3 Ship::getCameraPosition() const
+{
+	return _meshPosition() - _cameraForwardDirection() * (9.0f - abs(_surfaceSlope()) * 1.0f + _velocity / 25.0f) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f) + _meshUpDirection() * (1.0f + _surfaceSlope() * 5.0f);
 }
 
 SurfaceType Ship::getSurfaceType() const
@@ -253,6 +271,36 @@ SurfaceType Ship::getSurfaceType() const
 	return _currentSurface;
 }
 
+void Ship::checkObstacleCollision()
+{
+	// Check every relevant instance
+	for (SegmentInstance* segment : _segmentsToTest)
+	{
+		// For every obstacle
+		for (unsigned i = 0; i < segment->getObstacles().size(); ++i)
+		{
+			// For every bounding box in this obstacle
+			for (unsigned j = 0; j < segment->getObstacles()[i].getBoundingBoxes().size(); ++j)
+			{
+				BoundingBox& localBox = segment->getObstacles()[i].getBoundingBoxes()[j];
+
+				// Transform the bounding box to global space
+				BoundingBox globalBox;
+				globalBox.halfLengths = localBox.halfLengths;
+				globalBox.center = segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.center, 1.0f };
+				globalBox.directions[0] = glm::normalize(glm::vec3{ segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.directions[0], 0.0f } });
+				globalBox.directions[1] = glm::normalize(glm::vec3{ segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.directions[1], 0.0f } });
+				globalBox.directions[2] = glm::normalize(glm::vec3{ segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.directions[2], 0.0f } });
+
+				// Test ship bounding box against obstacle's bounding box in global space
+				if (bTestCollision(_boundingBox, globalBox))
+				{
+					obstacleCollision();
+				}
+			}
+		}
+	}
+}
 const BoundingBox & Ship::getBoundingBox() const
 {
 	return _boundingBox;
@@ -264,6 +312,11 @@ void Ship::obstacleCollision()
 	{
 		_engineCooldown = _cooldownOnObstacleCollision;
 	}
+}
+
+void Ship::setWaypointDifference(const glm::vec3 & difference)
+{
+	_waypointDifference = difference;
 }
 
 void Ship::handleInputs(float dt)
@@ -308,7 +361,7 @@ void Ship::handleCooldowns(float dt)
 	if (_timeSinceIntersection > 0.4f)
 	{
 		setPosition(_returnPos);
-		_velocity -= 0.01f * dt;
+		_velocity -= 0.1f * dt;
 	}
 
 	// Update jump cooldown
@@ -455,7 +508,7 @@ void Ship::updateDirectionsAndPositions(float dt)
 	_meshPosition.setVector(_meshPosition() + (_meshXZPosition() - _meshPosition()) - glm::dot(_upDirection, (_meshXZPosition() - _meshPosition())) * _upDirection);
 }
 
-void Ship::trackSurface()
+void Ship::trackSurface(float dt)
 {
 	// Create rays and test for intersections
 	Ray atShipRay{ getPosition() + _upDirection * _rayHeight, -_upDirection, 1000.0f };
@@ -494,21 +547,4 @@ void Ship::trackSurface()
 		// Move up/down to the correct track height
 		move(_upDirection * (_preferredHeight - (((atShipIntersection._length + aheadOfShipIntersection._length) / 2.0f) - _rayHeight)));
 	}
-}
-
-void Ship::checkObstacleCollision()
-{
-	//for (SegmentInstance* segment : _segmentsToTest)
-	//{
-	//	for (every obstacle)
-	//	{
-	//		for (boxes in obstacle)
-	//		{
-	//			if (bTestCollision(_boundingBox, /*segment's bounding boxes*/))
-	//			{
-	//				obstacleCollision();
-	//			}
-	//		}
-	//	}
-	//}
 }
