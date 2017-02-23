@@ -21,6 +21,7 @@
 
 PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
+, _trackGenerator(context.segmentHandler.get(), context.obstacleHandler.get())
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _input()
 , _numPlayers(0)
@@ -144,8 +145,9 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     GuiButton* startButton = new GuiButton(sf::Text("Start", *_font.get()), [&]()
     {
         _stack.clear();
-        unsigned char numPlayers = _numPlayers == 0 ? 1 : _numPlayers;
-        _stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context, numPlayers)));
+        _context.numPlayers = _numPlayers == 0 ? 1 : _numPlayers;
+        _context.track = _trackGenerator.takeTrack();
+        _stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context)));
     });
     guiElements.emplace_back(startButton);
 

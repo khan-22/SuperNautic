@@ -29,7 +29,7 @@ struct ApplicationContext;
 class World
 {
 public:
-    World(ApplicationContext& context, Track * track, const int numberOfPlayers);
+    World(ApplicationContext& context);
 
 	void handleEvent(const sf::Event& e);
 	void update(float dt, sf::Window& window);
@@ -40,7 +40,7 @@ public:
 
 private:
 	Track*									_track;
-	std::vector<Player>						_players;	
+	std::vector<Player>						_players;
 	std::vector<std::vector<PointLight>>	_playerPointLights;
 	bool									_bHasWon;
 
