@@ -51,8 +51,21 @@ ObstacleHandler::~ObstacleHandler()
 	}
 }
 
-ObstacleHandler::Obstacle * ObstacleHandler::getRandomObstacle()
+ObstacleHandler::Obstacle * ObstacleHandler::getRandomObstacle(float diff)
 {
-	return _obstacles[rand() % _obstacles.size()];
-	//return _obstacles[1];
+	int totalProb = 0;
+	for (size_t i = 0; i < _obstacles.size(); i++)
+	{
+		totalProb += _obstacles[i]->getProbability(diff);
+	}
+	int r = rand() % totalProb;
+	int tried = 0;
+	size_t index = 0;
+	while (tried <= r)
+	{
+		tried += _obstacles[index]->getProbability(diff);
+		index++;
+	}
+	index--;
+	return _obstacles[index];
 }

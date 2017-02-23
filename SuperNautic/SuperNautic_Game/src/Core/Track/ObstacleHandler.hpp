@@ -66,7 +66,7 @@ public:
 
 	ObstacleHandler(const std::string& infoFileName);
 	virtual ~ObstacleHandler();
-	Obstacle* getRandomObstacle();
+	Obstacle* getRandomObstacle(float diff);
 
 private:
 	std::vector<Obstacle*>		_obstacles;

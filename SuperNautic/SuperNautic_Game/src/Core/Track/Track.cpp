@@ -522,14 +522,14 @@ void Track::placeObstacles()
 	int previousPadding = 0;
 	while (currentLength < _generatedLength - endLength)
 	{
-		ObstacleHandler::Obstacle * newObstacle = _obstacleHandler->getRandomObstacle();
-		int lengthToNextObstacle = 50;
+		ObstacleHandler::Obstacle * newObstacle = _obstacleHandler->getRandomObstacle(_difficulty);
+		int lengthToNextObstacle = _track[index]->getLength() + 1;
 		currentLength += lengthToNextObstacle;
 		index = findTrackIndex(currentLength, lastFullSegmentLength);
 
 		const std::vector<glm::vec3>& waypoints = _track[index]->getParent()->getWaypoints();
 		assert(waypoints.size() > 0);
-		float targetDepth = static_cast<float>(currentLength - lastFullSegmentLength);
+		float targetDepth = static_cast<float>(currentLength - lastFullSegmentLength) + 0.01;
 		//lengthFromSegmentStart = targetDepth;
 
 		std::vector<glm::vec3> distanceVectors;
@@ -541,7 +541,7 @@ void Track::placeObstacles()
 
 		size_t distanceIndex = 0;
 		float depth = 0.f;
-		while (depth <= targetDepth && distanceIndex < distanceVectors.size())
+		while (depth < targetDepth && distanceIndex < distanceVectors.size())
 		{
 			depth += glm::length(distanceVectors[distanceIndex]);
 			distanceIndex++;
