@@ -15,18 +15,27 @@ GuiSlider::GuiSlider(float min, float max, float sliderWidth, size_t numSteps, c
 {
     deselect();
 
+    float height = std::max(_leftLabel.getGlobalBounds().height, _rightLabel.getGlobalBounds().height);
+
     sf::FloatRect lRect = _leftLabel.getLocalBounds();
     _leftLabel.setOrigin(lRect.left, lRect.top);
     _leftLabel.setPosition(0.f, 0.f);
+    _leftLabel.setOutlineColor(sf::Color::Black);
+    _leftLabel.setOutlineThickness(2.f);
 
     _slider.setPosition(_leftLabel.getPosition());
-    _slider.move(lRect.width, _SLIDER_HEIGHT / 4.f);
+    _slider.move(lRect.width + 5.f, height / 4.f);
 
     _rightLabel.setOrigin(_rightLabel.getLocalBounds().left, _rightLabel.getLocalBounds().top);
     _rightLabel.setPosition(_slider.getPosition().x, 0.f);
-    _rightLabel.move(_sliderWidth, 0.f);
+    _rightLabel.move(_sliderWidth + 5.f, 0.f);
+    _rightLabel.setOutlineColor(sf::Color::Black);
+    _rightLabel.setOutlineThickness(2.f);
 
-    _slider.setFillColor(sf::Color::Blue);
+
+    _slider.setFillColor(sf::Color(220, 220, 220));
+    _slider.setOutlineColor(sf::Color::Black);
+    _slider.setOutlineThickness(2.f);
 
     setOrigin(_slider.getPosition() + sf::Vector2f(_sliderWidth, _SLIDER_HEIGHT) / 2.f);
     setValue(_min);
@@ -63,15 +72,19 @@ bool GuiSlider::bIsSelectable() const
 
 void GuiSlider::select()
 {
-    _leftLabel.setColor(sf::Color::White);
-    _rightLabel.setColor(sf::Color::White);
+    _leftLabel.setColor(sf::Color(200, 200, 90));
+    _rightLabel.setColor(sf::Color(200, 200, 90));
+    _slider.setFillColor(sf::Color(200, 200, 90));
+
     setScale(1.2f, 1.2f);
 }
 
 void GuiSlider::deselect()
 {
-    _leftLabel.setColor(sf::Color::Black);
-    _rightLabel.setColor(sf::Color::Black);
+    _leftLabel.setColor(sf::Color::White);
+    _rightLabel.setColor(sf::Color::White);
+    _slider.setFillColor(sf::Color(220, 220, 220));
+
     setScale(1.0f, 1.0f);
 }
 

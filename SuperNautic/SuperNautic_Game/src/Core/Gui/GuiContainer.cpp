@@ -266,8 +266,9 @@ void GuiContainer::updateSize()
     sf::Vector2f pos = min;
     sf::Vector2f size = max - min;
     _bounds = sf::FloatRect(pos, size);
-    _background.setSize(size * 1.1f);
-    _background.setPosition(pos - size * 0.05f);
+    float bgModifier = 0.4f;
+    _background.setSize(size * (1.f + bgModifier));
+    _background.setPosition(pos - size * bgModifier / 2.f);
 }
 
 sf::FloatRect GuiContainer::getBoundingRect() const

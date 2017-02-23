@@ -27,6 +27,7 @@ private:
     GuiTrackGenerator _trackGenerator;
     Input _input;
     Asset<sf::Font> _font;
+    unsigned char _numPlayers;
 
     GFX::SfmlRenderer _sfmlRenderer;
     GFX::ForwardRenderer _forwardRenderer;

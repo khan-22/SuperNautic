@@ -16,7 +16,7 @@ GuiTextInput::GuiTextInput(size_t numCharacters, GuiCharacterInput::CharacterFla
             updateCharacter(i, c);
         });
         character->setPosition(pos);
-        pos.x += character->getBoundingRect().width;
+        pos.x += character->getBoundingRect().width * 1.2f;
 
         auto uPtr = std::unique_ptr<GuiElement>(character);
         insert(uPtr);

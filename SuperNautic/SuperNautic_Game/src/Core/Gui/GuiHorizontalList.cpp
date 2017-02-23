@@ -151,7 +151,7 @@ void GuiHorizontalList::onElementSelect()
     }
 
 
-    for(int i = _selection - 1; i >= 0 && i >= int(_selection - (_maxVisibleElements + 1) / 2); i--)
+    for(int i = _selection - 1; i >= 0 && i > int(_selection - (_maxVisibleElements + 1) / 2); i--)
     {
         GuiElement& left = *_elements[i];
         left.setOrigin(left.getBoundingRect().width / 2.f, left.getBoundingRect().height / 2.f);

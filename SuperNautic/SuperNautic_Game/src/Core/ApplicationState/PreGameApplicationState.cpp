@@ -17,11 +17,13 @@
 #include "Core/Gui/GuiTextInput.hpp"
 #include "Core/Gui/GuiHorizontalList.hpp"
 #include "Core/Gui/GuiSlider.hpp"
+#include "Core/Gui/GuiPlayerJoinContainer.hpp"
 
 PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _input()
+, _numPlayers(0)
 {
     GuiHorizontalList* seedList = new GuiHorizontalList();
     seedList->setOnElementSelect([&](GuiElement* selection)
@@ -100,14 +102,33 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     });
     guiElements.emplace_back(curviness);
 
-    sf::Vector2f pos(0.f, 0.f);
+    GuiButton* startButton = new GuiButton(sf::Text("Start", *_font.get()), [&]()
+    {
+        _stack.clear();
+        unsigned char numPlayers = _numPlayers == 0 ? 1 : _numPlayers;
+        _stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context, numPlayers)));
+    });
+    guiElements.emplace_back(startButton);
+
+    GuiPlayerJoinContainer* players = new GuiPlayerJoinContainer();
+    players->setOnJoin([this](unsigned char playerId)
+    {
+        _numPlayers++;
+    });
+    players->setOnLeave([this](unsigned char playerId)
+    {
+        _numPlayers--;
+    });
+    guiElements.emplace_back(players);
+
+    sf::Vector2f pos(0.f, -guiElements.front()->getBoundingRect().height);
     for(const std::unique_ptr<GuiElement>& e : guiElements)
     {
+        pos.y += e->getBoundingRect().height * 1.5f;
         e->setPosition(pos);
-        pos.y += e->getBoundingRect().height * 2.f;
     }
 
-    _guiContainer.setBackground(sf::Color(255, 255, 255, 50));
+    _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
     _guiContainer.insert(guiElements);
 
     sf::Vector2u windowSize = _context.window.getSize();

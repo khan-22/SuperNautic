@@ -14,7 +14,10 @@ GuiCharacterInput::GuiCharacterInput(CharacterFlags flags)
     _text.setOrigin(_text.getLocalBounds().left, _text.getLocalBounds().top);
     _text.setPosition(0.f, 0.f);
     sf::FloatRect textBounds = _text.getLocalBounds();
-    _text.setFillColor(sf::Color::Black);
+    _text.setFillColor(sf::Color::White);
+    _text.setOutlineColor(sf::Color::Black);
+    _text.setOutlineThickness(2.f);
+
 }
 
 void GuiCharacterInput::setOnChange(const std::function<void(char)>& callback)
@@ -26,13 +29,13 @@ void GuiCharacterInput::setOnChange(const std::function<void(char)>& callback)
 void GuiCharacterInput::select()
 {
     setScale(1.2f, 1.2f);
-    _text.setFillColor(sf::Color::White);
+    _text.setFillColor(sf::Color(200, 200, 90));
 }
 
 void GuiCharacterInput::deselect()
 {
     setScale(1.0f, 1.0f);
-    _text.setFillColor(sf::Color::Black);
+    _text.setFillColor(sf::Color::White);
 }
 
 void GuiCharacterInput::handleEventCurrent(const sf::Event& event)
