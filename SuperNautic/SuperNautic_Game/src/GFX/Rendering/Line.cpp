@@ -100,7 +100,7 @@ std::shared_ptr<GFX::VertexArrayObject> Line::generateVao(const std::vector<glm:
     std::vector<glm::vec3> colors(points.size(), glm::vec3(0.f, 255.f, 0.f));
     if(!colors.empty())
     {
-        colors.back() = glm::vec3(255.f, 0.f, 0.f);
+        colors.front() = colors.back() = glm::vec3(255.f, 0.f, 0.f);
     }
     std::vector<float> sizes(points.size(), 50.f);
     auto vao = std::make_shared<GFX::VertexArrayObject>();
