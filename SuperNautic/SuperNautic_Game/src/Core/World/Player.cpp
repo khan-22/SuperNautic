@@ -36,6 +36,10 @@ void Player::setScreenSize(int screenWidth, int screenHeight, int offsetX, int o
 	_hud.setScreenSize(screenWidth, screenHeight, offsetX, offsetY);
 }
 
+void Player::setId(int id) 
+{
+	_input.setControllerId(id);
+}
 
 void Player::update(float dt)
 {
