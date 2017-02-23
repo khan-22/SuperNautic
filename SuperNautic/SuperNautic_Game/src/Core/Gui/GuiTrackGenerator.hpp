@@ -13,6 +13,7 @@ class GuiTrackGenerator : public GFX::Renderable3D
 {
     public:
         GuiTrackGenerator(SegmentHandler* segmentHandler, ObstacleHandler* obstacleHandler);
+        ~GuiTrackGenerator();
 
         std::unique_ptr<Track> takeTrack();
         void render(GFX::RenderStates& states) override;

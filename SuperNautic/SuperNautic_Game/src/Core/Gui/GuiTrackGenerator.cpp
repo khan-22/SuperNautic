@@ -8,6 +8,11 @@ GuiTrackGenerator::GuiTrackGenerator(SegmentHandler* segmentHandler, ObstacleHan
     _preview.reset(new TrackPreview());
 }
 
+GuiTrackGenerator::~GuiTrackGenerator()
+{
+    _bDoAbortGenerate = true;
+}
+
 
 std::unique_ptr<Track> GuiTrackGenerator::takeTrack()
 {
