@@ -26,6 +26,51 @@ void GuiHorizontalList::deselect()
 }
 
 
+void GuiHorizontalList::handleEventCurrent(const sf::Event& event)
+{
+    GuiContainer::handleEventCurrent(event);
+    if(event.type == sf::Event::KeyPressed)
+    {
+        switch(event.key.code)
+        {
+            case sf::Keyboard::Escape:
+            case sf::Keyboard::B:
+                toggleActivation();
+                break;
+
+            default:
+                break;
+        }
+    }
+}
+
+
+void GuiHorizontalList::activate()
+{
+//    if(!bHasSelection())
+//    {
+//        GuiContainer::select();
+//    }
+
+    if(bHasSelection())
+    {
+        getSelection().toggleActivation();
+    }
+}
+
+void GuiHorizontalList::deactivate()
+{
+//    if(!bHasSelection())
+//    {
+//        GuiContainer::select();
+//    }
+
+//    if(bHasSelection())
+//    {
+//        getSelection().toggleActivation();
+//    }
+}
+
 
 bool GuiHorizontalList::bIsSelectable() const
 {

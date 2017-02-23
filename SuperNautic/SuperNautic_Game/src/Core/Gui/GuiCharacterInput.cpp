@@ -187,6 +187,46 @@ char GuiCharacterInput::getCharacter() const
     return _text.getString()[0];
 }
 
+void GuiCharacterInput::setCharacter(char character)
+{
+    CharacterFlags flags = CharacterFlags::INVALID;
+    unsigned char charIndex = 0;
+    if(character >= 'a' && character <= 'z')
+    {
+        flags = CharacterFlags::LOWERCASE;
+        charIndex = character - 'A';
+    }
+    else if(character >= 'A' && character <= 'Z')
+    {
+        flags = CharacterFlags::UPPERCASE;
+        charIndex = character - 'A';
+    }
+    else if(character >= '0' && character <= '9')
+    {
+        flags = CharacterFlags::DIGITS;
+        charIndex = character - '0';
+    }
+
+    auto found = std::find(_characterLists.begin(), _characterLists.end(), flags);
+    if(found != _characterLists.end())
+    {
+        _currentCharacterListIndex = std::distance(_characterLists.begin(), found);
+        if(flags == CharacterFlags::DIGITS)
+        {
+            _currentDigit = charIndex;
+        }
+        else
+        {
+            _currentLetter = charIndex;
+        }
+
+        updateText();
+        return;
+    }
+
+    LOG_ERROR("Invalid character: ", character, " (", (int)character, ")");
+}
+
 
 std::vector<GuiCharacterInput::CharacterFlags> GuiCharacterInput::generateCharacterLists(CharacterFlags flags)
 {

@@ -30,14 +30,22 @@ void GuiTextInput::setOnChange(const std::function<void(const std::string&)>& ca
 
 void GuiTextInput::select()
 {
-    GuiContainer::select();
     setScale(1.2f, 1.2f);
 }
 
 void GuiTextInput::deselect()
 {
-    GuiContainer::deselect();
     setScale(1.0f, 1.0f);
+}
+
+void GuiTextInput::activate()
+{
+    GuiContainer::select();
+}
+
+void GuiTextInput::deactivate()
+{
+    GuiContainer::deselect();
 }
 
 bool GuiTextInput::bIsActivatable() const
@@ -61,4 +69,18 @@ void GuiTextInput::updateCharacter(size_t index, char character)
     {
         _onChangeCallback(_text);
     }
+}
+
+void GuiTextInput::setText(const std::string& str)
+{
+    size_t size = std::min(str.size(), _characters.size());
+    for(size_t i = 0; i < size; i++)
+    {
+        _characters[i]->setCharacter(str[i]);
+    }
+}
+
+const std::string& GuiTextInput::getText() const
+{
+    return _text;
 }
