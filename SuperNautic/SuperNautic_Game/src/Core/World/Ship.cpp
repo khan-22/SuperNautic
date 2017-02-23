@@ -31,7 +31,7 @@ Ship::Ship()
 		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 10.0f },
 		_meshXZPosition{ glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 0, 0 }, 100.0f },
 		_minAcceleration{ 0.0f },
-		_maxAcceleration{ 200.0f },
+		_maxAcceleration{ 100.0f },
 		_maxTurningSpeed{ 8.0f },
 		_straighteningForce{ 3.0f },
 		_steerStraighteningForce{ 15.0f },
