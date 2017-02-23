@@ -514,22 +514,22 @@ bool Track::bEndTrack()
 // Places obstacles in the finished track
 void Track::placeObstacles()
 {
-	const unsigned int endLength = 400;
-	unsigned int currentLength = 0;
-	unsigned int lastFullSegmentLength = 0;
-	unsigned int lengthFromSegmentStart = 0;
+	const float endLength = 400;
+	float currentLength = 2;
+	float lastFullSegmentLength = 0;
+	//float lengthFromSegmentStart = 0;
 	size_t index = findTrackIndex(currentLength, lastFullSegmentLength);
-	int previousPadding = 0;
+	//float previousPadding = 0;
 	while (currentLength < _generatedLength - endLength)
 	{
 		ObstacleHandler::Obstacle * newObstacle = _obstacleHandler->getRandomObstacle(_difficulty);
-		int lengthToNextObstacle = _track[index]->getLength() + 1;
+		float lengthToNextObstacle = _track[index]->getLength();
 		currentLength += lengthToNextObstacle;
 		index = findTrackIndex(currentLength, lastFullSegmentLength);
 
 		const std::vector<glm::vec3>& waypoints = _track[index]->getParent()->getWaypoints();
 		assert(waypoints.size() > 0);
-		float targetDepth = static_cast<float>(currentLength - lastFullSegmentLength) + 0.01;
+		float targetDepth = currentLength - lastFullSegmentLength + 0.01;
 		//lengthFromSegmentStart = targetDepth;
 
 		std::vector<glm::vec3> distanceVectors;
@@ -555,20 +555,26 @@ void Track::placeObstacles()
 		float remainderDepth = targetDepth - depth;
 
 		glm::vec3 pos = waypoints[distanceIndex] + finalDistance * (remainderDepth / finalDistanceLength);
+		
+		glm::vec3 v1 = glm::vec3(0, 0, 1);
+		glm::vec3 v2 = _track[index]->getEndMatrix() * glm::vec4(0, 0, 1, 0);
+		float factor = targetDepth / _track[index]->getLength();
+		glm::vec3 forward = v1 * (1 - factor) + v2 * factor;
 
-		_track[index]->addObstacle(ObstacleInstance(pos, finalDistance, _track[index]->getModelMatrix(), newObstacle, _difficulty));
+		glm::mat4 modelMat = glm::inverse(glm::lookAt(pos, pos + forward, glm::vec3(0, 1, 0)));
+		_track[index]->addObstacle(ObstacleInstance(_track[index]->getModelMatrix(), newObstacle, _difficulty));
 
 		//previousPadding = newObstacle->getPadding(_difficulty);
 	}
 }
 
-size_t Track::findTrackIndex(const unsigned int totalLength, unsigned int & lastFullSegmentLength) const
+size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLength) const
 {
-	unsigned int traversedLength = 0;
+	float traversedLength = 0;
 	size_t index = 0;
 	while (traversedLength <= totalLength)
 	{
-		int l = _track[index]->getLength();
+		float l = _track[index]->getLength();
 		traversedLength += l;
 		index++;
 	}
@@ -589,7 +595,7 @@ void Track::update(const float dt)
 // Render the track
 void Track::render(GFX::DeferredRenderer& renderer, const int shipIndex)
 {
-	for (int i = -1; i < 10; i++)
+	for (int i = -2; i < 7; i++)
 	{
 		int index = shipIndex + i;
 		if (index >= 0 && index < _track.size())

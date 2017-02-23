@@ -69,8 +69,8 @@ void main()
 		lightingResult.rgb += calculatePointLight(i, fragPos, diffuseTex, normal, viewDir);
 	}
 
-	outColor = vec4(diffuseTex, 1.0);
-	//outColor = mix(lightingResult, vec4(diffuseTex, 1.0), illumination);
+	//outColor = vec4(diffuseTex, 1.0);
+	outColor = mix(lightingResult, vec4(diffuseTex, 1.0), illumination);
 }
 
 //vec3 lightDir = vec3(-0.2, -0.2, -0.2);

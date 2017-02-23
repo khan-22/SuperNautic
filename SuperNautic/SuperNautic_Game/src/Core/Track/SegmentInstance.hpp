@@ -19,7 +19,7 @@ public:
 	virtual ~SegmentInstance();
 	glm::mat4 getEndMatrix() const;
 	glm::mat4 getModelMatrix() const;
-	const int getLength() const;
+	const float getLength() const;
     const std::vector<BoundingBox>& getGlobalBoundingBoxes() const;
 	const int getIndex() const;
 	void addObstacle(ObstacleInstance newObstacle);

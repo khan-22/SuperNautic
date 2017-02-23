@@ -45,7 +45,7 @@ private:
 	void deleteSegments(const int lengthToDelete);
 	bool bEndTrack();
 	void placeObstacles();
-	size_t findTrackIndex(const unsigned int totalLength, unsigned int & lastFullSegmentLength) const;
+	size_t findTrackIndex(const float totalLength, float & lastFullSegmentLength) const;
 
 	SegmentHandler *						_segmentHandler;
 	ObstacleHandler *						_obstacleHandler;
@@ -54,8 +54,8 @@ private:
 	std::string								_seed;
 	float									_curviness;
 	float									_difficulty;
-	int										_targetLength;
-	int										_generatedLength;
+	float									_targetLength;
+	float									_generatedLength;
 	float									_totalProgress;
 	int										_lengthAfterLastCall;
 	int										_progressionLength;
