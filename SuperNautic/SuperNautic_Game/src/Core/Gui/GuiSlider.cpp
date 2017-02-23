@@ -12,6 +12,8 @@ GuiSlider::GuiSlider(float min, float max, float sliderWidth, size_t numSteps, c
 , _min(min)
 , _valueSize(max - min)
 {
+    deselect();
+
     sf::FloatRect lRect = _leftLabel.getLocalBounds();
     _leftLabel.setOrigin(lRect.left, lRect.top);
     _leftLabel.setPosition(0.f, 0.f);
@@ -24,6 +26,8 @@ GuiSlider::GuiSlider(float min, float max, float sliderWidth, size_t numSteps, c
     _rightLabel.move(_sliderWidth, 0.f);
 
     _slider.setFillColor(sf::Color::Blue);
+
+    setOrigin(_slider.getPosition() + sf::Vector2f(_sliderWidth, _SLIDER_HEIGHT) / 2.f);
     setValue(0.f);
 }
 
@@ -55,11 +59,15 @@ bool GuiSlider::bIsSelectable() const
 
 void GuiSlider::select()
 {
+    _leftLabel.setColor(sf::Color::White);
+    _rightLabel.setColor(sf::Color::White);
     setScale(1.2f, 1.2f);
 }
 
 void GuiSlider::deselect()
 {
+    _leftLabel.setColor(sf::Color::Black);
+    _rightLabel.setColor(sf::Color::Black);
     setScale(1.0f, 1.0f);
 }
 
