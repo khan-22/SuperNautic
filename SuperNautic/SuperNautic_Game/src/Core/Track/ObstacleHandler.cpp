@@ -37,6 +37,7 @@ ObstacleHandler::ObstacleHandler(const std::string& infoFileName)
 		int prob1, padding1;
 		float minRotSpeed1, maxRotSpeed1;
 		in >> prob1 >> minRotSpeed1 >> maxRotSpeed1 >> padding1;
+		in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 		_obstacles.push_back(new Obstacle(model, boxes, prob1, minRotSpeed1, maxRotSpeed1, padding1));
 	}
