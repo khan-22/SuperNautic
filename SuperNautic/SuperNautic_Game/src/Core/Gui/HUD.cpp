@@ -45,7 +45,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_progressionMeter.setOrigin(_widthStep, _heightStep);
 	_progressionMeter.setPosition(_progressionPosX, _heightStep * 90 + _offsetY);
 
-	_speedMeter.setSize(sf::Vector2f(_widthStep * 2, _heightStep));
+	_speedMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
 	_speedMeter.setFillColor(sf::Color(200, 200, 200, 255));
 	_speedMeter.setOrigin(_widthStep, _heightStep);
 	_speedMeter.setPosition(_heatPosX, _heightStep * 90 + _offsetY);
@@ -116,7 +116,7 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_progressionMeter.setOrigin(_widthStep, _heightStep);
 	_progressionMeter.setPosition(_progressionPosX, _heightStep * 90 + _offsetY);
 
-	_speedMeter.setSize(sf::Vector2f(_widthStep * 2, _heightStep));
+	_speedMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
 	_speedMeter.setFillColor(sf::Color(200, 200, 200, 255));
 	_speedMeter.setOrigin(_widthStep, _heightStep);
 	_speedMeter.setPosition(_heatPosX, _heightStep * 90 + _offsetY);
@@ -152,7 +152,7 @@ void HUD::updateCurrent()
 
 	_progressionMeter.setPosition(_progressionPosX, _heightStep * 90 + _offsetY  - (_progression * _heightStep * 80));
 
-	_speedMeter.setPosition(_heatPosX, _heightStep * 90 + _offsetY - (_speed / 200 * _heightStep * 80));
+	_speedMeter.setPosition(_heatPosX - _widthStep / 2, _heightStep * 90 + _offsetY - (_speed / 200 * _heightStep * 80));
 
 	_tSpeed.setString("Speed: " + std::to_string(_speed));
 	_tPosition.setString(std::to_string(_position));
