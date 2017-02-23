@@ -68,6 +68,10 @@ HUD::~HUD()
 void HUD::setHeat(float heat)
 {
 	_heat = heat;
+	if (_heat > 1.0f)
+	{
+		_heat = 1.0f;
+	}
 }
 
 void HUD::setSpeed(float speed)
