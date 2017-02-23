@@ -123,9 +123,10 @@ void World::update(float dt, sf::Window& window)
 		{
 			// Finds forward vector of ship and updates segment index
 			glm::vec3 returnPos;
+			glm::vec3 directionDifference;
 			unsigned segmentIndex = _playerProgression[i].getCurrentSegment();
 			float lengthInSegment = 0.0f;
-			glm::vec3 forward = _track->findForward(_players[i].getShip().getPosition(), segmentIndex, returnPos, lengthInSegment);
+			glm::vec3 forward = _track->findForward(_players[i].getShip().getPosition(), segmentIndex, returnPos, lengthInSegment, directionDifference);
 			
 			// Update progression
 			_playerProgression[i].setCurrentSegment(segmentIndex);
@@ -137,6 +138,7 @@ void World::update(float dt, sf::Window& window)
 			// Update ship forward position and respawn position
 			_players[i].getShip().setForward(forward);
 			_players[i].getShip().setReturnPos(returnPos);
+			_players[i].getShip().setWaypointDifference(directionDifference);
 
 			// Find segments adjacent to ship
 			std::vector<SegmentInstance*> instances;
@@ -174,7 +176,7 @@ void World::update(float dt, sf::Window& window)
 
 		// Update debug camera
 		_debugCamera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
-		_debugCamera.setUp(_players[0].getShip().getCameraUp());
+		//_debugCamera.setUp(_players[0].getShip().getCameraUp());
 		_debugCamera.setViewDir(_players[0].getShip().getCameraForward());
 	}
 	else
