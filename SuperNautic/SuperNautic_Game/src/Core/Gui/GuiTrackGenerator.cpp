@@ -11,8 +11,6 @@ GuiTrackGenerator::GuiTrackGenerator()
     {
         _segmentHandler.loadSegment(i);
     }
-
-    generate();
 }
 
 
@@ -89,27 +87,17 @@ void GuiTrackGenerator::generate()
 //    _preview->setTrack(*_track);
 }
 
-void GuiTrackGenerator::setTrackAttributes()
-{
-	_track->setCurviness(_curviness);
-	_track->setSeed(_seed);
-	_track->setLength(_length);
-}
-
 void GuiTrackGenerator::setLength(unsigned int length)
 {
     _length = length;
-    generate();
 }
 
 void GuiTrackGenerator::setSeed(const std::string& seed)
 {
     _seed = seed;
-    generate();
 }
 
 void GuiTrackGenerator::setCurviness(unsigned int curviness)
 {
     _curviness = curviness;
-    generate();
 }

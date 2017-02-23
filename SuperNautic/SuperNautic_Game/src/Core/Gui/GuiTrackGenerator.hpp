@@ -18,6 +18,7 @@ class GuiTrackGenerator : public GFX::Renderable3D
         void render(GFX::RenderStates& states) override;
         void update(float dtSeconds);
 
+        void generate();
         void setLength(unsigned int length);
         void setSeed(const std::string& seed);
         void setCurviness(unsigned int curviness);
@@ -34,8 +35,6 @@ class GuiTrackGenerator : public GFX::Renderable3D
         std::string	 _seed = "1";
         unsigned int _curviness = 3;
 
-        void generate();
-        void setTrackAttributes();
 };
 
 #endif //GUI_TRACK_GENERATOR_HPP
