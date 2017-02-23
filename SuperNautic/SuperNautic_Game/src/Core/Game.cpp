@@ -78,11 +78,11 @@ bool Game::bInitialize()
 	//	LOG("WOOOOOW!!");
 	//}
 
-    TextureAsset textureTest = TextureCache::get("heatchart.png");
-    if(textureTest.get() == nullptr)
-    {
-        LOG("Failed to load texture.");
-    }
+    //TextureAsset textureTest = TextureCache::get("heatchart.png");
+    //if(textureTest.get() == nullptr)
+    //{
+    //    LOG("Failed to load texture.");
+    //}
 
     MaterialAsset materialTest = MaterialCache::get("test.mat");
     if(materialTest.get() == nullptr)

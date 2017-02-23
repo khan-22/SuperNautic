@@ -16,7 +16,7 @@ Ship::Ship()
 		_turningFactor{ 0.0f },
 		_currentTurningAngle{ 0.0f },
 		_accelerationFactor{ 0.5f },
-		_jumpCooldown{ 1.5f },
+		_jumpCooldown{ .8f },
 		_currentJumpCooldown{ 0.0f },
 		_engineTemperature{ 0.0f },
 		_velocity{ 0.0f },
@@ -160,7 +160,7 @@ bool Ship::getOverload(float dt)
 		_engineFlashTime -= dt;
 		isWhite = _bEngineFlash;
 
-		_velocity *= 0.9999f * dt;
+		//_velocity *= 0.9999f * dt;
 	}
 	else if (_engineOverload > 0)
 	{
@@ -326,7 +326,7 @@ void Ship::handleCooldowns(float dt)
 	if (_timeSinceIntersection > 0.4f)
 	{
 		setPosition(_returnPos);
-		_velocity = 0.0f;
+		_velocity -= 0.01f * dt;
 	}
 
 	// Update jump cooldown
