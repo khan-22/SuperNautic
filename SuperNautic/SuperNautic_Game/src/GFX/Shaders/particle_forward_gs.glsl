@@ -28,16 +28,16 @@ void main()
 	
 	finalParticleColor = particleColor[0];
 
-	gl_Position = uPerspective * (point - horizontal + vertical);
+	gl_Position = uPerspective * vec4(point.xyz - horizontal + vertical, 1.f);
 	EmitVertex();
 
-	gl_Position = uPerspective * (point + horizontal + vertical);
+	gl_Position = uPerspective * vec4(point.xyz + horizontal + vertical, 1.f);
 	EmitVertex();
 	
-	gl_Position = uPerspective * (point - horizontal - vertical);
+	gl_Position = uPerspective * vec4(point.xyz - horizontal - vertical, 1.f);
 	EmitVertex();
 	
-	gl_Position = uPerspective * (point + horizontal - vertical);
+	gl_Position = uPerspective * vec4(point.xyz + horizontal - vertical, 1.f);
 	EmitVertex();
 
 	EndPrimitive();

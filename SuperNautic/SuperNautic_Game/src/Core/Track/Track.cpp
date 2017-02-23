@@ -19,7 +19,7 @@ Track::Track(SegmentHandler * segmentHandler)
 	, _endMargin(400)
 	, _endMatrix(glm::mat4())
 {
-	
+
 }
 
 // Destructor
@@ -84,6 +84,7 @@ void Track::startNewTrack()
 	{
 		delete _track[i];
 	}
+	_track.clear();
 }
 
 // Generates the track
@@ -243,7 +244,7 @@ int Track::getIndex() const
 	{
 		return 0;
 	}
-	
+
 	//This should never ever run!
 	assert(true);
 
@@ -298,7 +299,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 		// Update ship's current segment
 		segmentIndex = closestIndex;
 	}
-	
+
 	// Find direction and position of next waypoint
 	WaypointInfo next = findNextWaypointInfo(closest, closestIndex);
 
@@ -311,7 +312,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 	}
 
 	// Project globalPosition onto the plane defined by closest.direction and closest.position
-	// Cast a ray from this position in the direction of closest.direction and find 
+	// Cast a ray from this position in the direction of closest.direction and find
 	//     intersection with plane defined by next.direction and next.distance
 	// The length of the ray is used to find interpolation value between waypoint normals
 	glm::vec3 projectedGlobalPos{ globalPosition - glm::dot(closest.direction, globalPosition - closest.position) * closest.direction };
