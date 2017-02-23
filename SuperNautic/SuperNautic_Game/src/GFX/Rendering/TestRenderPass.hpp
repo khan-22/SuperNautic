@@ -16,7 +16,7 @@ namespace GFX
 		TestRenderPass();
 		~TestRenderPass();
 		
-		void initialize(sf::RenderWindow* window, Framebuffer origin, Framebuffer target, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
+		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
 
 		void perform();
 

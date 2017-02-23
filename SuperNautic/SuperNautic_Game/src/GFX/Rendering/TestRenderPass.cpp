@@ -8,9 +8,20 @@ GFX::TestRenderPass::~TestRenderPass()
 {
 }
 
-void GFX::TestRenderPass::initialize(sf::RenderWindow * window, Framebuffer origin, Framebuffer target, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
+void GFX::TestRenderPass::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
 {
-	_shader = ShaderCache::get("");
+	_shader = ShaderCache::get("testRenderPass_forward");
+	_window = window;
+
+	_shader.get()->setSampler("uOrigin", 0);
+
+	//_origin = &origin;
+	//_target = &target;
+
+	_x		= x;
+	_y		= y;
+	_width	= width;
+	_height = height;
 
 	GLfloat screenX1 = _x * 2.f - 1.f;
 	GLfloat screenY1 = _y * 2.f - 1.f;
@@ -61,5 +72,19 @@ void GFX::TestRenderPass::perform()
 {
 	assert(_window != nullptr);
 
+	//_origin->bindRead();
+	//_target->bindWrite();
 
+	//_origin->bindColorTextures();
+
+	glDisable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_CULL_FACE);
+
+	_shader.get()->bind();
+	//glViewport(0, 0, width, height);
+	_screenQuad->render();
+
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
 }
