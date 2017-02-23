@@ -67,6 +67,8 @@ private:
 	char									_endConnection;
 	int										_prevIndex;
 	const Segment *							_lastSegment;
+	// TEMPORARY
+	bool									_bDoneGenerating;
 };
 
 #endif // !TRACK_HPP

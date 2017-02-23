@@ -23,6 +23,8 @@ Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 {
 	//_octrees.push_back(Octree<SegmentInstance*>(glm::vec3(0, 0, 0), 10000));
 	_difficulty = 1.f;
+	_progressionLength = 1500.f;
+	_bDoneGenerating = false;
 }
 
 // Destructor
@@ -51,7 +53,6 @@ void Track::setLength(const unsigned int length)
 {
 	assert(length >= 3000 && length <= 1000000);
 	_targetLength = length;
-	_progressionLength = _targetLength / 30;
 }
 
 // Set randomization seed
@@ -96,6 +97,7 @@ void Track::startNewTrack()
 	_prevIndex = -1;
 	_lastSegment = nullptr;
 	_octrees.clear();
+	_bDoneGenerating = false;
 	for (unsigned int i = 0; i < _track.size(); i++)
 	{
 		delete _track[i];
@@ -106,6 +108,13 @@ void Track::startNewTrack()
 // Generates the track
 bool Track::bGenerate()
 {
+	// TEMPORARY
+	if (_bDoneGenerating)
+	{
+		return true;
+	}
+	///////
+
 	// Make the inital stretch straight
 	while (_generatedLength < 300)
 	{
@@ -164,9 +173,10 @@ bool Track::bGenerate()
 		{
 			if (bEndTrack())
 			{
+				_bDoneGenerating = true;
 				placeObstacles();
-				return true;
 				LOG("Track generated. Length: ", _generatedLength);
+				return true;
 			}
 			else
 			{
