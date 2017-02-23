@@ -27,7 +27,7 @@ void main()
 	vec4 illumination = texture(uIllumination, fs_in.uv);
 	
 	
-	diffuseOut.rgb += (specular + normal).rgb * 0.f;
 	diffuseOut		= vec4(diffuse.rgb, illumination.r);
+	diffuseOut.rgb += (specular + normal).rgb * 0.f;
 
 }
