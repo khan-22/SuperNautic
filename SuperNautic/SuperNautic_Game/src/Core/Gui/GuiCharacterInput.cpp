@@ -133,16 +133,16 @@ void GuiCharacterInput::stepCharacter(bool bForward)
         case CharacterFlags::DIGITS:
             if(bForward)
             {
-                _currentDigit++;
-                _currentDigit %= NUM_DIGITS;
-            }
-            else
-            {
                 _currentDigit--;
                 if(_currentDigit > NUM_DIGITS)
                 {
                     _currentDigit = NUM_DIGITS - 1;
                 }
+            }
+            else
+            {
+                _currentDigit++;
+                _currentDigit %= NUM_DIGITS;
             }
             break;
         default:
