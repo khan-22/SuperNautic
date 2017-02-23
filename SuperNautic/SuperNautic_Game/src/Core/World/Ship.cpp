@@ -406,6 +406,7 @@ void Ship::updateDirectionsAndPositions(float dt)
 {
 	// Move forward
 	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _shipForward, 0.0f };
+	glm::vec3 visualTurningDirection = glm::rotate(_currentTurningAngle * 0.5f, _upDirection) * glm::vec4{ _shipForward, 0.0f };
 	move(velocityDirection * _velocity * dt);
 
 	// Update mesh position
@@ -413,13 +414,13 @@ void Ship::updateDirectionsAndPositions(float dt)
 	_meshPosition.update(dt);
 
 	// Update mesh forward direction
-	_meshForwardDirection.setTarget(velocityDirection);
+	_meshForwardDirection.setTarget(visualTurningDirection);
 	_meshForwardDirection.setBackupAxis(_upDirection);
 	_meshForwardDirection.update(dt);
 
 	// Update mesh up direction
 	_meshUpDirection.setBackupAxis(_meshForwardDirection());
-	_meshUpDirection.setTarget(glm::rotate(-_currentTurningAngle * 1.5f, _shipForward) * glm::vec4{ _upDirection, 0.0f });
+	_meshUpDirection.setTarget(glm::rotate(-_currentTurningAngle * 1.0f, _shipForward) * glm::vec4{ _upDirection, 0.0f });
 	_meshUpDirection.update(dt);
 
 	// Update camera up direction

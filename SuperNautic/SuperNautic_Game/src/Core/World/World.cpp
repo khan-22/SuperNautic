@@ -189,7 +189,7 @@ void World::update(float dt, sf::Window& window)
 	//_testParticles.update(dt, currentPos, currentPos - previousPos);
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
-		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 2.0f;
+		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 1.9f;
 		_playerParticles[i].update(dt, particlePos);
 	}
 
