@@ -26,6 +26,19 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 , _input()
 , _numPlayers(0)
 {
+    std::string startSeed = "AAAAA";
+    size_t startLength = 40000;
+    size_t startCurviness = 3;
+
+    if(_context.track != nullptr)
+    {
+        Track& t = *_context.track;
+        startSeed = t.getSeed();
+        startLength = t.getTargetLength();
+        startCurviness = t.getCurviness();
+    }
+
+
     GuiHorizontalList* seedList = new GuiHorizontalList();
     seedList->setOnElementSelect([&](GuiElement* selection)
     {
@@ -51,15 +64,21 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         seedList->insert(seedPtr);
     }
     _selectedSeedInput = _seedInputs.front();
-    _trackGenerator.setSeed("AAAAA");
+    _trackGenerator.setSeed(startSeed);
 
     std::vector<std::unique_ptr<GuiElement>> guiElements;
     guiElements.emplace_back(seedList);
 
     GuiTextInput* length = new GuiTextInput(6, GuiCharacterInput::CharacterFlags::DIGITS);
-    length->setText("040000");
+
+    std::string lengthStr = std::to_string(startLength);
+    if(lengthStr.size() < 6)
+    {
+        lengthStr.insert(0, 6 - lengthStr.size(), '0');
+    }
+    length->setText(lengthStr);
     _lengthInput = length;
-    _trackGenerator.setLength(40000);
+    _trackGenerator.setLength(startLength);
     length->setOnChange([this, length](const std::string& str)
     {
         std::stringstream sstream(str);
@@ -97,8 +116,8 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         sf::Text("High", *_font.get())
     );
     _curvinessInput = curviness;
-    curviness->setValue(3.f);
-    _trackGenerator.setCurviness(3);
+    curviness->setValue(startCurviness);
+    _trackGenerator.setCurviness(startCurviness);
 
     curviness->setOnChange([&](float c)
     {
@@ -179,6 +198,8 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     _guiContainer.toggleSelection();
 
     _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f);
+
+
 }
 
 void PreGameApplicationState::render()
