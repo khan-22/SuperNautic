@@ -161,7 +161,10 @@ void World::update(float dt, sf::Window& window)
 
 		// Update debug camera
 		_debugCamera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
-		_debugCamera.setUp(_players[0].getShip().getCameraUp());
+
+		// Commenting this out fixes mouse movement and debug camera rotation desyncing
+		//_debugCamera.setUp(_players[0].getShip().getCameraUp());
+
 		_debugCamera.setViewDir(_players[0].getShip().getCameraForward());
 	}
 	else
@@ -255,20 +258,24 @@ void World::render()
 			_playerRTs[i].display(*_players[i].getCamera());
 			_playerRTs[i].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 		}
+		for (int i = 0; i < _playerParticleRenderers.size(); i++)
+		{
+			for (int j = 0; j < _players.size(); j++)
+			{
+				_playerParticleRenderers[i].render(_playerParticles[j]);
+				_playerParticleRenderers[i].display(*_players[i].getCamera());
+			}
+		}
 	}
 	else
 	{
 		_playerRTs[0].display(_debugCamera);
 		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
-	}
 
-
-	for (int i = 0; i < _playerParticleRenderers.size(); i++)
-	{
 		for (int j = 0; j < _players.size(); j++)
 		{
-			_playerParticleRenderers[i].render(_playerParticles[j]);
-			_playerParticleRenderers[i].display(*_players[i].getCamera());
+			_playerParticleRenderers[0].render(_playerParticles[j]);
+			_playerParticleRenderers[0].display(_debugCamera);
 		}
 	}
 

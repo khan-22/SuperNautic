@@ -179,3 +179,8 @@ const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const
 
 	return intersection;
 }
+
+const std::vector<ObstacleInstance>& SegmentInstance::getObstacles() const
+{
+	return _obstacles;
+}

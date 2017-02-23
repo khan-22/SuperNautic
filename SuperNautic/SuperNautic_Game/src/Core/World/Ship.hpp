@@ -54,7 +54,7 @@ public:
 	const glm::vec3& getMeshPosition() const;
 	const glm::vec3& getMeshForward() const;
 	const glm::vec3& getMeshUp() const;
-	const glm::vec3& getVelocity() const;
+	glm::vec3 getVelocity() const;
 	SurfaceType getSurfaceType() const;
 	const BoundingBox& getBoundingBox() const;
 	void obstacleCollision();
@@ -118,6 +118,8 @@ private:
 
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
 
+	void checkObstacleCollision();
+
 	// Helper functions for update()
 	void handleInputs(float dt);
 	void handleCooldowns(float dt);
@@ -125,6 +127,5 @@ private:
 	void rotateTowardTrackForward(float dt);
 	void updateDirectionsAndPositions(float dt);
 	void trackSurface();
-	void checkObstacleCollision();
 };
 #endif // SHIP_HPP

@@ -16,6 +16,8 @@ public:
 	virtual ~ObstacleInstance();
 	void update(const float dt);
 	void render(GFX::RenderStates& states) override;
+	std::vector<BoundingBox>& getBoundingBoxes() const;
+	const glm::mat4& getModelMatrix() const;
 
 private:
 	glm::vec3					_pos;
