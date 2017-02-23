@@ -72,8 +72,8 @@ bool GuiSlider::bIsSelectable() const
 
 void GuiSlider::select()
 {
-    _leftLabel.setColor(sf::Color(200, 200, 90));
-    _rightLabel.setColor(sf::Color(200, 200, 90));
+    _leftLabel.setFillColor(sf::Color(200, 200, 90));
+    _rightLabel.setFillColor(sf::Color(200, 200, 90));
     _slider.setFillColor(sf::Color(200, 200, 90));
 
     setScale(1.2f, 1.2f);
@@ -81,8 +81,8 @@ void GuiSlider::select()
 
 void GuiSlider::deselect()
 {
-    _leftLabel.setColor(sf::Color::White);
-    _rightLabel.setColor(sf::Color::White);
+    _leftLabel.setFillColor(sf::Color::White);
+    _rightLabel.setFillColor(sf::Color::White);
     _slider.setFillColor(sf::Color(220, 220, 220));
 
     setScale(1.0f, 1.0f);
