@@ -47,7 +47,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 
 	_speedMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
 	_speedMeter.setFillColor(sf::Color(200, 200, 200, 255));
-	_speedMeter.setOrigin(_widthStep, _heightStep);
+	_speedMeter.setOrigin(_widthStep, _heightStep * 1.5);
 	_speedMeter.setPosition(_heatPosX, _heightStep * 90 + _offsetY);
 
 	_tSpeed.setFont(*_font.get());
@@ -122,7 +122,7 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 
 	_speedMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
 	_speedMeter.setFillColor(sf::Color(200, 200, 200, 255));
-	_speedMeter.setOrigin(_widthStep, _heightStep);
+	_speedMeter.setOrigin(_widthStep, _heightStep * 1.5);
 	_speedMeter.setPosition(_heatPosX, _heightStep * 90 + _offsetY);
 
 	_tSpeed.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
