@@ -45,7 +45,7 @@ private:
 	void deleteSegments(const int lengthToDelete);
 	bool bEndTrack();
 	void placeObstacles();
-	size_t findTrackIndex(size_t lastIndex, const unsigned int lengthFromLast) const;
+	size_t findTrackIndex(const unsigned int totalLength, unsigned int & lastFullSegmentLength) const;
 
 	SegmentHandler *						_segmentHandler;
 	ObstacleHandler *						_obstacleHandler;

@@ -11,8 +11,8 @@
 class ObstacleInstance : public GFX::Renderable3D
 {
 public:
-	ObstacleInstance(const glm::vec3& pos, const glm::vec3& forward, const glm::mat4& m
-					, ObstacleHandler::Obstacle* parent, float diff);
+	ObstacleInstance(const glm::vec3& pos, const glm::vec3& forward
+		, glm::mat4 m, ObstacleHandler::Obstacle* parent, float diff);
 	virtual ~ObstacleInstance();
 	void update(const float dt);
 	void render(GFX::RenderStates& states) override;
