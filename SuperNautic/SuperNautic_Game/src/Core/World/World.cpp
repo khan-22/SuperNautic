@@ -176,7 +176,7 @@ void World::update(float dt, sf::Window& window)
 
 		// Update debug camera
 		_debugCamera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
-		_debugCamera.setUp(_players[0].getShip().getCameraUp());
+		//_debugCamera.setUp(_players[0].getShip().getCameraUp());
 		_debugCamera.setViewDir(_players[0].getShip().getCameraForward());
 	}
 	else
