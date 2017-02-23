@@ -33,8 +33,6 @@ namespace GFX
 		GLfloat _width;
 		GLfloat _height;
 
-		Framebuffer* _origin;
-		Framebuffer* _target;
 
 	};
 }
