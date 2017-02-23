@@ -31,7 +31,7 @@ VictoryApplicationState::VictoryApplicationState(ApplicationStateStack& stack, A
     auto playAgain = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.clear();
-		_stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context, _playersActive)));
+		_stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context)));
     }));
 
     text.setString("Go to main menu");
@@ -44,6 +44,9 @@ VictoryApplicationState::VictoryApplicationState(ApplicationStateStack& stack, A
     quit->move(0.f, playAgain->getBoundingRect().height * 1.5f);
     _guiContainer.insert(playAgain);
     _guiContainer.insert(quit);
+    _guiContainer.toggleSelection();
+    _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
+
 
     sf::Vector2u windowSize = _context.window.getSize();
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
