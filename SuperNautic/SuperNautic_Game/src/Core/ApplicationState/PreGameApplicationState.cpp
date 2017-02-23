@@ -28,7 +28,8 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     GuiHorizontalList* seedList = new GuiHorizontalList();
     seedList->setOnElementSelect([&](GuiElement* selection)
     {
-        std::string text = ((GuiTextInput*)selection)->getText();
+        _selectedSeedInput = (GuiTextInput*)selection;
+        std::string text = _selectedSeedInput->getText();
         LOG("Set new seed: \"", text, "\"");
         _trackGenerator.setSeed(text);
         _trackGenerator.generate();
@@ -37,6 +38,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     for(size_t i = 0; i < 10; i++)
     {
         GuiTextInput* seed = new GuiTextInput(5, GuiCharacterInput::CharacterFlags::ALL);
+        _seedInputs.push_back(seed);
         seed->setText(std::string(5, 'A' + i));
         seed->setOnChange([this](const std::string& str)
         {
@@ -47,6 +49,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         auto seedPtr = std::unique_ptr<GuiElement>(seed);
         seedList->insert(seedPtr);
     }
+    _selectedSeedInput = _seedInputs.front();
     _trackGenerator.setSeed("AAAAA");
 
     std::vector<std::unique_ptr<GuiElement>> guiElements;
@@ -101,6 +104,41 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         _trackGenerator.generate();
     });
     guiElements.emplace_back(curviness);
+
+    GuiButton* randSeedButton = new GuiButton(sf::Text("Random seed", *_font.get()), [&]()
+    {
+        srand(time(NULL));
+        std::string seed(5, 'A');
+        for(char& c : seed)
+        {
+            switch(rand() % 3)
+            {
+                case 0:
+                    c = '0' + rand() % ('9' - '0');
+                    break;
+                case 1:
+                    c = 'A' + rand() % ('Z' - 'A');
+                    break;
+                case 2:
+                    c = 'a' + rand() % ('z' - 'a');
+                    break;
+                default:
+                    break;
+            }
+        }
+        std::cout << seed << std::endl;
+        _selectedSeedInput->setText(seed);
+        _trackGenerator.setSeed(seed);
+        _trackGenerator.generate();
+    });
+    guiElements.emplace_back(randSeedButton);
+
+    GuiButton* shuffleButton = new GuiButton(sf::Text("Shuffle", *_font.get()), [&]()
+    {
+
+    });
+    guiElements.emplace_back(shuffleButton);
+
 
     GuiButton* startButton = new GuiButton(sf::Text("Start", *_font.get()), [&]()
     {

@@ -13,6 +13,9 @@
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 
+
+class GuiTextInput;
+
 class PreGameApplicationState : public ApplicationState
 {
 public:
@@ -28,6 +31,8 @@ private:
     Input _input;
     Asset<sf::Font> _font;
     unsigned char _numPlayers;
+    std::vector<GuiTextInput*> _seedInputs;
+    GuiTextInput* _selectedSeedInput;
 
     GFX::SfmlRenderer _sfmlRenderer;
     GFX::ForwardRenderer _forwardRenderer;
