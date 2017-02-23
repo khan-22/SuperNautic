@@ -369,6 +369,10 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
+	if(maxRotOffset == 0)
+    {
+        maxRotOffset = 1;
+    }
 	int rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
