@@ -76,6 +76,7 @@ void GuiTextInput::setText(const std::string& str)
     size_t size = std::min(str.size(), _characters.size());
     for(size_t i = 0; i < size; i++)
     {
+        _text[i] = str[i];
         _characters[i]->setCharacter(str[i]);
     }
 }
