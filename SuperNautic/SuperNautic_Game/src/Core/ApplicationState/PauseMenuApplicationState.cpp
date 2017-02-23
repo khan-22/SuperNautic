@@ -44,6 +44,9 @@ PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stac
     _guiContainer.insert(resume);
     _guiContainer.insert(quit);
 
+    _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
+
+
     sf::Vector2u windowSize = _context.window.getSize();
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
     _guiContainer.toggleSelection();
