@@ -14,7 +14,7 @@ uniform mat4 uModel;
 
 uniform mat4 uMVP;
 
-uniform vec3 cameraPos;
+uniform vec3 uCameraPos;
 
 out VS_OUT
 {
@@ -31,7 +31,7 @@ void main()
 	//vs_out.uv	  = vec2(uv.x, 1.0 - uv.y); 
 	//vs_out.normal = normal;
 
-	vs_out.direction = cameraPos - (uModel * vec4(pos, 1.0f)).xyz;
+	vs_out.direction = uCameraPos - (uModel * vec4(pos, 1.0f)).xyz;
 	gl_Position = uMVP * vec4(pos, 1.0f);
 	
 }

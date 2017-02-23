@@ -20,7 +20,7 @@ in VS_OUT
 void main()
 {
 	vec3 dir = normalize(fs_in.direction);
-	float factor = dot(dir, vec3(0, 1, 0));
+	float factor = max(dot(dir, -vec3(0.0, 1.0, 0.0)), 0.0);
 
-	outColor = mix(vec3(1), vec3(1,0,0), factor);
+	outColor = vec4(mix(vec3(0.0, 0.03, 0.06), vec3(0.0, 0.6, 0.7), factor), 1.0);
 }
