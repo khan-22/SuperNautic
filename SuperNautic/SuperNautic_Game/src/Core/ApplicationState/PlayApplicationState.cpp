@@ -21,7 +21,7 @@ PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, Applica
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
 	_track.setCurviness(2);
 	_track.setSeed("1");
-	_track.setLength(40000);
+	_track.setLength(10000);
 }
 
 void PlayApplicationState::initialize()
