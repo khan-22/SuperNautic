@@ -57,6 +57,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     GuiTextInput* length = new GuiTextInput(6, GuiCharacterInput::CharacterFlags::DIGITS);
     length->setText("040000");
+    _lengthInput = length;
     _trackGenerator.setLength(40000);
     length->setOnChange([this, length](const std::string& str)
     {
@@ -94,6 +95,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         sf::Text("Curviness  Low", *_font.get()),
         sf::Text("High", *_font.get())
     );
+    _curvinessInput = curviness;
     curviness->setValue(3.f);
     _trackGenerator.setCurviness(3);
 
@@ -107,26 +109,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     GuiButton* randSeedButton = new GuiButton(sf::Text("Random seed", *_font.get()), [&]()
     {
-        srand(time(NULL));
-        std::string seed(5, 'A');
-        for(char& c : seed)
-        {
-            switch(rand() % 3)
-            {
-                case 0:
-                    c = '0' + rand() % ('9' - '0');
-                    break;
-                case 1:
-                    c = 'A' + rand() % ('Z' - 'A');
-                    break;
-                case 2:
-                    c = 'a' + rand() % ('z' - 'a');
-                    break;
-                default:
-                    break;
-            }
-        }
-        std::cout << seed << std::endl;
+        std::string seed = randString(5);
         _selectedSeedInput->setText(seed);
         _trackGenerator.setSeed(seed);
         _trackGenerator.generate();
@@ -135,7 +118,25 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     GuiButton* shuffleButton = new GuiButton(sf::Text("Shuffle", *_font.get()), [&]()
     {
+        std::string seed = randString(5);
+        _selectedSeedInput->setText(seed);
+        _trackGenerator.setSeed(seed);
 
+        size_t length = 3000 + rand() % 50000;
+        length -= length % 500;
+        std::string lengthText = std::to_string(length);
+        if(lengthText.size() < 6)
+        {
+            lengthText.insert(0, 6 - lengthText.size(), '0');
+        }
+        _lengthInput->setText(lengthText);
+        _trackGenerator.setLength(length);
+
+        size_t curviness = rand() % 6;
+        _curvinessInput->setValue(curviness);
+        _trackGenerator.setCurviness(curviness);
+
+        _trackGenerator.generate();
     });
     guiElements.emplace_back(shuffleButton);
 
@@ -170,6 +171,8 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     _guiContainer.insert(guiElements);
 
     sf::Vector2u windowSize = _context.window.getSize();
+    sf::FloatRect guiBounds = _guiContainer.getBoundingRect();
+    _guiContainer.setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height / 2.f);
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
     _guiContainer.toggleSelection();
 

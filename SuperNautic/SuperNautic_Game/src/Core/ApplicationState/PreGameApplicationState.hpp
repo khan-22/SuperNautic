@@ -15,6 +15,7 @@
 
 
 class GuiTextInput;
+class GuiSlider;
 
 class PreGameApplicationState : public ApplicationState
 {
@@ -33,6 +34,8 @@ private:
     unsigned char _numPlayers;
     std::vector<GuiTextInput*> _seedInputs;
     GuiTextInput* _selectedSeedInput;
+    GuiTextInput* _lengthInput;
+    GuiSlider* _curvinessInput;
 
     GFX::SfmlRenderer _sfmlRenderer;
     GFX::ForwardRenderer _forwardRenderer;
