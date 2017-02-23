@@ -12,7 +12,7 @@ class Camera;		// Forward-decl
 
 namespace GFX
 {
-	class Renderable3D; // Forward-decl
+	struct Window; // Forward-decl
 
 	class WindowRenderer
 	{
@@ -22,13 +22,13 @@ namespace GFX
 
 		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
 
-		void render(Renderable3D& renderable);
+		void render(Window& segmentWindow);
 		void display(Camera& camera);
 
 	protected:
 
 	private:
-		std::vector<Renderable3D*> _drawCalls;
+		std::vector<Window*> _drawCalls;
 		ShaderAsset	_shader;
 
 		sf::RenderWindow* _window;

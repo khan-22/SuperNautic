@@ -1,6 +1,6 @@
 #include "GFX/Rendering/WindowRenderer.hpp"
 
-#include "GFX/Rendering/Renderable3D.hpp"
+#include "GFX/Resources/Window.hpp"
 #include "Core/Utility/Camera.h"
 
 using namespace GFX;
@@ -29,9 +29,9 @@ void WindowRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, 
 	_height = height;
 }
 
-void WindowRenderer::render(Renderable3D& renderable)
+void WindowRenderer::render(GFX::Window& segmentWindow)
 {
-	_drawCalls.push_back(&renderable);
+	_drawCalls.push_back(&segmentWindow);
 }
 
 void WindowRenderer::display(Camera& camera)
@@ -43,12 +43,18 @@ void WindowRenderer::display(Camera& camera)
 
 	glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
 
-	_shader.get()->bind();
+	glm::mat4 VP = camera.getVP();
+
+	Shader* shader = _shader.get();
+	shader->bind();
+	shader->setUniform("uCameraPos", camera.getPosition());
+
 	for (auto drawCall : _drawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _shader.get()};
 
-		drawCall->render(states);
+		drawCall->windowModel.get()->setModelMatrix(drawCall->modelTransform);
+		drawCall->windowModel.get()->render(states);
 	}
 
 	_drawCalls.clear();
