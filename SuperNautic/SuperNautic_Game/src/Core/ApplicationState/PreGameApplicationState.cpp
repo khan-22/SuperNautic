@@ -5,6 +5,7 @@
 #include "SFML/Window/Event.hpp"
 
 #include "Core/ApplicationState/PreGameApplicationState.hpp"
+#include "Core/ApplicationState/MainMenuApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/ApplicationState/PlayApplicationState.hpp"
@@ -65,6 +66,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     }
     _selectedSeedInput = _seedInputs.front();
     _trackGenerator.setSeed(startSeed);
+    _selectedSeedInput->setText(startSeed);
 
     std::vector<std::unique_ptr<GuiElement>> guiElements;
     guiElements.emplace_back(seedList);
@@ -169,6 +171,14 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         _stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context)));
     });
     guiElements.emplace_back(startButton);
+
+    GuiButton* backButton = new GuiButton(sf::Text("Back", *_font.get()), [&]()
+    {
+        _stack.clear();
+        _context.track = _trackGenerator.takeTrack();
+        _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
+    });
+    guiElements.emplace_back(backButton);
 
     GuiPlayerJoinContainer* players = new GuiPlayerJoinContainer();
     players->setOnJoin([this](unsigned char playerId)
