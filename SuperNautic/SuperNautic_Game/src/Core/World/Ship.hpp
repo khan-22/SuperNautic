@@ -124,6 +124,8 @@ private:
 
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
 
+	void checkObstacleCollision();
+
 	// Helper functions for update()
 	void handleInputs(float dt);
 	void handleCooldowns(float dt);
@@ -131,6 +133,6 @@ private:
 	void rotateTowardTrackForward(float dt);
 	void updateDirectionsAndPositions(float dt);
 	void trackSurface(float dt);
-	void checkObstacleCollision();
+	//void checkObstacleCollision();
 };
 #endif // SHIP_HPP

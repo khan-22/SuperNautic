@@ -2,7 +2,7 @@
 #ifndef SEGMENTINSTANCE_HPP
 #define SEGMENTINSTANCE_HPP
 
-#include <glm\glm.hpp>
+#include <glm/glm.hpp>
 
 #include "Core/Geometry/Sphere.hpp"
 #include "Core/Geometry/Ray.hpp"
@@ -10,6 +10,7 @@
 #include "Core/Track/Segment.hpp"
 #include "Core/Asset/LoadAssetFunctions.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
+#include "Core/Track/ObstacleInstance.hpp"
 
 class SegmentInstance : public GFX::Renderable3D
 {
@@ -18,12 +19,15 @@ public:
 	virtual ~SegmentInstance();
 	glm::mat4 getEndMatrix() const;
 	glm::mat4 getModelMatrix() const;
-	const int getLength() const;
+	const float getLength() const;
     const std::vector<BoundingBox>& getGlobalBoundingBoxes() const;
 	const int getIndex() const;
+	void addObstacle(ObstacleInstance newObstacle);
 
+	void update(const float dt);
 	void render(GFX::RenderStates& states) override;
 	const RayIntersection rayIntersectionTest(const Ray& ray) const;
+	const std::vector<ObstacleInstance>& getObstacles() const;
 
 	const Segment* getParent()
 	{
@@ -33,21 +37,20 @@ public:
 	bool bTestCollision(const SegmentInstance& other) const;
 
 private:
-    const Segment *		_parent;
-	glm::mat4			_model;
-	std::vector<BoundingBox> _globalBoundingBoxes;
-	std::vector<Sphere> _globalBoundingSpheres;
-	bool				_bHasLighting;
+    const Segment *					_parent;
+	glm::mat4						_model;
+	std::vector<BoundingBox>		_globalBoundingBoxes;
+	std::vector<Sphere>				_globalBoundingSpheres;
+	bool							_bHasLighting;
+	std::vector<ObstacleInstance>	_obstacles;
 
 	// temperatures[i] contains temperature of zone i
-	std::vector<SurfaceType> temperatures;
+	std::vector<SurfaceType>		temperatures;
 
 	SegmentInstance();
 	void updateGlobalBounds();
 	bool bTestCollisionSphere(const SegmentInstance& other) const;
 	bool bTestCollisionBox(const SegmentInstance& other) const;
-
-
 };
 
 #endif // !SEGMENTINSTANCE_HPP

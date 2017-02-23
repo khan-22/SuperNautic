@@ -71,10 +71,6 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 		// Skip rest of line
 		infoFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
-	int test = _structures[0].getProbability(0.4f);
-	int test2 = _structures[0].getProbability(1.0f);
-	int test3 = _structures[0].getProbability(0.7f);
-
 	infoFile.close();
 
 

@@ -49,14 +49,19 @@ glm::mat4 SegmentInstance::getModelMatrix() const
 	return _model;
 }
 
-const int SegmentInstance::getLength() const
+const float SegmentInstance::getLength() const
 {
-	return static_cast<int>(_parent->getLength());
+	return _parent->getLength();
 }
 
 const int SegmentInstance::getIndex() const
 {
 	return _parent->getInfo()->loadedIndex;
+}
+
+void SegmentInstance::addObstacle(ObstacleInstance newObstacle)
+{
+	_obstacles.push_back(newObstacle);
 }
 
 bool SegmentInstance::bTestCollisionSphere(const SegmentInstance& other) const
@@ -137,10 +142,22 @@ void SegmentInstance::updateGlobalBounds()
 }
 
 
+void SegmentInstance::update(const float dt)
+{
+	for (size_t i = 0; i < _obstacles.size(); i++)
+	{
+		_obstacles[i].update(dt);
+	}
+}
+
 void SegmentInstance::render(GFX::RenderStates & states)
 {
 	_parent->getVisualModel().getModelAsset().get()->setModelMatrix(_model);
 	_parent->getVisualModel().render(states);
+	for (size_t i = 0; i < _obstacles.size(); i++)
+	{
+		_obstacles[i].render(states);
+	}
 }
 
 const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const
@@ -161,4 +178,9 @@ const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const
 	}
 
 	return intersection;
+}
+
+const std::vector<ObstacleInstance>& SegmentInstance::getObstacles() const
+{
+	return _obstacles;
 }

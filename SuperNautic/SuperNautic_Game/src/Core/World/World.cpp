@@ -104,8 +104,6 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 		_playerWindowRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_players[3].setScreenSize(640, 360, 640, 360);
 	}
-
-	_bDebugging = false;
 }
 
 
@@ -176,6 +174,10 @@ void World::update(float dt, sf::Window& window)
 
 		// Update debug camera
 		_debugCamera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
+
+		// Commenting this out fixes mouse movement and debug camera rotation desyncing
+		//_debugCamera.setUp(_players[0].getShip().getCameraUp());
+
 		//_debugCamera.setUp(_players[0].getShip().getCameraUp());
 		_debugCamera.setViewDir(_players[0].getShip().getCameraForward());
 	}
@@ -186,11 +188,14 @@ void World::update(float dt, sf::Window& window)
 	if (!_bDebugging && sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
 		_bDebugging = true;
+		_debugCamera.setPos(_players[0].getCamera()->getPosition());
 	}
 	if (_bDebugging && sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
 	{
 		_bDebugging = false;
 	}
+
+	_track->update(dt);
 
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
@@ -267,7 +272,6 @@ void World::render()
 			_playerRTs[i].display(*_players[i].getCamera());
 			_playerRTs[i].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 		}
-
 		for (int i = 0; i < _playerParticleRenderers.size(); i++)
 		{
 			for (int j = 0; j < _players.size(); j++)
@@ -287,11 +291,16 @@ void World::render()
 		_playerRTs[0].display(_debugCamera);
 		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 
-		
-		_playerParticleRenderers[0].render(_playerParticles[0]);
-		_playerParticleRenderers[0].display(_debugCamera);
-		
-		_playerWindowRenderers[0].display(_debugCamera);
+		for (int j = 0; j < _players.size(); j++)
+		{
+			_playerParticleRenderers[0].render(_playerParticles[j]);
+			_playerParticleRenderers[0].display(_debugCamera);
+		}
+
+		for (int i = 0; i < _playerWindowRenderers.size(); i++)
+		{
+			_playerWindowRenderers[i].display(*_players[i].getCamera());
+		}
 	}
 
 
