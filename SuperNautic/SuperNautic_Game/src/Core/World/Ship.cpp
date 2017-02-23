@@ -152,7 +152,7 @@ bool Ship::getOverload(float dt)
 		_engineFlashTime -= dt;
 		isWhite = _bEngineFlash;
 
-		_velocity *= 0.9999 * dt;
+		_velocity *= 0.9999f * dt;
 	}
 	else if (_engineOverload > 0)
 	{
@@ -321,15 +321,15 @@ void Ship::handleCooldowns(float dt)
 void Ship::handleTemperature(float dt)
 {
 	// Update engine temperature
-	float fieldAddition = 1.0;
+	float fieldAddition = 1.0f;
 
 	switch (getSurfaceType())
 	{
 	case SurfaceType::cold:
-		fieldAddition = 0.9;
+		fieldAddition = 0.9f;
 		break;
 	case SurfaceType::hot:
-		fieldAddition = 1.1;
+		fieldAddition = 1.1f;
 		break;
 	default:
 		break;
