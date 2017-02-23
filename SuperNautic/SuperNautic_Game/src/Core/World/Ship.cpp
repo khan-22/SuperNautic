@@ -26,9 +26,9 @@ Ship::Ship()
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 200.0f, 6.0f, false},
 		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 100.0f, 6.0f, true },
-		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 15.0f, 10.0f, true },
+		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
 		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
-		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 10.0f },
+		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 5.0f },
 		_meshXZPosition{ glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 0, 0 }, 100.0f },
 		_minAcceleration{ 0.0f },
 		_maxAcceleration{ 100.0f },
@@ -43,8 +43,12 @@ Ship::Ship()
 		_bEngineFlash{ false },
 		_bEngineOverload { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
-		_cooldownOnObstacleCollision{ 2.0f }
+		_cooldownOnObstacleCollision{ 2.0f },
+		_surfaceSlope{ 0.0f, 0.0f, 3.0f },
+		_rayHeight{ 5.0f },
+		_rayAheadDistance{ 5.0f }
 {
+	setPosition(0, 0, 1);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 }
 
@@ -71,7 +75,7 @@ void Ship::update(float dt)
 	handleTemperature(dt);
 	rotateTowardTrackForward(dt);
 
-	trackSurface();
+	trackSurface(dt);
 	updateDirectionsAndPositions(dt);
 
 	checkObstacleCollision();
@@ -90,6 +94,10 @@ void Ship::update(float dt)
 	_boundingBox.directions[0] = glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection()));
 	_boundingBox.directions[1] = _meshUpDirection();
 	_boundingBox.directions[2] = _meshForwardDirection();
+
+	// Update slope
+	_surfaceSlope.setTarget(glm::dot(_waypointDifference, _upDirection));
+	_surfaceSlope.update(dt);
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -223,9 +231,9 @@ void Ship::setReturnPos(const glm::vec3& returnPos)
 	_returnPos = returnPos;
 }
 
-const glm::vec3& Ship::getCameraForward() const
+const glm::vec3 Ship::getCameraForward() const
 {
-	return _cameraForwardDirection();
+	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope());
 }
 
 const glm::vec3& Ship::getMeshPosition() const
@@ -243,9 +251,14 @@ const glm::vec3 & Ship::getMeshUp() const
 	return _meshUpDirection();
 }
 
-const glm::vec3 & Ship::getVelocity() const
+const glm::vec3 Ship::getVelocity() const
 {
 	return _velocity * _meshForwardDirection();
+}
+
+const glm::vec3 Ship::getCameraPosition() const
+{
+	return _meshPosition() - _cameraForwardDirection() * (9.0f - abs(_surfaceSlope()) * 1.0f + _velocity / 25.0f) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f) + _meshUpDirection() * (1.0f + _surfaceSlope() * 5.0f);
 }
 
 SurfaceType Ship::getSurfaceType() const
@@ -264,6 +277,11 @@ void Ship::obstacleCollision()
 	{
 		_engineCooldown = _cooldownOnObstacleCollision;
 	}
+}
+
+void Ship::setWaypointDifference(const glm::vec3 & difference)
+{
+	_waypointDifference = difference;
 }
 
 void Ship::handleInputs(float dt)
@@ -441,7 +459,7 @@ void Ship::updateDirectionsAndPositions(float dt)
 	_meshPosition.setVector(_meshPosition() + (_meshXZPosition() - _meshPosition()) - glm::dot(_upDirection, (_meshXZPosition() - _meshPosition())) * _upDirection);
 }
 
-void Ship::trackSurface()
+void Ship::trackSurface(float dt)
 {
 	// Create rays and test for intersections
 	Ray atShipRay{ getPosition() + _upDirection * _rayHeight, -_upDirection, 1000.0f };

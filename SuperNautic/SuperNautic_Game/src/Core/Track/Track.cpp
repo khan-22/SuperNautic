@@ -262,7 +262,7 @@ int Track::getInRow(int index) const
 }
 
 
-glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos, float& lengthInSegment)
+glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos, float& lengthInSegment, glm::vec3& directionDifference)
 {
 	WaypointInfo closest;
 	closest.found = false;
@@ -345,6 +345,8 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 
 	// Add current length
 	lengthInSegment += glm::dot(closest.direction, globalPosition - closest.position);
+
+	directionDifference = closest.direction - next.direction;
 
 	// Interpolate between directions
 	return glm::normalize(closest.direction * (1 - interpolationValue) + next.direction * interpolationValue);

@@ -16,6 +16,7 @@
 #include "Core/Utility/SpringTranslatedVector.hpp"
 #include "Core/Geometry/BoundingBox.hpp"
 #include "Core/Utility/CollisionUtility.hpp"
+#include "Core/Utility/SpringSmoothedValue.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 {
@@ -50,14 +51,16 @@ public:
 	void setSegments(const std::vector<SegmentInstance*> segments);
 	// Indicates where to return to if ship has escaped track
 	void setReturnPos(const glm::vec3& returnPos);
-	const glm::vec3& getCameraForward() const;
+	const glm::vec3 getCameraForward() const;
 	const glm::vec3& getMeshPosition() const;
 	const glm::vec3& getMeshForward() const;
 	const glm::vec3& getMeshUp() const;
-	const glm::vec3& getVelocity() const;
+	const glm::vec3 getVelocity() const;
+	const glm::vec3 getCameraPosition() const;
 	SurfaceType getSurfaceType() const;
 	const BoundingBox& getBoundingBox() const;
 	void obstacleCollision();
+	void setWaypointDifference(const glm::vec3& difference);
 
 	// TEST
 	glm::mat4 getMatrix()
@@ -87,11 +90,14 @@ private:
 	glm::vec3					_shipForward;			// Current forward direction of ship
 	glm::vec3					_upDirection;			// Current up direction
 	glm::vec3					_returnPos;				// Respawn position of ship
+	glm::vec3					_waypointDifference;	// Difference between waypoint direcitons, used to calculate track slope
 
 	SpringRotatedVector			_meshForwardDirection;	// Current facing direction
 	SpringRotatedVector			_meshUpDirection;		// Up direction of ship mesh
 	SpringRotatedVector			_cameraUpDirection;
 	SpringRotatedVector			_cameraForwardDirection;
+
+	SpringSmoothedValue			_surfaceSlope;			// Determines the height of the camera
 
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
@@ -111,8 +117,8 @@ private:
 	const float _speedResistance;			// 'Air resistance'
 	const float _preferredHeight;			// Desired ship height above track
 
-	const float _rayHeight{ 5.0f };			// Height above ship of the origin of the rays used for intersection
-	const float _rayAheadDistance{ 2.0f };	// Distance ahead of ship the second ray starts
+	const float _rayHeight;			// Height above ship of the origin of the rays used for intersection
+	const float _rayAheadDistance;	// Distance ahead of ship the second ray starts
 
 	const float _cooldownOnObstacleCollision;
 
@@ -124,7 +130,7 @@ private:
 	void handleTemperature(float dt);
 	void rotateTowardTrackForward(float dt);
 	void updateDirectionsAndPositions(float dt);
-	void trackSurface();
+	void trackSurface(float dt);
 	void checkObstacleCollision();
 };
 #endif // SHIP_HPP
