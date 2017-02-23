@@ -40,3 +40,8 @@ std::vector<BoundingBox>& ObstacleInstance::getBoundingBoxes() const
 {
 	return _parent->_boxes;
 }
+
+const glm::mat4 & ObstacleInstance::getModelMatrix() const
+{
+	return _modelMat;
+}

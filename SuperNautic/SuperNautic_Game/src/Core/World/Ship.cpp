@@ -87,10 +87,14 @@ void Ship::update(float dt)
 	// Update bounding box
 	_boundingBox.center = _meshPosition();
 	_boundingBox.directions[0] = glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection()));
-	_boundingBox.directions[1] = _meshUpDirection();
-	_boundingBox.directions[2] = _meshForwardDirection();
+	_boundingBox.directions[1] = glm::normalize(_meshUpDirection());
+	_boundingBox.directions[2] = glm::normalize(_meshForwardDirection());
 
-	//checkObstacleCollision();
+	float dot1 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[1]);
+	float dot2 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[2]);
+	float dot3 = glm::dot(_boundingBox.directions[2], _boundingBox.directions[1]);
+
+	checkObstacleCollision();
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -263,7 +267,18 @@ void Ship::checkObstacleCollision()
 			// For every bounding box in this obstacle
 			for (unsigned j = 0; j < segment->getObstacles()[i].getBoundingBoxes().size(); ++j)
 			{
-				if (bTestCollision(_boundingBox, segment->getObstacles()[i].getBoundingBoxes()[j]))
+				BoundingBox& localBox = segment->getObstacles()[i].getBoundingBoxes()[j];
+
+				// Transform the bounding box to global space
+				BoundingBox globalBox;
+				globalBox.halfLengths = localBox.halfLengths;
+				globalBox.center = segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.center, 1.0f };
+				globalBox.directions[0] = glm::normalize(glm::vec3{ segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.directions[0], 0.0f } });
+				globalBox.directions[1] = glm::normalize(glm::vec3{ segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.directions[1], 0.0f } });
+				globalBox.directions[2] = glm::normalize(glm::vec3{ segment->getObstacles()[i].getModelMatrix() * glm::vec4{ localBox.directions[2], 0.0f } });
+
+				// Test ship bounding box against obstacle's bounding box in global space
+				if (bTestCollision(_boundingBox, globalBox))
 				{
 					obstacleCollision();
 				}
