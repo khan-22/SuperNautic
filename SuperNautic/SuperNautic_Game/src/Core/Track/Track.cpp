@@ -23,6 +23,8 @@ Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 {
 	//_octrees.push_back(Octree<SegmentInstance*>(glm::vec3(0, 0, 0), 10000));
 	_difficulty = 1.f;
+	_progressionLength = 1500.f;
+	_bDoneGenerating = false;
 }
 
 // Destructor
@@ -56,7 +58,6 @@ void Track::setLength(const unsigned int length)
 {
 	assert(length >= 3000 && length <= 1000000);
 	_targetLength = length;
-	_progressionLength = _targetLength / 30;
 }
 
 // Set randomization seed
@@ -101,6 +102,7 @@ void Track::startNewTrack()
 	_prevIndex = -1;
 	_lastSegment = nullptr;
 	_octrees.clear();
+	_bDoneGenerating = false;
 	for (unsigned int i = 0; i < _track.size(); i++)
 	{
 		delete _track[i];
@@ -111,6 +113,13 @@ void Track::startNewTrack()
 // Generates the track
 bool Track::bGenerate()
 {
+	// TEMPORARY
+	if (_bDoneGenerating)
+	{
+		return true;
+	}
+	///////
+
 	// Make the inital stretch straight
 	while (_generatedLength < 300)
 	{
@@ -169,9 +178,10 @@ bool Track::bGenerate()
 		{
 			if (bEndTrack())
 			{
+				_bDoneGenerating = true;
 				placeObstacles();
-				return true;
 				LOG("Track generated. Length: ", _generatedLength);
+				return true;
 			}
 			else
 			{
@@ -539,7 +549,7 @@ void Track::placeObstacles()
 	while (currentLength < _generatedLength - endLength)
 	{
 		ObstacleHandler::Obstacle * newObstacle = _obstacleHandler->getRandomObstacle(_difficulty);
-		float lengthToNextObstacle = _track[index]->getLength();
+		float lengthToNextObstacle = rand() % 70 + 50;
 		currentLength += lengthToNextObstacle;
 		index = findTrackIndex(currentLength, lastFullSegmentLength);
 
@@ -570,15 +580,16 @@ void Track::placeObstacles()
 		depth -= finalDistanceLength;
 		float remainderDepth = targetDepth - depth;
 
-		glm::vec3 pos = waypoints[distanceIndex] + finalDistance * (remainderDepth / finalDistanceLength);
+		float derp = (remainderDepth / finalDistanceLength);
+		glm::vec3 pos = waypoints[distanceIndex] + finalDistance * derp;
 
 		glm::vec3 v1 = glm::vec3(0, 0, 1);
 		glm::vec3 v2 = _track[index]->getEndMatrix() * glm::vec4(0, 0, 1, 0);
 		float factor = targetDepth / _track[index]->getLength();
 		glm::vec3 forward = v1 * (1 - factor) + v2 * factor;
 
-		glm::mat4 modelMat = glm::inverse(glm::lookAt(pos, pos + forward, glm::vec3(0, 1, 0)));
-		_track[index]->addObstacle(ObstacleInstance(_track[index]->getModelMatrix(), newObstacle, _difficulty));
+		glm::mat4 modelMat = _track[index]->getModelMatrix() * glm::inverse(glm::lookAt(pos, pos + forward, glm::vec3(0, 1, 0)));
+		_track[index]->addObstacle(ObstacleInstance(modelMat, newObstacle, _difficulty));
 
 		//previousPadding = newObstacle->getPadding(_difficulty);
 	}

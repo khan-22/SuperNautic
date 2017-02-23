@@ -36,6 +36,10 @@ void Player::setScreenSize(int screenWidth, int screenHeight, int offsetX, int o
 	_hud.setScreenSize(screenWidth, screenHeight, offsetX, offsetY);
 }
 
+void Player::setId(int id) 
+{
+	_input.setControllerId(id);
+}
 
 void Player::update(float dt)
 {
@@ -120,6 +124,10 @@ void Player::update(float dt)
 	_hud.setHeatWhite(_ship.getOverload(dt));
 	_hud.update();
 
+	float speed = _ship.getSpeed();
+	float newFOV = 90.f + 40.f * (speed - 20.f) / 180.f;
+
+	_currentCamera->setFOV(newFOV);
 	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 100 + 1);
 }
 

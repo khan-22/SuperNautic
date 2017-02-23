@@ -24,6 +24,7 @@ public:
     const sf::Drawable& getHud() const;
 
 	void setScreenSize(int screenWidth, int screenHeight, int offsetX, int offsetY);
+	void setId(int id);
 
 	Ship& getShip()
 	{
