@@ -47,6 +47,7 @@ void ParticleRenderer::display(Camera& camera)
 
 	_shader.get()->setUniform("uView", camera.getView());
 	_shader.get()->setUniform("uPerspective", camera.getPerspective());
+	_shader.get()->setUniform("uModel", glm::mat4(1.f));
 	for (auto drawCall : _drawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _shader.get()};
