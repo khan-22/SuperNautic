@@ -10,7 +10,7 @@ Framebuffer Framebuffer::DEFAULT;
 
 Framebuffer::Framebuffer()
 	: _width(0), _height(0)
-	, _numColorAttachments(0U)
+	, _numColorAttachments(1U)
 	, _depthTexture(0U)
 	, _fbo(0U)
 {
