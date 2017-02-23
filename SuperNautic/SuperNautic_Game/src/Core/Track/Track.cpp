@@ -46,6 +46,11 @@ int Track::getGeneratedLength() const
 	return _generatedLength;
 }
 
+unsigned int Track::getCurviness() const
+{
+    return _curviness * 5.f;
+}
+
 // Sets the track length in whole meters
 void Track::setLength(const unsigned int length)
 {
@@ -398,7 +403,7 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 		//						const std::function<bool(const std::vector<ElementT*>&)>& predicate
 		/*auto predicate = [this](const std::function<bool(const std::vector<SegmentInstance*>&)>& segments)
 		{
-			
+
 		};
 		for (size_t i = 0; i < _octrees.size(); i++)
 		{
@@ -566,7 +571,7 @@ void Track::placeObstacles()
 		float remainderDepth = targetDepth - depth;
 
 		glm::vec3 pos = waypoints[distanceIndex] + finalDistance * (remainderDepth / finalDistanceLength);
-		
+
 		glm::vec3 v1 = glm::vec3(0, 0, 1);
 		glm::vec3 v2 = _track[index]->getEndMatrix() * glm::vec4(0, 0, 1, 0);
 		float factor = targetDepth / _track[index]->getLength();

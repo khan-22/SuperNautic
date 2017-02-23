@@ -22,6 +22,7 @@ public:
 	virtual ~Track();
 	int getTargetLength() const;
 	int getGeneratedLength() const;
+	unsigned int getCurviness() const;
 	void setLength(const unsigned int length);
 	void setSeed(const std::string& seed);
 	const std::string& getSeed() const;
