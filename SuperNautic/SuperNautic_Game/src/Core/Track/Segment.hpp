@@ -62,6 +62,10 @@ public:
 
 	GFX::TexturedModel getVisualModel() const;
 
+	ModelAsset	getWindowModel() const;
+
+	bool bHasWindow() const;
+
 private:
 	const SegmentInfo*	_segmentInfo;
 
@@ -69,7 +73,9 @@ private:
 	RawMeshAsset _scene;
 
 	// The visual geometry for this segment
-	GFX::TexturedModel _visual;
+	GFX::TexturedModel	_visual;
+	ModelAsset			_window;
+	bool				_bHasWindow;
 
 	// Indices in _scene.get()->meshes to the required meshes
 	unsigned				_baseVisual;
