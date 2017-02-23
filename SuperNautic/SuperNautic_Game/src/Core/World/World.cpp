@@ -94,15 +94,15 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 		_playerRTs[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerWindowRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_players[1].setScreenSize(640, 360, 640, 0);
+		_players[1].setScreenSize(640, 360, 640, 360);
 		_playerRTs[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_players[2].setScreenSize(640, 360, 0, 360);
+		_players[2].setScreenSize(640, 360, 640, 0);
 		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerWindowRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_players[3].setScreenSize(640, 360, 640, 360);
+		_players[3].setScreenSize(640, 360, 0, 360);
 	}
 }
 
@@ -310,9 +310,9 @@ void World::render()
 	// Should be done for each player before drawing particles.
 
 	GFX::SfmlRenderer sfml;
-	for (Player& player : _players)
+	for (int i = 0; i < _players.size(); i++)
 	{
-		sfml.render(player.getHud());
+		sfml.render(_players[i].getHud());
 	}
 
 	sfml.render(_timer);

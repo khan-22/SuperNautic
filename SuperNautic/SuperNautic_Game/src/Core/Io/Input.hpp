@@ -23,6 +23,7 @@ public:
 	std::list<sf::Event> getEvents();
 
 	int getControllerId();
+	void setControllerId(int id);
 
 protected:
 	

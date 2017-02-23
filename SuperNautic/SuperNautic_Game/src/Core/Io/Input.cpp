@@ -164,3 +164,8 @@ int Input::getControllerId()
 {
 	return _controllerId;
 }
+
+void Input::setControllerId(int id)
+{
+	_controllerId = id;
+}
