@@ -263,7 +263,7 @@ const glm::vec3 Ship::getVelocity() const
 
 const glm::vec3 Ship::getCameraPosition() const
 {
-	return _meshPosition() - _cameraForwardDirection() * (9.0f - abs(_surfaceSlope()) * 1.0f + _velocity / 25.0f) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f) + _meshUpDirection() * (1.0f + _surfaceSlope() * 5.0f);
+	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f/* + _velocity / 90.0f*/) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f) + _meshUpDirection() * (1.0f + _surfaceSlope() * 5.0f);
 }
 
 SurfaceType Ship::getSurfaceType() const

@@ -121,9 +121,9 @@ void Player::update(float dt)
 	_hud.update();
 
 	float speed = _ship.getSpeed();
-	float newFOV = 90.f + 50.f * (speed - 20.f) / 180.f;
+	float newFOV = 90.f + 40.f * (speed - 20.f) / 180.f;
 
-	//_currentCamera->setFOV(newFOV);
+	_currentCamera->setFOV(newFOV);
 	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 100 + 1);
 }
 
