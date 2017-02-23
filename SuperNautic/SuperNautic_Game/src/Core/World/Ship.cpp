@@ -35,7 +35,7 @@ Ship::Ship()
 		_maxTurningSpeed{ 8.0f },
 		_straighteningForce{ 3.0f },
 		_steerStraighteningForce{ 15.0f },
-		_speedResistance{ 0.005f },
+		_speedResistance{ 0.001f },
 		_preferredHeight{ 1.5f },
 		_engineCooldown{ 0 },
 		_engineOverload{ 0 },
@@ -151,6 +151,8 @@ bool Ship::getOverload(float dt)
 		}
 		_engineFlashTime -= dt;
 		isWhite = _bEngineFlash;
+
+		_velocity *= 0.9999 * dt;
 	}
 	else if (_engineOverload > 0)
 	{
@@ -285,9 +287,13 @@ void Ship::handleInputs(float dt)
 		_velocity -= 0.9f * _velocity * dt;
 	}
 
-	if (_velocity < 20)
+	if (_velocity < 50)
 	{
-		_velocity = 20;
+		_velocity = 50;
+	}
+	else if (_velocity > 200)
+	{
+		_velocity = 200;
 	}
 }
 
