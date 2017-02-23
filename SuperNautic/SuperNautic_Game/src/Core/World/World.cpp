@@ -293,7 +293,7 @@ void World::render()
 	}
 
 
-	
+
 
 
 	// Should be done for each player before drawing particles.
