@@ -197,7 +197,7 @@ void GuiCharacterInput::setCharacter(char character)
     if(character >= 'a' && character <= 'z')
     {
         flags = CharacterFlags::LOWERCASE;
-        charIndex = character - 'A';
+        charIndex = character - 'a';
     }
     else if(character >= 'A' && character <= 'Z')
     {
