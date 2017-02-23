@@ -20,7 +20,10 @@ namespace sf
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 
-class ApplicationContext;
+#include "GFX/Rendering/ParticleRenderer.hpp"
+#include "GFX/Resources/ParticleSystem.hpp"
+
+struct ApplicationContext;
 
 class World
 {
@@ -35,24 +38,26 @@ public:
 	void setTrack(Track * track);
 
 private:
-	Track*							_track;
-	std::vector<Player>				_players;
-	std::vector<PointLight>			_pointLights;
-	bool							_bHasWon;
+	Track*									_track;
+	std::vector<Player>						_players;	
+	std::vector<std::vector<PointLight>>	_playerPointLights;
+	bool									_bHasWon;
 
-	Timer							_timer;
+	Timer									_timer;
 
-	const ApplicationContext&		_context;
+	const ApplicationContext&				_context;
 
 	// Keeps track of indices and progress of players
 	std::vector<TrackProgression>	_playerProgression;
 
-	//GFX::DeferredRenderer		_renderer;
+	std::vector<GFX::DeferredRenderer>	_playerRTs;
+	std::vector<GFX::ParticleRenderer>	_playerParticleRenderers;
+	std::vector<GFX::ParticleSystem>	_playerParticles;
 
-	std::vector<GFX::DeferredRenderer> _playerRTs;
+	DebugCamera						_debugCamera;
+	bool							_bDebugging;
 
-	Camera						_camera;
-	bool						_bDebugging;
+	void updateLightPos(const TrackProgression& playerProgression, int playerIndex);
 };
 
 #endif //WORLD_HPP

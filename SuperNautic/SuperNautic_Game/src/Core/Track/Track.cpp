@@ -56,7 +56,7 @@ void Track::setSeed(const unsigned int seed)
 {
 	if (seed == 1)
 	{
-		srand(time(NULL));
+		srand(static_cast<unsigned>(time(NULL)));
 	}
 	else
 	{
@@ -109,7 +109,7 @@ bool Track::bGenerate()
 			// Randomize nr of same segment type in a row
 			inRow = getInRow(index);
 
-			for (unsigned int i = 0; i < inRow; i++)
+			for (int i = 0; i < inRow; i++)
 			{
 				if (!bInsertNormalSegment(index, true))
 				{
@@ -122,7 +122,7 @@ bool Track::bGenerate()
 		// Structures
 		else
 		{
-			insertStructure(index - _segmentHandler->infos().size());
+			insertStructure(index - static_cast<int>(_segmentHandler->infos().size()));
 		}
 		_endConnection = _track.back()->getParent()->getEnd();
 		_prevIndex = index;
@@ -153,7 +153,7 @@ bool Track::bGenerate()
 
 int Track::getNrOfSegments() const
 {
-	return _track.size();
+	return static_cast<int>(_track.size());
 }
 
 SegmentInstance* Track::getInstance(int index)
@@ -192,12 +192,12 @@ int Track::getIndex() const
 			}
 		}
 		// Structures
-		for (unsigned int i = 0; i < _segmentHandler->getNrOfStructures(); i++)
+		for (int i = 0; i < _segmentHandler->getNrOfStructures(); i++)
 		{
 			if (infos[_segmentHandler->getStructure(i)->pieces[0]->index]._startConnection == _endConnection
 				&& i != _prevIndex && _segmentHandler->getStructure(i)->curviness <= _curviness)
 			{
-				validSegments.push_back(infos.size() + i);
+				validSegments.push_back(static_cast<int>(infos.size()) + i);
 			}
 		}
 		// Calculating total probability
@@ -210,7 +210,7 @@ int Track::getIndex() const
 			}
 			else
 			{
-				int index = validSegments[i] - infos.size();
+				int index = validSegments[i] - static_cast<int>(infos.size());
 				int prob = _segmentHandler->getStructure(index)->getProbability(_curviness);
 				totalProbability += prob;
 			}
@@ -231,7 +231,7 @@ int Track::getIndex() const
 			}
 			else
 			{
-				int test = _segmentHandler->getStructure(validSegments[i] - infos.size())->getProbability(_curviness);
+				int test = _segmentHandler->getStructure(validSegments[i] - static_cast<int>(infos.size()))->getProbability(_curviness);
 				if (r - tested < test)
 				{
 					return i;
@@ -247,6 +247,8 @@ int Track::getIndex() const
 
 	//This should never ever run!
 	assert(true);
+
+	return -1; // Suppress compiler warning
 }
 
 // Returns the random nr of same segment in a row
@@ -256,7 +258,7 @@ int Track::getInRow(int index) const
 	int min = infos[index].getMinInRow(_curviness);
 	int max = infos[index].getMaxInRow(_curviness);
 	double scaled = (double)rand() / RAND_MAX;
-	return (max - min + 1) * scaled + min;
+	return static_cast<int>((max - min + 1) * scaled) + min;
 }
 
 
@@ -365,12 +367,12 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 		}
 	}
 	glm::mat4 modelEndMat = segment->getEndMatrix();
-	int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
+	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
-	float rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
-	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
+	int rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
+	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
-	_generatedLength += segment->getLength();
+	_generatedLength += static_cast<int>(segment->getLength());
 	_track.push_back(tempInstance);
 	return true;
 }
@@ -384,7 +386,7 @@ void Track::insertStructure(const int index)
 	int min = s->minInRow;
 	int max = s->maxInRow;
 	double scaled = (double)rand() / RAND_MAX;
-	int amount = (max - min + 1) * scaled + min;
+	int amount = static_cast<int>((max - min + 1) * scaled) + min;
 	// Randomize if there should be "negative" rotation
 	int rotationDir = 1;
 	if (rand() % 2 == 0)
@@ -392,7 +394,7 @@ void Track::insertStructure(const int index)
 		rotationDir = -1;
 	}
 	// Amount of "loops"
-	for (unsigned int i = 0; i < amount; i++)
+	for (int i = 0; i < amount; i++)
 	{
 		// Amount of pieces in each "loop"
 		for (unsigned int j = 0; j < s->pieces.size(); j++)
@@ -411,16 +413,16 @@ void Track::insertStructure(const int index)
 				}
 			}
 			glm::mat4 modelEndMat = segment->getEndMatrix();
-			int angle = 360.f / _segmentHandler->getConnectionRotation(segment->getStart());
+			int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 			// Randomize angle from structure info
 			int minRot = p->minRotation / angle;
 			int maxRot = p->maxRotation / angle;
 			double scaled = (double)rand() / RAND_MAX;
-			float rotVal = ((maxRot - minRot) * scaled + minRot) * angle;
+			float rotVal = static_cast<float>(((maxRot - minRot) * scaled + minRot) * angle);
 			// Finalizing
 			glm::mat4 rotMat = glm::rotate(glm::radians(rotVal * rotationDir), glm::vec3(0, 0, 1));
 			_endMatrix = _endMatrix * modelEndMat * rotMat;
-			_generatedLength += segment->getLength();
+			_generatedLength += static_cast<int>(segment->getLength());
 			_track.push_back(tempInstance);
 
 			// Terminating if target length is approaching

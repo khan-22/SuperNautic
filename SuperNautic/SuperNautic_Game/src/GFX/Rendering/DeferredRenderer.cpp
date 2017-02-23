@@ -21,6 +21,7 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	_geometryPassShader.get()->setSampler("uDiffuse", 0);
 	_geometryPassShader.get()->setSampler("uSpecular", 1);
 	_geometryPassShader.get()->setSampler("uNormal", 2);
+	_geometryPassShader.get()->setSampler("uIllumination", 3);
 
 	_lightPassShader.get()->bind();
 	_lightPassShader.get()->setSampler("uPosition", 0);
@@ -35,8 +36,14 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
+	
+	_actualX = _x * windowWidth;
+	_actualY = _y * windowHeight;
+	_actualWidth  = _width  * windowWidth;
+	_actualHeight = _height * windowHeight;
 
-	_frameBuffer.initialize(_width * windowWidth, _height * windowHeight, 3);
+	GLuint colorChannels[] = { 3, 4, 3 };
+	_frameBuffer.initialize(_width * windowWidth, _height * windowHeight, colorChannels, sizeof(colorChannels) / sizeof(colorChannels[0]));
 
 	GLfloat screenX1 = _x * 2.f - 1.f;
 	GLfloat screenY1 = _y * 2.f - 1.f;
@@ -110,6 +117,25 @@ void DeferredRenderer::display(Camera& camera)
 	lightPass(camera, windowWidth, windowHeight);
 
 	Framebuffer::DEFAULT.bindBoth();
+}
+
+void GFX::DeferredRenderer::blitDepthOnto(Framebuffer& framebuffer)
+{
+	LOG_GL_ERRORS();
+	_frameBuffer.bindRead();
+	framebuffer.bindWrite();
+	LOG_GL_ERRORS();
+
+	glBlitFramebuffer(
+		0,			0,			_actualWidth,				_actualHeight,
+		_actualX,	_actualY,	_actualX + _actualWidth,	_actualY + _actualHeight,
+		GL_DEPTH_BUFFER_BIT, GL_NEAREST
+	);
+	LOG_GL_ERRORS();
+
+	framebuffer.bindBoth();
+	LOG_GL_ERRORS();
+
 }
 
 void DeferredRenderer::geometryPass(Camera& camera, GLsizei width, GLsizei height)

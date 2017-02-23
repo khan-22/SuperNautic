@@ -25,6 +25,7 @@ public:
 	void setPosition(int position);
 	void setProgression(float progression);
 	void setScreenSize(int width, int height, int offsetX, int offsetY);
+	void setHeatWhite(bool isWhite);
 
 	void updateCurrent() override;
 	void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
@@ -44,6 +45,7 @@ private:
 	float				_heatSizeX;
 	float				_heatPosY;
 	float				_heatPosX;
+	bool				_bWhiteHeat;
 
 	Asset<sf::Font>		_font;
 	Asset<sf::Texture>	_texture;

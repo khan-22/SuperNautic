@@ -3,6 +3,8 @@
 #ifndef GUI_SLIDER_HPP
 #define GUI_SLIDER_HPP
 
+#include <functional>
+
 #include "SFML/Graphics/Text.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
 

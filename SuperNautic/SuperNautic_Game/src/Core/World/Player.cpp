@@ -58,6 +58,9 @@ void Player::update(float dt)
 				case sf::Keyboard::Y:
 					swapPerspective();
 					break;
+				case sf::Keyboard::Escape:
+					//Player paused game
+					break;
 				default:
 					break;
 				}
@@ -92,6 +95,11 @@ void Player::update(float dt)
 
     _ship.update(dt);
 
+	if (_ship.isEngineOverload())
+	{
+		_audio.playAudio(_audio.overheat);
+	}
+
 	if (_bIsFirstPerson)
 	{
 		//First person
@@ -102,13 +110,14 @@ void Player::update(float dt)
 	else
 	{
 		//Third person
-		_currentCamera->setPos(_ship.getMeshPosition() - _ship.getCameraForward() * 12.0f + _ship.getCameraUp() * 2.0f);
+		_currentCamera->setPos(_ship.getMeshPosition() - _ship.getCameraForward() * 12.0f + _ship.getCameraUp() * 3.0f);
 		_currentCamera->setUp(_ship.getCameraUp());
-		_currentCamera->setViewDir(_ship.getCameraForward());
+		_currentCamera->setViewDir(glm::normalize(_ship.getCameraForward() - _ship.getCameraUp() * 0.1f));
 	}
 
     _hud.setHeat(_ship.getEngineTemperature() / 100);
     _hud.setSpeed(_ship.getSpeed());
+	_hud.setHeatWhite(_ship.getOverload(dt));
 	_hud.update();
 
 	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 100 + 1);

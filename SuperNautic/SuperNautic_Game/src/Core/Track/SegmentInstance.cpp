@@ -17,6 +17,20 @@ SegmentInstance::SegmentInstance(const Segment * segment, glm::mat4 modelMatrix,
 	_model = modelMatrix;
 	updateGlobalBounds();
 	_bHasLighting = lighting;
+
+	// TEMPORARY
+	for (unsigned i = 0; i < _parent->getNumZones(); ++i)
+	{
+		if (i % 2 == 0)
+		{
+			temperatures.push_back(SurfaceType::hot);
+		}
+		else
+		{
+			temperatures.push_back(SurfaceType::cold);
+		}
+	}
+	////////////
 }
 
 //Destructor
@@ -37,7 +51,7 @@ glm::mat4 SegmentInstance::getModelMatrix() const
 
 const int SegmentInstance::getLength() const
 {
-	return _parent->getLength();
+	return static_cast<int>(_parent->getLength());
 }
 
 const int SegmentInstance::getIndex() const
@@ -137,7 +151,7 @@ const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const
 				  inverse * glm::vec4{ ray.direction().x, ray.direction().y, ray.direction().z, 0.0f },
 				  ray.length() };
 
-	RayIntersection intersection = _parent->rayIntersectionTest(localRay);
+	RayIntersection intersection = _parent->rayIntersectionTest(localRay, temperatures);
 
 	// Transform to global coordinates if a hit is detected
 	if (intersection)

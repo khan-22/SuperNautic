@@ -10,7 +10,7 @@
 const std::string Segment::baseVisualName					{ "VM" };
 const std::string Segment::baseCollisionName				{ "CM" };
 const std::string Segment::temperatureZoneVisualName		{ "zoneVisual" };
-const std::string Segment::temperatureZoneCollisionName		{ "zoneCollision" };
+const std::string Segment::temperatureZoneCollisionName		{ "Z" };
 const std::string Segment::boundingBoxName					{ "BB" };
 const std::string Segment::waypointsName					{ "WP" };
 
@@ -68,7 +68,7 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 }
 
 // Tests a ray collision against all collision surfaces of the segment. Returns collision information
-const RayIntersection Segment::rayIntersectionTest(const Ray& ray) const
+const RayIntersection Segment::rayIntersectionTest(const Ray& ray, const std::vector<SurfaceType>& temperatures) const
 {
 	// Get distance to largest box
 	float firstBoxDistance = _octTree.rayIntersection(ray);
@@ -113,7 +113,7 @@ const RayIntersection Segment::rayIntersectionTest(const Ray& ray) const
 				modelIndices.push_back(_baseCollision);
 
 				// Test intersection with geometry
-				RayIntersection intersection = boxesToTest.begin()->second->triangleRayIntersection(ray, modelIndices, _scene);
+				RayIntersection intersection = boxesToTest.begin()->second->triangleRayIntersection(ray, modelIndices, temperatures, _scene);
 
 				if (intersection)
 				{
@@ -271,31 +271,9 @@ void Segment::createBoundingBoxes()
 			continue;
 		}
 
-		// Check for correct number of faces
-		if (_scene.get()->meshes[_boundingBoxMeshes[i]].faces.size() != 12)
-		{
-			LOG_ERROR("A bounding box mesh was not a box");
-			continue;
-		}
-
-		BoundingBox box {};
-
-		// Get middle of box
-		box.center = findMeshCenter(_boundingBoxMeshes[i]);
-
-		// Find first two directions and half-lengths of box
-		findTwoDirections(_boundingBoxMeshes[i], box);
-
-		box.halfLengths[2] = findThirdHalfDistance(_boundingBoxMeshes[i], box);
-		if (box.halfLengths[2] <= 0.0f)
-		{
-			LOG_ERROR("Could not find the third half-length of a bounding box");
-		}
-		else
-		{
-			// Box created successfully
-			_boundingBoxes.push_back(box);
-		}
+		// Create bounding box from mesh
+		BoundingBox box { _scene.get()->meshes[_boundingBoxMeshes[i]] };
+		_boundingBoxes.push_back(box);
 	}
 }
 
@@ -380,106 +358,6 @@ void Segment::createAverageWaypoints(std::vector<unsigned>& meshIndices)
 		// Divide by number of vertices to obtain average
 		_waypoints[index] /= _scene.get()->meshes[meshIndices[i]].vertices.size();
 	}
-}
-
-// Find the center of mesh _scene->meshes[meshIndex]
-glm::vec3 Segment::findMeshCenter(unsigned meshIndex) const
-{
-	glm::vec3 center {0, 0, 0};
-
-	// Add position of every vertex
-	for (unsigned i = 0; i < _scene.get()->meshes[meshIndex].vertices.size(); ++i)
-	{
-		center.x += _scene.get()->meshes[meshIndex].vertices[i].x;
-		center.y += _scene.get()->meshes[meshIndex].vertices[i].y;
-		center.z += _scene.get()->meshes[meshIndex].vertices[i].z;
-	}
-
-	// Divide by number of vertices and return
-	return (center /= _scene.get()->meshes[meshIndex].vertices.size());
-}
-
-// Helper function for createBoundingBoxes(). Finds the third half-distance of a box
-float Segment::findThirdHalfDistance(unsigned boundingBoxMeshIndex, const BoundingBox& box) const
-{
-	// Reduce initializer length
-	std::vector<glm::vec3>& vertices = _scene.get()->meshes[boundingBoxMeshIndex].vertices;
-	std::vector<glm::uvec3>& faces = _scene.get()->meshes[boundingBoxMeshIndex].faces;
-
-	// Loop through faces to find an edge along the third direction. This will be used to find the third half-length
-	for (unsigned j = 1; j < faces.size(); ++j)
-	{
-		// Construct vertices for this face
-		std::array<glm::vec3, 3> faceVertices{
-			glm::vec3{ vertices[faces[j].x] },
-			glm::vec3{ vertices[faces[j].y] },
-			glm::vec3{ vertices[faces[j].z] }
-		};
-
-		// Construct vectors between vertices of this face
-		std::array<glm::vec3, 3> faceVectors{ glm::vec3{ faceVertices[0] - faceVertices[1] },
-			glm::vec3{ faceVertices[0] - faceVertices[2] },
-			glm::vec3{ faceVertices[1] - faceVertices[2] }
-		};
-
-		// If a vector points in the same or opposite direction as the third box direction, the distance can be found from its length
-		for (unsigned k = 0; k < 3; ++k)
-		{
-			if (bAlmostEqual(glm::normalize(faceVectors[k]), box.directions[2]) ||
-				bAlmostEqual(glm::normalize(-faceVectors[k]), box.directions[2]))
-			{
-				return glm::length(faceVectors[k]) / 2.0f;
-			}
-		}
-	}
-
-	return -1.0f;
-}
-
-// Helper function for createBoundingBoxes(). Finds three directions and two half-lengths of a box using the first face of the box mesh
-void Segment::findTwoDirections(unsigned boundingBoxMeshIndex, BoundingBox& box) const
-{
-	// Reduce initializer length
-	std::vector<glm::vec3>& vertices = _scene.get()->meshes[boundingBoxMeshIndex].vertices;
-	std::vector<glm::uvec3>& faces = _scene.get()->meshes[boundingBoxMeshIndex].faces;
-
-	// Vertices of first face in bounding box, will be used to construct two direction vectors
-	std::array<glm::vec3, 3> firstFaceVertices{
-		glm::vec3{ vertices[faces[0].x] },
-		glm::vec3{ vertices[faces[0].y] },
-		glm::vec3{ vertices[faces[0].z] }
-	};
-
-	// Initialize three vectors, only two will be kept (the longest is not part of a box edge)
-	box.directions[0] = firstFaceVertices[0] - firstFaceVertices[1];
-	float length0 = glm::length(box.directions[0]);
-	box.directions[1] = firstFaceVertices[0] - firstFaceVertices[2];
-	float length1 = glm::length(box.directions[1]);
-	box.directions[2] = firstFaceVertices[1] - firstFaceVertices[2];
-	float length2 = glm::length(box.directions[2]);
-
-	// Swap vectors so that box.directions[2] is the longest, as it will be replaced
-	if (length2 < length0)
-	{
-		std::swap(box.directions[2], box.directions[0]);
-		std::swap(length2, length0);
-	}
-	if (length2 < length1)
-	{
-		std::swap(box.directions[2], box.directions[1]);
-		std::swap(length2, length1);
-	}
-
-	// Normalize first two vectors
-	box.directions[0] = glm::normalize(box.directions[0]);
-	box.directions[1] = glm::normalize(box.directions[1]);
-
-	// The third vector is the cross product of the first two
-	box.directions[2] = glm::cross(box.directions[0], box.directions[1]);
-
-	// length0 and length1 are halved to find halfLengths of x and y
-	box.halfLengths[0] = length0 / 2.0f;
-	box.halfLengths[1] = length1 / 2.0f;
 }
 
 // Divides the collision geometry of this segment into an oct-tree
@@ -783,4 +661,51 @@ unsigned Segment::findChildIndex(size_t currentModel, unsigned index, glm::vec3 
 	}
 
 	return targetChild;
+}
+
+unsigned Segment::getNumZones() const
+{
+	return static_cast<unsigned>(_temperatureZoneCollisions.size());
+}
+
+// Returns bounding boxes
+const std::vector<BoundingBox>& Segment::getBoundingBoxes() const
+{
+	return _boundingBoxes;
+}
+
+// Returns connection names
+char Segment::getStart() const
+{
+	return _segmentInfo->_startConnection;
+}
+char Segment::getEnd() const
+{
+	return _segmentInfo->_endConnection;
+}
+
+const SegmentInfo* Segment::getInfo() const
+{
+	return _segmentInfo;
+}
+
+// Returns approximate segment length
+float Segment::getLength() const
+{
+	return _length;
+}
+
+const glm::mat4x4& Segment::getEndMatrix() const
+{
+	return _scene.get()->cameras[0];
+}
+
+const std::vector<glm::vec3>& Segment::getWaypoints() const
+{
+	return _waypoints;
+}
+
+GFX::TexturedModel Segment::getVisualModel() const
+{
+	return _visual;
 }

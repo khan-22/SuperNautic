@@ -5,10 +5,8 @@
 
 WorldAudio::WorldAudio()
 {
-	std::string folder = "./res/audio/music/";
-	if (!_music.openFromFile(folder + "Stranger Danger - Haste(Repeat).wav"))
-	{
-	}
+	loadSound("Stranger Danger - Haste(Repeat).ogg");
+	_music.setBuffer(_musicbuffer);
 
 	_music.setLoop(true);
 	play();
@@ -20,9 +18,18 @@ WorldAudio::~WorldAudio()
 }
 
 void WorldAudio::play() {
-	_music.play();
+	if (sf::SoundBufferRecorder::isAvailable())
+	{
+		_music.play();
+	}
 }
 
 void WorldAudio::stop() {
 	_music.stop();
+}
+
+void WorldAudio::loadSound(std::string filename)
+{
+	std::string folder = "./res/audio/music/";
+	_musicbuffer.loadFromFile(folder + filename);
 }
