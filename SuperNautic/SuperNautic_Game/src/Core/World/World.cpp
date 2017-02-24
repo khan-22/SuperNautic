@@ -34,14 +34,20 @@ World::World(ApplicationContext& context)
 	}
 
 	// Create one player
-	for (int i = 0; i < 5; i++)
-	{
-		if (sf::Joystick::isConnected(i)) {
-			_players.emplace_back(i);
-			_playerProgression.push_back(TrackProgression{ 0, _track });
-			LOG(i);
-		}
-	}
+//	for (int i = 0; i < 5; i++)
+//	{
+//		if (sf::Joystick::isConnected(i)) {
+//			_players.emplace_back(i);
+//			_playerProgression.push_back(TrackProgression{ 0, _track });
+//			LOG(i);
+//		}
+//	}
+    for(size_t i = 0 ; i < _context.numPlayers; i++)
+    {
+        _players.emplace_back(i);
+        _playerProgression.push_back(TrackProgression{ 0, _track });
+        LOG(i);
+    }
 
 	// TEST PLAYER
 
@@ -229,10 +235,29 @@ void World::render()
 			}
 		}
 	}
-	for (Player& player : _players)
+
+    //////////////////////
+    // Copy-pasted from GuiPlayerJoinContainer::createWindows
+    static constexpr size_t MAX_PLAYERS = 4;
+    static constexpr unsigned char COLORS[4][MAX_PLAYERS] =
+    {
+        {255, 0, 0, 255},
+        {0, 255, 0, 255},
+        {0, 0, 255, 255},
+        {255, 255, 0, 255}
+    };
+	//////////////////////
+//	for (Player& player : _players)
+    assert(_players.size() <= MAX_PLAYERS);
+	for(size_t i = 0; i < _players.size(); i++)
 	{
+	    Player& player = _players[i];
+        unsigned char* c = COLORS[i];
+        glm::vec3 diffuseColor(c[0], c[1], c[2]);
+        diffuseColor /= 255.f;
 		//shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 3.0f, { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
-		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,0.f }, 1.5f));
+//		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,0.f }, 1.5f));
+		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, diffuseColor, 1.5f));
 
 		// TEST
 		//shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{ -2,0,0,1 } }, { 0.f,0.5f,1.f }, 1.f));
