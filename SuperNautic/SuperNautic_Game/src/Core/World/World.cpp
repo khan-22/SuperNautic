@@ -19,6 +19,7 @@ World::World(ApplicationContext& context)
 	, _playerWindowRenderers(context.numPlayers)
 	, _playerParticles(context.numPlayers)
 	, _playerPointLights(context.numPlayers)
+	, _bDebugging(false)
 {
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
