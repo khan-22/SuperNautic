@@ -221,19 +221,38 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
 {
     _guiContainer.update();
     _trackGenerator.update(dtSeconds);
+
+    if(_input.checkActive())
+    {
+        _input.update();
+        for(const sf::Event& e : _input.getEvents())
+        {
+            if(e.type == sf::Event::KeyPressed)
+            {
+                switch(e.key.code)
+                {
+                case sf::Keyboard::B:
+                    if(!_guiContainer.bIsActive())
+                    {
+                        _stack.clear();
+                        _context.track = _trackGenerator.takeTrack();
+                        _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+            }
+            _guiContainer.handleEvent(e);
+        }
+    }
+
     return true;
 }
 
 bool PreGameApplicationState::bHandleEvent(const sf::Event& event)
 {
     _guiContainer.handleEvent(event);
-    if(_input.checkActive())
-    {
-        _input.update();
-        for(const sf::Event& e : _input.getEvents())
-        {
-            _guiContainer.handleEvent(e);
-        }
-    }
     return true;
 }
