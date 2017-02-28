@@ -76,7 +76,10 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
 
             case sf::Keyboard::Escape:
             case sf::Keyboard::B:
-                toggleActivation();
+                if(bIsActive())
+                {
+                    toggleActivation();
+                }
                 break;
 
             default:
@@ -285,7 +288,7 @@ void GuiContainer::setBackground(sf::Color fillColor, sf::Color outlineColor, fl
 
 void GuiContainer::activate()
 {
-    if(bHasSelection())
+    if(bHasSelection() && !getSelection().bIsSelected())
     {
         getSelection().toggleSelection();
     }
