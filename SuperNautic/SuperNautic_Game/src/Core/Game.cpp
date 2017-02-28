@@ -23,7 +23,7 @@
 
 
 Game::Game()
-	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Default, sf::ContextSettings(24U, 8U, 0U, 4U, 0U))
+	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Titlebar | sf::Style::Close, sf::ContextSettings(24U, 8U, 0U, 4U, 0U))
 	, _context(_window)
 	, _quitTimer(0.f)
 	, _fps(60.f)
