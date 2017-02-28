@@ -45,12 +45,14 @@ protected:
     virtual void select() override;
     virtual void deselect() override;
 
+protected:
+    virtual void handleEventCurrent(const sf::Event& event) override;
+
 private:
     std::function<void(GuiElement*)> _onElementSelectCallback = [](GuiElement*){};
     sf::Keyboard::Key _nextKey;
     sf::Keyboard::Key _previousKey;
 
-    void handleEventCurrent(const sf::Event& event) override;
     virtual void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
     virtual void updateCurrent() override;
 

@@ -39,4 +39,9 @@ inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2)
 		(0.0001f > abs(vector1.z - vector2.z));
 }
 
+// Create random string of specified size using the following characters
+// A-Z, a-z, 0-9
+std::string randString(size_t size);
+
+
 #endif

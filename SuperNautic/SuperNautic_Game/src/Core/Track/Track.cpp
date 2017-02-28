@@ -48,6 +48,11 @@ int Track::getGeneratedLength() const
 	return _generatedLength;
 }
 
+unsigned int Track::getCurviness() const
+{
+    return _curviness * 5.f;
+}
+
 // Sets the track length in whole meters
 void Track::setLength(const unsigned int length)
 {
@@ -408,7 +413,7 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 		//						const std::function<bool(const std::vector<ElementT*>&)>& predicate
 		/*auto predicate = [this](const std::function<bool(const std::vector<SegmentInstance*>&)>& segments)
 		{
-			
+
 		};
 		for (size_t i = 0; i < _octrees.size(); i++)
 		{
@@ -430,6 +435,10 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
+	if(maxRotOffset == 0)
+    {
+        maxRotOffset = 1;
+    }
 	int rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
@@ -573,7 +582,7 @@ void Track::placeObstacles()
 
 		float derp = (remainderDepth / finalDistanceLength);
 		glm::vec3 pos = waypoints[distanceIndex] + finalDistance * derp;
-		
+
 		glm::vec3 v1 = glm::vec3(0, 0, 1);
 		glm::vec3 v2 = _track[index]->getEndMatrix() * glm::vec4(0, 0, 1, 0);
 		float factor = targetDepth / _track[index]->getLength();

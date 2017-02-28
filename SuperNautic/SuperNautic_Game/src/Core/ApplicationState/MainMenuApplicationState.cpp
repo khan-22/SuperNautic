@@ -7,7 +7,7 @@
 #include "Core/ApplicationState/MainMenuApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
-#include "Core/ApplicationState/PlayApplicationState.hpp"
+#include "Core/ApplicationState/PreGameApplicationState.hpp"
 #include "Core/Asset/AssetCache.hpp"
 #include "Core/Gui/GuiButton.hpp"
 #include "Core/Utility/Camera.h"
@@ -30,9 +30,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     auto button1 = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.pop();
-        auto playState = std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context, _playersActive));
-        _stack.push(std::move(playState));
-
+        _stack.push(std::unique_ptr<ApplicationState>(new PreGameApplicationState(_stack, _context)));
     }));
 
     text.setString("Quit");
@@ -48,6 +46,8 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     sf::Vector2u windowSize = _context.window.getSize();
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
     _guiContainer.toggleSelection();
+    _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
+
 }
 
 void MainMenuApplicationState::render()

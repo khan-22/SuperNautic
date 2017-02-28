@@ -26,6 +26,51 @@ void GuiHorizontalList::deselect()
 }
 
 
+void GuiHorizontalList::handleEventCurrent(const sf::Event& event)
+{
+    GuiContainer::handleEventCurrent(event);
+    if(event.type == sf::Event::KeyPressed)
+    {
+        switch(event.key.code)
+        {
+            case sf::Keyboard::Escape:
+            case sf::Keyboard::B:
+                toggleActivation();
+                break;
+
+            default:
+                break;
+        }
+    }
+}
+
+
+void GuiHorizontalList::activate()
+{
+//    if(!bHasSelection())
+//    {
+//        GuiContainer::select();
+//    }
+
+    if(bHasSelection())
+    {
+        getSelection().toggleActivation();
+    }
+}
+
+void GuiHorizontalList::deactivate()
+{
+//    if(!bHasSelection())
+//    {
+//        GuiContainer::select();
+//    }
+
+//    if(bHasSelection())
+//    {
+//        getSelection().toggleActivation();
+//    }
+}
+
 
 bool GuiHorizontalList::bIsSelectable() const
 {
@@ -106,7 +151,7 @@ void GuiHorizontalList::onElementSelect()
     }
 
 
-    for(int i = _selection - 1; i >= 0 && i >= int(_selection - (_maxVisibleElements + 1) / 2); i--)
+    for(int i = _selection - 1; i >= 0 && i > int(_selection - (_maxVisibleElements + 1) / 2); i--)
     {
         GuiElement& left = *_elements[i];
         left.setOrigin(left.getBoundingRect().width / 2.f, left.getBoundingRect().height / 2.f);

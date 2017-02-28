@@ -45,12 +45,20 @@ void GuiPlayerJoin::updateCurrent()
         {
             switch(e.key.code)
             {
-                case sf::Keyboard::A:
-                    join();
-                    break;
+//                case sf::Keyboard::A:
+//                    join();
+//                    break;
 
                 case sf::Keyboard::Y:
-                    leave();
+//                    leave();
+                    if(_bHasJoined)
+                    {
+                        leave();
+                    }
+                    else
+                    {
+                        join();
+                    }
                     break;
 
                 default:

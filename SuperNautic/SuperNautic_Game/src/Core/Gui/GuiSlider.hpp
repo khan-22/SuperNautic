@@ -35,6 +35,7 @@ class GuiSlider : public GuiElement
         float _min;
         float _valueSize;
         float _value = 0.f;
+        float _step;
 
         std::function<void(float)> _onChangeCallback = [](float){};
 

@@ -11,23 +11,13 @@
 #include "Core/ApplicationState/TrackGenerationApplicationState.h"
 
 
-PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context, int numberOfPlayers)
+PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 	: ApplicationState(stack, context)
-	, _segmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt")
-	, _obstacleHandler("obstacleinfo.txt")
-	, _track(&_segmentHandler, &_obstacleHandler)
-	, _world(context, &_track, numberOfPlayers)
+	, _world(context)
 {
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
-	_track.setCurviness(2);
-	_track.setSeed("1");
-	_track.setLength(10000);
 }
 
-void PlayApplicationState::initialize()
-{
-	_stack.push(std::unique_ptr<ApplicationState>(new TrackGenerationApplicationState(_stack, _context, &_track)));
-}
 
 void PlayApplicationState::render()
 {

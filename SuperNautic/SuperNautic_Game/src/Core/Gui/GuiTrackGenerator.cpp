@@ -1,25 +1,23 @@
 #include "Core/Gui/GuiTrackGenerator.hpp"
 
-GuiTrackGenerator::GuiTrackGenerator()
-: _segmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt")
-, _obstacleHandler("obstacleinfo.txt")
+GuiTrackGenerator::GuiTrackGenerator(SegmentHandler* segmentHandler, ObstacleHandler* obstacleHandler)
+: _segmentHandler(segmentHandler)
+, _obstacleHandler(obstacleHandler)
 {
-    _track.reset(new Track(&_segmentHandler, &_obstacleHandler));
+    _track.reset(new Track(_segmentHandler, _obstacleHandler));
     _preview.reset(new TrackPreview());
+}
 
-	for(size_t i = 0; i < _segmentHandler.infos().size(); i++)
-    {
-        _segmentHandler.loadSegment(i);
-    }
-
-    generate();
+GuiTrackGenerator::~GuiTrackGenerator()
+{
+    _bDoAbortGenerate = true;
 }
 
 
 std::unique_ptr<Track> GuiTrackGenerator::takeTrack()
 {
     std::unique_ptr<Track> ret = std::move(_track);
-    _track.reset(new Track(&_segmentHandler, &_obstacleHandler));
+    _track.reset(new Track(_segmentHandler, _obstacleHandler));
 
 
     return std::move(ret);
@@ -57,7 +55,7 @@ void GuiTrackGenerator::generate()
         auto nullReturn = std::make_pair(std::unique_ptr<Track>(nullptr), std::unique_ptr<TrackPreview>(nullptr));
 
         std::cout << "Generating... " << std::endl;
-        auto track = std::unique_ptr<Track>(new Track(&_segmentHandler, &_obstacleHandler));
+        auto track = std::unique_ptr<Track>(new Track(_segmentHandler, _obstacleHandler));
         track->setCurviness(_curviness);
         track->setSeed(_seed);
         track->setLength(_length);
@@ -89,27 +87,17 @@ void GuiTrackGenerator::generate()
 //    _preview->setTrack(*_track);
 }
 
-void GuiTrackGenerator::setTrackAttributes()
-{
-	_track->setCurviness(_curviness);
-	_track->setSeed(_seed);
-	_track->setLength(_length);
-}
-
 void GuiTrackGenerator::setLength(unsigned int length)
 {
     _length = length;
-    generate();
 }
 
 void GuiTrackGenerator::setSeed(const std::string& seed)
 {
     _seed = seed;
-    generate();
 }
 
 void GuiTrackGenerator::setCurviness(unsigned int curviness)
 {
     _curviness = curviness;
-    generate();
 }
