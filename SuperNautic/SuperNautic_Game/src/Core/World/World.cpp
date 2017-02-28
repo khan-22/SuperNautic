@@ -300,6 +300,12 @@ void World::render()
 			_playerRTs[i].display(*_players[i].getCamera());
 			_playerRTs[i].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 		}
+		
+		for (int i = 0; i < _playerWindowRenderers.size(); i++)
+		{
+			_playerWindowRenderers[i].display(*_players[i].getCamera());
+		}
+
 		for (int i = 0; i < _playerParticleRenderers.size(); i++)
 		{
 			for (int j = 0; j < _players.size(); j++)
@@ -309,15 +315,16 @@ void World::render()
 			}
 		}
 
-		for (int i = 0; i < _playerWindowRenderers.size(); i++)
-		{
-			_playerWindowRenderers[i].display(*_players[i].getCamera());
-		}
 	}
 	else
 	{
 		_playerRTs[0].display(_debugCamera);
 		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
+
+		for (int i = 0; i < _playerWindowRenderers.size(); i++)
+		{
+			_playerWindowRenderers[i].display(*_players[i].getCamera());
+		}
 
 		for (int j = 0; j < _players.size(); j++)
 		{
@@ -325,10 +332,6 @@ void World::render()
 			_playerParticleRenderers[0].display(_debugCamera);
 		}
 
-		for (int i = 0; i < _playerWindowRenderers.size(); i++)
-		{
-			_playerWindowRenderers[i].display(*_players[i].getCamera());
-		}
 	}
 
 
