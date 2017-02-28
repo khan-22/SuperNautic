@@ -224,6 +224,7 @@ void PreGameApplicationState::render()
 
 bool PreGameApplicationState::bUpdate(float dtSeconds)
 {
+    _guiContainer.update();
     _trackGenerator.update(dtSeconds);
     return true;
 }
