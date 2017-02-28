@@ -25,6 +25,14 @@ namespace GFX
 
 		void render(RenderStates& states) override;
 
+		void start();
+		void stop();
+		void setBirthColor(glm::vec3 color);
+		void setDeathColor(glm::vec3 color);
+		void setBirthSize(float size);
+		void setDeathSize(float size);
+		void setLifeTime(float lifeTime);
+
 	protected:
 
 	private:
@@ -51,6 +59,12 @@ namespace GFX
 		GLfloat		_maxSpread;
 		GLfloat		_maxLifetime;
 
+		glm::vec3	_birthColor;
+		glm::vec3	_deathColor;
+		GLfloat		_birthSize;
+		GLfloat		_deathSize;
+
+		bool		_bIsRunning;
 		GLsizei		_sizeInBytes;
 		GLsizei		_positionsSizeInBytes;
 		GLsizei		_colorsSizeInBytes;
