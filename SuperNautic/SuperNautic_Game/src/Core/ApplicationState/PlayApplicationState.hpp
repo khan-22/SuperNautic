@@ -5,6 +5,7 @@
 
 #include "Core/ApplicationState/ApplicationState.hpp"
 #include "Core/World/World.hpp"
+#include "Core/Io/Input.hpp"
 
 class PlayApplicationState : public ApplicationState
 {
@@ -17,6 +18,7 @@ public:
 
 private:
     World			_world;
+    Input           _input;
 };
 
 
