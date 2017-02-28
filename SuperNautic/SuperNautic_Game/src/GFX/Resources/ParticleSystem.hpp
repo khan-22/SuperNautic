@@ -10,6 +10,8 @@
 #include "GFX/Resources/VertexArrayObject.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
 
+#include "Core/Asset/LoadAssetFunctions.hpp"
+
 namespace GFX
 {
 
@@ -52,6 +54,8 @@ namespace GFX
 
 		std::vector<ParticlePhysicsData>	_physParticles;
 		ParticleRenderData	_renderParticles;
+
+		TextureAsset	_texture;
 
 		GLuint		_particleCount;
 		GLfloat		_turbulence;
