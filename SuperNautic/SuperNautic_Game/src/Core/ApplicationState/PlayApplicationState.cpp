@@ -33,6 +33,27 @@ bool PlayApplicationState::bUpdate(float dtSeconds)
 		_stack.push(std::unique_ptr<ApplicationState>(new VictoryApplicationState(_stack, _context)));
 	}
 
+    if(_input.checkActive())
+    {
+        _input.update();
+        for(const sf::Event& e : _input.getEvents())
+        {
+            if(e.type == sf::Event::KeyPressed)
+            {
+                switch(e.key.code)
+                {
+                case sf::Keyboard::Escape:
+                    _stack.push(std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context)));
+                    return true;
+                    break;
+
+                default:
+                    break;
+                }
+            }
+        }
+    }
+
     return true;
 }
 
