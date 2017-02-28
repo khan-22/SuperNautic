@@ -14,7 +14,10 @@ GuiCharacterInput::GuiCharacterInput(CharacterFlags flags)
     _text.setOrigin(_text.getLocalBounds().left, _text.getLocalBounds().top);
     _text.setPosition(0.f, 0.f);
     sf::FloatRect textBounds = _text.getLocalBounds();
-    _text.setFillColor(sf::Color::Black);
+    _text.setFillColor(sf::Color::White);
+    _text.setOutlineColor(sf::Color::Black);
+    _text.setOutlineThickness(2.f);
+
 }
 
 void GuiCharacterInput::setOnChange(const std::function<void(char)>& callback)
@@ -26,13 +29,13 @@ void GuiCharacterInput::setOnChange(const std::function<void(char)>& callback)
 void GuiCharacterInput::select()
 {
     setScale(1.2f, 1.2f);
-    _text.setFillColor(sf::Color::White);
+    _text.setFillColor(sf::Color(200, 200, 90));
 }
 
 void GuiCharacterInput::deselect()
 {
     setScale(1.0f, 1.0f);
-    _text.setFillColor(sf::Color::Black);
+    _text.setFillColor(sf::Color::White);
 }
 
 void GuiCharacterInput::handleEventCurrent(const sf::Event& event)
@@ -133,16 +136,16 @@ void GuiCharacterInput::stepCharacter(bool bForward)
         case CharacterFlags::DIGITS:
             if(bForward)
             {
-                _currentDigit++;
-                _currentDigit %= NUM_DIGITS;
-            }
-            else
-            {
                 _currentDigit--;
                 if(_currentDigit > NUM_DIGITS)
                 {
                     _currentDigit = NUM_DIGITS - 1;
                 }
+            }
+            else
+            {
+                _currentDigit++;
+                _currentDigit %= NUM_DIGITS;
             }
             break;
         default:
@@ -185,6 +188,46 @@ char GuiCharacterInput::getCharacter() const
 {
     assert(_text.getString().getSize() == 1);
     return _text.getString()[0];
+}
+
+void GuiCharacterInput::setCharacter(char character)
+{
+    CharacterFlags flags = CharacterFlags::INVALID;
+    unsigned char charIndex = 0;
+    if(character >= 'a' && character <= 'z')
+    {
+        flags = CharacterFlags::LOWERCASE;
+        charIndex = character - 'a';
+    }
+    else if(character >= 'A' && character <= 'Z')
+    {
+        flags = CharacterFlags::UPPERCASE;
+        charIndex = character - 'A';
+    }
+    else if(character >= '0' && character <= '9')
+    {
+        flags = CharacterFlags::DIGITS;
+        charIndex = character - '0';
+    }
+
+    auto found = std::find(_characterLists.begin(), _characterLists.end(), flags);
+    if(found != _characterLists.end())
+    {
+        _currentCharacterListIndex = std::distance(_characterLists.begin(), found);
+        if(flags == CharacterFlags::DIGITS)
+        {
+            _currentDigit = charIndex;
+        }
+        else
+        {
+            _currentLetter = charIndex;
+        }
+
+        updateText();
+        return;
+    }
+
+    LOG_ERROR("Invalid character: ", character, " (", (int)character, ")");
 }
 
 

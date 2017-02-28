@@ -21,6 +21,7 @@ class GuiCharacterInput : public GuiElement
             DIGITS      = 1 << 2,
             ONLY_LETTERS = LOWERCASE | UPPERCASE,
             ALL = ONLY_LETTERS | DIGITS,
+            INVALID = 255,
         };
 
         GuiCharacterInput(CharacterFlags flags = CharacterFlags::ALL);
@@ -30,6 +31,7 @@ class GuiCharacterInput : public GuiElement
 
         void setOnChange(const std::function<void(char)>& callback);
         char getCharacter() const;
+        void setCharacter(char character);
 
 
     private:
