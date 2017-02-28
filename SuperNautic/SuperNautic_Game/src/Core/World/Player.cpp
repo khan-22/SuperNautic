@@ -99,6 +99,10 @@ void Player::update(float dt)
 
     _ship.update(dt);
 
+	// Set camera shake value
+	_camera.setShake(std::max((glm::length(_ship.getVelocity()) - 100.0f) * 0.085f, 0.0f) + (_ship.getSteeringCooldown() > 0.0f ? _ship.getSteeringCooldown() * 35.0f : 0.0f));
+	_camera.update(dt);
+
 	if (_ship.isEngineOverload())
 	{
 		_audio.playAudio(_audio.overheat);
