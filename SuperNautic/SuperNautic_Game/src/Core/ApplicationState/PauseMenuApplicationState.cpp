@@ -44,6 +44,9 @@ PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stac
     _guiContainer.insert(resume);
     _guiContainer.insert(quit);
 
+    _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
+
+
     sf::Vector2u windowSize = _context.window.getSize();
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
     _guiContainer.toggleSelection();
@@ -58,6 +61,26 @@ void PauseMenuApplicationState::render()
 
 bool PauseMenuApplicationState::bUpdate(float dtSeconds)
 {
+    if(_input.checkActive())
+    {
+        _input.update();
+        for(const sf::Event& e : _input.getEvents())
+        {
+            if(e.type == sf::Event::KeyPressed)
+            {
+                switch(e.key.code)
+                {
+                case sf::Keyboard::Escape:
+                    _stack.pop();
+                    return false;
+
+                default:
+                    break;
+                }
+            }
+            _guiContainer.handleEvent(e);
+        }
+    }
     return false;
 }
 
@@ -72,13 +95,5 @@ bool PauseMenuApplicationState::bHandleEvent(const sf::Event& event)
         }
     }
     _guiContainer.handleEvent(event);
-    if(_input.checkActive())
-    {
-        _input.update();
-        for(const sf::Event& e : _input.getEvents())
-        {
-            _guiContainer.handleEvent(e);
-        }
-    }
     return false;
 }

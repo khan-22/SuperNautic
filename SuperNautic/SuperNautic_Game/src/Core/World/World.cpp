@@ -8,17 +8,18 @@
 
 #include <cmath>
 
-World::World(ApplicationContext& context, Track* track, const int numberOfPlayers)
+World::World(ApplicationContext& context)
 	: _context{ context }
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
-	, _track(track)
-	, _playerRTs(numberOfPlayers)
-	, _playerParticleRenderers(numberOfPlayers)
-	, _playerWindowRenderers(numberOfPlayers)
-	, _playerParticles(numberOfPlayers)
-	, _playerPointLights(numberOfPlayers)
+	, _track(context.track.get())
+	, _playerRTs(context.numPlayers)
+	, _playerParticleRenderers(context.numPlayers)
+	, _playerWindowRenderers(context.numPlayers)
+	, _playerParticles(context.numPlayers)
+	, _playerPointLights(context.numPlayers)
+	, _bDebugging(false)
 {
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
@@ -26,7 +27,7 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 		_playerParticles[i].start();
 	}
 
-	for (int i = 0; i < numberOfPlayers; i++)
+	for (int i = 0; i < context.numPlayers; i++)
 	{
 		for (int j = 0; j < 6; j++)
 		{
@@ -35,14 +36,20 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	}
 
 	// Create one player
-	for (int i = 0; i < 5; i++)
-	{
-		if (sf::Joystick::isConnected(i)) {
-			_players.emplace_back(i);
-			_playerProgression.push_back(TrackProgression{ 0, _track });
-			LOG(i);
-		}
-	}
+//	for (int i = 0; i < 5; i++)
+//	{
+//		if (sf::Joystick::isConnected(i)) {
+//			_players.emplace_back(i);
+//			_playerProgression.push_back(TrackProgression{ 0, _track });
+//			LOG(i);
+//		}
+//	}
+    for(size_t i = 0 ; i < _context.numPlayers; i++)
+    {
+        _players.emplace_back(i);
+        _playerProgression.push_back(TrackProgression{ 0, _track });
+        LOG(i);
+    }
 
 	// TEST PLAYER
 
@@ -126,7 +133,7 @@ void World::update(float dt, sf::Window& window)
 			unsigned segmentIndex = _playerProgression[i].getCurrentSegment();
 			float lengthInSegment = 0.0f;
 			glm::vec3 forward = _track->findForward(_players[i].getShip().getPosition(), segmentIndex, returnPos, lengthInSegment, directionDifference);
-			
+
 			// Update progression
 			_playerProgression[i].setCurrentSegment(segmentIndex);
 			_playerProgression[i].update(lengthInSegment);
@@ -204,7 +211,7 @@ void World::update(float dt, sf::Window& window)
 	//static glm::vec3 currentPos = _players[0].getShip().getPosition();
 	//static glm::vec3 previousPos = currentPos;
 	//currentPos = glm::vec3{ _players[0].getShip().getMatrix() * glm::vec4{ 0.f,0.f,0.f,1.f } } - _players[0].getShip().getMeshForward() * 2.0f;//_players[0].getShip().getPosition();
-	
+
 	//_testParticles.update(dt, currentPos, currentPos - previousPos);
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
@@ -230,10 +237,29 @@ void World::render()
 			}
 		}
 	}
-	for (Player& player : _players)
+
+    //////////////////////
+    // Copy-pasted from GuiPlayerJoinContainer::createWindows
+    static constexpr size_t MAX_PLAYERS = 4;
+    static constexpr unsigned char COLORS[4][MAX_PLAYERS] =
+    {
+        {255, 0, 0, 255},
+        {0, 255, 0, 255},
+        {0, 0, 255, 255},
+        {255, 255, 0, 255}
+    };
+	//////////////////////
+//	for (Player& player : _players)
+    assert(_players.size() <= MAX_PLAYERS);
+	for(size_t i = 0; i < _players.size(); i++)
 	{
+	    Player& player = _players[i];
+        unsigned char* c = COLORS[i];
+        glm::vec3 diffuseColor(c[0], c[1], c[2]);
+        diffuseColor /= 255.f;
 		//shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 3.0f, { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
-		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,0.f }, 1.5f));
+//		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,0.f }, 1.5f));
+		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, diffuseColor, 1.5f));
 
 		// TEST
 		//shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{ -2,0,0,1 } }, { 0.f,0.5f,1.f }, 1.f));
@@ -249,7 +275,7 @@ void World::render()
 			_playerRTs[i].pushPointLight(shipLights[j]);
 		}
 	}
-	
+
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
 		_track->render(_playerRTs[i], _playerWindowRenderers[i], _playerProgression[i].getCurrentSegment());
@@ -305,7 +331,7 @@ void World::render()
 	}
 
 
-	
+
 
 
 	// Should be done for each player before drawing particles.

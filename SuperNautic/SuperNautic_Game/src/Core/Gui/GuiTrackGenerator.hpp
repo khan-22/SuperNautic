@@ -12,12 +12,14 @@
 class GuiTrackGenerator : public GFX::Renderable3D
 {
     public:
-        GuiTrackGenerator();
+        GuiTrackGenerator(SegmentHandler* segmentHandler, ObstacleHandler* obstacleHandler);
+        ~GuiTrackGenerator();
 
         std::unique_ptr<Track> takeTrack();
         void render(GFX::RenderStates& states) override;
         void update(float dtSeconds);
 
+        void generate();
         void setLength(unsigned int length);
         void setSeed(const std::string& seed);
         void setCurviness(unsigned int curviness);
@@ -25,8 +27,8 @@ class GuiTrackGenerator : public GFX::Renderable3D
     private:
         bool _bDoAbortGenerate = false;
         std::future<std::pair<std::unique_ptr<Track>, std::unique_ptr<TrackPreview>>> _generation;
-        SegmentHandler _segmentHandler;
-		ObstacleHandler _obstacleHandler;
+        SegmentHandler* _segmentHandler;
+		ObstacleHandler* _obstacleHandler;
         std::unique_ptr<Track> _track;
         std::unique_ptr<TrackPreview> _preview;
 
@@ -34,8 +36,6 @@ class GuiTrackGenerator : public GFX::Renderable3D
         std::string	 _seed = "1";
         unsigned int _curviness = 3;
 
-        void generate();
-        void setTrackAttributes();
 };
 
 #endif //GUI_TRACK_GENERATOR_HPP

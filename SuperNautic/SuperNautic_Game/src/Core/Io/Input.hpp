@@ -26,18 +26,20 @@ public:
 	void setControllerId(int id);
 
 protected:
-	
+
 private:
 	float _leftStickX;
 	float _leftStickY;
 	float _triggers;
 
 	bool _bButtonA;
+	bool _bButtonB;
 	bool _bButtonY;
 	bool _bButtonStart;
 
 	bool _bLeftStickDormant;
 	bool _bAWasDormant;
+	bool _bBWasDormant;
 	bool _bYWasDormant;
 	bool _bStartWasDormant;
 

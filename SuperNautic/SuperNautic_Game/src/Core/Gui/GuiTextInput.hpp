@@ -21,6 +21,8 @@ class GuiTextInput : public GuiContainer
 
         void setOnChange(const std::function<void(const std::string&)>& callback);
 
+        void setText(const std::string& str);
+        const std::string& getText() const;
 
     private:
         std::vector<GuiCharacterInput*> _characters;
@@ -29,8 +31,13 @@ class GuiTextInput : public GuiContainer
 
         void select() override;
         void deselect() override;
+        void activate() override;
+        void deactivate() override;
 
         void updateCharacter(size_t index, char character);
+
+        virtual void handleEventCurrent(const sf::Event& event) override;
+
 
 };
 
