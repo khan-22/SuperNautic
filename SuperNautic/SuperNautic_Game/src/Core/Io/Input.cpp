@@ -11,6 +11,8 @@ Input::Input() :
 	_bAWasDormant(true),
 	_bButtonA(false)
 {
+    update();
+    _events.clear();
 }
 
 Input::Input(int id) :
@@ -19,6 +21,8 @@ Input::Input(int id) :
 	_bAWasDormant(true),
 	_bButtonA(false)
 {
+    update();
+    _events.clear();
 }
 
 Input::~Input()
