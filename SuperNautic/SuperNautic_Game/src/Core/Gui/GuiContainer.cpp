@@ -63,6 +63,10 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
         if(bHasSelection() && getSelection().bIsActive())
         {
             getSelection().handleEvent(event);
+            if(!getSelection().bIsActive())
+            {
+                toggleActivation();
+            }
             return;
         }
 
@@ -128,7 +132,14 @@ void GuiContainer::activateSelection()
         {
             selection.toggleSelection();
         }
+
+        toggleActivation();
         selection.toggleActivation();
+
+        if(!selection.bIsActive())
+        {
+            toggleActivation();
+        }
     }
 }
 
@@ -296,10 +307,10 @@ void GuiContainer::activate()
 
 void GuiContainer::deactivate()
 {
-    if(bHasSelection())
-    {
-        getSelection().toggleSelection();
-    }
+//    if(bHasSelection())
+//    {
+//        getSelection().toggleSelection();
+//    }
 }
 
 bool GuiContainer::bIsActivatable() const
