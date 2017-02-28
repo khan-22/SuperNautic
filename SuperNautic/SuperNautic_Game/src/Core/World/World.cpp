@@ -23,6 +23,7 @@ World::World(ApplicationContext& context, Track* track, const int numberOfPlayer
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
 		_playerParticles[i].init(500, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+		_playerParticles[i].start();
 	}
 
 	for (int i = 0; i < numberOfPlayers; i++)
