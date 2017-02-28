@@ -24,6 +24,7 @@ World::World(ApplicationContext& context)
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
 		_playerParticles[i].init(500, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+		_playerParticles[i].setBirthColor(glm::vec3(0.0f, 0.6f, 0.3f));
 		_playerParticles[i].start();
 	}
 
