@@ -254,7 +254,7 @@ void World::render()
 	for(size_t i = 0; i < _players.size(); i++)
 	{
 	    Player& player = _players[i];
-        unsigned char* c = COLORS[i];
+        const unsigned char* c = COLORS[i];
         glm::vec3 diffuseColor(c[0], c[1], c[2]);
         diffuseColor /= 255.f;
 		//shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 3.0f, { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
