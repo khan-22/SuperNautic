@@ -204,7 +204,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f);
 
-
+    _trackGenerator.generate();
 }
 
 void PreGameApplicationState::render()
