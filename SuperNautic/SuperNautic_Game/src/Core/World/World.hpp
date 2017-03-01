@@ -17,6 +17,7 @@ namespace sf
 #include "Core/Utility/DebugCamera.hpp"
 #include "Core/Track/TrackProgression.hpp"
 #include "Core/Gui/Timer.hpp"
+#include "Core/Gui/Progression.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/WindowRenderer.hpp"
@@ -45,6 +46,7 @@ private:
 	bool									_bHasWon;
 
 	Timer									_timer;
+	Progression								_progression;
 
 	const ApplicationContext&				_context;
 

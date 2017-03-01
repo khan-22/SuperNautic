@@ -57,7 +57,9 @@ HUD::HUD(int windowWidth, int windowHeight) :
 
 	_tPosition.setFont(*_font.get());
 	_tPosition.setFillColor(sf::Color::Cyan);
-	_tPosition.setPosition(windowWidth / 2 - _widthStep * 5, 0);
+	_tPosition.setString("0");
+	_tPosition.setOrigin(_tPosition.getGlobalBounds().width / 2, 0);
+	_tPosition.setPosition(windowWidth / 2, _heightStep);
 	_tPosition.setCharacterSize(windowWidth / 10);
 }
 
@@ -129,7 +131,8 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_tSpeed.setPosition(_widthStep * 75 + _offsetX, _heightStep + _offsetY);
 
 	_tPosition.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
-	_tPosition.setPosition(static_cast<float>(_widthStep * 50 - _widthStep * 5 + _offsetX), static_cast<float>(0 + _offsetY));
+	_tPosition.setOrigin(_tPosition.getGlobalBounds().width / 2, 0);
+	_tPosition.setPosition(static_cast<float>(_widthStep * 50 + _offsetX), static_cast<float>(0 + _offsetY));
 }
 
 void HUD::setHeatWhite(bool isWhite)
@@ -168,7 +171,7 @@ void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) cons
 	target.draw(_tPosition);
 	target.draw(_heatOutline);
 	target.draw(_heatMeter);
-	target.draw(_progressionOutline);
-	target.draw(_progressionMeter);
+	//target.draw(_progressionOutline);
+	//target.draw(_progressionMeter);
 	target.draw(_speedMeter);
 }

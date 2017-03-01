@@ -13,7 +13,7 @@
 class Timer : public SceneNode
 {
 public:
-	Timer(int windowWidth, int windowHeight);
+	Timer(int windowWidth, int windowHeight, int amountOfPlayers);
 	~Timer();
 
 	void updateTime(float dt);

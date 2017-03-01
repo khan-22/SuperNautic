@@ -10,7 +10,7 @@
 #include "Core/Gui/GuiContainer.hpp"
 #include "Core/Io/Input.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
-
+#include "Core/Utility/VideoOptions.hpp"
 
 class GuiTextInput;
 class GuiSlider;
@@ -26,18 +26,13 @@ public:
 
 
 private:
+    VideoOptions _videoOptions;
     GuiContainer _guiContainer;
     Input _input;
     Asset<sf::Font> _font;
     GFX::SfmlRenderer _sfmlRenderer;
 
-    uint32_t _windowStyle;
-    size_t _resolutionX;
-    size_t _resolutionY;
-
-    void setResolution(size_t x, size_t y);
-    void setFullscreen(bool bSetFullscreen);
-    void recreateWindow();
+    void applyOptions();
 };
 
 

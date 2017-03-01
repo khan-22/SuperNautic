@@ -38,14 +38,18 @@ public:
 
     // Get element value paired with key as type T
     template<typename T>
-    T get(const std::string& key)
+    bool get(const std::string& key, T& out)
     {
-        std::stringstream sstream(_elements[key]);
-        T value;
-        sstream >> value;
-        LOG(value);
+        auto it = _elements.find(key);
+        if(it == _elements.end())
+        {
+            return false;
+        }
 
-        return value;
+        std::stringstream sstream(it->second);
+        sstream >> out;
+
+        return true;
     }
 
 
@@ -57,7 +61,7 @@ public:
 };
 
 template<>
-std::string ConfigFile::get<std::string>(const std::string& key);
+bool ConfigFile::get(const std::string& key, std::string& out);
 
 
 #endif // CONFIG_FILE_HPP

@@ -75,7 +75,10 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
         {
             case sf::Keyboard::Return:
             case sf::Keyboard::A:
-                activateSelection();
+                if(!bIsActive())
+                {
+                    toggleActivation();
+                }
                 break;
 
             case sf::Keyboard::Escape:
@@ -133,13 +136,16 @@ void GuiContainer::activateSelection()
             selection.toggleSelection();
         }
 
-        toggleActivation();
         selection.toggleActivation();
 
         if(!selection.bIsActive())
         {
             toggleActivation();
         }
+    }
+    else
+    {
+        toggleActivation();
     }
 }
 
@@ -303,6 +309,8 @@ void GuiContainer::activate()
     {
         getSelection().toggleSelection();
     }
+
+    activateSelection();
 }
 
 void GuiContainer::deactivate()
@@ -321,4 +329,36 @@ bool GuiContainer::bIsActivatable() const
 void GuiContainer::onElementSelect()
 {
     _onElementSelectCallback(&getSelection());
+}
+
+bool GuiContainer::select(GuiElement* element)
+{
+    for(size_t i = 0; i < _elements.size(); i++)
+    {
+        if(_elements[i].get() == element)
+        {
+            if(!bHasSelection())
+            {
+                _selection = i;
+                getSelection().toggleSelection();
+                onElementSelect();
+                return true;
+            }
+
+            size_t previousSelection = _selection;
+
+            getSelection().toggleSelection();
+            _selection = i;
+            getSelection().toggleSelection();
+
+            if(previousSelection != _selection)
+            {
+                onElementSelect();
+            }
+
+            return true;
+        }
+    }
+
+    return false;
 }

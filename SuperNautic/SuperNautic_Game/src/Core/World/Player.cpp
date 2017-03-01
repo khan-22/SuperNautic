@@ -6,7 +6,11 @@ Player::Player(int id) :
 	_hud(1280, 720),
 	_camera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
 	_fpCamera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
-	_currentCamera(&_camera)
+	_currentCamera(&_camera),
+	_cameraVelocityPositionShake(30.0f, 0.02f, 19.0f, 0.007f, 1.0f, 0.2f),
+	_cameraVelocityDirectionShake(30.5f, 0.002f, 10.1f, 0.0009f, 1.0f, 0.2f),
+	_cameraCollisionPositionShake(40.0f, 0.5f, 27.0f, 0.25f, 1.5f, 0.2f),
+	_cameraCollisionDirectionShake(35.0f, 0.2f, 24.0f, 0.16f, 1.0f, 0.2f)
 {
 	_bIsFirstPerson = false;
 }
@@ -99,13 +103,31 @@ void Player::update(float dt)
 
     _ship.update(dt);
 
-	// Set camera shake value
-	_camera.setShake(std::max((glm::length(_ship.getVelocity()) - 100.0f) * 0.065f, 0.0f) + (_ship.getSteeringCooldown() > 0.0f ? _ship.getSteeringCooldown() * 35.0f : 0.0f));
-	_camera.update(dt);
+	// Update shake offsets
+	_cameraVelocityPositionShake.setMagnitude(std::max((glm::length(_ship.getVelocity()) - 80.0f) * 0.01f, 0.0f));
+	_cameraVelocityPositionShake.setSpeed(std::max((glm::length(_ship.getVelocity()) - 80.0f) * 0.01f, 0.0f));
+	_cameraVelocityPositionShake.update(dt);
+
+	_cameraVelocityDirectionShake.setMagnitude(std::max((glm::length(_ship.getVelocity()) - 80.0f) * 0.01f, 0.0f));
+	_cameraVelocityDirectionShake.setSpeed(std::max((glm::length(_ship.getVelocity()) - 80.0f) * 0.01f, 0.0f));
+	_cameraVelocityDirectionShake.update(dt);
+
+	_cameraCollisionPositionShake.setMagnitude(_ship.getSteeringCooldown());
+	_cameraCollisionPositionShake.setSpeed(_ship.getSteeringCooldown());
+	_cameraCollisionPositionShake.update(dt);
+
+	_cameraCollisionDirectionShake.setMagnitude(_ship.getSteeringCooldown());
+	_cameraCollisionDirectionShake.setSpeed(_ship.getSteeringCooldown());
+	_cameraCollisionDirectionShake.update(dt);
 
 	if (_ship.isEngineOverload())
 	{
 		_audio.playAudio(_audio.overheat);
+	}
+
+	if (_ship.checkIfCollided())
+	{
+		_audio.playAudio(_audio.obstacleCollision);
 	}
 
 	if (_bIsFirstPerson)
@@ -122,6 +144,17 @@ void Player::update(float dt)
 		_currentCamera->setUp(_ship.getCameraUp());
 		_currentCamera->setViewDir(glm::normalize(_ship.getCameraForward() - _ship.getCameraUp() * 0.1f));
 	}
+
+	// Apply camera shake
+	glm::mat4 toCameraSpace{ glm::vec4{ glm::normalize(glm::cross(_currentCamera->getUp(), _currentCamera->getDirection())), 0.0f },
+							 glm::vec4{ _currentCamera->getUp(), 0.0f }, 
+							 glm::vec4{ _currentCamera->getDirection(), 0.0f }, 
+							 glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+	glm::vec3 newPos = glm::vec4{ _currentCamera->getPosition(), 0.0f } + toCameraSpace * glm::vec4{ _cameraVelocityPositionShake() + _cameraCollisionPositionShake(), 0.0f };
+	glm::vec3 newDir = glm::normalize(glm::vec4{ _currentCamera->getDirection(), 0.0f } + toCameraSpace * glm::vec4{ _cameraVelocityDirectionShake() + _cameraCollisionDirectionShake(), 0.0f });
+	_currentCamera->setView(glm::lookAt(newPos, newPos + newDir, _currentCamera->getUp()));
+
+	// TODO: Apply ship shake
 
     _hud.setHeat(_ship.getEngineTemperature() / 100);
     _hud.setSpeed(_ship.getSpeed());

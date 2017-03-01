@@ -10,7 +10,12 @@ template<typename AssetT, typename KeyT>
 class AssetCache
 {
 public:
+    // Get asset by key.
     static Asset<AssetT> get(KeyT key);
+
+    // Reload all assets.
+    // Does NOT invalidate any existing Asset instances that
+    // use the reloaded assets.
     static void reload();
 
 private:

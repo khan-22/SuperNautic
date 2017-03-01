@@ -12,7 +12,8 @@ World::World(ApplicationContext& context)
 	: _context{ context }
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
-	, _timer(1280, 720)
+	, _timer(1280, 720, context.numPlayers)
+	, _progression(1280, 720, context.numPlayers)
 	, _track(context.track.get())
 	, _playerRTs(context.numPlayers)
 	, _playerParticleRenderers(context.numPlayers)
@@ -168,6 +169,8 @@ void World::update(float dt, sf::Window& window)
 			_players[i].update(dt);
 		}
 
+		std::vector<float> positions;
+
 		for (unsigned i = 0; i < _players.size(); ++i)
 		{
 			int k = 1;
@@ -179,7 +182,10 @@ void World::update(float dt, sf::Window& window)
 				}
 			}
 			_players[i].setPosition(k);
+			positions.push_back(_playerProgression[i].getProgression());
 		}
+
+		_progression.updatePositions(positions);
 
 		// Update debug camera
 		_debugCamera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
@@ -209,6 +215,8 @@ void World::update(float dt, sf::Window& window)
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
 
+	_progression.updateCurrent();
+
 	//static glm::vec3 currentPos = _players[0].getShip().getPosition();
 	//static glm::vec3 previousPos = currentPos;
 	//currentPos = glm::vec3{ _players[0].getShip().getMatrix() * glm::vec4{ 0.f,0.f,0.f,1.f } } - _players[0].getShip().getMeshForward() * 2.0f;//_players[0].getShip().getPosition();
@@ -216,7 +224,7 @@ void World::update(float dt, sf::Window& window)
 	//_testParticles.update(dt, currentPos, currentPos - previousPos);
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
-		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 1.9f;
+		glm::vec3 particlePos = _players[i].getShip().getTransform() * glm::vec4{ 0.0f, 0.0f, -1.9f, 1.0f };
 		_playerParticles[i].update(dt, particlePos);
 	}
 
@@ -347,6 +355,7 @@ void World::render()
 	}
 
 	sfml.render(_timer);
+	sfml.render(_progression);
 
 	sfml.display(_context.window);
 }
