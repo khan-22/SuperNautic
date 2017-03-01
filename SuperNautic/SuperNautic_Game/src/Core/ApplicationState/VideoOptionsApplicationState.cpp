@@ -12,6 +12,7 @@
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/Asset/AssetCache.hpp"
 #include "Core/Gui/GuiButton.hpp"
+#include "Core/Gui/GuiHorizontalList.hpp"
 
 #include "Core/Asset/LoadAssetFunctions.hpp"
 
@@ -22,19 +23,22 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
-    GuiButton* set1920x1080 = new GuiButton(sf::Text("1920x1080", *_font.get()), [&]()
+    GuiHorizontalList* resolutionList = new GuiHorizontalList();
+    std::vector<std::unique_ptr<GuiElement>> resolutionButtons;
+    resolutionButtons.emplace_back(new GuiButton(sf::Text("1920x1080", *_font.get()), [&]()
     {
         _videoOptions.setResolution(1920, 1080);
         applyOptions();
-    });
-    guiElements.emplace_back(set1920x1080);
+    }));
 
-    GuiButton* set1280x720 = new GuiButton(sf::Text("1280x720", *_font.get()), [&]()
+    resolutionButtons.emplace_back(new GuiButton(sf::Text("1280x720", *_font.get()), [&]()
     {
         _videoOptions.setResolution(1280, 720);
         applyOptions();
-    });
-    guiElements.emplace_back(set1280x720);
+    }));
+    resolutionList->insert(resolutionButtons);
+
+    guiElements.emplace_back(resolutionList);
 
     GuiButton* fs = new GuiButton(sf::Text("toggle fs", *_font.get()), [&]()
     {
