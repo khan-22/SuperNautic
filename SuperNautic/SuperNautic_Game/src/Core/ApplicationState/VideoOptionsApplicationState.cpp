@@ -42,21 +42,6 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
         }
     }
 
-//    GuiHorizontalList* resolutionList = new GuiHorizontalList();
-//    std::vector<std::unique_ptr<GuiElement>> resolutionButtons;
-//    resolutionButtons.emplace_back(new GuiButton(sf::Text("1920x1080", *_font.get()), [&]()
-//    {
-//        _videoOptions.setResolution({1920, 1080});
-//        applyOptions();
-//    }));
-//
-//    resolutionButtons.emplace_back(new GuiButton(sf::Text("1280x720", *_font.get()), [&]()
-//    {
-//        _videoOptions.setResolution({1280, 720});
-//        applyOptions();
-//    }));
-//    resolutionList->insert(resolutionButtons);
-
     guiElements.emplace_back(resolutionList);
 
     GuiButton* fs = new GuiButton(sf::Text("Toggle Fullscreen", *_font.get()), [&]()
@@ -112,6 +97,7 @@ bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
                 switch(e.key.code)
                 {
                 case sf::Keyboard::B:
+                case sf::Keyboard::Escape:
                     if(!_guiContainer.bIsActive())
                     {
                         _stack.clear();
@@ -132,6 +118,23 @@ bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
 
 bool VideoOptionsApplicationState::bHandleEvent(const sf::Event& event)
 {
+    if(event.type == sf::Event::KeyPressed)
+    {
+        switch(event.key.code)
+        {
+        case sf::Keyboard::B:
+        case sf::Keyboard::Escape:
+            if(!_guiContainer.bIsActive())
+            {
+                _stack.clear();
+                _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
     _guiContainer.handleEvent(event);
     return true;
 }
