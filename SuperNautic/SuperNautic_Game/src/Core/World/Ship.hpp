@@ -17,6 +17,7 @@
 #include "Core/Geometry/BoundingBox.hpp"
 #include "Core/Utility/CollisionUtility.hpp"
 #include "Core/Utility/SpringSmoothedValue.hpp"
+#include "Core/Utility/ShakeOffset.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 {
@@ -57,6 +58,7 @@ public:
 	const glm::vec3& getMeshUp() const;
 	const glm::vec3 getVelocity() const;
 	const glm::vec3 getCameraPosition() const;
+	const glm::mat4& getTransform() const;
 	SurfaceType getSurfaceType() const;
 	const BoundingBox& getBoundingBox() const;
 	void obstacleCollision();
@@ -100,6 +102,8 @@ private:
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
 
 	SurfaceType _currentSurface{ SurfaceType::normal };
+
+	ShakeOffset	_shipCollisionShake;
 
 	BoundingBox _boundingBox;
 

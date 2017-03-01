@@ -28,7 +28,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 , _numPlayers(0)
 {
     std::string startSeed = "AAAAA";
-    size_t startLength = 40000;
+    size_t startLength = 10000;
     size_t startCurviness = 3;
 
     if(_context.track != nullptr)
@@ -204,7 +204,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f);
 
-
+    _trackGenerator.generate();
 }
 
 void PreGameApplicationState::render()

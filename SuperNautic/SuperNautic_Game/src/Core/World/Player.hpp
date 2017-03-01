@@ -11,6 +11,7 @@
 #include "Core/World/Ship.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "Core/Utility/Camera.h"
+#include "Core/Utility/ShakeOffset.hpp"
 
 class Player
 {
@@ -49,6 +50,11 @@ private:
 	Camera			_camera;
 	Camera			_fpCamera;
 	Camera*			_currentCamera;
+
+	ShakeOffset		_cameraVelocityPositionShake;
+	ShakeOffset		_cameraVelocityDirectionShake;
+	ShakeOffset		_cameraCollisionPositionShake;
+	ShakeOffset		_cameraCollisionDirectionShake;
 };
 
 #endif // !PLAYER_HPP

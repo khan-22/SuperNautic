@@ -168,7 +168,7 @@ void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) cons
 	target.draw(_tPosition);
 	target.draw(_heatOutline);
 	target.draw(_heatMeter);
-	target.draw(_progressionOutline);
-	target.draw(_progressionMeter);
+	//target.draw(_progressionOutline);
+	//target.draw(_progressionMeter);
 	target.draw(_speedMeter);
 }
