@@ -151,11 +151,14 @@ void VideoOptionsApplicationState::recreateWindow()
     _context.obstacleHandler.reset();
     _context.segmentHandler.reset();
 
-    RawMeshCache::reload();
     ShaderCache::reload();
     ModelCache::reload();
     TextureCache::reload();
-    MaterialCache::reload();
+
+    // These caches below don't actually manage OpenGL resources and
+    // don't have to be reloaded.
+//    RawMeshCache::reload();
+//    MaterialCache::reload();
 
     _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
