@@ -26,7 +26,6 @@ void GuiPlayerJoinContainer::createWindows()
     std::vector<std::unique_ptr<GuiElement>> joins;
     for(size_t i = 0; i < MAX_PLAYERS; i++)
     {
-		int ids[4] = {0, 3, 4, 1};
         GuiPlayerJoin* p = new GuiPlayerJoin(i);
 
         p->setPosition(pos);
