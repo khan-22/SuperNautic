@@ -10,14 +10,14 @@ class Asset
 {
 public:
     Asset();
-    Asset(std::shared_ptr<AssetT>& asset);
+    Asset(std::shared_ptr<bool> refCount, std::shared_ptr<AssetT>& asset);
     ~Asset();
 
     AssetT* get() const;
 
 private:
-    std::shared_ptr<AssetT> _asset;
-    std::shared_ptr<AssetT>* _parentAsset;
+    std::shared_ptr<AssetT>* _asset;
+    std::shared_ptr<bool> _refCount;
 };
 
 #include "Core/Asset/Asset.inl"

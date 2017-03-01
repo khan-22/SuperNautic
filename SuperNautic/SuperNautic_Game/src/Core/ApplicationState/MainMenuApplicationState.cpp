@@ -5,6 +5,7 @@
 #include "SFML/Window/Event.hpp"
 
 #include "Core/ApplicationState/MainMenuApplicationState.hpp"
+#include "Core/ApplicationState/VideoOptionsApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/ApplicationState/PreGameApplicationState.hpp"
@@ -33,14 +34,24 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
         _stack.push(std::unique_ptr<ApplicationState>(new PreGameApplicationState(_stack, _context)));
     }));
 
+    text.setString("Video options");
+    auto videoOptions = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
+    {
+        _stack.clear();
+        _stack.push(std::unique_ptr<ApplicationState>(new VideoOptionsApplicationState(_stack, _context)));
+    }));
+
     text.setString("Quit");
     auto button2 = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.clear();
     }));
 
-    button2->move(0.f, button1->getBoundingRect().height * 1.5f);
+    videoOptions->move(0.f, button1->getBoundingRect().height * 1.5f);
+    button2->setPosition(videoOptions->getPosition());
+    button2->move(0.f, videoOptions->getBoundingRect().height * 1.5f);
     _guiContainer.insert(button1);
+    _guiContainer.insert(videoOptions);
     _guiContainer.insert(button2);
 
     sf::Vector2u windowSize = _context.window.getSize();

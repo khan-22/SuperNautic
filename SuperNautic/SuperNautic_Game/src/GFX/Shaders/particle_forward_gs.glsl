@@ -9,6 +9,7 @@ in vec3 particleColor[];
 in float particleSize[];
 
 out vec3 finalParticleColor;
+out vec2 finalParticleUV;
 //createVertex(vec3 h, vec3 v, vec2 uv)
 //{
 //	vec4 point = gl_in[0].gl_Position + h + v;
@@ -29,15 +30,19 @@ void main()
 	finalParticleColor = particleColor[0];
 
 	gl_Position = uPerspective * vec4(point.xyz - horizontal + vertical, 1.f);
+	finalParticleUV = vec2(0.0, 1.0);
 	EmitVertex();
 
 	gl_Position = uPerspective * vec4(point.xyz + horizontal + vertical, 1.f);
+	finalParticleUV = vec2(1.0, 1.0);
 	EmitVertex();
 	
 	gl_Position = uPerspective * vec4(point.xyz - horizontal - vertical, 1.f);
+	finalParticleUV = vec2(0.0, 0.0);
 	EmitVertex();
 	
 	gl_Position = uPerspective * vec4(point.xyz + horizontal - vertical, 1.f);
+	finalParticleUV = vec2(1.0, 0.0);
 	EmitVertex();
 
 	EndPrimitive();

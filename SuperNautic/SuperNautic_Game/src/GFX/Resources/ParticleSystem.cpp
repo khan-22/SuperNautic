@@ -6,6 +6,7 @@ glm::vec3 lerp(float f, glm::vec3 a, glm::vec3 b)
 	return (1.f - f) * a + f * b;
 }
 
+
 GLfloat lerp(float f, GLfloat a, GLfloat b)
 {
 	return (1.f - f) * a + f * b;
@@ -22,6 +23,11 @@ glm::vec3 randomVector()
 }
 
 GFX::ParticleSystem::ParticleSystem()
+	: _bIsRunning(false)
+	, _birthColor(glm::vec3(1.f, 1.f, 0.f))
+	, _deathColor(glm::vec3(1.f, 0.f, 0.f))
+	, _birthSize(0.5f)
+	, _deathSize(0.f)
 {
 }
 
@@ -71,6 +77,8 @@ void GFX::ParticleSystem::init(GLuint particleCount, glm::vec3 position, glm::ve
 	}
 
 	update(0.f, position);
+
+	_texture = TextureCache::get("particle01.png");
 }
 
 void GFX::ParticleSystem::update(float dt, glm::vec3 position)
@@ -78,38 +86,65 @@ void GFX::ParticleSystem::update(float dt, glm::vec3 position)
 	//const float 
 
 	glm::vec3 turbulence = (randomVector() * _turbulence * 0.1f) + _previousTurbulence * 0.9f;
-	for (unsigned int i = 0; i < _particleCount; ++i)
+	
+	if (_bIsRunning)
 	{
-		ParticlePhysicsData& phys = _physParticles[i];
-		
-		if (phys.life >= 0.f)
+		for (unsigned int i = 0; i < _particleCount; ++i)
 		{
-			phys.life -= dt;
+			ParticlePhysicsData& phys = _physParticles[i];
 
-			glm::vec3 relativeVelocity = phys.velocity - turbulence;
+			if (phys.life >= 0.f)
+			{
+				phys.life -= dt;
 
-			phys.velocity -= 0.5f * glm::dot(relativeVelocity, relativeVelocity) * glm::normalize(relativeVelocity) * dt;
-			//phys.color = lerp(phys.life / 5.f, glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 0.f, 0.f));
+				glm::vec3 relativeVelocity = phys.velocity - turbulence;
+
+				phys.velocity -= 0.5f * glm::dot(relativeVelocity, relativeVelocity) * glm::normalize(relativeVelocity) * dt;
+				//phys.color = lerp(phys.life / 5.f, glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 0.f, 0.f));
+			}
+			else
+			{
+				glm::vec3 spread = randomVector() * _maxSpread * (float)(rand() % 10) * 0.1f;
+
+				glm::vec3 velocity = (position - _previousPosition);
+				phys.velocity = velocity + spread;
+
+				double randomFactor = double(rand() % (int)(_particleCount)) / (double)(_particleCount);
+				phys.life = _maxLifetime * (0.8f + 0.3f * randomFactor);
+
+				//phys.color = lerp(phys.life / 5.f, glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 0.f, 0.f));
+
+				_renderParticles.positions[i] = position - (velocity * (float)randomFactor);
+			}
+
+			_renderParticles.positions[i] += (phys.velocity) * dt;
+			_renderParticles.colors[i] = lerp(phys.life / _maxLifetime, _deathColor, _birthColor);
+			_renderParticles.sizes[i] = lerp(phys.life / _maxLifetime, _deathSize, _birthSize);
 		}
-		else
-		{
-			glm::vec3 spread = randomVector() * _maxSpread * (float)(rand() % 10) * 0.1f;
-			
-			glm::vec3 velocity = (position - _previousPosition);
-			phys.velocity = velocity + spread;
-			
-			double randomFactor = double(rand() % (int)(_particleCount)) / (double)(_particleCount);
-			phys.life = _maxLifetime * (0.8f + 0.3f * randomFactor);
-
-			//phys.color = lerp(phys.life / 5.f, glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 0.f, 0.f));
-
-			_renderParticles.positions[i] = position - (velocity * (float)randomFactor);
-		}
-
-		_renderParticles.positions[i] += (phys.velocity) * dt;
-		_renderParticles.colors[i]	   = lerp(phys.life / _maxLifetime, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
-		_renderParticles.sizes[i]	   = lerp(phys.life / _maxLifetime, 0.0f, 0.5f);
 	}
+	else
+	{
+		for (unsigned int i = 0; i < _particleCount; ++i)
+		{
+			ParticlePhysicsData& phys = _physParticles[i];
+			if (phys.life >= 0.f)
+			{
+				phys.life -= dt;
+				glm::vec3 relativeVelocity = phys.velocity - turbulence;
+				phys.velocity -= 0.5f * glm::dot(relativeVelocity, relativeVelocity) * glm::normalize(relativeVelocity) * dt;
+				
+				_renderParticles.sizes[i] = lerp(phys.life / _maxLifetime, _deathSize, _birthSize);
+			}
+			else
+			{
+				_renderParticles.sizes[i] = 0.f;
+			}
+
+			_renderParticles.positions[i] += (phys.velocity) * dt;
+			_renderParticles.colors[i] = lerp(phys.life / _maxLifetime, _deathColor, _birthColor);
+		}
+	}
+	
 
 	_previousPosition = position;
 }
@@ -128,7 +163,45 @@ void GFX::ParticleSystem::render(RenderStates & states)
 	_vao->updateDataInBuffer(0, 2, offset, _sizesSizeInBytes, _renderParticles.sizes.data());
 	offset += _sizesSizeInBytes;
 
+	_texture.get()->bind(0);
 	_vao->renderPoints();
+	_texture.get()->unbind(0);
+
+}
+
+void GFX::ParticleSystem::start()
+{
+	_bIsRunning = true;
+}
+
+void GFX::ParticleSystem::stop()
+{
+	_bIsRunning = false;
+}
+
+void GFX::ParticleSystem::setBirthColor(glm::vec3 color)
+{
+	_birthColor = color;
+}
+
+void GFX::ParticleSystem::setDeathColor(glm::vec3 color)
+{
+	_deathColor = color;
+}
+
+void GFX::ParticleSystem::setBirthSize(float size)
+{
+	_birthSize = size;
+}
+
+void GFX::ParticleSystem::setDeathSize(float size)
+{
+	_deathSize = size;
+}
+
+void GFX::ParticleSystem::setLifeTime(float lifeTime)
+{
+	_maxLifetime = lifeTime;
 }
 
 

@@ -61,6 +61,27 @@ void PauseMenuApplicationState::render()
 
 bool PauseMenuApplicationState::bUpdate(float dtSeconds)
 {
+    if(_input.checkActive())
+    {
+        _input.update();
+        for(const sf::Event& e : _input.getEvents())
+        {
+            if(e.type == sf::Event::KeyPressed)
+            {
+                switch(e.key.code)
+                {
+                case sf::Keyboard::Escape:
+                case sf::Keyboard::B:
+                    _stack.pop();
+                    return false;
+
+                default:
+                    break;
+                }
+            }
+            _guiContainer.handleEvent(e);
+        }
+    }
     return false;
 }
 
@@ -68,20 +89,17 @@ bool PauseMenuApplicationState::bHandleEvent(const sf::Event& event)
 {
     if(event.type == sf::Event::KeyPressed)
     {
-        if(event.key.code == sf::Keyboard::Escape)
+        switch(event.key.code)
         {
+        case sf::Keyboard::Escape:
+        case sf::Keyboard::B:
             _stack.pop();
             return false;
+
+        default:
+            break;
         }
     }
     _guiContainer.handleEvent(event);
-    if(_input.checkActive())
-    {
-        _input.update();
-        for(const sf::Event& e : _input.getEvents())
-        {
-            _guiContainer.handleEvent(e);
-        }
-    }
     return false;
 }

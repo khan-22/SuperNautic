@@ -25,6 +25,9 @@ public:
 	void setFOV(float newFOV);
 	void changeFOV(float deltaFOV);
 	void setAspectRatio(int width, int height);
+	void setShake(float shakeValue);
+
+	void update(float dt);
 
 protected:
 	Camera();
@@ -39,6 +42,8 @@ protected:
 	int _viewWidth;
 	int _viewHeight;
 
+	float _shakeValue;	// Controls speed and magnitude of screen shake, automatically decays
+	float _shakeTimer;	// Used for camera shake
 };
 
 #endif // !CAMERA_H

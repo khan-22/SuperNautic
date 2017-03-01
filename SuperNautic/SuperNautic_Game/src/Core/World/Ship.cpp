@@ -27,7 +27,7 @@ Ship::Ship()
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 200.0f, 6.0f, false},
 		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 100.0f, 6.0f, true },
-		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
+		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 40.0f, 10.0f, true },
 		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
 		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 5.0f },
 		_meshXZPosition{ glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 0, 0 }, 100.0f },
@@ -44,10 +44,14 @@ Ship::Ship()
 		_bEngineFlash{ false },
 		_bEngineOverload { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
-		_cooldownOnObstacleCollision{ 2.0f },
-		_surfaceSlope{ 0.0f, 0.0f, 3.0f },
+		_cooldownOnObstacleCollision{ 1.0f },
+		_immunityoOnObstacleCollision{ 2.0f },
+		_immunityTimer{ 0.0f },
+		_blinkFrequency{ 0.1f },
+		_surfaceSlope{ 0.0f, 0.0f, 0.5f },
 		_rayHeight{ 5.0f },
-		_rayAheadDistance{ 5.0f }
+		_rayAheadDistance{ 5.0f },
+		_steeringCooldown{ 0.0f }
 {
 	setPosition(0, 0, 1);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
@@ -64,7 +68,11 @@ void Ship::render(GFX::RenderStates& states)
 	// Update model's matrix
 	_shipModel.getModelAsset().get()->setModelMatrix(_transformMatrix);
 
-	_shipModel.render(states);
+	// Achieves blinking effecet
+	if (static_cast<int>(_immunityTimer / _blinkFrequency) % 2 == 0)
+	{
+		_shipModel.render(states);
+	}
 }
 
 void Ship::update(float dt)
@@ -111,7 +119,7 @@ void Ship::update(float dt)
 
 void Ship::jump()
 {
-	if (_currentJumpCooldown <= 0.0f)
+	if (_currentJumpCooldown <= 0.0f && _steeringCooldown <= 0.0f)
 	{
 		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _shipForward);
 
@@ -263,7 +271,7 @@ const glm::vec3 Ship::getVelocity() const
 
 const glm::vec3 Ship::getCameraPosition() const
 {
-	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f/* + _velocity / 90.0f*/) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f) + _meshUpDirection() * (1.0f + _surfaceSlope() * 5.0f);
+	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f);
 }
 
 SurfaceType Ship::getSurfaceType() const
@@ -308,9 +316,11 @@ const BoundingBox & Ship::getBoundingBox() const
 
 void Ship::obstacleCollision()
 {
-	if (_cooldownOnObstacleCollision > _engineCooldown)
+	if (_immunityTimer <= 0.0f)
 	{
 		_engineCooldown = _cooldownOnObstacleCollision;
+		_steeringCooldown = _cooldownOnObstacleCollision;
+		_immunityTimer = _immunityoOnObstacleCollision;
 	}
 }
 
@@ -319,12 +329,29 @@ void Ship::setWaypointDifference(const glm::vec3 & difference)
 	_waypointDifference = difference;
 }
 
+void Ship::setSteeringCooldown(float cooldown)
+{
+	_steeringCooldown = cooldown;
+}
+
+float Ship::getSteeringCooldown()
+{
+	return _steeringCooldown;
+}
+
 void Ship::handleInputs(float dt)
 {
 	if (!_stopped)
 	{
-		// Update turning angle										reduce maneuverability at high acceleration
-		_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.3f) * dt;
+		if (_steeringCooldown <= 0.0f)
+		{
+			// Update turning angle										reduce maneuverability at high acceleration
+			_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.0f) * dt;
+		}
+		else
+		{
+			_accelerationFactor = -1.0f;
+		}
 		// abs to preserve sign of _currentTurningAngle
 		_currentTurningAngle -= _steerStraighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
 
@@ -368,6 +395,17 @@ void Ship::handleCooldowns(float dt)
 	if (_currentJumpCooldown > 0.0f)
 	{
 		_currentJumpCooldown -= dt;
+	}
+
+	// Update steering cooldown
+	if (_steeringCooldown > 0.0f)
+	{
+		_steeringCooldown -= dt;
+	}
+
+	if (_immunityTimer > 0.0f)
+	{
+		_immunityTimer -= dt;
 	}
 }
 

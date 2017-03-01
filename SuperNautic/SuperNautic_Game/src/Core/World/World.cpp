@@ -25,6 +25,8 @@ World::World(ApplicationContext& context)
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
 		_playerParticles[i].init(500, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+		_playerParticles[i].setBirthColor(glm::vec3(0.0f, 0.6f, 0.3f));
+		_playerParticles[i].start();
 	}
 
 	for (int i = 0; i < context.numPlayers; i++)
@@ -254,7 +256,7 @@ void World::render()
 	for(size_t i = 0; i < _players.size(); i++)
 	{
 	    Player& player = _players[i];
-        unsigned char* c = COLORS[i];
+        const unsigned char* c = COLORS[i];
         glm::vec3 diffuseColor(c[0], c[1], c[2]);
         diffuseColor /= 255.f;
 		//shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 3.0f, { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
@@ -299,6 +301,12 @@ void World::render()
 			_playerRTs[i].display(*_players[i].getCamera());
 			_playerRTs[i].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 		}
+		
+		for (int i = 0; i < _playerWindowRenderers.size(); i++)
+		{
+			_playerWindowRenderers[i].display(*_players[i].getCamera());
+		}
+
 		for (int i = 0; i < _playerParticleRenderers.size(); i++)
 		{
 			for (int j = 0; j < _players.size(); j++)
@@ -308,15 +316,16 @@ void World::render()
 			}
 		}
 
-		for (int i = 0; i < _playerWindowRenderers.size(); i++)
-		{
-			_playerWindowRenderers[i].display(*_players[i].getCamera());
-		}
 	}
 	else
 	{
 		_playerRTs[0].display(_debugCamera);
 		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
+
+		for (int i = 0; i < _playerWindowRenderers.size(); i++)
+		{
+			_playerWindowRenderers[i].display(*_players[i].getCamera());
+		}
 
 		for (int j = 0; j < _players.size(); j++)
 		{
@@ -324,10 +333,6 @@ void World::render()
 			_playerParticleRenderers[0].display(_debugCamera);
 		}
 
-		for (int i = 0; i < _playerWindowRenderers.size(); i++)
-		{
-			_playerWindowRenderers[i].display(*_players[i].getCamera());
-		}
 	}
 
 

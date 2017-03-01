@@ -71,12 +71,14 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     std::vector<std::unique_ptr<GuiElement>> guiElements;
     guiElements.emplace_back(seedList);
 
-    GuiTextInput* length = new GuiTextInput(6, GuiCharacterInput::CharacterFlags::DIGITS);
+    static const size_t LENGTH_TEXT_LENGTH = 3;
+    static const size_t MIN_TRACK_LENGTH_KM = 3;
+    GuiTextInput* length = new GuiTextInput(LENGTH_TEXT_LENGTH, GuiCharacterInput::CharacterFlags::DIGITS);
 
-    std::string lengthStr = std::to_string(startLength);
-    if(lengthStr.size() < 6)
+    std::string lengthStr = std::to_string(startLength / 1000);
+    if(lengthStr.size() < LENGTH_TEXT_LENGTH)
     {
-        lengthStr.insert(0, 6 - lengthStr.size(), '0');
+        lengthStr.insert(0, LENGTH_TEXT_LENGTH - lengthStr.size(), '0');
     }
     length->setText(lengthStr);
     _lengthInput = length;
@@ -86,23 +88,17 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         std::stringstream sstream(str);
         size_t c;
         sstream >> c;
-        size_t remainder = c % 500;
-        c -= remainder;
-        if(remainder != 0 || c < 3000)
+        if(c < MIN_TRACK_LENGTH_KM)
         {
-            if(c < 3000)
-            {
-                c = 3000;
-            }
-            std::string text = std::to_string(c);
-            if(text.size() < str.size())
-            {
-                text.insert(0, std::string(str.size() - text.size(), '0'));
-            }
-            length->setText(text);
+            c = MIN_TRACK_LENGTH_KM;
         }
-        LOG("Length: ", c);
-        _trackGenerator.setLength(c);
+        std::string lengthText = std::to_string(c);
+        if(lengthText.size() < LENGTH_TEXT_LENGTH)
+        {
+            lengthText.insert(0, LENGTH_TEXT_LENGTH - lengthText.size(), '0');
+        }
+        _lengthInput->setText(lengthText);
+        _trackGenerator.setLength(c * 1000);
         _trackGenerator.generate();
     });
     length->setOrigin(length->getBoundingRect().width / 2.f, length->getBoundingRect().height / 2.f);
@@ -144,15 +140,14 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         _selectedSeedInput->setText(seed);
         _trackGenerator.setSeed(seed);
 
-        size_t length = 3000 + rand() % 50000;
-        length -= length % 500;
+        size_t length = MIN_TRACK_LENGTH_KM + rand() % 50;
         std::string lengthText = std::to_string(length);
-        if(lengthText.size() < 6)
+        if(lengthText.size() < LENGTH_TEXT_LENGTH)
         {
-            lengthText.insert(0, 6 - lengthText.size(), '0');
+            lengthText.insert(0, LENGTH_TEXT_LENGTH - lengthText.size(), '0');
         }
         _lengthInput->setText(lengthText);
-        _trackGenerator.setLength(length);
+        _trackGenerator.setLength(length * 1000);
 
         size_t curviness = rand() % 6;
         _curvinessInput->setValue(curviness);
@@ -226,19 +221,38 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
 {
     _guiContainer.update();
     _trackGenerator.update(dtSeconds);
+
+    if(_input.checkActive())
+    {
+        _input.update();
+        for(const sf::Event& e : _input.getEvents())
+        {
+            if(e.type == sf::Event::KeyPressed)
+            {
+                switch(e.key.code)
+                {
+                case sf::Keyboard::B:
+                    if(!_guiContainer.bIsActive())
+                    {
+                        _stack.clear();
+                        _context.track = _trackGenerator.takeTrack();
+                        _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+            }
+            _guiContainer.handleEvent(e);
+        }
+    }
+
     return true;
 }
 
 bool PreGameApplicationState::bHandleEvent(const sf::Event& event)
 {
     _guiContainer.handleEvent(event);
-    if(_input.checkActive())
-    {
-        _input.update();
-        for(const sf::Event& e : _input.getEvents())
-        {
-            _guiContainer.handleEvent(e);
-        }
-    }
     return true;
 }

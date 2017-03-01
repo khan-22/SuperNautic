@@ -31,6 +31,7 @@ namespace GFX
         size_t _numPoints;
         std::shared_ptr<GFX::VertexArrayObject> _vao;
         ShaderAsset _shader;
+		Texture	_texture;
 
         glm::vec3 _centerTranslation;
         glm::vec2 _screenTranslation;

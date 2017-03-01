@@ -1,17 +1,20 @@
 
+#include "Core/Io/Log.hpp"
+
 #include <cassert>
 
 template<typename AssetT>
 Asset<AssetT>::Asset()
-: _parentAsset(nullptr)
+: _asset(nullptr)
+, _refCount(new bool())
 {
 
 }
 
 template<typename AssetT>
-Asset<AssetT>::Asset(std::shared_ptr<AssetT>& asset)
-: _asset(asset)
-, _parentAsset(&asset)
+Asset<AssetT>::Asset(std::shared_ptr<bool> refCount, std::shared_ptr<AssetT>& asset)
+: _asset(&asset)
+, _refCount(refCount)
 {
     //assert(asset != nullptr);
 }
@@ -19,19 +22,26 @@ Asset<AssetT>::Asset(std::shared_ptr<AssetT>& asset)
 template<typename AssetT>
 Asset<AssetT>::~Asset()
 {
-    if(_parentAsset == nullptr)
+    if(_asset == nullptr)
     {
         return;
     }
 
-    if(_asset.use_count() == 2)
+    if(_refCount.use_count() == 2)
     {
-        _parentAsset->reset();
+        _asset->reset();
     }
 }
 
 template<typename AssetT>
 AssetT* Asset<AssetT>::get() const
 {
-    return _asset.get();
+    if(_asset != nullptr)
+    {
+        return _asset->get();
+    }
+    else
+    {
+        return nullptr;
+    }
 }

@@ -21,14 +21,18 @@ struct Camera2D
 
 using namespace GFX;
 
+const unsigned char TEXTURE_COLOR[] = { 255, 255, 255, 255 };
+
 Line::Line()
-: _shader(ShaderCache::get("particle_forward"))
+	: _shader(ShaderCache::get("particle_forward"))
+	, _texture(TEXTURE_COLOR, 1, 1, GL_TEXTURE_2D)
 {
     setPoints({});
 }
 
 Line::Line(const std::vector<glm::vec3>& points)
-: _shader(ShaderCache::get("particle_forward"))
+	: _shader(ShaderCache::get("particle_forward"))
+	, _texture(TEXTURE_COLOR, 1, 1, GL_TEXTURE_2D)
 {
     setPoints(points);
 }
@@ -41,10 +45,13 @@ void Line::render(RenderStates& states)
 	shader->setUniform("uView", _modelMatrix);
 	shader->setUniform("uPerspective", _screenPerspectiveMatrix);
 
+	_texture.bind(0);
+
     _vao->bind();
     glDrawElements(GL_POINTS, _numPoints, GL_UNSIGNED_INT, 0);
     _vao->unbind();
 
+	_texture.unbind(0);
 
     states.shader->bind();
 }

@@ -61,13 +61,8 @@ public:
 	const BoundingBox& getBoundingBox() const;
 	void obstacleCollision();
 	void setWaypointDifference(const glm::vec3& difference);
-
-	// TEST
-	glm::mat4 getMatrix()
-	{
-		return _transformMatrix;
-	}
-	///////
+	void setSteeringCooldown(float cooldown);
+	float getSteeringCooldown();
 
 private:
 	bool		_destroyed;
@@ -85,6 +80,8 @@ private:
 	bool		_bEngineOverload;
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
+	float		_steeringCooldown;		// Time until ship can be controlled
+	float		_immunityTimer;			// Time until ship will be able to collide with obstacles
 
 	glm::vec3					_trackForward;			// Forward direction of track
 	glm::vec3					_shipForward;			// Current forward direction of ship
@@ -121,6 +118,9 @@ private:
 	const float _rayAheadDistance;	// Distance ahead of ship the second ray starts
 
 	const float _cooldownOnObstacleCollision;
+	const float _immunityoOnObstacleCollision;
+
+	const float _blinkFrequency;	// How fast the ship blinks when immune to obstacle collision
 
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
 
@@ -133,6 +133,5 @@ private:
 	void rotateTowardTrackForward(float dt);
 	void updateDirectionsAndPositions(float dt);
 	void trackSurface(float dt);
-	//void checkObstacleCollision();
 };
 #endif // SHIP_HPP
