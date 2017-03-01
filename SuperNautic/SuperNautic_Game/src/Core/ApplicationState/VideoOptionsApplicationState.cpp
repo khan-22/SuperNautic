@@ -137,12 +137,6 @@ void VideoOptionsApplicationState::setFullscreen(bool bSetFullscreen)
 
 void VideoOptionsApplicationState::recreateWindow()
 {
-//    HGLRC oldContext = wglGetCurrentContext();
-//    assert(oldContext != NULL);
-//    HGLRC newContext = wglCreateContext(GetDC(_context.window.getSystemHandle()));
-//    assert(newContext != NULL);
-//    bool result = wglCopyContext(oldContext, newContext, )
-
     sf::ContextSettings settings = _context.window.getSettings();
     _context.window.create(sf::VideoMode(_resolutionX, _resolutionY), WindowConstants::TITLE, _windowStyle, settings);
 
@@ -160,6 +154,9 @@ void VideoOptionsApplicationState::recreateWindow()
 //    RawMeshCache::reload();
 //    MaterialCache::reload();
 
+    // SegmentHandler and ObstacleHandler have to be reloaded
+    // manually for some reason.
+    // TODO: Ask Timmie about it.
     _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
 
@@ -167,6 +164,4 @@ void VideoOptionsApplicationState::recreateWindow()
     {
         _context.segmentHandler->loadSegment(i);
     }
-
-
 }
