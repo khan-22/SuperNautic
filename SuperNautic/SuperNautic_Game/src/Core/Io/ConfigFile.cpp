@@ -81,13 +81,15 @@ bool ConfigFile::read(const std::string& filePath)
 }
 
 template<>
-std::string ConfigFile::get<std::string>(const std::string& key)
+bool ConfigFile::get<std::string>(const std::string& key, std::string& out)
 {
     auto it = _elements.find(key);
     if(it == _elements.end())
     {
-        return "";
+        return false;
     }
 
-    return it->second;
+    out = it->second;
+
+    return true;
 }
