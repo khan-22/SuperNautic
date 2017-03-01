@@ -77,6 +77,8 @@ void GFX::ParticleSystem::init(GLuint particleCount, glm::vec3 position, glm::ve
 	}
 
 	update(0.f, position);
+
+	_texture = TextureCache::get("particle01.png");
 }
 
 void GFX::ParticleSystem::update(float dt, glm::vec3 position)
@@ -161,7 +163,10 @@ void GFX::ParticleSystem::render(RenderStates & states)
 	_vao->updateDataInBuffer(0, 2, offset, _sizesSizeInBytes, _renderParticles.sizes.data());
 	offset += _sizesSizeInBytes;
 
+	_texture.get()->bind(0);
 	_vao->renderPoints();
+	_texture.get()->unbind(0);
+
 }
 
 void GFX::ParticleSystem::start()
