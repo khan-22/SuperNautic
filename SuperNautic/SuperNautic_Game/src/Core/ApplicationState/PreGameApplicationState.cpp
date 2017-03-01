@@ -232,6 +232,7 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
                 switch(e.key.code)
                 {
                 case sf::Keyboard::B:
+                case sf::Keyboard::Escape:
                     if(!_guiContainer.bIsActive())
                     {
                         _stack.clear();
@@ -253,6 +254,24 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
 
 bool PreGameApplicationState::bHandleEvent(const sf::Event& event)
 {
+    if(event.type == sf::Event::KeyPressed)
+    {
+        switch(event.key.code)
+        {
+        case sf::Keyboard::B:
+        case sf::Keyboard::Escape:
+            if(!_guiContainer.bIsActive())
+            {
+                _stack.clear();
+                _context.track = _trackGenerator.takeTrack();
+                _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
     _guiContainer.handleEvent(event);
     return true;
 }
