@@ -9,10 +9,16 @@ template<typename AssetT>
 class Asset
 {
 public:
+    // Create empty asset
     Asset();
+
+    // Create shared asset
     Asset(std::shared_ptr<bool> refCount, std::shared_ptr<AssetT>& asset);
+
+    // Dtor
     ~Asset();
 
+    // Get element
     AssetT* get() const;
 
 private:
