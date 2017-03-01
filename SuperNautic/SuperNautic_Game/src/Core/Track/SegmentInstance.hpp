@@ -27,7 +27,7 @@ public:
 	void update(const float dt);
 	void render(GFX::RenderStates& states) override;
 	const RayIntersection rayIntersectionTest(const Ray& ray) const;
-	const std::vector<ObstacleInstance>& getObstacles() const;
+	std::vector<ObstacleInstance>& getObstacles();
 
 	const Segment* getParent()
 	{
