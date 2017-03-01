@@ -47,6 +47,7 @@ protected:
 
 protected:
     virtual void handleEventCurrent(const sf::Event& event) override;
+    void activateSelection();
 
 private:
     std::function<void(GuiElement*)> _onElementSelectCallback = [](GuiElement*){};
@@ -58,7 +59,6 @@ private:
 
     void selectNext();
     void selectPrevious();
-    void activateSelection();
     virtual void activate() override;
     virtual void deactivate() override;
 };

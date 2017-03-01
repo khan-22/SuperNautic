@@ -75,7 +75,10 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
         {
             case sf::Keyboard::Return:
             case sf::Keyboard::A:
-                activateSelection();
+                if(!bIsActive())
+                {
+                    toggleActivation();
+                }
                 break;
 
             case sf::Keyboard::Escape:
@@ -133,13 +136,16 @@ void GuiContainer::activateSelection()
             selection.toggleSelection();
         }
 
-        toggleActivation();
         selection.toggleActivation();
 
         if(!selection.bIsActive())
         {
             toggleActivation();
         }
+    }
+    else
+    {
+        toggleActivation();
     }
 }
 
@@ -303,6 +309,8 @@ void GuiContainer::activate()
     {
         getSelection().toggleSelection();
     }
+
+    activateSelection();
 }
 
 void GuiContainer::deactivate()
