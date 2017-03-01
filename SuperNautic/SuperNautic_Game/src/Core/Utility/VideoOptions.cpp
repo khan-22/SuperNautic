@@ -6,6 +6,12 @@
 size_t VideoOptions::_DEFAULT_RESOLUTION_X = 1280;
 size_t VideoOptions::_DEFAULT_RESOLUTION_Y = 720;
 
+const std::vector<glm::ivec2> VideoOptions::_ALLOWED_RESOLUTIONS =
+{
+    glm::ivec2(1920, 1080),
+    glm::ivec2(1280, 720)
+};
+
 VideoOptions::VideoOptions(sf::Window& window)
 : _window(window)
 {
@@ -23,8 +29,8 @@ void VideoOptions::readConfig()
 
     if
     (
-        !_config.get("resX", _resolutionX) ||
-        !_config.get("resY", _resolutionY) ||
+        !_config.get("resX", resolutionX) ||
+        !_config.get("resY", resolutionY) ||
         !_config.get("fullscreen", bFullscreen)
     )
     {
@@ -33,6 +39,7 @@ void VideoOptions::readConfig()
         return;
     }
 
+    setResolution(resolutionX, resolutionY);
     setFullscreen(bFullscreen);
 }
 
@@ -60,6 +67,10 @@ void VideoOptions::recreateWindow()
 
 void VideoOptions::setResolution(size_t x, size_t y)
 {
+    if(!bIsResolutionAllowed(x, y))
+    {
+        return;
+    }
     _resolutionX = x;
     _resolutionY = y;
     writeConfig();
@@ -84,3 +95,20 @@ bool VideoOptions::bIsFullscreen() const
     return _windowStyle & sf::Style::Fullscreen;
 }
 
+
+const std::vector<glm::ivec2>& VideoOptions::getAllowedResolutions()
+{
+    return _ALLOWED_RESOLUTIONS;
+}
+
+bool VideoOptions::bIsResolutionAllowed(size_t x, size_t y)
+{
+    for(const glm::ivec2& res : _ALLOWED_RESOLUTIONS)
+    {
+        if(res.x == x && res.y == y)
+        {
+            return true;
+        }
+    }
+    return false;
+}

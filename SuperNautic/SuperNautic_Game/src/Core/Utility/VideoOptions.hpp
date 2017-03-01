@@ -6,6 +6,8 @@
 #include "SFML/Window/Window.hpp"
 
 
+#include "glm/glm.hpp"
+
 #include "Core/Io/ConfigFile.hpp"
 
 class VideoOptions
@@ -18,9 +20,13 @@ public:
     void setFullscreen(bool bSetFullscreen);
     bool bIsFullscreen() const;
 
+    static const std::vector<glm::ivec2>& getAllowedResolutions();
+    static bool bIsResolutionAllowed(size_t x, size_t y);
+
 private:
     static constexpr char* const _CONFIG_PATH = "config.cfg";
     static constexpr uint32_t _DEFAULT_WINDOW_STYLE = sf::Style::Titlebar | sf::Style::Close;
+    static const std::vector<glm::ivec2> _ALLOWED_RESOLUTIONS;
     static size_t _DEFAULT_RESOLUTION_X;
     static size_t _DEFAULT_RESOLUTION_Y;
 
