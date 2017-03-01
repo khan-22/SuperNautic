@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <glm\gtx\transform.hpp>
 
 #include "Core/Utility/Camera.h"
@@ -18,8 +19,6 @@ Camera::Camera(float fov, int viewWidth, int viewHeight, const glm::vec3 & pos
 	, _viewWidth(viewWidth)
 	, _viewHeight(viewHeight)
 	, _viewDir(viewDirection)
-	, _shakeValue(0.0f)
-	, _shakeTimer(0.0f)
 {
 	_perspective = glm::perspective(glm::radians(_fov), (float)_viewWidth / _viewHeight, 0.1f, 1000.f);
 	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
@@ -34,6 +33,16 @@ Camera::~Camera()
 glm::vec3 Camera::getPosition() const
 {
 	return _pos;
+}
+
+glm::vec3 Camera::getDirection() const
+{
+	return _viewDir;
+}
+
+glm::vec3 Camera::getUp() const
+{
+	return _up;
 }
 
 //Returns the view matrix
@@ -58,9 +67,6 @@ glm::mat4 Camera::getVP() const
 void Camera::setPos(const glm::vec3 & newPos)
 {
 	_pos = newPos;
-
-	// Add offsets to shake camera
-	_pos += (_up * sinf(_shakeTimer * 1.5f) + glm::normalize(glm::cross(_up, _viewDir)) * sinf(_shakeTimer * 2.2f)) * _shakeValue * 0.02f;
 
 	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
 }
@@ -90,9 +96,6 @@ void Camera::setUp(const glm::vec3 & newUp)
 void Camera::setViewDir(const glm::vec3 & newDir)
 {
 	_viewDir = newDir;
-
-	// Add shake
-	_viewDir += (_up * sinf(_shakeTimer * 1.f) + glm::normalize(glm::cross(_up, _viewDir)) * sinf(_shakeTimer * 1.5f)) * _shakeValue * 0.006f;
 
 	_view = glm::lookAt(_pos, _pos + glm::normalize(_viewDir), _up);
 }
@@ -126,23 +129,8 @@ void Camera::setAspectRatio(int width, int height)
 	_perspective = glm::perspective(glm::radians(_fov), (float)_viewWidth / _viewHeight, 0.1f, 1000.f);
 }
 
-void Camera::setShake(float shakeValue)
+void Camera::setView(const glm::mat4& view)
 {
-	_shakeValue = shakeValue;
+	_view = view;
 }
 
-void Camera::update(float dt)
-{
-	if (_shakeValue > 0.0f)
-	{
-		_shakeValue -= dt;
-		_shakeValue = clamp(_shakeValue, 0.0f, 1000.0f);
-	}
-
-	_shakeTimer += dt + _shakeValue * 0.007f;
-
-	/*if (_shakeTimer >= glm::pi<float>() * 2.0f)
-	{
-		_shakeTimer -= glm::pi<float>() * 2.0f;
-	}*/
-}
