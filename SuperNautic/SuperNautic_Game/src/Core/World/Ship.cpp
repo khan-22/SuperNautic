@@ -43,6 +43,7 @@ Ship::Ship()
 		_engineFlashTime{ 0 },
 		_bEngineFlash{ false },
 		_bEngineOverload { false },
+		_bObstacleCollision { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
 		_cooldownOnObstacleCollision{ 1.0f },
 		_immunityoOnObstacleCollision{ 2.0f },
@@ -331,6 +332,20 @@ void Ship::obstacleCollision()
 		_engineCooldown = _cooldownOnObstacleCollision;
 		_steeringCooldown = _cooldownOnObstacleCollision;
 		_immunityTimer = _immunityoOnObstacleCollision;
+		_bObstacleCollision = true;
+	}
+}
+
+bool Ship::checkIfCollided()
+{
+	if (_bObstacleCollision)
+	{
+		_bObstacleCollision = false;
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
