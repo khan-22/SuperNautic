@@ -51,7 +51,8 @@ Ship::Ship()
 		_surfaceSlope{ 0.0f, 0.0f, 0.5f },
 		_rayHeight{ 5.0f },
 		_rayAheadDistance{ 5.0f },
-		_steeringCooldown{ 0.0f }
+		_steeringCooldown{ 0.0f },
+		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f }
 {
 	setPosition(0, 0, 1);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
@@ -87,6 +88,10 @@ void Ship::update(float dt)
 	trackSurface(dt);
 	updateDirectionsAndPositions(dt);
 
+	_shipCollisionShake.setMagnitude(_steeringCooldown);
+	_shipCollisionShake.setSpeed(_steeringCooldown);
+	_shipCollisionShake.update(dt);
+
 	// Create mesh rotation matrix from mesh up and forward directions
 	_meshMatrix = { glm::vec4{ glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection())), 0.0f },
 						  glm::vec4{ _meshUpDirection(), 0.0f },
@@ -94,7 +99,7 @@ void Ship::update(float dt)
 						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 
 	// Update matrix
-	_transformMatrix = glm::translate(_meshPosition()) * _meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin());
+	_transformMatrix = glm::translate(_meshPosition()) * glm::translate(glm::vec3{ _meshMatrix * glm::vec4{ _shipCollisionShake(), 0.0f } }) *_meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin());
 
 	// Update bounding box
 	_boundingBox.center = _meshPosition();
@@ -272,6 +277,11 @@ const glm::vec3 Ship::getVelocity() const
 const glm::vec3 Ship::getCameraPosition() const
 {
 	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f);
+}
+
+const glm::mat4 & Ship::getTransform() const
+{
+	return _transformMatrix;
 }
 
 SurfaceType Ship::getSurfaceType() const
