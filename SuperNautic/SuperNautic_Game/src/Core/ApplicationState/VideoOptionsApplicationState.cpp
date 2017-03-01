@@ -40,7 +40,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
 
     guiElements.emplace_back(resolutionList);
 
-    GuiButton* fs = new GuiButton(sf::Text("toggle fs", *_font.get()), [&]()
+    GuiButton* fs = new GuiButton(sf::Text("Toggle Fullscreen", *_font.get()), [&]()
     {
         _videoOptions.setFullscreen(!_videoOptions.bIsFullscreen());
         applyOptions();
