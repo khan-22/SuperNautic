@@ -99,7 +99,7 @@ World::World(ApplicationContext& context)
 
 void World::handleEvent(const sf::Event& e)
 {
-
+	
 }
 
 void World::update(float dt, sf::Window& window)

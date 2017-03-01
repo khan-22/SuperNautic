@@ -68,7 +68,8 @@ void main()
 	{
 		lightingResult.rgb += calculatePointLight(i, fragPos, diffuseTex, normal, viewDir);
 	}
-
+	
 	//outColor = vec4(diffuseTex, 1.0);
+	lightingResult.rgb += vec3(0.1, 0.9, 1.0) * 0.1; //Add slight shade of blue as ambient
 	outColor = mix(lightingResult, vec4(diffuseTex, 1.0), illumination);
 }

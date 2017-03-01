@@ -57,8 +57,6 @@ private:
 
 	DebugCamera						_debugCamera;
 	bool							_bDebugging;
-
-	void updateLightPos(const TrackProgression& playerProgression, int playerIndex);
 };
 
 #endif //WORLD_HPP
