@@ -1,16 +1,30 @@
 #include "Core/Utility/VideoOptions.hpp"
-#include "Core/Utility/WindowConstants.hpp"
 #include "Core/Utility/FileUtility.hpp"
 
+const char* const VideoOptions::_TITLE = "SuperNautic";
+const unsigned int VideoOptions::_NUM_DEPTH_BITS = 24;
+const unsigned int VideoOptions::_NUM_STENCIL_BITS = 8;
+const unsigned int VideoOptions::_ANTIALIASING_LEVEL = 0;
+const unsigned int VideoOptions::_CONTEXT_MAJOR_VERSION = 4;
+const unsigned int VideoOptions::_CONTEXT_MINOR_VERSION = 0;
+const sf::ContextSettings VideoOptions::_CONTEXT_SETTINGS
+(
+    _NUM_DEPTH_BITS,
+    _NUM_STENCIL_BITS,
+    _ANTIALIASING_LEVEL,
+    _CONTEXT_MAJOR_VERSION,
+    _CONTEXT_MINOR_VERSION
+);
 
-size_t VideoOptions::_DEFAULT_RESOLUTION_X = 1280;
-size_t VideoOptions::_DEFAULT_RESOLUTION_Y = 720;
-
+const char* const VideoOptions::_CONFIG_PATH = "config.cfg";
+const uint32_t VideoOptions::_DEFAULT_WINDOW_STYLE = sf::Style::Titlebar | sf::Style::Close;
 const std::vector<glm::ivec2> VideoOptions::_ALLOWED_RESOLUTIONS =
 {
     glm::ivec2(1920, 1080),
     glm::ivec2(1280, 720)
 };
+size_t VideoOptions::_DEFAULT_RESOLUTION_X = 1280;
+size_t VideoOptions::_DEFAULT_RESOLUTION_Y = 720;
 
 VideoOptions::VideoOptions(sf::Window& window)
 : _window(window)
@@ -61,7 +75,7 @@ void VideoOptions::writeConfig()
 
 void VideoOptions::recreateWindow()
 {
-    _window.create(sf::VideoMode(_resolutionX, _resolutionY), WindowConstants::TITLE, _windowStyle, WindowConstants::CONTEXT_SETTINGS);
+    _window.create(sf::VideoMode(_resolutionX, _resolutionY), _TITLE, _windowStyle, _CONTEXT_SETTINGS);
 }
 
 
