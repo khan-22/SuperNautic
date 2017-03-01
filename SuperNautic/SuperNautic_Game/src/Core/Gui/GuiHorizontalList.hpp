@@ -32,8 +32,8 @@ class GuiHorizontalList : public GuiContainer
         virtual void updateSize() override;
         virtual void select() override;
         virtual void deselect() override;
-        virtual void activate() override;
-        virtual void deactivate() override;
+//        virtual void activate() override;
+//        virtual void deactivate() override;
 };
 
 #endif //GUI_HORIZONTAL_LIST_HPP
