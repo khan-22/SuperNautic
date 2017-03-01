@@ -40,7 +40,13 @@ public:
     template<typename T>
     T get(const std::string& key)
     {
-        std::stringstream sstream(_elements[key]);
+        auto it = _elements.find(key);
+        if(it == _elements.end())
+        {
+            return T();
+        }
+
+        std::stringstream sstream(it->second);
         T value;
         sstream >> value;
         LOG(value);
