@@ -14,21 +14,23 @@
 #include "Core/Gui/GuiButton.hpp"
 #include "Core/Utility/WindowConstants.hpp"
 #include "Core/Asset/LoadAssetFunctions.hpp"
+#include "Core/Utility/FileUtility.hpp"
 
+size_t VideoOptionsApplicationState::_DEFAULT_RESOLUTION_X = 1280;
+size_t VideoOptionsApplicationState::_DEFAULT_RESOLUTION_Y = 720;
 
 VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
-, _windowStyle(sf::Style::Titlebar | sf::Style::Close)
-, _resolutionX(1280)
-, _resolutionY(720)
 {
+    readConfig();
 
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
     GuiButton* set1920x1080 = new GuiButton(sf::Text("1920x1080", *_font.get()), [&]()
     {
         setResolution(1920, 1080);
+        writeConfig();
         recreateWindow();
     });
     guiElements.emplace_back(set1920x1080);
@@ -36,6 +38,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
     GuiButton* set1280x720 = new GuiButton(sf::Text("1280x720", *_font.get()), [&]()
     {
         setResolution(1280, 720);
+        writeConfig();
         recreateWindow();
     });
     guiElements.emplace_back(set1280x720);
@@ -43,6 +46,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
     GuiButton* fs = new GuiButton(sf::Text("toggle fs", *_font.get()), [&]()
     {
         setFullscreen(!(_windowStyle & sf::Style::Fullscreen));
+        writeConfig();
         recreateWindow();
     });
     guiElements.emplace_back(fs);
@@ -164,4 +168,43 @@ void VideoOptionsApplicationState::recreateWindow()
     {
         _context.segmentHandler->loadSegment(i);
     }
+}
+
+void VideoOptionsApplicationState::readConfig()
+{
+    createFileIfNotExists(_CONFIG_PATH);
+    _config.read(_CONFIG_PATH);
+    size_t resolutionX;
+    size_t resolutionY;
+    bool bFullscreen;
+
+    if
+    (
+        !_config.get("resX", _resolutionX) ||
+        !_config.get("resY", _resolutionY) ||
+        !_config.get("fullscreen", bFullscreen)
+    )
+    {
+        rebuildConfig(_config);
+        readConfig();
+        return;
+    }
+
+    setFullscreen(bFullscreen);
+}
+
+void VideoOptionsApplicationState::rebuildConfig(ConfigFile& config)
+{
+    config.set("resX", _DEFAULT_RESOLUTION_X);
+    config.set("resY", _DEFAULT_RESOLUTION_Y);
+    config.set("fullscreen", bool(_DEFAULT_WINDOW_STYLE & sf::Style::Fullscreen));
+    config.write(_CONFIG_PATH);
+}
+
+void VideoOptionsApplicationState::writeConfig()
+{
+    _config.set("resX", _resolutionX);
+    _config.set("resY", _resolutionY);
+    _config.set("fullscreen", bool(_windowStyle & sf::Style::Fullscreen));
+    _config.write(_CONFIG_PATH);
 }
