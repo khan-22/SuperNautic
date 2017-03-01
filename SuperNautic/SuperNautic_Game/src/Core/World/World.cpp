@@ -13,6 +13,7 @@ World::World(ApplicationContext& context)
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
+	, _trackProgression(1280, 720, 1)
 	, _track(context.track.get())
 	, _playerRTs(context.numPlayers)
 	, _playerParticleRenderers(context.numPlayers)
