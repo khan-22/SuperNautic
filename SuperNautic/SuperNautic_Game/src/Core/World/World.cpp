@@ -13,13 +13,11 @@ World::World(ApplicationContext& context)
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
 	, _timer(1280, 720)
-	, _progression(1280, 720, context.numPlayers)
 	, _track(context.track.get())
 	, _playerRTs(context.numPlayers)
 	, _playerParticleRenderers(context.numPlayers)
 	, _playerWindowRenderers(context.numPlayers)
 	, _playerParticles(context.numPlayers)
-	, _playerPointLights(context.numPlayers)
 	, _bDebugging(false)
 {
 	for (int i = 0; i < _playerParticles.size(); i++)
@@ -29,29 +27,29 @@ World::World(ApplicationContext& context)
 		_playerParticles[i].start();
 	}
 
-	for (int i = 0; i < context.numPlayers; i++)
+	/*for (int i = 0; i < context.numPlayers; i++)
 	{
-		for (int j = 0; j < 6; j++)
-		{
-			_playerPointLights[i].push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
-		}
+	for (int j = 0; j < 6; j++)
+	{
+	_playerPointLights[i].push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
 	}
+	}*/
 
 	// Create one player
-//	for (int i = 0; i < 5; i++)
-//	{
-//		if (sf::Joystick::isConnected(i)) {
-//			_players.emplace_back(i);
-//			_playerProgression.push_back(TrackProgression{ 0, _track });
-//			LOG(i);
-//		}
-//	}
-    for(size_t i = 0 ; i < _context.numPlayers; i++)
-    {
-        _players.emplace_back(i);
-        _playerProgression.push_back(TrackProgression{ 0, _track });
-        LOG(i);
-    }
+	//	for (int i = 0; i < 5; i++)
+	//	{
+	//		if (sf::Joystick::isConnected(i)) {
+	//			_players.emplace_back(i);
+	//			_playerProgression.push_back(TrackProgression{ 0, _track });
+	//			LOG(i);
+	//		}
+	//	}
+	for (size_t i = 0; i < _context.numPlayers; i++)
+	{
+		_players.emplace_back(i);
+		_playerProgression.push_back(TrackProgression{ 0, _track });
+		LOG(i);
+	}
 
 	// TEST PLAYER
 
@@ -169,8 +167,6 @@ void World::update(float dt, sf::Window& window)
 			_players[i].update(dt);
 		}
 
-		std::vector<float> positions;
-
 		for (unsigned i = 0; i < _players.size(); ++i)
 		{
 			int k = 1;
@@ -182,13 +178,10 @@ void World::update(float dt, sf::Window& window)
 				}
 			}
 			_players[i].setPosition(k);
-			positions.push_back(_playerProgression[i].getProgression());
 		}
 
-		_progression.updatePositions(positions);
-
 		// Update debug camera
-		_debugCamera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
+		_debugCamera.setPos(_players[0].getShip().getMeshPosition() - _players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
 
 		// Commenting this out fixes mouse movement and debug camera rotation desyncing
 		//_debugCamera.setUp(_players[0].getShip().getCameraUp());
@@ -215,8 +208,6 @@ void World::update(float dt, sf::Window& window)
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
 
-	_progression.updateCurrent();
-
 	//static glm::vec3 currentPos = _players[0].getShip().getPosition();
 	//static glm::vec3 previousPos = currentPos;
 	//currentPos = glm::vec3{ _players[0].getShip().getMatrix() * glm::vec4{ 0.f,0.f,0.f,1.f } } - _players[0].getShip().getMeshForward() * 2.0f;//_players[0].getShip().getPosition();
@@ -224,7 +215,7 @@ void World::update(float dt, sf::Window& window)
 	//_testParticles.update(dt, currentPos, currentPos - previousPos);
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
-		glm::vec3 particlePos = _players[i].getShip().getTransform() * glm::vec4{ 0.0f, 0.0f, -1.9f, 1.0f };
+		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 1.9f;
 		_playerParticles[i].update(dt, particlePos);
 	}
 
@@ -238,7 +229,7 @@ void World::render()
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
 		//Do not render the player's own ship if they are in first person, but render all other ships as normal
-		for(int j = 0; j < _players.size(); j++)
+		for (int j = 0; j < _players.size(); j++)
 		{
 			if (!(i == j && _players[j]._bIsFirstPerson))
 			{
@@ -247,27 +238,27 @@ void World::render()
 		}
 	}
 
-    //////////////////////
-    // Copy-pasted from GuiPlayerJoinContainer::createWindows
-    static constexpr size_t MAX_PLAYERS = 4;
-    static constexpr unsigned char COLORS[4][MAX_PLAYERS] =
-    {
-        {255, 0, 0, 255},
-        {0, 255, 0, 255},
-        {0, 0, 255, 255},
-        {255, 255, 0, 255}
-    };
 	//////////////////////
-//	for (Player& player : _players)
-    assert(_players.size() <= MAX_PLAYERS);
-	for(size_t i = 0; i < _players.size(); i++)
+	// Copy-pasted from GuiPlayerJoinContainer::createWindows
+	static constexpr size_t MAX_PLAYERS = 4;
+	static constexpr unsigned char COLORS[4][MAX_PLAYERS] =
 	{
-	    Player& player = _players[i];
-        const unsigned char* c = COLORS[i];
-        glm::vec3 diffuseColor(c[0], c[1], c[2]);
-        diffuseColor /= 255.f;
+		{ 255, 0, 0, 255 },
+		{ 0, 255, 0, 255 },
+		{ 0, 0, 255, 255 },
+		{ 255, 255, 0, 255 }
+	};
+	//////////////////////
+	//	for (Player& player : _players)
+	assert(_players.size() <= MAX_PLAYERS);
+	for (size_t i = 0; i < _players.size(); i++)
+	{
+		Player& player = _players[i];
+		const unsigned char* c = COLORS[i];
+		glm::vec3 diffuseColor(c[0], c[1], c[2]);
+		diffuseColor /= 255.f;
 		//shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 3.0f, { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
-//		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,0.f }, 1.5f));
+		//		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,0.f }, 1.5f));
 		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, diffuseColor, 1.5f));
 
 		// TEST
@@ -291,15 +282,15 @@ void World::render()
 	}
 
 
-	for (int i = 0; i < _playerRTs.size(); i++)
+	/*for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		updateLightPos(_playerProgression[i], i);
+	updateLightPos(_playerProgression[i], i);
 
-		for (int j = 0; j < _playerPointLights[i].size(); j++)
-		{
-			_playerRTs[i].pushPointLight(_playerPointLights[i][j]);
-		}
+	for (int j = 0; j < _playerPointLights[i].size(); j++)
+	{
+	_playerRTs[i].pushPointLight(_playerPointLights[i][j]);
 	}
+	}*/
 
 	if (!_bDebugging)
 	{
@@ -308,7 +299,7 @@ void World::render()
 			_playerRTs[i].display(*_players[i].getCamera());
 			_playerRTs[i].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 		}
-		
+
 		for (int i = 0; i < _playerWindowRenderers.size(); i++)
 		{
 			_playerWindowRenderers[i].display(*_players[i].getCamera());
@@ -355,7 +346,6 @@ void World::render()
 	}
 
 	sfml.render(_timer);
-	sfml.render(_progression);
 
 	sfml.display(_context.window);
 }
@@ -383,6 +373,6 @@ void World::updateLightPos(const TrackProgression& playerProgression, int player
 
 	for (int k = 0; k < instancesForLights.size(); k++)
 	{
-		_playerPointLights[playerIndex][k].setPosition(instancesForLights[k]->getModelMatrix() * glm::vec4(instancesForLights[k]->getParent()->getWaypoints()[0], 1.f));
+		//_playerPointLights[playerIndex][k].setPosition(instancesForLights[k]->getModelMatrix() * glm::vec4(instancesForLights[k]->getParent()->getWaypoints()[0], 1.f));
 	}
 }

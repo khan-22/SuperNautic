@@ -14,7 +14,7 @@ in VS_OUT
 	vec2 uv;
 } fs_in;
 
-const int NUM_LIGHTS = 32;
+const int NUM_LIGHTS = 4;
 struct PointLightData
 {
 	vec3 pos[NUM_LIGHTS];

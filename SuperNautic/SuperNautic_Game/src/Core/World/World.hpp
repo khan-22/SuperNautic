@@ -6,7 +6,7 @@
 #include "SFML/Graphics/RenderWindow.hpp"
 namespace sf
 {
-    class Event;
+	class Event;
 }
 
 #include <list>
@@ -17,7 +17,6 @@ namespace sf
 #include "Core/Utility/DebugCamera.hpp"
 #include "Core/Track/TrackProgression.hpp"
 #include "Core/Gui/Timer.hpp"
-#include "Core/Gui/Progression.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/WindowRenderer.hpp"
@@ -30,7 +29,7 @@ struct ApplicationContext;
 class World
 {
 public:
-    World(ApplicationContext& context);
+	World(ApplicationContext& context);
 
 	void handleEvent(const sf::Event& e);
 	void update(float dt, sf::Window& window);
@@ -42,11 +41,10 @@ public:
 private:
 	Track*									_track;
 	std::vector<Player>						_players;
-	std::vector<std::vector<PointLight>>	_playerPointLights;
+	//std::vector<std::vector<PointLight>>	_playerPointLights;
 	bool									_bHasWon;
 
 	Timer									_timer;
-	Progression								_progression;
 
 	const ApplicationContext&				_context;
 
