@@ -14,6 +14,10 @@ in VS_OUT
 	vec2 uv;
 } fs_in;
 
+//Should be exposed as uniforms
+const float FOG_DISTANCE = 1500.0;
+const vec4 FOG_COLOR = vec4(0.3, 0.3, 0.3, 1.0);
+
 const int NUM_LIGHTS = 4;
 struct PointLightData
 {
@@ -69,7 +73,13 @@ void main()
 		lightingResult.rgb += calculatePointLight(i, fragPos, diffuseTex, normal, viewDir);
 	}
 	
+	float distanceToFragment = clamp(length(fragPos - uViewPos) / FOG_DISTANCE, 0.0, 1.0);
+
+	//if(distanceToFragment >= 100)
+	//	lightingResult.rgb += vec3(1.0, 1.0, 1.0);
+
 	//outColor = vec4(diffuseTex, 1.0);
-	lightingResult.rgb += vec3(0.1, 0.9, 1.0) * 0.1; //Add slight shade of blue as ambient
-	outColor = mix(lightingResult, vec4(diffuseTex, 1.0), illumination);
+	//lightingResult.rgb += vec3(0.1, 0.9, 1.0) * 0.1; //Add slight shade of blue as ambient
+	outColor = mix(mix(lightingResult, vec4(diffuseTex, 1.0), illumination), FOG_COLOR, distanceToFragment);
+	//outColor = mix(lightingResult, vec4(diffuseTex, 1.0), illumination);
 }
