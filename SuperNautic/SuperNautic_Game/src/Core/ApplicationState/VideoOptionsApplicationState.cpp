@@ -12,38 +12,38 @@
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/Asset/AssetCache.hpp"
 #include "Core/Gui/GuiButton.hpp"
-#include "Core/Utility/WindowConstants.hpp"
-#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "Core/Gui/GuiHorizontalList.hpp"
 
+#include "Core/Asset/LoadAssetFunctions.hpp"
 
 VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
-, _windowStyle(sf::Style::Titlebar | sf::Style::Close)
-, _resolutionX(1280)
-, _resolutionY(720)
+, _videoOptions(context.window)
 {
-
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
-    GuiButton* set1920x1080 = new GuiButton(sf::Text("1920x1080", *_font.get()), [&]()
+    GuiHorizontalList* resolutionList = new GuiHorizontalList();
+    std::vector<std::unique_ptr<GuiElement>> resolutionButtons;
+    resolutionButtons.emplace_back(new GuiButton(sf::Text("1920x1080", *_font.get()), [&]()
     {
-        setResolution(1920, 1080);
-        recreateWindow();
-    });
-    guiElements.emplace_back(set1920x1080);
+        _videoOptions.setResolution(1920, 1080);
+        applyOptions();
+    }));
 
-    GuiButton* set1280x720 = new GuiButton(sf::Text("1280x720", *_font.get()), [&]()
+    resolutionButtons.emplace_back(new GuiButton(sf::Text("1280x720", *_font.get()), [&]()
     {
-        setResolution(1280, 720);
-        recreateWindow();
-    });
-    guiElements.emplace_back(set1280x720);
+        _videoOptions.setResolution(1280, 720);
+        applyOptions();
+    }));
+    resolutionList->insert(resolutionButtons);
 
-    GuiButton* fs = new GuiButton(sf::Text("toggle fs", *_font.get()), [&]()
+    guiElements.emplace_back(resolutionList);
+
+    GuiButton* fs = new GuiButton(sf::Text("Toggle Fullscreen", *_font.get()), [&]()
     {
-        setFullscreen(!(_windowStyle & sf::Style::Fullscreen));
-        recreateWindow();
+        _videoOptions.setFullscreen(!_videoOptions.bIsFullscreen());
+        applyOptions();
     });
     guiElements.emplace_back(fs);
 
@@ -117,46 +117,27 @@ bool VideoOptionsApplicationState::bHandleEvent(const sf::Event& event)
     return true;
 }
 
-void VideoOptionsApplicationState::setResolution(size_t x, size_t y)
+void VideoOptionsApplicationState::applyOptions()
 {
-    _resolutionX = x;
-    _resolutionY = y;
-}
-
-void VideoOptionsApplicationState::setFullscreen(bool bSetFullscreen)
-{
-    if(bSetFullscreen)
-    {
-        _windowStyle |= sf::Style::Fullscreen;
-    }
-    else
-    {
-        _windowStyle &= ~sf::Style::Fullscreen;
-    }
-}
-
-void VideoOptionsApplicationState::recreateWindow()
-{
-//    HGLRC oldContext = wglGetCurrentContext();
-//    assert(oldContext != NULL);
-//    HGLRC newContext = wglCreateContext(GetDC(_context.window.getSystemHandle()));
-//    assert(newContext != NULL);
-//    bool result = wglCopyContext(oldContext, newContext, )
-
-    sf::ContextSettings settings = _context.window.getSettings();
-    _context.window.create(sf::VideoMode(_resolutionX, _resolutionY), WindowConstants::TITLE, _windowStyle, settings);
+    _videoOptions.recreateWindow();
 
     _context.track.reset();
 
     _context.obstacleHandler.reset();
     _context.segmentHandler.reset();
 
-    RawMeshCache::reload();
     ShaderCache::reload();
     ModelCache::reload();
     TextureCache::reload();
-    MaterialCache::reload();
 
+    // These caches below don't actually manage OpenGL resources and
+    // don't have to be reloaded.
+//    RawMeshCache::reload();
+//    MaterialCache::reload();
+
+    // SegmentHandler and ObstacleHandler have to be reloaded
+    // manually for some reason.
+    // TODO: Ask Timmie about it.
     _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
 
@@ -164,6 +145,6 @@ void VideoOptionsApplicationState::recreateWindow()
     {
         _context.segmentHandler->loadSegment(i);
     }
-
-
 }
+
+
