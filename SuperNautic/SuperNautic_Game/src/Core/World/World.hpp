@@ -41,7 +41,6 @@ public:
 private:
 	Track*									_track;
 	std::vector<Player>						_players;
-	//std::vector<std::vector<PointLight>>	_playerPointLights;
 	bool									_bHasWon;
 
 	Timer									_timer;

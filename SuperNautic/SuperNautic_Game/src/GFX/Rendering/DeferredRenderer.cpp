@@ -1,5 +1,7 @@
 #include "GFX/Rendering/DeferredRenderer.hpp"
 
+#define NUMOFLIGHTS 4
+
 using namespace GFX;
 
 DeferredRenderer::DeferredRenderer()
@@ -185,17 +187,17 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	lpShader->setUniform("uViewPos", camera.getPosition());
 
 	// Send all point light data as a uniform array struct
-	int lightCount = std::min((int)_pointLights.size(), 4);
+	int lightCount = std::min((int)_pointLights.size(), NUMOFLIGHTS);
 
 	std::vector<glm::vec3> pointLightPos;
 	std::vector<glm::vec3> pointLightColor;
 	std::vector<float>	   pointLightIntensity;
 	std::vector<glm::vec3> pointLightProperties;
 
-	pointLightPos.reserve(4);
-	pointLightColor.reserve(4);
-	pointLightIntensity.reserve(4);
-	pointLightProperties.reserve(4);
+	pointLightPos.reserve(NUMOFLIGHTS);
+	pointLightColor.reserve(NUMOFLIGHTS);
+	pointLightIntensity.reserve(NUMOFLIGHTS);
+	pointLightProperties.reserve(NUMOFLIGHTS);
 
 	for (int i = 0; i < lightCount; i++)
 	{
@@ -207,7 +209,7 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 		pointLightProperties.push_back(properties);
 
 	}
-	for (int i = lightCount; i < 4; i++)
+	for (int i = lightCount; i < NUMOFLIGHTS; i++)
 	{
 		pointLightPos.push_back({ 0.f, 0.f, 0.f });
 		pointLightColor.push_back({ 0.f, 0.f, 0.f });
@@ -215,10 +217,10 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 		pointLightProperties.push_back({ 1.f, 0.f, 0.f });
 	}
 
-	lpShader->setUniform("pointLights.pos", pointLightPos[0], 4);
-	lpShader->setUniform("pointLights.color", pointLightColor[0], 4);
-	lpShader->setUniform("pointLights.intensity", pointLightIntensity[0], 4);
-	lpShader->setUniform("pointLights.properties", pointLightProperties[0], 4);
+	lpShader->setUniform("pointLights.pos", pointLightPos[0], NUMOFLIGHTS);
+	lpShader->setUniform("pointLights.color", pointLightColor[0], NUMOFLIGHTS);
+	lpShader->setUniform("pointLights.intensity", pointLightIntensity[0], NUMOFLIGHTS);
+	lpShader->setUniform("pointLights.properties", pointLightProperties[0], NUMOFLIGHTS);
 
 
 

@@ -27,23 +27,6 @@ World::World(ApplicationContext& context)
 		_playerParticles[i].start();
 	}
 
-	/*for (int i = 0; i < context.numPlayers; i++)
-	{
-	for (int j = 0; j < 6; j++)
-	{
-	_playerPointLights[i].push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
-	}
-	}*/
-
-	// Create one player
-	//	for (int i = 0; i < 5; i++)
-	//	{
-	//		if (sf::Joystick::isConnected(i)) {
-	//			_players.emplace_back(i);
-	//			_playerProgression.push_back(TrackProgression{ 0, _track });
-	//			LOG(i);
-	//		}
-	//	}
 	for (size_t i = 0; i < _context.numPlayers; i++)
 	{
 		_players.emplace_back(i);
@@ -51,8 +34,7 @@ World::World(ApplicationContext& context)
 		LOG(i);
 	}
 
-	// TEST PLAYER
-
+	//Create a render target for each player
 	if (_players.size() == 0)
 	{
 		_players.emplace_back(10);
@@ -208,11 +190,6 @@ void World::update(float dt, sf::Window& window)
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
 
-	//static glm::vec3 currentPos = _players[0].getShip().getPosition();
-	//static glm::vec3 previousPos = currentPos;
-	//currentPos = glm::vec3{ _players[0].getShip().getMatrix() * glm::vec4{ 0.f,0.f,0.f,1.f } } - _players[0].getShip().getMeshForward() * 2.0f;//_players[0].getShip().getPosition();
-
-	//_testParticles.update(dt, currentPos, currentPos - previousPos);
 	for (int i = 0; i < _playerParticles.size(); i++)
 	{
 		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 1.9f;
@@ -249,7 +226,7 @@ void World::render()
 		{ 255, 255, 0, 255 }
 	};
 	//////////////////////
-	//	for (Player& player : _players)
+
 	assert(_players.size() <= MAX_PLAYERS);
 	for (size_t i = 0; i < _players.size(); i++)
 	{
@@ -257,15 +234,8 @@ void World::render()
 		const unsigned char* c = COLORS[i];
 		glm::vec3 diffuseColor(c[0], c[1], c[2]);
 		diffuseColor /= 255.f;
-		//shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 3.0f, { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
-		//		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,0.f }, 1.5f));
 		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, diffuseColor, 1.5f));
 
-		// TEST
-		//shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{ -2,0,0,1 } }, { 0.f,0.5f,1.f }, 1.f));
-		//shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{ 0,0,0,1 } } +player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,1.f }, 1.f));
-		//shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{0,0,0,1} } - player.getShip().getMeshForward() * 2.0f, { 1.f,0.0f,0.f }, 1.f));
-		///////
 	}
 
 	for (int i = 0; i < _playerRTs.size(); i++)
@@ -280,17 +250,6 @@ void World::render()
 	{
 		_track->render(_playerRTs[i], _playerWindowRenderers[i], _playerProgression[i].getCurrentSegment());
 	}
-
-
-	/*for (int i = 0; i < _playerRTs.size(); i++)
-	{
-	updateLightPos(_playerProgression[i], i);
-
-	for (int j = 0; j < _playerPointLights[i].size(); j++)
-	{
-	_playerRTs[i].pushPointLight(_playerPointLights[i][j]);
-	}
-	}*/
 
 	if (!_bDebugging)
 	{
@@ -333,12 +292,7 @@ void World::render()
 
 	}
 
-
-
-
-
 	// Should be done for each player before drawing particles.
-
 	GFX::SfmlRenderer sfml;
 	for (int i = 0; i < _players.size(); i++)
 	{
@@ -358,21 +312,4 @@ bool World::bHasWon()
 void World::setTrack(Track * track)
 {
 	_track = track;
-}
-
-void World::updateLightPos(const TrackProgression& playerProgression, int playerIndex)
-{
-	std::vector<SegmentInstance*> instancesForLights;
-	for (long j = static_cast<long>(playerProgression.getCurrentSegment()); j <= static_cast<long>(playerProgression.getCurrentSegment()) + 5; ++j)
-	{
-		if (j >= 0 && j < _track->getNrOfSegments())
-		{
-			instancesForLights.push_back(_track->getInstance(static_cast<int>(j)));
-		}
-	}
-
-	for (int k = 0; k < instancesForLights.size(); k++)
-	{
-		//_playerPointLights[playerIndex][k].setPosition(instancesForLights[k]->getModelMatrix() * glm::vec4(instancesForLights[k]->getParent()->getWaypoints()[0], 1.f));
-	}
 }
