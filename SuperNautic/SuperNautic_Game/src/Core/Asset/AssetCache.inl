@@ -44,6 +44,7 @@ void AssetCache<AssetT, KeyT>::reload()
     {
         if(pair.second.first.use_count() != 1)
         {
+            pair.second.second.reset();
             pair.second.second = loadAsset(pair.first);
         }
     }
