@@ -330,3 +330,35 @@ void GuiContainer::onElementSelect()
 {
     _onElementSelectCallback(&getSelection());
 }
+
+bool GuiContainer::select(GuiElement* element)
+{
+    for(size_t i = 0; i < _elements.size(); i++)
+    {
+        if(_elements[i].get() == element)
+        {
+            if(!bHasSelection())
+            {
+                _selection = i;
+                getSelection().toggleSelection();
+                onElementSelect();
+                return true;
+            }
+
+            size_t previousSelection = _selection;
+
+            getSelection().toggleSelection();
+            _selection = i;
+            getSelection().toggleSelection();
+
+            if(previousSelection != _selection)
+            {
+                onElementSelect();
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}

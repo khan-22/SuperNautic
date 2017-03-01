@@ -32,6 +32,8 @@ public:
 
     void setOnElementSelect(const std::function<void(GuiElement*)>& func);
 
+    bool select(GuiElement* element);
+
 protected:
     std::vector<std::unique_ptr<GuiElement>> _elements;
     size_t _selection = -1;
