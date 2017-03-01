@@ -69,11 +69,11 @@ void VideoOptions::setFullscreen(bool bSetFullscreen)
 {
     if(bSetFullscreen)
     {
-        _windowStyle |= sf::Style::Fullscreen;
+        _windowStyle |= uint32_t(sf::Style::Fullscreen);
     }
     else
     {
-        _windowStyle &= ~sf::Style::Fullscreen;
+        _windowStyle &= ~uint32_t(sf::Style::Fullscreen);
     }
 
     writeConfig();
