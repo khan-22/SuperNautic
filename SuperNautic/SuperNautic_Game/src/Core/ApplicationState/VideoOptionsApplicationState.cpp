@@ -24,19 +24,23 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
     GuiHorizontalList* resolutionList = new GuiHorizontalList();
-    std::vector<std::unique_ptr<GuiElement>> resolutionButtons;
-    resolutionButtons.emplace_back(new GuiButton(sf::Text("1920x1080", *_font.get()), [&]()
+    for(const glm::ivec2& resolution : _videoOptions.getAllowedResolutions())
     {
-        _videoOptions.setResolution(1920, 1080);
-        applyOptions();
-    }));
+        std::string text = std::to_string(resolution.x) + "x" + std::to_string(resolution.y);
+        GuiButton* buttonPtr = new GuiButton(sf::Text(text, *_font.get()), [&]()
+        {
+            glm::ivec2 localResolution = resolution;
+            _videoOptions.setResolution(localResolution);
+            applyOptions();
+        });
+        std::unique_ptr<GuiElement> button(buttonPtr);
+        resolutionList->insert(button);
 
-    resolutionButtons.emplace_back(new GuiButton(sf::Text("1280x720", *_font.get()), [&]()
-    {
-        _videoOptions.setResolution(1280, 720);
-        applyOptions();
-    }));
-    resolutionList->insert(resolutionButtons);
+        if(resolution == _videoOptions.getResolution())
+        {
+            resolutionList->GuiContainer::select((GuiElement*)buttonPtr);
+        }
+    }
 
     guiElements.emplace_back(resolutionList);
 
@@ -93,6 +97,7 @@ bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
                 switch(e.key.code)
                 {
                 case sf::Keyboard::B:
+                case sf::Keyboard::Escape:
                     if(!_guiContainer.bIsActive())
                     {
                         _stack.clear();
@@ -113,6 +118,23 @@ bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
 
 bool VideoOptionsApplicationState::bHandleEvent(const sf::Event& event)
 {
+    if(event.type == sf::Event::KeyPressed)
+    {
+        switch(event.key.code)
+        {
+        case sf::Keyboard::B:
+        case sf::Keyboard::Escape:
+            if(!_guiContainer.bIsActive())
+            {
+                _stack.clear();
+                _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
     _guiContainer.handleEvent(event);
     return true;
 }

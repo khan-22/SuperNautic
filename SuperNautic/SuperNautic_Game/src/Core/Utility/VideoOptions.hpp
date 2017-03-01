@@ -16,26 +16,33 @@ public:
     VideoOptions(sf::Window& window);
 
     void recreateWindow();
-    void setResolution(size_t x, size_t y);
+    void setResolution(const glm::ivec2& resolution);
+    const glm::ivec2& getResolution() const;
     void setFullscreen(bool bSetFullscreen);
     bool bIsFullscreen() const;
 
     static const std::vector<glm::ivec2>& getAllowedResolutions();
-    static bool bIsResolutionAllowed(size_t x, size_t y);
+    static bool bIsResolutionAllowed(const glm::ivec2& resolution);
 
 private:
-    static constexpr char* const _CONFIG_PATH = "config.cfg";
-    static constexpr uint32_t _DEFAULT_WINDOW_STYLE = sf::Style::Titlebar | sf::Style::Close;
+    static const char* const _TITLE;
+    static const unsigned int _NUM_DEPTH_BITS;
+    static const unsigned int _NUM_STENCIL_BITS;
+    static const unsigned int _ANTIALIASING_LEVEL;
+    static const unsigned int _CONTEXT_MAJOR_VERSION;
+    static const unsigned int _CONTEXT_MINOR_VERSION;
+    static const sf::ContextSettings _CONTEXT_SETTINGS;
+
+    static const char* const _CONFIG_PATH;
+    static const bool _B_IS_FULLSCREEN;
     static const std::vector<glm::ivec2> _ALLOWED_RESOLUTIONS;
-    static size_t _DEFAULT_RESOLUTION_X;
-    static size_t _DEFAULT_RESOLUTION_Y;
+    static const glm::ivec2 _DEFAULT_RESOLUTION;
 
     sf::Window& _window;
     ConfigFile  _config;
 
-    uint32_t    _windowStyle;
-    size_t      _resolutionX;
-    size_t      _resolutionY;
+    bool _bIsFullscreen;
+    glm::ivec2 _resolution;
 
     void readConfig();
     void rebuildConfig();
