@@ -11,11 +11,13 @@ class AssetCache
 {
 public:
     static Asset<AssetT> get(KeyT key);
+    static void reload();
 
 private:
-    static std::map<KeyT, std::shared_ptr<AssetT>> _cache;
+    static std::map<KeyT, std::pair<std::shared_ptr<bool>, std::shared_ptr<AssetT>>> _cache;
 
-    static Asset<AssetT> load(KeyT key);
+    static std::shared_ptr<AssetT> loadAsset(KeyT key);
+    static Asset<AssetT> loadNew(KeyT key);
 };
 
 #include "Core/Asset/AssetCache.inl"
