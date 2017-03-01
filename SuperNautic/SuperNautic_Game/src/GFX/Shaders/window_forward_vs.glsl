@@ -13,11 +13,13 @@ layout (location = 0) in vec3 pos;
 uniform mat4 uModel;
 
 uniform mat4 uMVP;
+//uniform mat4 uVP;
 
 uniform vec3 uCameraPos;
 
 out VS_OUT
 {
+	vec2 uv;
 	vec3 direction;
 	//vec2 uv;
 	//vec3 normal;
@@ -31,7 +33,12 @@ void main()
 	//vs_out.uv	  = vec2(uv.x, 1.0 - uv.y); 
 	//vs_out.normal = normal;
 
-	vs_out.direction = uCameraPos - (uModel * vec4(pos, 1.0f)).xyz;
-	gl_Position = uMVP * vec4(pos, 1.0f);
-	
+	vs_out.direction = vec3(uCameraPos - uModel * vec4(pos, 1.0));
+	gl_Position = uMVP * vec4(pos, 1.0);
+
+
+
+	//vec4 projectedPoint = uVP * uModel * vec4(pos, 1.0);
+	//vs_out.uv = 2.0 * (projectedPoint.xy / projectedPoint.w) - vec2(1.0);
+
 }
