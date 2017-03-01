@@ -323,7 +323,7 @@ void World::render()
 
 		for (int i = 0; i < _playerWindowRenderers.size(); i++)
 		{
-			_playerWindowRenderers[i].display(*_players[i].getCamera());
+			_playerWindowRenderers[i].display(_debugCamera);
 		}
 
 		for (int j = 0; j < _players.size(); j++)
