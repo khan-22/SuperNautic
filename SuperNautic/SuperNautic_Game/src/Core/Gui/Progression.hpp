@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef TRACKPROGRESSION_HPP
-#define TRACKPROGRESSION_HPP
+#ifndef PROGRESSION_HPP
+#define PROGRESSION_HPP
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -9,11 +9,11 @@
 #include "Core/Gui/SceneNode.hpp"
 #include "Core/Asset/Asset.hpp"
 
-class TrackProgression : public SceneNode
+class Progression : public SceneNode
 {
 public:
-	TrackProgression(int windowWidth, int windowHeight, int amountOfPlayers);
-	~TrackProgression();
+	Progression(int windowWidth, int windowHeight, int amountOfPlayers);
+	~Progression();
 
 	void updatePositions(std::vector<float> positions);
 
@@ -31,4 +31,4 @@ private:
 	std::vector<sf::RectangleShape>	_progressionMeter;
 };
 
-#endif // !TRACKPROGRESSION_HPP
+#endif // !PROGRESSION_HPP

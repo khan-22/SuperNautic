@@ -1,12 +1,12 @@
-#include "TrackProgression.h"
+#include "Progression.hpp"
 
-TrackProgression::TrackProgression(int windowWidth, int windowHeight, int amountOfPlayers):
+Progression::Progression(int windowWidth, int windowHeight, int amountOfPlayers):
 	_windowHeight(windowHeight),
 	_windowWidth(windowWidth),
 	_amountOfPlayers(amountOfPlayers)
 {
-	float widthStep = windowWidth / 100;
-	float heightStep = windowHeight / 100;
+	float widthStep = windowWidth / 100.f;
+	float heightStep = windowHeight / 100.f;
 
 	_progressionOutline.setFillColor(sf::Color(0, 50, 100, 100));
 	_progressionOutline.setSize(sf::Vector2f(widthStep * 80, heightStep));
@@ -25,7 +25,7 @@ TrackProgression::TrackProgression(int windowWidth, int windowHeight, int amount
 		_positions.push_back(0);
 		_progressionMeter.push_back(sf::RectangleShape());
 		_progressionMeter[i].setSize(sf::Vector2f(widthStep, heightStep));
-		_progressionMeter[i].setOrigin(widthStep / 2, heightStep / 2);
+		_progressionMeter[i].setOrigin(0, 0);
 		switch (i)
 		{
 		case 0:
@@ -47,11 +47,11 @@ TrackProgression::TrackProgression(int windowWidth, int windowHeight, int amount
 	}
 }
 
-TrackProgression::~TrackProgression()
+Progression::~Progression()
 {
 }
 
-void TrackProgression::updatePositions(std::vector<float> positions)
+void Progression::updatePositions(std::vector<float> positions)
 {
 	for (int i = 0; i < _positions.size(); i++)
 	{
@@ -59,15 +59,15 @@ void TrackProgression::updatePositions(std::vector<float> positions)
 	}
 }
 
-void TrackProgression::updateCurrent()
+void Progression::updateCurrent()
 {
 	for (int i = 0; i < _progressionMeter.size(); i++)
 	{
-		_progressionMeter[i].setPosition(_positions[i], 0);
+		_progressionMeter[i].setPosition(_positions[i] * _progressionOutline.getGlobalBounds().width + _progressionOutline.getGlobalBounds().left, _progressionOutline.getGlobalBounds().top);
 	}
 }
 
-void TrackProgression::renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const
+void Progression::renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	target.draw(_progressionOutline);
 

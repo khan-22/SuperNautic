@@ -21,6 +21,23 @@ Input::Input(int id) :
 	_bAWasDormant(true),
 	_bButtonA(false)
 {
+	switch (id)
+	{
+	case 0:
+		_controllerId = 0;
+		break;
+	case 1:
+		_controllerId = 3;
+		break;
+	case 2:
+		_controllerId = 4;
+		break;
+	case 3:
+		_controllerId = 1;
+		break;
+	default:
+		break;
+	}
     update();
     _events.clear();
 }
