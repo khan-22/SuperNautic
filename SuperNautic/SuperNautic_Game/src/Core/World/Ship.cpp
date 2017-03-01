@@ -49,7 +49,7 @@ Ship::Ship()
 		_rayHeight{ 5.0f },
 		_rayAheadDistance{ 5.0f }
 {
-	setPosition(0, 0, 1);
+	setPosition(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 }
 

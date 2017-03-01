@@ -24,7 +24,6 @@ Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	//_octrees.push_back(Octree<SegmentInstance*>(glm::vec3(0, 0, 0), 10000));
 	_difficulty = 1.f;
 	_progressionLength = 1500.f;
-	_bDoneGenerating = false;
 }
 
 // Destructor
@@ -102,7 +101,6 @@ void Track::startNewTrack()
 	_prevIndex = -1;
 	_lastSegment = nullptr;
 	_octrees.clear();
-	_bDoneGenerating = false;
 	for (unsigned int i = 0; i < _track.size(); i++)
 	{
 		delete _track[i];
@@ -113,18 +111,13 @@ void Track::startNewTrack()
 // Generates the track
 bool Track::bGenerate()
 {
-	// TEMPORARY
-	if (_bDoneGenerating)
-	{
-		return true;
-	}
-	///////
-
 	// Make the inital stretch straight
-	while (_generatedLength < 300)
+	while (_generatedLength < 1000)
 	{
 		bInsertNormalSegment(0, false);
 	}
+	return true;
+
 	int failedRecently = 0;
 	// Create random path
 	while (_generatedLength - _lengthAfterLastCall < _progressionLength)
@@ -178,7 +171,6 @@ bool Track::bGenerate()
 		{
 			if (bEndTrack())
 			{
-				_bDoneGenerating = true;
 				placeObstacles();
 				LOG("Track generated. Length: ", _generatedLength);
 				return true;
@@ -527,7 +519,13 @@ bool Track::bEndTrack()
 {
 	while (_generatedLength < _targetLength)
 	{
-		if (!bInsertNormalSegment(0, true))
+		if (_endConnection == 'a' && !bInsertNormalSegment(0, true))
+		{
+			deleteSegments(_endMargin + 400);
+			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+			return false;
+		}
+		if (_endConnection == 'b' && !bInsertNormalSegment(1, true))
 		{
 			deleteSegments(_endMargin + 400);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
@@ -580,7 +578,7 @@ void Track::placeObstacles()
 		depth -= finalDistanceLength;
 		float remainderDepth = targetDepth - depth;
 
-		float derp = (remainderDepth / finalDistanceLength);
+		float derp = remainderDepth / finalDistanceLength;
 		glm::vec3 pos = waypoints[distanceIndex] + finalDistance * derp;
 
 		glm::vec3 v1 = glm::vec3(0, 0, 1);

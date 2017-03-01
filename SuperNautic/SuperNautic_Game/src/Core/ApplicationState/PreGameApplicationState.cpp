@@ -28,8 +28,8 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 , _numPlayers(0)
 {
     std::string startSeed = "AAAAA";
-    size_t startLength = 40000;
-    size_t startCurviness = 3;
+    size_t startLength = 10000;
+    size_t startCurviness = 0;
 
     if(_context.track != nullptr)
     {
