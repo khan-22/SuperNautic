@@ -78,7 +78,7 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 }
 
 // Tests a ray collision against all collision surfaces of the segment. Returns collision information
-const RayIntersection Segment::rayIntersectionTest(const Ray& ray, const std::vector<SurfaceType>& temperatures) const
+const RayIntersection Segment::rayIntersectionTest(const Ray& ray, const std::vector<float>& temperatures) const
 {
 	// Get distance to largest box
 	float firstBoxDistance = _octTree.rayIntersection(ray);

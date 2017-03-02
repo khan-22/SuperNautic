@@ -5,14 +5,12 @@
 
 #include "glm\vec3.hpp"
 
-enum class SurfaceType : char { normal, hot, cold };
-
 // Holds information about a detected collision
 struct RayIntersection
 {
 	glm::vec3	_position;
 	glm::vec3	_normal;
-	SurfaceType _surface;
+	float _surface;
 	bool		_hit{ false };
 	float		_length;
 
@@ -21,7 +19,7 @@ struct RayIntersection
 		_hit = hit;
 	}
 
-	RayIntersection(bool hit, glm::vec3 position, glm::vec3 normal, SurfaceType surface, float length)
+	RayIntersection(bool hit, glm::vec3 position, glm::vec3 normal, float surface, float length)
 	{
 		_hit = hit;
 		_position = position;

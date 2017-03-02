@@ -23,11 +23,11 @@ SegmentInstance::SegmentInstance(const Segment * segment, glm::mat4 modelMatrix,
 	{
 		if (i % 2 == 0)
 		{
-			temperatures.push_back(SurfaceType::hot);
+			_temperatures.push_back(1.0f);
 		}
 		else
 		{
-			temperatures.push_back(SurfaceType::cold);
+			_temperatures.push_back(-1.0f);
 		}
 	}
 	////////////
@@ -169,7 +169,7 @@ const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const
 				  inverse * glm::vec4{ ray.direction().x, ray.direction().y, ray.direction().z, 0.0f },
 				  ray.length() };
 
-	RayIntersection intersection = _parent->rayIntersectionTest(localRay, temperatures);
+	RayIntersection intersection = _parent->rayIntersectionTest(localRay, _temperatures);
 
 	// Transform to global coordinates if a hit is detected
 	if (intersection)

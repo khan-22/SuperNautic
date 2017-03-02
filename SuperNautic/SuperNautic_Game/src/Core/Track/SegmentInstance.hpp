@@ -45,7 +45,7 @@ private:
 	std::vector<ObstacleInstance>	_obstacles;
 
 	// temperatures[i] contains temperature of zone i
-	std::vector<SurfaceType>		temperatures;
+	std::vector<float>				_temperatures;
 
 	SegmentInstance();
 	void updateGlobalBounds();

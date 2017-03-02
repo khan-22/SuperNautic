@@ -60,7 +60,7 @@ public:
 	const glm::vec3 getVelocity() const;
 	const glm::vec3 getCameraPosition() const;
 	const glm::mat4& getTransform() const;
-	SurfaceType getSurfaceType() const;
+	float getSurfaceTemperature() const;
 	const BoundingBox& getBoundingBox() const;
 	void obstacleCollision();
 	void setWaypointDifference(const glm::vec3& difference);
@@ -120,7 +120,7 @@ private:
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
 
-	SurfaceType _currentSurface{ SurfaceType::normal };
+	float _currentSurfaceTemperature{ 0.0f };
 
 	ShakeOffset	_shipCollisionShake;
 
