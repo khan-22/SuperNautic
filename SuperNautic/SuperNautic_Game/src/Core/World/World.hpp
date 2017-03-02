@@ -6,7 +6,7 @@
 #include "SFML/Graphics/RenderWindow.hpp"
 namespace sf
 {
-    class Event;
+	class Event;
 }
 
 #include <list>
@@ -30,7 +30,7 @@ struct ApplicationContext;
 class World
 {
 public:
-    World(ApplicationContext& context);
+	World(ApplicationContext& context);
 
 	void handleEvent(const sf::Event& e);
 	void update(float dt, sf::Window& window);
@@ -56,7 +56,6 @@ private:
 	std::vector<GFX::DeferredRenderer>	_playerRTs;
 	std::vector<GFX::ParticleRenderer>	_playerParticleRenderers;
 	std::vector<GFX::WindowRenderer>	_playerWindowRenderers;
-	std::vector<GFX::ParticleSystem>	_playerParticles;
 
 	DebugCamera						_debugCamera;
 	bool							_bDebugging;

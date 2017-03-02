@@ -37,7 +37,7 @@ public:
 
 	// Tests a ray collision against all collision surfaces of the segment. Returns collision information
 	// temperatures[i] holds temperature of temperature zone i
-	const RayIntersection rayIntersectionTest(const Ray& ray, const std::vector<SurfaceType>& temperatures) const;
+	const RayIntersection rayIntersectionTest(const Ray& ray, const std::vector<float>& temperatures) const;
 
 	// Returns bounding boxes
 	const std::vector<BoundingBox>& getBoundingBoxes() const;

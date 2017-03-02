@@ -212,7 +212,7 @@ void GuiTrackGeneratorControls::insertSeedInput(const TrackPresetManager::Preset
     seedInput->registerOnSelect([this, preset, seedInput]()
     {
         _selectedSeedInput = seedInput;
-        _currentPreset = preset;
+        _currentPreset = (TrackPresetManager::Preset*)preset;
 
         _curvinessInput->setValue(preset->curviness);
         _lengthInput->setText(toLengthInputString(preset->length));

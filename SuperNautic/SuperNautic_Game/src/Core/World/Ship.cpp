@@ -1,4 +1,5 @@
 #include <math.h>
+#include <cstdlib>
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -11,7 +12,7 @@
 #include "Core/Geometry/RayIntersection.hpp"
 #include "Core/Utility/CollisionUtility.hpp"
 
-Ship::Ship()
+Ship::Ship(glm::vec3 color)
 	:	_destroyed{ false },
 		_stopped{ false },
 		_turningFactor{ 0.0f },
@@ -45,24 +46,25 @@ Ship::Ship()
 		_bEngineOverload { false },
 		_bObstacleCollision { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
-		_cooldownOnObstacleCollision{ 1.0f },
-		_immunityoOnObstacleCollision{ 2.0f },
+		_cooldownOnObstacleCollision{ 3.0f },
+		_immunityoOnObstacleCollision{ 4.0f },
 		_immunityTimer{ 0.0f },
 		_blinkFrequency{ 0.1f },
 		_surfaceSlope{ 0.0f, 0.0f, 0.5f },
 		_rayHeight{ 5.0f },
 		_rayAheadDistance{ 5.0f },
 		_steeringCooldown{ 0.0f },
-		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f }
+		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
+		_shipColor{ color },
+		_engineLight{ glm::vec3{ 0.0f }, _shipColor, 1.0f },
+		_intensityOffset{ 1.0f, 1.0f, 20.0f },
+		_timeUntilIntensityUpdate{ 0.0f }
 {
-	setPosition(0, 0, 1);
+	setPosition(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
-}
 
-
-Ship::Ship(glm::vec3 position) : Ship{}
-{
-	setPosition(position);
+	_particleSystem.init(200, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.start();
 }
 
 void Ship::render(GFX::RenderStates& states)
@@ -89,8 +91,8 @@ void Ship::update(float dt)
 	trackSurface(dt);
 	updateDirectionsAndPositions(dt);
 
-	_shipCollisionShake.setMagnitude(_steeringCooldown);
-	_shipCollisionShake.setSpeed(_steeringCooldown);
+	_shipCollisionShake.setMagnitude(_steeringCooldown / _cooldownOnObstacleCollision);
+	_shipCollisionShake.setSpeed(_steeringCooldown / _cooldownOnObstacleCollision);
 	_shipCollisionShake.update(dt);
 
 	// Create mesh rotation matrix from mesh up and forward directions
@@ -112,11 +114,29 @@ void Ship::update(float dt)
 	_surfaceSlope.setTarget(glm::dot(_waypointDifference, _upDirection));
 	_surfaceSlope.update(dt);
 
-	float dot1 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[1]);
-	float dot2 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[2]);
-	float dot3 = glm::dot(_boundingBox.directions[2], _boundingBox.directions[1]);
-
 	checkObstacleCollision();
+
+	// Handle particle system and light variables
+	float interpolation = powf(clamp(_engineTemperature * 0.01f, 0.1f, 0.9f), 2.0f);
+	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
+	_engineLight.updateColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } *interpolation);
+
+	_particleSystem.setDeathColor(glm::vec3{0.0f});
+	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+
+	// Update random intensity offset
+	_timeUntilIntensityUpdate -= dt;
+	if (_timeUntilIntensityUpdate <= 0.0f)
+	{
+		_timeUntilIntensityUpdate += 0.02f + (static_cast<float>(rand()) / RAND_MAX) * 0.06f;
+		_intensityOffset.setTarget(static_cast<float>(rand()) / RAND_MAX);
+	}
+	_intensityOffset.update(dt);
+
+	_engineLight.changeIntensity(powf(_velocity * 0.03f, 1.5f) * 0.2f + _intensityOffset() * _velocity * 0.015f);
+
+	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
+	_engineLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -127,167 +147,14 @@ void Ship::jump()
 {
 	if (_currentJumpCooldown <= 0.0f && _steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 	{
-		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _shipForward);
+		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _trackForward);
 
 		_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
 
+		_upDirection = glm::normalize(_upDirection - glm::dot(_upDirection, _trackForward) * _trackForward);
+
 		_currentJumpCooldown = _jumpCooldown;
 	}
-}
-
-void Ship::setTurning(float turnFactor)
-{
-	_turningFactor = clamp(turnFactor, -1.0f, 1.0f);
-}
-
-void Ship::setAcceleration(float accelerationFactor)
-{
-	if (_engineCooldown < 0)
-	{
-		_accelerationFactor = clamp(accelerationFactor, -1.0f, 1.0f);
-	}
-}
-
-float Ship::getEngineTemperature()
-{
-	return _engineTemperature;
-}
-
-float Ship::getSpeed()
-{
-	return _velocity;
-}
-
-bool Ship::getOverload(float dt)
-{
-	bool isWhite = false;
-
-	if (_engineCooldown > 0)
-	{
-		if (_engineFlashTime < 0)
-		{
-			float denominator = 1.f;
-
-			if (_engineCooldown > 1.f)
-			{
-				denominator = _engineCooldown;
-			}
-
-			_engineFlashTime = 0.5f / denominator;
-			_bEngineFlash = !_bEngineFlash;
-		}
-		_engineFlashTime -= dt;
-		isWhite = _bEngineFlash;
-
-		//_velocity *= 0.9999f * dt;
-	}
-	else if (_engineOverload > 0)
-	{
-		float denominator = 1.f;
-
-		if (_engineOverload > 1.f)
-		{
-			denominator = _engineOverload;
-		}
-
-		if (_engineFlashTime > 0.2f / denominator || _engineFlashTime < 0)
-		{
-			_engineFlashTime = 0.2f / denominator;
-			_bEngineFlash = !_bEngineFlash;
-		}
-
-		_engineFlashTime -= dt;
-		isWhite = _bEngineFlash;
-	}
-	return isWhite;
-}
-
-bool Ship::isEngineOverload()
-{
-	bool isOverload = false;
-	if (_bEngineOverload)
-	{
-		isOverload = true;
-		_bEngineOverload = false;
-	}
-	return isOverload;
-}
-
-void Ship::setForward(const glm::vec3& forwardDirection)
-{
-	_trackForward = forwardDirection;
-}
-
-void Ship::setSegments(const std::vector<SegmentInstance*> segments)
-{
-	_segmentsToTest = segments;
-}
-
-glm::vec3 Ship::getCameraUp()
-{
-	return _cameraUpDirection();
-}
-
-void Ship::start()
-{ 
-	_stopped = false;
-}
-void Ship::stop()
-{ 
-	_stopped = true;
-}
-void Ship::destroy()
-{ 
-	_destroyed = true; 
-}
-void Ship::repair() 
-{ 
-	_destroyed = false; 
-}
-
-void Ship::setReturnPos(const glm::vec3& returnPos)
-{
-	_returnPos = returnPos;
-}
-
-const glm::vec3 Ship::getCameraForward() const
-{
-	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope());
-}
-
-const glm::vec3& Ship::getMeshPosition() const
-{
-	return _meshPosition();
-}
-
-const glm::vec3 & Ship::getMeshForward() const
-{
-	return _meshForwardDirection();
-}
-
-const glm::vec3 & Ship::getMeshUp() const
-{
-	return _meshUpDirection();
-}
-
-const glm::vec3 Ship::getVelocity() const
-{
-	return _velocity * _meshForwardDirection();
-}
-
-const glm::vec3 Ship::getCameraPosition() const
-{
-	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f);
-}
-
-const glm::mat4 & Ship::getTransform() const
-{
-	return _transformMatrix;
-}
-
-SurfaceType Ship::getSurfaceType() const
-{
-	return _currentSurface;
 }
 
 void Ship::checkObstacleCollision()
@@ -320,35 +187,17 @@ void Ship::checkObstacleCollision()
 		}
 	}
 }
-const BoundingBox & Ship::getBoundingBox() const
-{
-	return _boundingBox;
-}
 
 void Ship::obstacleCollision()
 {
 	if (_immunityTimer <= 0.0f)
 	{
-		_engineCooldown = _cooldownOnObstacleCollision;
+		_engineCooldown = std::max(_cooldownOnObstacleCollision, _engineCooldown);
 		_steeringCooldown = _cooldownOnObstacleCollision;
 		_immunityTimer = _immunityoOnObstacleCollision;
 		_bObstacleCollision = true;
 	}
 }
-
-bool Ship::checkIfCollided()
-{
-	if (_bObstacleCollision)
-	{
-		_bObstacleCollision = false;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
 
 void Ship::rotateAtStart(float down, float angle)
 {
@@ -360,26 +209,6 @@ void Ship::rotateAtStart(float down, float angle)
 	_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
 	_meshUpDirection.setVector(_upDirection);
 	_cameraUpDirection.setVector(_upDirection);
-}
-
-void Ship::setWaypointDifference(const glm::vec3 & difference)
-{
-	_waypointDifference = difference;
-}
-
-void Ship::setSteeringCooldown(float cooldown)
-{
-	_steeringCooldown = cooldown;
-}
-
-void Ship::setInactiveTime(float inactiveTime)
-{
-	_inactiveTimer = inactiveTime;
-}
-
-float Ship::getSteeringCooldown()
-{
-	return _steeringCooldown;
 }
 
 void Ship::handleInputs(float dt)
@@ -462,16 +291,13 @@ void Ship::handleTemperature(float dt)
 	// Update engine temperature
 	float fieldAddition = 1.0f;
 
-	switch (getSurfaceType())
+	if (getSurfaceTemperature() < -0.1f)
 	{
-	case SurfaceType::cold:
 		fieldAddition = 0.9f;
-		break;
-	case SurfaceType::hot:
+	}
+	else if (getSurfaceTemperature() > 0.1f)
+	{
 		fieldAddition = 1.1f;
-		break;
-	default:
-		break;
 	}
 
 	float enginePower = ((_accelerationFactor + _velocity) / 2) * fieldAddition;
@@ -586,7 +412,7 @@ void Ship::updateDirectionsAndPositions(float dt)
 	_cameraForwardDirection.setBackupAxis(_upDirection);
 	_cameraForwardDirection.update(dt);
 
-	// Update forward/right position 
+	// Update forward/right position
 	_meshXZPosition.setTarget(getPosition());
 	_meshXZPosition.update(dt);
 
@@ -598,39 +424,239 @@ void Ship::trackSurface(float dt)
 {
 	// Create rays and test for intersections
 	Ray atShipRay{ getPosition() + _upDirection * _rayHeight, -_upDirection, 1000.0f };
-	Ray aheadOfShipRay{ getPosition() + _shipForward * _rayAheadDistance + _upDirection * _rayHeight, -_upDirection, 1000.0f };
 	RayIntersection atShipIntersection{ false };
-	RayIntersection aheadOfShipIntersection{ false };
 
 	for (unsigned i = 0; i < _segmentsToTest.size(); ++i)
 	{
 		RayIntersection at = _segmentsToTest[i]->rayIntersectionTest(atShipRay);
-		RayIntersection aheadOf = _segmentsToTest[i]->rayIntersectionTest(aheadOfShipRay);
 
 		if (at && (!atShipIntersection || at._length < atShipIntersection._length))
 		{
 			atShipIntersection = at;
 		}
-
-		if (aheadOf && (!aheadOfShipIntersection || aheadOf._length < aheadOfShipIntersection._length))
-		{
-			aheadOfShipIntersection = aheadOf;
-		}
 	}
 
-	if (atShipIntersection && aheadOfShipIntersection)
+	if (atShipIntersection)
 	{
 		// Reset hit timer
 		_timeSinceIntersection = 0.0f;
 
 		// Set current surface
-		_currentSurface = atShipIntersection._surface;
+		_currentSurfaceTemperature = atShipIntersection._surface;
 
 		// Update local directions
 		_upDirection = atShipIntersection._normal;
-		_shipForward = glm::normalize(aheadOfShipIntersection._position - atShipIntersection._position);
+		_shipForward = glm::normalize(_shipForward - glm::dot(_shipForward, _upDirection) * _upDirection);
 
 		// Move up/down to the correct track height
-		move(_upDirection * (_preferredHeight - (((atShipIntersection._length + aheadOfShipIntersection._length) / 2.0f) - _rayHeight)));
+		move(_upDirection * (_preferredHeight - (atShipIntersection._length - _rayHeight)));
 	}
+}
+
+bool Ship::getOverload(float dt)
+{
+	bool isWhite = false;
+
+	if (_engineCooldown > 0)
+	{
+		if (_engineFlashTime < 0)
+		{
+			float denominator = 1.f;
+
+			if (_engineCooldown > 1.f)
+			{
+				denominator = _engineCooldown;
+			}
+
+			_engineFlashTime = 0.5f / denominator;
+			_bEngineFlash = !_bEngineFlash;
+		}
+		_engineFlashTime -= dt;
+		isWhite = _bEngineFlash;
+
+		//_velocity *= 0.9999f * dt;
+	}
+	else if (_engineOverload > 0)
+	{
+		float denominator = 1.f;
+
+		if (_engineOverload > 1.f)
+		{
+			denominator = _engineOverload;
+		}
+
+		if (_engineFlashTime > 0.2f / denominator || _engineFlashTime < 0)
+		{
+			_engineFlashTime = 0.2f / denominator;
+			_bEngineFlash = !_bEngineFlash;
+		}
+
+		_engineFlashTime -= dt;
+		isWhite = _bEngineFlash;
+	}
+	return isWhite;
+}
+
+bool Ship::isEngineOverload()
+{
+	bool isOverload = false;
+	if (_bEngineOverload)
+	{
+		isOverload = true;
+		_bEngineOverload = false;
+	}
+	return isOverload;
+}
+
+void Ship::setForward(const glm::vec3& forwardDirection)
+{
+	_trackForward = forwardDirection;
+}
+
+void Ship::setSegments(const std::vector<SegmentInstance*> segments)
+{
+	_segmentsToTest = segments;
+}
+
+glm::vec3 Ship::getCameraUp()
+{
+	return _cameraUpDirection();
+}
+
+void Ship::start()
+{
+	_stopped = false;
+}
+void Ship::stop()
+{
+	_stopped = true;
+}
+void Ship::destroy()
+{
+	_destroyed = true;
+}
+void Ship::repair()
+{
+	_destroyed = false;
+}
+
+void Ship::setReturnPos(const glm::vec3& returnPos)
+{
+	_returnPos = returnPos;
+}
+
+const glm::vec3 Ship::getCameraForward() const
+{
+	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope());
+}
+
+const glm::vec3& Ship::getMeshPosition() const
+{
+	return _meshPosition();
+}
+
+const glm::vec3 & Ship::getMeshForward() const
+{
+	return _meshForwardDirection();
+}
+
+const glm::vec3 & Ship::getMeshUp() const
+{
+	return _meshUpDirection();
+}
+
+const glm::vec3 Ship::getVelocity() const
+{
+	return _velocity * _meshForwardDirection();
+}
+
+const glm::vec3 Ship::getCameraPosition() const
+{
+	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f);
+}
+
+const glm::mat4 & Ship::getTransform() const
+{
+	return _transformMatrix;
+}
+
+float Ship::getSurfaceTemperature() const
+{
+	return _currentSurfaceTemperature;
+}
+
+void Ship::setTurning(float turnFactor)
+{
+	_turningFactor = clamp(turnFactor, -1.0f, 1.0f);
+}
+
+void Ship::setAcceleration(float accelerationFactor)
+{
+	if (_engineCooldown < 0)
+	{
+		_accelerationFactor = clamp(accelerationFactor, -1.0f, 1.0f);
+	}
+}
+
+float Ship::getEngineTemperature()
+{
+	return _engineTemperature;
+}
+
+float Ship::getSpeed()
+{
+	return _velocity;
+}
+
+void Ship::setWaypointDifference(const glm::vec3 & difference)
+{
+	_waypointDifference = difference;
+}
+
+void Ship::setSteeringCooldown(float cooldown)
+{
+	_steeringCooldown = cooldown;
+}
+
+void Ship::setInactiveTime(float inactiveTime)
+{
+	_inactiveTimer = inactiveTime;
+}
+
+float Ship::getSteeringCooldown()
+{
+	return _steeringCooldown;
+}
+
+bool Ship::checkIfCollided()
+{
+	if (_bObstacleCollision)
+	{
+		_bObstacleCollision = false;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+GFX::ParticleSystem& Ship::getParticleSystem()
+{
+	return _particleSystem;
+}
+
+PointLight& Ship::getPointLight()
+{
+	return _engineLight;
+}
+
+const glm::vec3 & Ship::getColor()
+{
+	return _shipColor;
+}
+
+const BoundingBox & Ship::getBoundingBox() const
+{
+	return _boundingBox;
 }

@@ -27,6 +27,7 @@ public:
 	void setSeed(const std::string& seed);
 	const std::string& getSeed() const;
 	void setCurviness(const unsigned int curviness);
+	void setDifficulty(const unsigned int difficulty);
 	void startNewTrack();
 	bool bGenerate();
 	int getNrOfSegments() const;
@@ -71,8 +72,6 @@ private:
 	char									_endConnection;
 	int										_prevIndex;
 	const Segment *							_lastSegment;
-	// TEMPORARY
-	bool									_bDoneGenerating;
 
     static const unsigned int _MIN_TRACK_LENGTH;
     static const unsigned int _MAX_TRACK_LENGTH;

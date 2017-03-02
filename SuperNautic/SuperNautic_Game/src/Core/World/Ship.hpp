@@ -12,6 +12,8 @@
 #include "GFX/Rendering/Transformable3D.hpp"
 #include "GFX/Resources/TexturedModel.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
+#include "GFX/Resources/ParticleSystem.hpp"
+#include "GFX/Lighting/PointLight.hpp"
 #include "Core/Utility/SpringRotatedVector.hpp"
 #include "Core/Utility/SpringTranslatedVector.hpp"
 #include "Core/Geometry/BoundingBox.hpp"
@@ -24,8 +26,7 @@ class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 public:
 	GFX::TexturedModel _shipModel;
 
-	Ship();
-	Ship(glm::vec3 position);
+	Ship(glm::vec3 color);
 
 	void render(GFX::RenderStates& states) override;
 	void update(float dt);
@@ -59,7 +60,7 @@ public:
 	const glm::vec3 getVelocity() const;
 	const glm::vec3 getCameraPosition() const;
 	const glm::mat4& getTransform() const;
-	SurfaceType getSurfaceType() const;
+	float getSurfaceTemperature() const;
 	const BoundingBox& getBoundingBox() const;
 	void obstacleCollision();
 	void setWaypointDifference(const glm::vec3& difference);
@@ -67,6 +68,9 @@ public:
 	void setInactiveTime(float inactiveTime);
 	float getSteeringCooldown();
 	bool checkIfCollided();
+	GFX::ParticleSystem& getParticleSystem();
+	PointLight& getPointLight();
+	const glm::vec3& getColor();
 
 	// Moves down units in -y direction, then rotates angle radians around z
 	// Used to position ship at start of race
@@ -93,6 +97,11 @@ private:
 	float		_immunityTimer;			// Time until ship will be able to collide with obstacles
 	float		_inactiveTimer;			// If >0, ship is inactive and cannot be controlled
 
+	GFX::ParticleSystem			_particleSystem;
+	PointLight					_engineLight;
+
+	glm::vec3					_shipColor;
+
 	glm::vec3					_trackForward;			// Forward direction of track
 	glm::vec3					_shipForward;			// Current forward direction of ship
 	glm::vec3					_upDirection;			// Current up direction
@@ -105,11 +114,13 @@ private:
 	SpringRotatedVector			_cameraForwardDirection;
 
 	SpringSmoothedValue			_surfaceSlope;			// Determines the height of the camera
+	SpringSmoothedValue			_intensityOffset;		// Offset for engine light intensity
+	float						_timeUntilIntensityUpdate;
 
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
 
-	SurfaceType _currentSurface{ SurfaceType::normal };
+	float _currentSurfaceTemperature{ 0.0f };
 
 	ShakeOffset	_shipCollisionShake;
 

@@ -16,7 +16,7 @@
 class Player
 {
 public:
-	Player(int id);
+	Player(int id, glm::vec3 color);
 	~Player();
 	Player(const Player& other);
 

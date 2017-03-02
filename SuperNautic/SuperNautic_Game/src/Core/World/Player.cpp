@@ -1,8 +1,9 @@
 #include "Core/World/Player.hpp"
 
-Player::Player(int id) :
+Player::Player(int id, glm::vec3 color) :
 	_playerId(id),
 	_input(id),
+	_ship(color),
 	_hud(1280, 720),
 	_camera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
 	_fpCamera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
@@ -15,7 +16,7 @@ Player::Player(int id) :
 	_bIsFirstPerson = false;
 }
 
-Player::Player(const Player& other) : Player{ other._playerId }
+Player::Player(const Player& other) : Player{ other._playerId, glm::vec3{0, 0, 0} }
 {
 
 }
@@ -112,12 +113,12 @@ void Player::update(float dt)
 	_cameraVelocityDirectionShake.setSpeed(std::max((glm::length(_ship.getVelocity()) - 80.0f) * 0.01f, 0.0f));
 	_cameraVelocityDirectionShake.update(dt);
 
-	_cameraCollisionPositionShake.setMagnitude(_ship.getSteeringCooldown());
-	_cameraCollisionPositionShake.setSpeed(_ship.getSteeringCooldown());
+	_cameraCollisionPositionShake.setMagnitude(_ship.getSteeringCooldown() / 3.f);
+	_cameraCollisionPositionShake.setSpeed(_ship.getSteeringCooldown() / 3.f);
 	_cameraCollisionPositionShake.update(dt);
 
-	_cameraCollisionDirectionShake.setMagnitude(_ship.getSteeringCooldown());
-	_cameraCollisionDirectionShake.setSpeed(_ship.getSteeringCooldown());
+	_cameraCollisionDirectionShake.setMagnitude(_ship.getSteeringCooldown() / 3.f);
+	_cameraCollisionDirectionShake.setSpeed(_ship.getSteeringCooldown() / 3.f);
 	_cameraCollisionDirectionShake.update(dt);
 
 	if (_ship.isEngineOverload())
