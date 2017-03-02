@@ -628,11 +628,26 @@ void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowR
 		if (index >= 0 && index < _track.size())
 		{
 			renderer.render(*_track[index]);
+			std::vector<ObstacleInstance>& obstacles = _track[index]->getObstacles();
+			for (auto& obstacle : obstacles)
+			{
+				renderer.render(obstacle);
+			}
 		}
 	}
 
+	for (int i = 1; i < 100; i++)
+	{
+		int index = shipIndex + i;
+		if (index >= 0 && index < _track.size())
+		{
+			windowRenderer.render(*_track[index]);
+		}
+	}
+
+
 	int lowestIndex = shipIndex - 2;
-	int largestIndex = shipIndex + 30;
+	int largestIndex = shipIndex + 7;
 
 	for (auto& window : _segmentWindows)
 	{
