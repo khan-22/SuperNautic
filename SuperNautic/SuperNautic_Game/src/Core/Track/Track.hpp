@@ -27,6 +27,7 @@ public:
 	void setSeed(const std::string& seed);
 	const std::string& getSeed() const;
 	void setCurviness(const unsigned int curviness);
+	void setDifficulty(const unsigned int difficulty);
 	void startNewTrack();
 	bool bGenerate();
 	int getNrOfSegments() const;

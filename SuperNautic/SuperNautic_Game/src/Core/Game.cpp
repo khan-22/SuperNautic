@@ -116,8 +116,8 @@ bool Game::bInitialize()
 	//_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 	_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
 
-    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos2.txt", "Segments/ConnectionTypes.txt"));
-	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
+    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos3.txt", "Segments/ConnectionTypes.txt"));
+	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo1.txt"));
 
 	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
     {
