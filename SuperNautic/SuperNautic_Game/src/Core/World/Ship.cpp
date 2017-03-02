@@ -11,7 +11,7 @@
 #include "Core/Geometry/RayIntersection.hpp"
 #include "Core/Utility/CollisionUtility.hpp"
 
-Ship::Ship()
+Ship::Ship(glm::vec3 color)
 	:	_destroyed{ false },
 		_stopped{ false },
 		_turningFactor{ 0.0f },
@@ -53,16 +53,14 @@ Ship::Ship()
 		_rayHeight{ 5.0f },
 		_rayAheadDistance{ 5.0f },
 		_steeringCooldown{ 0.0f },
-		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f }
+		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
+		_shipColor{ color }
 {
 	setPosition(0, 0, 1);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
-}
 
-
-Ship::Ship(glm::vec3 position) : Ship{}
-{
-	setPosition(position);
+	_particleSystem.init(200, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.start();
 }
 
 void Ship::render(GFX::RenderStates& states)
@@ -117,6 +115,13 @@ void Ship::update(float dt)
 	float dot3 = glm::dot(_boundingBox.directions[2], _boundingBox.directions[1]);
 
 	checkObstacleCollision();
+
+	// Handle particle system variables
+	float interpolation = powf(clamp(_engineTemperature * 0.01f, 0.1f, 0.9f), 2.0f);
+	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
+	_particleSystem.setDeathColor(glm::vec3{0.0f});
+	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -347,6 +352,16 @@ bool Ship::checkIfCollided()
 	{
 		return false;
 	}
+}
+
+GFX::ParticleSystem& Ship::getParticleSystem()
+{
+	return _particleSystem;
+}
+
+const glm::vec3 & Ship::getColor()
+{
+	return _shipColor;
 }
 
 
