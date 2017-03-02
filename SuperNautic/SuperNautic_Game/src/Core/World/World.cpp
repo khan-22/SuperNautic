@@ -51,6 +51,12 @@ World::World(ApplicationContext& context)
         _players.emplace_back(i);
         _playerProgression.push_back(TrackProgression{ 0, _track });
         LOG(i);
+
+		// Set ship position and rotation
+		_players[i].getShip().rotateAtStart(10.0f, glm::pi<float>() * 0.5f * i);
+
+		// Set ship engine cooldown
+		_players[i].getShip().setInactiveTime(2.0f);
     }
 
 	// TEST PLAYER
