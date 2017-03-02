@@ -18,9 +18,15 @@ public:
     bool bIsActive() const;
     void toggleActivation();
 
+    void registerOnSelect(const std::function<void()>& callback);
+    void registerOnDeselect(const std::function<void()>& callback);
+
 private:
     bool _bIsSelected;
     bool _bIsActive;
+
+    std::vector<std::function<void()>> _onSelectCallbacks;
+    std::vector<std::function<void()>> _onDeselectCallbacks;
 
     virtual void select();
     virtual void deselect();
