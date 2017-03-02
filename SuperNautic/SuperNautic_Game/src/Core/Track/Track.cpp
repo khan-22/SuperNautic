@@ -18,7 +18,7 @@ Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	: _segmentHandler(segmentHandler)
 	, _obstacleHandler(obstacleHandler)
 	, _seed("1")
-	, _curviness(0.4)
+	, _curviness(0.4f)
 	, _difficulty(0.6f)
 	, _targetLength(10000)
 	, _generatedLength(0)
@@ -565,11 +565,12 @@ void Track::placeObstacles()
 	float currentLength = 300;
 	float lastFullSegmentLength = 0.f;
 	size_t index = findTrackIndex(currentLength, lastFullSegmentLength);
-	ObstacleHandler::Obstacle * lastObstacleType = nullptr;
+	ObstacleHandler::Obstacle * lastObstacleType = _obstacleHandler->getRandomObstacle(_difficulty);
 	int inRow = 0;
 	int currentInRow = 0;
 	float leftOfArea = 0.f;
-	float invDiff = 1 - _difficulty;
+	const float invDiff = 1 - _difficulty;
+	float padding = 0.f;
 	while (currentLength < _generatedLength - endLength)
 	{
 		if (leftOfArea > 10.f)
@@ -586,11 +587,12 @@ void Track::placeObstacles()
 				{
 					newObstacle = _obstacleHandler->getRandomObstacle(_difficulty);
 				} while (newObstacle == lastObstacleType);
+				padding = lastObstacleType->getPadding(_difficulty);
 				lastObstacleType = newObstacle;
 				inRow = rand() % (newObstacle->getMaxInRow(_difficulty) + 1);
 				currentInRow = 1;
 			}
-			float lengthToNextObstacle = rand() % int(150 * invDiff + 30) + newObstacle->getPadding(_difficulty);
+			float lengthToNextObstacle = rand() % int(80 * invDiff + 10) + padding;
 			currentLength += lengthToNextObstacle;
 			index = findTrackIndex(currentLength, lastFullSegmentLength);
 
@@ -635,7 +637,7 @@ void Track::placeObstacles()
 		}
 		else
 		{
-			currentLength += rand() % (int(600 * invDiff) + 50) + 70;
+			currentLength += rand() % (int(500 * invDiff) + 50) + 70;
 			leftOfArea = rand() % (int(600 * _difficulty) + 50) + 100;
 		}
 	}
