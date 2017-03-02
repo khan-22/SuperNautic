@@ -18,7 +18,7 @@ Ship::Ship(glm::vec3 color)
 		_turningFactor{ 0.0f },
 		_currentTurningAngle{ 0.0f },
 		_accelerationFactor{ 0.5f },
-		_jumpCooldown{ .8f },
+		_jumpCooldown{ .5f },
 		_currentJumpCooldown{ 0.0f },
 		_engineTemperature{ 0.0f },
 		_velocity{ 0.0f },
@@ -46,7 +46,7 @@ Ship::Ship(glm::vec3 color)
 		_bEngineOverload { false },
 		_bObstacleCollision { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
-		_cooldownOnObstacleCollision{ 3.0f },
+		_cooldownOnObstacleCollision{ 2.0f },
 		_immunityoOnObstacleCollision{ 4.0f },
 		_immunityTimer{ 0.0f },
 		_blinkFrequency{ 0.1f },
@@ -140,7 +140,7 @@ void Ship::update(float dt)
 	_intensityOffset.update(dt);
 
 	// Add intensity offset
-	_engineLight.changeIntensity(powf(_velocity * 0.03f, 1.1f) * 0.2f + _intensityOffset() * _velocity * 0.015f);
+	_engineLight.changeIntensity(powf(_velocity * 0.02f, 1.1f) * 0.2f + _intensityOffset() * _velocity * 0.015f);
 
 
 	_engineLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });

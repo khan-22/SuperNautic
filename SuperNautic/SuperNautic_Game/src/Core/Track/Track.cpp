@@ -570,7 +570,7 @@ void Track::placeObstacles()
 	int currentInRow = 0;
 	float leftOfArea = 0.f;
 	const float invDiff = 1 - _difficulty;
-	float padding = 0.f;
+	float backPadding = 0.f;
 	while (currentLength < _generatedLength - endLength)
 	{
 		if (leftOfArea > 10.f)
@@ -587,12 +587,12 @@ void Track::placeObstacles()
 				{
 					newObstacle = _obstacleHandler->getRandomObstacle(_difficulty);
 				} while (newObstacle == lastObstacleType);
-				padding = lastObstacleType->getPadding(_difficulty);
+				backPadding = lastObstacleType->getBackPadding(_difficulty);
 				lastObstacleType = newObstacle;
 				inRow = rand() % (newObstacle->getMaxInRow(_difficulty) + 1);
 				currentInRow = 1;
 			}
-			float lengthToNextObstacle = rand() % int(80 * invDiff + 10) + padding;
+			float lengthToNextObstacle = rand() % int(30 * invDiff + 10) + backPadding + newObstacle->getFrontPadding(_difficulty);
 			currentLength += lengthToNextObstacle;
 			index = findTrackIndex(currentLength, lastFullSegmentLength);
 

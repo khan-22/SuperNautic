@@ -12,16 +12,16 @@ World::World(ApplicationContext& context)
 	: _context{ context }
 	, _debugCamera{ 90.0f, context.window.getSize().x, context.window.getSize().y, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
-	, _timer(context.window.getSize().x, context.window.getSize().y, context.numPlayers)
-	, _progression(context.window.getSize().x, context.window.getSize().y, context.numPlayers)
+	, _timer(context.window.getSize().x, context.window.getSize().y, context.players.size())
+	, _progression(context.window.getSize().x, context.window.getSize().y, context.players.size())
 	, _track(context.track.get())
-	, _playerRTs(context.numPlayers)
-	, _playerParticleRenderers(context.numPlayers)
-	, _playerWindowRenderers(context.numPlayers)
-	, _playerPointLights(context.numPlayers)
+	, _playerRTs(context.players.size())
+	, _playerParticleRenderers(context.players.size())
+	, _playerWindowRenderers(context.players.size())
+	, _playerPointLights(context.players.size())
 	, _bDebugging(false)
 {
-	for (int i = 0; i < context.numPlayers; i++)
+	for (int i = 0; i < context.players.size(); i++)
 	{
 		for (int j = 0; j < 6; j++)
 		{
@@ -29,14 +29,15 @@ World::World(ApplicationContext& context)
 		}
 	}
 
-	std::vector<glm::vec3> colors{ glm::vec3{ 0.8f, 0.15f, 0.1f },
+	std::vector<glm::vec3> colors{ glm::vec3{ 0.8f, 0.2f, 0.1f },
 		glm::vec3{ 0.1f, 0.8f, 0.1f },
 		glm::vec3{ 0.1f, 0.1f, 0.8f },
 		glm::vec3{ 0.8f, 0.8f, 0.1f } };
 
-    for(int i = 0 ; i < _context.numPlayers; i++)
+    for(int i = 0 ; i < context.players.size(); i++)
     {
-		_players.emplace_back(i, colors[i]);
+        GuiPlayerJoinContainer::Player player = context.players[i];
+		_players.emplace_back(player.id, glm::vec3(player.color));
         _playerProgression.push_back(TrackProgression{ 0, _track });
         LOG(i);
 
@@ -97,25 +98,28 @@ World::World(ApplicationContext& context)
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_players[0].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, 0);
-		_playerRTs[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerWindowRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
-		_playerRTs[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, 0);
-		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_playerParticleRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_playerWindowRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
+
+		_playerRTs[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_playerWindowRenderers[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, 0);
+
+		_playerRTs[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_playerParticleRenderers[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_playerWindowRenderers[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
+
+		_playerRTs[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_playerParticleRenderers[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_playerWindowRenderers[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
 }
 
 
 void World::handleEvent(const sf::Event& e)
 {
-	
+
 }
 
 void World::update(float dt, sf::Window& window)
