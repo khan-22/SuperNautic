@@ -57,6 +57,7 @@ Ship::Ship(glm::vec3 color)
 		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
 		_shipColor{ color },
 		_engineLight{ glm::vec3{ 0.0f }, _shipColor, 1.0f },
+		_warningLight{ glm::vec3{ 0.0f }, glm::vec3{ 1.0f }, 2.0f },
 		_intensityOffset{ 1.0f, 1.0f, 20.0f },
 		_timeUntilIntensityUpdate{ 0.0f }
 {
@@ -117,9 +118,9 @@ void Ship::update(float dt)
 	checkObstacleCollision();
 
 	// Handle particle system and light variables
-	float interpolation = powf(clamp(_engineTemperature * 0.01f, 0.1f, 0.9f), 2.0f);
+	float interpolation = powf(clamp(_engineTemperature, 0.1f, 0.9f), 2.0f);
 	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
-	_engineLight.updateColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } *interpolation);
+	_engineLight.updateColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
 
 	_particleSystem.setDeathColor(glm::vec3{0.0f});
 	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
@@ -133,10 +134,14 @@ void Ship::update(float dt)
 	}
 	_intensityOffset.update(dt);
 
+	// Add intensity offset
 	_engineLight.changeIntensity(powf(_velocity * 0.03f, 1.5f) * 0.2f + _intensityOffset() * _velocity * 0.015f);
 
 	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
 	_engineLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
+
+	_warningLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+	_warningLight.toggleLight(true);
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -286,64 +291,13 @@ void Ship::handleCooldowns(float dt)
 
 void Ship::handleTemperature(float dt)
 {
-	// Update engine temperature
-	float fieldAddition = 1.0f;
+	// Get difference between acceleration [0..1] and temperature [0..1]
+	float difference = (_accelerationFactor + 1.0f) / 2.0f - _engineTemperature;
 
-	if (getSurfaceTemperature() < -0.1f)
-	{
-		fieldAddition = 0.9f;
-	}
-	else if (getSurfaceTemperature() > 0.1f)
-	{
-		fieldAddition = 1.1f;
-	}
+	difference += _currentSurfaceTemperature * 0.5f;
 
-	float enginePower = ((_accelerationFactor + _velocity) / 2) * fieldAddition;
-
-	if (enginePower > _engineTemperature)
-	{
-		if (enginePower > _engineTemperature + 1)
-		{
-			_engineTemperature = (_engineTemperature * 24 + enginePower) / 25;
-		}
-		else
-		{
-			_engineTemperature += 1.f * dt;
-		}
-	}
-	else
-	{
-		if (enginePower < _engineTemperature - 1)
-		{
-			_engineTemperature = (_engineTemperature * 49 + enginePower) / 50;
-		}
-		else
-		{
-			_engineTemperature -= 1.f * dt;
-		}
-	}
-
-	if (_engineTemperature > 80)
-	{
-		_engineOverload += ((_engineTemperature - 80.f) / 20.f) * dt;
-		if (rand() % 500 + 1 < _engineOverload)
-		{
-			_engineCooldown = _engineOverload * _engineTemperature / 50;
-			_bEngineFlash = true;
-			_bEngineOverload = true;
-		}
-	}
-	else
-	{
-		if (_engineOverload > 0)
-		{
-			_engineOverload -= (100 - _engineTemperature) / 100 * dt;
-			if (_engineOverload < 0)
-			{
-				_engineOverload = 0;
-			}
-		}
-	}
+	_engineTemperature += (abs(difference) / difference) *  powf(abs(difference), 2.0f) * dt;
+	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 }
 
 void Ship::rotateTowardTrackForward(float dt)
@@ -461,57 +415,12 @@ void Ship::trackSurface(float dt)
 
 bool Ship::getOverload(float dt)
 {
-	bool isWhite = false;
-
-	if (_engineCooldown > 0)
-	{
-		if (_engineFlashTime < 0)
-		{
-			float denominator = 1.f;
-
-			if (_engineCooldown > 1.f)
-			{
-				denominator = _engineCooldown;
-			}
-
-			_engineFlashTime = 0.5f / denominator;
-			_bEngineFlash = !_bEngineFlash;
-		}
-		_engineFlashTime -= dt;
-		isWhite = _bEngineFlash;
-
-		//_velocity *= 0.9999f * dt;
-	}
-	else if (_engineOverload > 0)
-	{
-		float denominator = 1.f;
-
-		if (_engineOverload > 1.f)
-		{
-			denominator = _engineOverload;
-		}
-
-		if (_engineFlashTime > 0.2f / denominator || _engineFlashTime < 0)
-		{
-			_engineFlashTime = 0.2f / denominator;
-			_bEngineFlash = !_bEngineFlash;
-		}
-
-		_engineFlashTime -= dt;
-		isWhite = _bEngineFlash;
-	}
-	return isWhite;
+	return false;
 }
 
 bool Ship::isEngineOverload()
 {
-	bool isOverload = false;
-	if (_bEngineOverload)
-	{
-		isOverload = true;
-		_bEngineOverload = false;
-	}
-	return isOverload;
+	return false;
 }
 
 void Ship::setForward(const glm::vec3& forwardDirection)
@@ -655,6 +564,11 @@ GFX::ParticleSystem& Ship::getParticleSystem()
 PointLight Ship::getPointLight()
 {
 	return _engineLight;
+}
+
+PointLight Ship::getWarningLight()
+{
+	return _warningLight;
 }
 
 const glm::vec3 & Ship::getColor()

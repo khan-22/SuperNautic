@@ -231,6 +231,7 @@ void World::render()
 		for (int j = 0; j < _players.size(); j++)
 		{
 			_playerRTs[i].pushPointLight(_players[j].getShip().getPointLight());
+			_playerRTs[i].pushPointLight(_players[j].getShip().getWarningLight());
 		}
 	}
 

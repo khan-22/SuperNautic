@@ -92,7 +92,10 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 
 void DeferredRenderer::pushPointLight(PointLight & pointLight)
 {
-	_pointLights.push_back(&pointLight);
+	if (pointLight.bGetActive())
+	{
+		_pointLights.push_back(&pointLight);
+	}
 	if (_pointLights.size() > 32)
 	{
 		LOG_ERROR("Cannot draw more than 32 lights in a scene");

@@ -70,6 +70,7 @@ public:
 	bool checkIfCollided();
 	GFX::ParticleSystem& getParticleSystem();
 	PointLight getPointLight();
+	PointLight getWarningLight();
 	const glm::vec3& getColor();
 
 	// Moves down units in -y direction, then rotates angle radians around z
@@ -99,6 +100,7 @@ private:
 
 	GFX::ParticleSystem			_particleSystem;
 	PointLight					_engineLight;
+	PointLight					_warningLight;
 
 	glm::vec3					_shipColor;
 
