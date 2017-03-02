@@ -30,41 +30,6 @@ void GuiHorizontalList::handleEventCurrent(const sf::Event& event)
 {
     GuiContainer::handleEventCurrent(event);
 }
-//
-//
-//void GuiHorizontalList::activate()
-//{
-////    if(!bHasSelection())
-////    {
-////        GuiContainer::select();
-////    }
-//
-//    activateSelection();
-//
-////    if(bHasSelection())
-////    {
-////        getSelection().toggleActivation();
-////
-////        if(!getSelection().bIsActive())
-////        {
-////
-////        }
-////    }
-//}
-//
-//void GuiHorizontalList::deactivate()
-//{
-////    if(!bHasSelection())
-////    {
-////        GuiContainer::select();
-////    }
-//
-////    if(bHasSelection())
-////    {
-////        getSelection().toggleActivation();
-////    }
-//}
-//
 
 bool GuiHorizontalList::bIsSelectable() const
 {
