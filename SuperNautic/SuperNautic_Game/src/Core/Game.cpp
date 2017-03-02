@@ -170,16 +170,12 @@ void Game::handleEvents()
 	sf::Event event;
 	while (_window.pollEvent(event))
 	{
-
 		switch (event.type)
 		{
 		case sf::Event::Closed:
 			_window.close();
 			break;
 
-		case sf::Event::JoystickButtonPressed:
-			LOG(event.joystickButton.button);
-			break;
         default:
             _stateStack.handleEvent(event);
             break;
