@@ -72,6 +72,13 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     _selectedSeedInput = _seedInputs.front();
 
+    auto onSeedChange = [this](const std::string& str)
+    {
+        LOG("Seed: \"", str, "\"");
+        _trackGenerator.setSeed(str);
+        _trackGenerator.generate();
+    };
+
     assert(presets.size() == _seedInputs.size());
     for(size_t i = 0; i < presets.size(); i++)
     {
@@ -89,12 +96,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 //            _trackGenerator.generate();
 //        });
 
-        seedInput->setOnChange([this](const std::string& str)
-        {
-            LOG("Seed: \"", str, "\"");
-            _trackGenerator.setSeed(str);
-            _trackGenerator.generate();
-        });
+        seedInput->setOnChange(onSeedChange);
 
         auto seed = std::unique_ptr<GuiElement>(seedInput);
         seedList->insert(seed);
@@ -196,6 +198,25 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         _stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context)));
     });
     guiElements.emplace_back(startButton);
+
+    GuiButton* saveButton = new GuiButton(sf::Text("Save", *_font.get()), [&, seedList]()
+    {
+        TrackPresetManager::Preset p;
+        p.seed = _selectedSeedInput->getText();
+        p.curviness = _curvinessInput->getValue();
+        std::stringstream sstream(_lengthInput->getText());
+        sstream >> p.length;
+        _presetManager.insert(p);
+
+        GuiTextInput* seedInput = new GuiTextInput(_presetManager.getSeedLength(), GuiCharacterInput::CharacterFlags::ALL);
+        seedInput->setText(_presetManager.getPresets().back().seed);
+        seedInput->setOnChange(onSeedChange);
+
+
+        auto seed = std::unique_ptr<GuiElement>(seedInput);
+        seedList->insert(seed);
+    });
+    guiElements.emplace_back(saveButton);
 
     GuiButton* backButton = new GuiButton(sf::Text("Back", *_font.get()), [&]()
     {
