@@ -17,6 +17,7 @@ namespace sf
 #include "Core/Utility/DebugCamera.hpp"
 #include "Core/Track/TrackProgression.hpp"
 #include "Core/Gui/Timer.hpp"
+#include "Core/Gui/Progression.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/WindowRenderer.hpp"
@@ -41,9 +42,11 @@ public:
 private:
 	Track*									_track;
 	std::vector<Player>						_players;
+	std::vector<std::vector<PointLight>>	_playerPointLights;
 	bool									_bHasWon;
 
 	Timer									_timer;
+	Progression								_progression;
 
 	const ApplicationContext&				_context;
 
@@ -56,6 +59,8 @@ private:
 
 	DebugCamera						_debugCamera;
 	bool							_bDebugging;
+
+	void updateLightPos(const TrackProgression& playerProgression, int playerIndex);
 };
 
 #endif //WORLD_HPP
