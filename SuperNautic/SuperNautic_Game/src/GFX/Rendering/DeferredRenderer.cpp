@@ -1,5 +1,7 @@
 #include "GFX/Rendering/DeferredRenderer.hpp"
 
+#define NUMOFLIGHTS 4
+
 using namespace GFX;
 
 DeferredRenderer::DeferredRenderer()
@@ -36,10 +38,10 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
-	
+
 	_actualX = _x * windowWidth;
 	_actualY = _y * windowHeight;
-	_actualWidth  = _width  * windowWidth;
+	_actualWidth = _width  * windowWidth;
 	_actualHeight = _height * windowHeight;
 
 	GLuint colorChannels[] = { 3, 4, 3 };
@@ -78,9 +80,9 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	GLsizei sizeTexCoordsInBytes = sizeof(texCoords[0]) * 4;
 	_screenQuad->addVertexBuffer(sizePositionsInBytes + sizeTexCoordsInBytes, GL_STATIC_DRAW);
 
-	_screenQuad->sendDataToBuffer(0, 0, 0, 
+	_screenQuad->sendDataToBuffer(0, 0, 0,
 		sizePositionsInBytes, &positions[0], 3, GL_FLOAT);
-	_screenQuad->sendDataToBuffer(0, 1, sizePositionsInBytes, 
+	_screenQuad->sendDataToBuffer(0, 1, sizePositionsInBytes,
 		sizeTexCoordsInBytes, &texCoords[0], 2, GL_FLOAT);
 
 	GLsizei sizeIndicesInBytes = sizeof(indices[0]) * 6;
@@ -96,7 +98,9 @@ void DeferredRenderer::pushPointLight(PointLight & pointLight)
 	{
 		_pointLights.push_back(&pointLight);
 	}
-	if (_pointLights.size() > 32)
+
+	_pointLights.push_back(&pointLight);
+	if (_pointLights.size() > 4)
 	{
 		LOG_ERROR("Cannot draw more than 32 lights in a scene");
 	}
@@ -130,8 +134,8 @@ void GFX::DeferredRenderer::blitDepthOnto(Framebuffer& framebuffer)
 	LOG_GL_ERRORS();
 
 	glBlitFramebuffer(
-		0,			0,			_actualWidth,				_actualHeight,
-		_actualX,	_actualY,	_actualX + _actualWidth,	_actualY + _actualHeight,
+		0, 0, _actualWidth, _actualHeight,
+		_actualX, _actualY, _actualX + _actualWidth, _actualY + _actualHeight,
 		GL_DEPTH_BUFFER_BIT, GL_NEAREST
 	);
 	LOG_GL_ERRORS();
@@ -178,7 +182,7 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	Framebuffer::DEFAULT.bindWrite();
 	_frameBuffer.bindRead();
 	_frameBuffer.bindColorTextures();
-	
+
 	Shader* lpShader = _lightPassShader.get();
 	lpShader->bind();
 	//lpShader->setSampler("uPosition", 0);
@@ -188,52 +192,52 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	lpShader->setUniform("uViewPos", camera.getPosition());
 
 	// Send all point light data as a uniform array struct
-	int lightCount = std::min((int)_pointLights.size(), 32);
+	int lightCount = std::min((int)_pointLights.size(), NUMOFLIGHTS);
 
 	std::vector<glm::vec3> pointLightPos;
 	std::vector<glm::vec3> pointLightColor;
 	std::vector<float>	   pointLightIntensity;
 	std::vector<glm::vec3> pointLightProperties;
 
-	pointLightPos.reserve(32);
-	pointLightColor.reserve(32);
-	pointLightIntensity.reserve(32);
-	pointLightProperties.reserve(32);
+	pointLightPos.reserve(NUMOFLIGHTS);
+	pointLightColor.reserve(NUMOFLIGHTS);
+	pointLightIntensity.reserve(NUMOFLIGHTS);
+	pointLightProperties.reserve(NUMOFLIGHTS);
 
 	for (int i = 0; i < lightCount; i++)
 	{
 		pointLightPos.push_back(_pointLights[i]->getPosition());
-		pointLightColor.push_back(_pointLights[i]->getLightProperties( ).diffuseColor);
+		pointLightColor.push_back(_pointLights[i]->getLightProperties().diffuseColor);
 		pointLightIntensity.push_back(_pointLights[i]->getLightProperties().intensity);
 
 		glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
 		pointLightProperties.push_back(properties);
 
 	}
-	for (int i = lightCount; i < 32; i++)
+	for (int i = lightCount; i < NUMOFLIGHTS; i++)
 	{
-		pointLightPos.push_back({0.f, 0.f, 0.f});
-		pointLightColor.push_back({0.f, 0.f, 0.f});
-		pointLightIntensity.push_back({1.f});
-		pointLightProperties.push_back({1.f, 0.f, 0.f});
+		pointLightPos.push_back({ 0.f, 0.f, 0.f });
+		pointLightColor.push_back({ 0.f, 0.f, 0.f });
+		pointLightIntensity.push_back({ 1.f });
+		pointLightProperties.push_back({ 1.f, 0.f, 0.f });
 	}
 
-	lpShader->setUniform("pointLights.pos", pointLightPos[0], 32);
-	lpShader->setUniform("pointLights.color", pointLightColor[0], 32);
-	lpShader->setUniform("pointLights.intensity", pointLightIntensity[0], 32);
-	lpShader->setUniform("pointLights.properties", pointLightProperties[0], 32);
-	
+	lpShader->setUniform("pointLights.pos", pointLightPos[0], NUMOFLIGHTS);
+	lpShader->setUniform("pointLights.color", pointLightColor[0], NUMOFLIGHTS);
+	lpShader->setUniform("pointLights.intensity", pointLightIntensity[0], NUMOFLIGHTS);
+	lpShader->setUniform("pointLights.properties", pointLightProperties[0], NUMOFLIGHTS);
+
 
 
 	/*for (int i = 0; i < lightCount; i++)
 	{
-		std::string uName = "pointLights[" + std::to_string(i) + "]";
-		lpShader->setUniform(uName + ".pos",		_pointLights[i]->getPosition());
-		lpShader->setUniform(uName + ".color",		_pointLights[i]->getLightProperties().diffuseColor);
+	std::string uName = "pointLights[" + std::to_string(i) + "]";
+	lpShader->setUniform(uName + ".pos",		_pointLights[i]->getPosition());
+	lpShader->setUniform(uName + ".color",		_pointLights[i]->getLightProperties().diffuseColor);
 
-		glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
+	glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
 
-		lpShader->setUniform(uName + ".properties", properties);
+	lpShader->setUniform(uName + ".properties", properties);
 	}*/
 	_pointLights.clear();
 

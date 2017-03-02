@@ -46,8 +46,8 @@ Ship::Ship(glm::vec3 color)
 		_bEngineOverload { false },
 		_bObstacleCollision { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
-		_cooldownOnObstacleCollision{ 1.0f },
-		_immunityoOnObstacleCollision{ 2.0f },
+		_cooldownOnObstacleCollision{ 3.0f },
+		_immunityoOnObstacleCollision{ 4.0f },
 		_immunityTimer{ 0.0f },
 		_blinkFrequency{ 0.1f },
 		_surfaceSlope{ 0.0f, 0.0f, 0.5f },
@@ -61,7 +61,7 @@ Ship::Ship(glm::vec3 color)
 		_intensityOffset{ 1.0f, 1.0f, 20.0f },
 		_timeUntilIntensityUpdate{ 0.0f }
 {
-	setPosition(0, 0, 1);
+	setPosition(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 
 	_particleSystem.init(200, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
@@ -92,8 +92,8 @@ void Ship::update(float dt)
 	trackSurface(dt);
 	updateDirectionsAndPositions(dt);
 
-	_shipCollisionShake.setMagnitude(_steeringCooldown);
-	_shipCollisionShake.setSpeed(_steeringCooldown);
+	_shipCollisionShake.setMagnitude(_steeringCooldown / _cooldownOnObstacleCollision);
+	_shipCollisionShake.setSpeed(_steeringCooldown / _cooldownOnObstacleCollision);
 	_shipCollisionShake.update(dt);
 
 	// Create mesh rotation matrix from mesh up and forward directions
@@ -152,9 +152,11 @@ void Ship::jump()
 {
 	if (_currentJumpCooldown <= 0.0f && _steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 	{
-		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _shipForward);
+		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _trackForward);
 
 		_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
+
+		_upDirection = glm::normalize(_upDirection - glm::dot(_upDirection, _trackForward) * _trackForward);
 
 		_currentJumpCooldown = _jumpCooldown;
 	}
@@ -195,7 +197,7 @@ void Ship::obstacleCollision()
 {
 	if (_immunityTimer <= 0.0f)
 	{
-		_engineCooldown = _cooldownOnObstacleCollision;
+		_engineCooldown = std::max(_cooldownOnObstacleCollision, _engineCooldown);
 		_steeringCooldown = _cooldownOnObstacleCollision;
 		_immunityTimer = _immunityoOnObstacleCollision;
 		_bObstacleCollision = true;
@@ -296,7 +298,7 @@ void Ship::handleTemperature(float dt)
 
 	difference += _currentSurfaceTemperature * 0.5f;
 
-	_engineTemperature += (abs(difference) / difference) *  powf(abs(difference), 2.0f) * dt;
+	_engineTemperature += (difference == 0.0f ? 1.0f : (abs(difference) / difference)) *  powf(abs(difference), 2.0f) * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 }
 
@@ -364,7 +366,7 @@ void Ship::updateDirectionsAndPositions(float dt)
 	_cameraForwardDirection.setBackupAxis(_upDirection);
 	_cameraForwardDirection.update(dt);
 
-	// Update forward/right position 
+	// Update forward/right position
 	_meshXZPosition.setTarget(getPosition());
 	_meshXZPosition.update(dt);
 
@@ -376,27 +378,19 @@ void Ship::trackSurface(float dt)
 {
 	// Create rays and test for intersections
 	Ray atShipRay{ getPosition() + _upDirection * _rayHeight, -_upDirection, 1000.0f };
-	Ray aheadOfShipRay{ getPosition() + _shipForward * _rayAheadDistance + _upDirection * _rayHeight, -_upDirection, 1000.0f };
 	RayIntersection atShipIntersection{ false };
-	RayIntersection aheadOfShipIntersection{ false };
 
 	for (unsigned i = 0; i < _segmentsToTest.size(); ++i)
 	{
 		RayIntersection at = _segmentsToTest[i]->rayIntersectionTest(atShipRay);
-		RayIntersection aheadOf = _segmentsToTest[i]->rayIntersectionTest(aheadOfShipRay);
 
 		if (at && (!atShipIntersection || at._length < atShipIntersection._length))
 		{
 			atShipIntersection = at;
 		}
-
-		if (aheadOf && (!aheadOfShipIntersection || aheadOf._length < aheadOfShipIntersection._length))
-		{
-			aheadOfShipIntersection = aheadOf;
-		}
 	}
 
-	if (atShipIntersection && aheadOfShipIntersection)
+	if (atShipIntersection)
 	{
 		// Reset hit timer
 		_timeSinceIntersection = 0.0f;
@@ -406,10 +400,10 @@ void Ship::trackSurface(float dt)
 
 		// Update local directions
 		_upDirection = atShipIntersection._normal;
-		_shipForward = glm::normalize(aheadOfShipIntersection._position - atShipIntersection._position);
+		_shipForward = glm::normalize(_shipForward - glm::dot(_shipForward, _upDirection) * _upDirection);
 
 		// Move up/down to the correct track height
-		move(_upDirection * (_preferredHeight - (((atShipIntersection._length + aheadOfShipIntersection._length) / 2.0f) - _rayHeight)));
+		move(_upDirection * (_preferredHeight - (atShipIntersection._length - _rayHeight)));
 	}
 }
 
