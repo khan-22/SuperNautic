@@ -34,19 +34,19 @@ ObstacleHandler::ObstacleHandler(const std::string& infoFileName)
 			boxes.push_back(BoundingBox(asset.get()->meshes[n]));
 		}
 
-		int prob1, maxInRow1, padding1;
+		int prob1, maxInRow1, frontPadding1, backPadding1;
 		float minRotSpeed1, maxRotSpeed1;
-		in >> prob1 >> minRotSpeed1 >> maxRotSpeed1 >> maxInRow1 >> padding1;
+		in >> prob1 >> minRotSpeed1 >> maxRotSpeed1 >> maxInRow1 >> frontPadding1 >> backPadding1;
 
-		int prob2, maxInRow2, padding2;
+		int prob2, maxInRow2, frontPadding2, backPadding2;
 		float minRotSpeed2, maxRotSpeed2;
-		in >> prob2 >> minRotSpeed2 >> maxRotSpeed2 >> maxInRow2 >> padding2;
+		in >> prob2 >> minRotSpeed2 >> maxRotSpeed2 >> maxInRow2 >> frontPadding2 >> backPadding2;
 
 		in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 		_obstacles.push_back(new Obstacle(model, boxes
-			, prob1, minRotSpeed1, maxRotSpeed1, maxInRow1, padding1
-			, prob2, minRotSpeed2, maxRotSpeed2, maxInRow2, padding2));
+			, prob1, minRotSpeed1, maxRotSpeed1, maxInRow1, frontPadding1, backPadding1
+			, prob2, minRotSpeed2, maxRotSpeed2, maxInRow2, frontPadding2, backPadding2));
 	}
 	in.close();
 }

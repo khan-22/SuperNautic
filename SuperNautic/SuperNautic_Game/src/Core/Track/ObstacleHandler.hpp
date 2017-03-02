@@ -18,29 +18,33 @@ public:
 		float						_minRotSpeed1;
 		float						_maxRotSpeed1;
 		int							_maxInRow1;
-		int							_padding1;
+		int							_frontPadding1;
+		int							_backPadding1;
 		int							_probability2;
 		float						_minRotSpeed2;
 		float						_maxRotSpeed2;
 		int							_maxInRow2;
-		int							_padding2;
+		int							_frontPadding2;
+		int							_backPadding2;
 
 		Obstacle(const GFX::TexturedModel& model
 			, const std::vector<BoundingBox>& boxes
-			, int prob1, float minRotSpeed1, float maxRotSpeed1, int maxInRow1, int padding1
-			, int prob2, float minRotSpeed2, float maxRotSpeed2, int maxInRow2, int padding2)
+			, int prob1, float minRotSpeed1, float maxRotSpeed1, int maxInRow1, int frontPadding1, int backPadding1
+			, int prob2, float minRotSpeed2, float maxRotSpeed2, int maxInRow2, int frontPadding2, int backPadding2)
 			: _model(model)
 			, _boxes(boxes)
 			, _probability1(prob1)
 			, _minRotSpeed1(minRotSpeed1)
 			, _maxRotSpeed1(maxRotSpeed1)
 			, _maxInRow1(maxInRow1)
-			, _padding1(padding1)
+			, _frontPadding1(frontPadding1)
+			, _backPadding1(backPadding1)
 			, _probability2(prob2)
 			, _minRotSpeed2(minRotSpeed2)
 			, _maxRotSpeed2(maxRotSpeed2)
 			, _maxInRow2(maxInRow1)
-			, _padding2(padding2)
+			, _frontPadding2(frontPadding2)
+			, _backPadding2(backPadding2)
 		{ }
 		GFX::TexturedModel getModel() const
 		{
@@ -74,9 +78,13 @@ public:
 		{
 			return _maxInRow1 * (1 - diff) + _maxInRow2 * diff;
 		}
-		float getPadding(float diff)
+		float getFrontPadding(float diff)
 		{
-			return _padding1 * (1 - diff) + _padding2 * diff;
+			return _frontPadding1 * (1 - diff) + _frontPadding2 * diff;
+		}
+		float getBackPadding(float diff)
+		{
+			return _backPadding1 * (1 - diff) + _backPadding2 * diff;
 		}
 	};
 

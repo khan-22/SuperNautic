@@ -161,7 +161,7 @@ void VideoOptionsApplicationState::applyOptions()
     // manually for some reason.
     // TODO: Ask Timmie about it.
     _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt"));
-	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo1.txt"));
+	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
 
 	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
     {
