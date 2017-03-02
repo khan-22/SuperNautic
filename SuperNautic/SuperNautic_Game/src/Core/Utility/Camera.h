@@ -13,7 +13,10 @@ public:
 		, const glm::vec3 & up = glm::vec3(0.0, 0.0, 0.0));
 	virtual ~Camera();
 	glm::vec3 getPosition() const;
+	glm::vec3 getDirection() const;
+	glm::vec3 getUp() const;
 	glm::mat4 getView() const;
+	void setView(const glm::mat4& view);
 	glm::mat4 getPerspective() const;
 	glm::mat4 getVP() const;
 	void setPos(const glm::vec3 & newPos);
@@ -38,7 +41,6 @@ protected:
 	float _fov;
 	int _viewWidth;
 	int _viewHeight;
-
 };
 
 #endif // !CAMERA_H

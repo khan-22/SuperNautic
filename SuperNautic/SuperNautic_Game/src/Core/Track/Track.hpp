@@ -36,6 +36,9 @@ public:
 	void render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowRenderer, const int shipIndex);
 	void update(const float dt);
 
+	static unsigned int getMaxLength();
+	static unsigned int getMinLength();
+
 	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos and length from start of segment
 	glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos, float& lengthInSegment, glm::vec3& directionDifference);
 
@@ -69,6 +72,9 @@ private:
 	char									_endConnection;
 	int										_prevIndex;
 	const Segment *							_lastSegment;
+
+    static const unsigned int _MIN_TRACK_LENGTH;
+    static const unsigned int _MAX_TRACK_LENGTH;
 };
 
 #endif // !TRACK_HPP

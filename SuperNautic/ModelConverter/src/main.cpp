@@ -126,23 +126,27 @@ void processNormals(std::vector<glm::vec3>& normals, const aiMesh* importedMesh,
 	log(GREEN) << "\rNormals: 100%" << std::endl;
 }
 
-void processIndices(std::vector<glm::uvec3>& faces, std::vector<GLuint>& indices, const aiMesh* importedMesh)
+void processIndices(std::vector<glm::uvec3>& faces, std::vector<GLuint>& indices, const aiMesh* importedMesh, unsigned int& indexOffset)
 {
 	log(YELLOW) << "Indices: 0%";
 	faces.reserve(faces.capacity() + importedMesh->mNumFaces);
 	indices.reserve(indices.capacity() + importedMesh->mNumFaces * 3);
+
+	unsigned int largestIndex = 0;
 	for (unsigned int i = 0; i < importedMesh->mNumFaces; i++)
 	{
 		// We assume all faces only have 3 vertices.
 		glm::uvec3 face;
-		face[0] = importedMesh->mFaces[i].mIndices[0];
-		face[1] = importedMesh->mFaces[i].mIndices[1];
-		face[2] = importedMesh->mFaces[i].mIndices[2];
+		face[0] = importedMesh->mFaces[i].mIndices[0] + indexOffset;
+		face[1] = importedMesh->mFaces[i].mIndices[1] + indexOffset;
+		face[2] = importedMesh->mFaces[i].mIndices[2] + indexOffset;
 		faces.push_back(face);
 
 		indices.push_back(face[0]);
 		indices.push_back(face[1]);
 		indices.push_back(face[2]);
+
+		largestIndex = std::max(std::max(std::max(face[0], face[1]), face[2]), largestIndex);
 
 		if (i >= importedMesh->mNumVertices / 2)
 		{
@@ -150,6 +154,8 @@ void processIndices(std::vector<glm::uvec3>& faces, std::vector<GLuint>& indices
 		}
 	}
 	log(GREEN) << "\rIndices: 100%" << std::endl;
+
+	indexOffset = largestIndex + 1;
 }
 
 
@@ -163,6 +169,10 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 
 	accumulatedTransform = accumulatedTransform * toGLM(currentNode->mTransformation);
 
+	const char* previousName = "";
+
+	unsigned int indexOffset = 0;
+
 	for (int meshIndex = 0; meshIndex < numMeshes; meshIndex++)
 	{
 		const aiMesh* importedMesh = scene->mMeshes[currentNode->mMeshes[meshIndex]];
@@ -170,10 +180,17 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 		log(GREEN) << "-- Processing Mesh: " << currentNode->mName.C_Str() << std::endl;
 
 		Mesh* current;
-		if (containsSpecialName(currentNode->mName.C_Str()))
+		if (strcmp(previousName, currentNode->mName.C_Str()) == 0)
+		{
+			log(GREEN) << "Name is the same as previous, adding to it" << std::endl;
+
+			current = &meshes.back();
+		}
+		else if (containsSpecialName(currentNode->mName.C_Str()))
 		{
 			meshes.emplace_back();
 			current = &meshes.back();
+			indexOffset = 0;
 		}
 		else
 		{
@@ -183,6 +200,7 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 			{
 				meshes.emplace_back();
 				accumulatedMesh = &meshes.back();
+				indexOffset = 0;
 			}
 			else
 			{
@@ -190,14 +208,13 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 				{
 					meshes.emplace_back();
 					accumulatedMesh = &meshes.back();
+					indexOffset = 0;
 				}
 
 			}
 			
 			current = accumulatedMesh;
 		}
-
-		
 
 		current->name = std::string(currentNode->mName.C_Str());
 		current->textureIndex = importedMesh->mMaterialIndex;
@@ -208,7 +225,9 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 		processPositions(current->positions, importedMesh, accumulatedTransform);
 		processTexCoords(current->texCoords, importedMesh);
 		processNormals(current->normals, importedMesh, normalTransformation);
-		processIndices(current->faces, current->indices, importedMesh);
+		processIndices(current->faces, current->indices, importedMesh, indexOffset);
+
+		previousName = currentNode->mName.C_Str();
 	}
 	
 	int numChildren = currentNode->mNumChildren;
@@ -264,7 +283,7 @@ void processNodeCameras(const aiScene* scene, std::vector<Camera>& cameras)
 
 bool convertFile(char* filePath)
 {
-	const aiScene* importedData = aiImportFile(filePath, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+	const aiScene* importedData = aiImportFile(filePath, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes);
 
 	if (importedData == nullptr)
 	{

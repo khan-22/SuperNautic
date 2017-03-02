@@ -1,15 +1,22 @@
 #include "Core/Audio/PlayerAudio.hpp"
 #include "Core/Asset/AssetCache.hpp"
 
+#include <algorithm>
+
 PlayerAudio::PlayerAudio() :
 	_sbEngine(AssetCache<sf::SoundBuffer, std::string>::get("engine")),
 	_sbCrash(AssetCache<sf::SoundBuffer, std::string>::get("crash")),
-	_sbHit(AssetCache<sf::SoundBuffer, std::string>::get("hit")),
+	_sbObstacleCollision(AssetCache<sf::SoundBuffer, std::string>::get("hit")),
 	_sbOverheat(AssetCache<sf::SoundBuffer, std::string>::get("overheat"))
 {
 	loadFromBuffers();
 
 	_sEngine.setLoop(true);
+
+	setVolume(Sounds::crash, 80);
+	setVolume(Sounds::engine, 80);
+	setVolume(Sounds::obstacleCollision, 80);
+	setVolume(Sounds::overheat, 80);
 
 	playAudio(Sounds::engine);
 }
@@ -24,28 +31,20 @@ void PlayerAudio::playAudio(Sounds sound)
 	switch (sound)
 	{
 	case engine:
-		if (_sEngine.getStatus() != _sEngine.Playing)
-		{
-			_sEngine.play();
-		}
+		_sEngine.setPlayingOffset(sf::milliseconds(0));
+		_sEngine.play();
 		break;
 	case crash:
-		if (_sCrash.getStatus() != _sCrash.Playing)
-		{
-			_sCrash.play();
-		}
+		_sCrash.setPlayingOffset(sf::milliseconds(0));
+		_sCrash.play();
 		break;
-	case hit:
-		if (_sHit.getStatus() != _sHit.Playing)
-		{
-			_sHit.play();
-		}
+	case obstacleCollision:
+		_sObstacleCollision.setPlayingOffset(sf::milliseconds(0));
+		_sObstacleCollision.play();
 		break;
 	case overheat:
-		if (_sOverheat.getStatus() != _sOverheat.Playing)
-		{
-			_sOverheat.play();
-		}
+		_sOverheat.setPlayingOffset(sf::milliseconds(0));
+		_sOverheat.play();
 		break;
 	default:
 		break;
@@ -54,6 +53,7 @@ void PlayerAudio::playAudio(Sounds sound)
 
 void PlayerAudio::setPitch(Sounds sound, float pitchValue)
 {
+	float val = std::min(0.8f, std::max(2.f, pitchValue));
 	switch (sound)
 	{
 	case engine:
@@ -62,8 +62,8 @@ void PlayerAudio::setPitch(Sounds sound, float pitchValue)
 	case crash:
 		_sCrash.setPitch(pitchValue);
 		break;
-	case hit:
-		_sHit.setPitch(pitchValue);
+	case obstacleCollision:
+		_sObstacleCollision.setPitch(pitchValue);
 		break;
 	case overheat:
 		_sOverheat.setPitch(pitchValue);
@@ -83,8 +83,8 @@ void PlayerAudio::setVolume(Sounds sound, float volumeValue)
 	case crash:
 		_sCrash.setVolume(volumeValue);
 		break;
-	case hit:
-		_sHit.setVolume(volumeValue);
+	case obstacleCollision:
+		_sObstacleCollision.setVolume(volumeValue);
 		break;
 	case overheat:
 		_sOverheat.setVolume(volumeValue);
@@ -98,6 +98,6 @@ void PlayerAudio::loadFromBuffers()
 {
 	_sEngine.setBuffer(*_sbEngine.get());
 	_sCrash.setBuffer(*_sbCrash.get());
-	_sHit.setBuffer(*_sbHit.get());
+	_sObstacleCollision.setBuffer(*_sbObstacleCollision.get());
 	_sOverheat.setBuffer(*_sbOverheat.get());
 }

@@ -12,19 +12,21 @@
 #include "GFX/Rendering/Transformable3D.hpp"
 #include "GFX/Resources/TexturedModel.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
+#include "GFX/Resources/ParticleSystem.hpp"
+#include "GFX/Lighting/PointLight.hpp"
 #include "Core/Utility/SpringRotatedVector.hpp"
 #include "Core/Utility/SpringTranslatedVector.hpp"
 #include "Core/Geometry/BoundingBox.hpp"
 #include "Core/Utility/CollisionUtility.hpp"
 #include "Core/Utility/SpringSmoothedValue.hpp"
+#include "Core/Utility/ShakeOffset.hpp"
 
 class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 {
 public:
 	GFX::TexturedModel _shipModel;
 
-	Ship();
-	Ship(glm::vec3 position);
+	Ship(glm::vec3 color);
 
 	void render(GFX::RenderStates& states) override;
 	void update(float dt);
@@ -57,17 +59,22 @@ public:
 	const glm::vec3& getMeshUp() const;
 	const glm::vec3 getVelocity() const;
 	const glm::vec3 getCameraPosition() const;
+	const glm::mat4& getTransform() const;
 	SurfaceType getSurfaceType() const;
 	const BoundingBox& getBoundingBox() const;
 	void obstacleCollision();
 	void setWaypointDifference(const glm::vec3& difference);
+	void setSteeringCooldown(float cooldown);
+	void setInactiveTime(float inactiveTime);
+	float getSteeringCooldown();
+	bool checkIfCollided();
+	GFX::ParticleSystem& getParticleSystem();
+	PointLight getPointLight();
+	const glm::vec3& getColor();
 
-	// TEST
-	glm::mat4 getMatrix()
-	{
-		return _transformMatrix;
-	}
-	///////
+	// Moves down units in -y direction, then rotates angle radians around z
+	// Used to position ship at start of race
+	void rotateAtStart(float down, float angle);
 
 private:
 	bool		_destroyed;
@@ -83,8 +90,17 @@ private:
 	float		_engineFlashTime;
 	bool		_bEngineFlash;
 	bool		_bEngineOverload;
+	bool		_bObstacleCollision;
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
+	float		_steeringCooldown;		// Time until ship can be controlled
+	float		_immunityTimer;			// Time until ship will be able to collide with obstacles
+	float		_inactiveTimer;			// If >0, ship is inactive and cannot be controlled
+
+	GFX::ParticleSystem			_particleSystem;
+	PointLight					_engineLight;
+
+	glm::vec3					_shipColor;
 
 	glm::vec3					_trackForward;			// Forward direction of track
 	glm::vec3					_shipForward;			// Current forward direction of ship
@@ -98,11 +114,15 @@ private:
 	SpringRotatedVector			_cameraForwardDirection;
 
 	SpringSmoothedValue			_surfaceSlope;			// Determines the height of the camera
+	SpringSmoothedValue			_intensityOffset;		// Offset for engine light intensity
+	float						_timeUntilIntensityUpdate;
 
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
 
 	SurfaceType _currentSurface{ SurfaceType::normal };
+
+	ShakeOffset	_shipCollisionShake;
 
 	BoundingBox _boundingBox;
 
@@ -121,6 +141,9 @@ private:
 	const float _rayAheadDistance;	// Distance ahead of ship the second ray starts
 
 	const float _cooldownOnObstacleCollision;
+	const float _immunityoOnObstacleCollision;
+
+	const float _blinkFrequency;	// How fast the ship blinks when immune to obstacle collision
 
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
 
@@ -133,6 +156,5 @@ private:
 	void rotateTowardTrackForward(float dt);
 	void updateDirectionsAndPositions(float dt);
 	void trackSurface(float dt);
-	//void checkObstacleCollision();
 };
 #endif // SHIP_HPP

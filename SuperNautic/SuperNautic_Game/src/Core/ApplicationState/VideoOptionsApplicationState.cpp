@@ -1,65 +1,66 @@
 #include <iostream>
 
+#include <windows.h>
+
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Graphics/Text.hpp"
 #include "SFML/Window/Event.hpp"
 
-#include "Core/ApplicationState/PreGameApplicationState.hpp"
+#include "Core/ApplicationState/VideoOptionsApplicationState.hpp"
 #include "Core/ApplicationState/MainMenuApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
-#include "Core/ApplicationState/PlayApplicationState.hpp"
 #include "Core/Asset/AssetCache.hpp"
 #include "Core/Gui/GuiButton.hpp"
-#include "Core/Utility/Camera.h"
-#include "GFX/Rendering/SfmlRenderer.hpp"
-
-
-#include "Core/Gui/GuiTextInput.hpp"
 #include "Core/Gui/GuiHorizontalList.hpp"
-#include "Core/Gui/GuiSlider.hpp"
-#include "Core/Gui/GuiPlayerJoinContainer.hpp"
 
-PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
+#include "Core/Asset/LoadAssetFunctions.hpp"
+
+VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
-, _trackGenerator(context.segmentHandler.get(), context.obstacleHandler.get())
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
-, _input()
-, _numPlayers(0)
-, _guiContainer(_trackGenerator, _context.track.get())
+, _videoOptions(context.window)
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
-    GuiButton* startButton = new GuiButton(sf::Text("Start", *_font.get()), [&]()
+    GuiHorizontalList* resolutionList = new GuiHorizontalList();
+    for(const glm::ivec2& resolution : _videoOptions.getAllowedResolutions())
     {
-        _stack.clear();
-        _context.numPlayers = _numPlayers == 0 ? 1 : _numPlayers;
-        _context.track = _trackGenerator.takeTrack();
-        _stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context)));
+        std::string text = std::to_string(resolution.x) + "x" + std::to_string(resolution.y);
+        GuiButton* buttonPtr = new GuiButton(sf::Text(text, *_font.get()), [&]()
+        {
+            glm::ivec2 localResolution = resolution;
+            _videoOptions.setResolution(localResolution);
+            applyOptions();
+        });
+        std::unique_ptr<GuiElement> button(buttonPtr);
+        resolutionList->insert(button);
+
+        if(resolution == _videoOptions.getResolution())
+        {
+            resolutionList->GuiContainer::select((GuiElement*)buttonPtr);
+        }
+    }
+
+    guiElements.emplace_back(resolutionList);
+
+    GuiButton* fs = new GuiButton(sf::Text("Toggle Fullscreen", *_font.get()), [&]()
+    {
+        _videoOptions.setFullscreen(!_videoOptions.bIsFullscreen());
+        applyOptions();
     });
-    guiElements.emplace_back(startButton);
+    guiElements.emplace_back(fs);
 
 
     GuiButton* backButton = new GuiButton(sf::Text("Back", *_font.get()), [&]()
     {
         _stack.clear();
-        _context.track = _trackGenerator.takeTrack();
         _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
     });
     guiElements.emplace_back(backButton);
 
-    GuiPlayerJoinContainer* players = new GuiPlayerJoinContainer();
-    players->setOnJoin([this](unsigned char playerId)
-    {
-        _numPlayers++;
-    });
-    players->setOnLeave([this](unsigned char playerId)
-    {
-        _numPlayers--;
-    });
-    guiElements.emplace_back(players);
 
-    sf::Vector2f pos(0.f, _guiContainer.getBoundingRect().top + _guiContainer.getBoundingRect().height);
+    sf::Vector2f pos(0.f, -guiElements.front()->getBoundingRect().height);
     for(const std::unique_ptr<GuiElement>& e : guiElements)
     {
         pos.y += e->getBoundingRect().height * 1.5f;
@@ -73,25 +74,18 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     sf::FloatRect guiBounds = _guiContainer.getBoundingRect();
     _guiContainer.setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height / 2.f);
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
-    _guiContainer.select(startButton);
-
-    _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f);
+    _guiContainer.toggleSelection();
 }
 
-void PreGameApplicationState::render()
+void VideoOptionsApplicationState::render()
 {
-    _forwardRenderer.render(_trackGenerator);
-    static Camera garbageCam(glm::radians(90.f), 1280.f, 720.f);
-    _forwardRenderer.display(garbageCam);
-
     _sfmlRenderer.render(_guiContainer);
     _sfmlRenderer.display(_context.window);
 }
 
-bool PreGameApplicationState::bUpdate(float dtSeconds)
+bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
 {
     _guiContainer.update();
-    _trackGenerator.update(dtSeconds);
 
     if(_input.checkActive())
     {
@@ -107,7 +101,6 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
                     if(!_guiContainer.bIsActive())
                     {
                         _stack.clear();
-                        _context.track = _trackGenerator.takeTrack();
                         _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
                     }
                     break;
@@ -123,7 +116,7 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
     return true;
 }
 
-bool PreGameApplicationState::bHandleEvent(const sf::Event& event)
+bool VideoOptionsApplicationState::bHandleEvent(const sf::Event& event)
 {
     if(event.type == sf::Event::KeyPressed)
     {
@@ -134,7 +127,6 @@ bool PreGameApplicationState::bHandleEvent(const sf::Event& event)
             if(!_guiContainer.bIsActive())
             {
                 _stack.clear();
-                _context.track = _trackGenerator.takeTrack();
                 _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
             }
             break;
@@ -146,3 +138,35 @@ bool PreGameApplicationState::bHandleEvent(const sf::Event& event)
     _guiContainer.handleEvent(event);
     return true;
 }
+
+void VideoOptionsApplicationState::applyOptions()
+{
+    _videoOptions.recreateWindow();
+
+    _context.track.reset();
+
+    _context.obstacleHandler.reset();
+    _context.segmentHandler.reset();
+
+    ShaderCache::reload();
+    ModelCache::reload();
+    TextureCache::reload();
+
+    // These caches below don't actually manage OpenGL resources and
+    // don't have to be reloaded.
+//    RawMeshCache::reload();
+//    MaterialCache::reload();
+
+    // SegmentHandler and ObstacleHandler have to be reloaded
+    // manually for some reason.
+    // TODO: Ask Timmie about it.
+    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt"));
+	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
+
+	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
+    {
+        _context.segmentHandler->loadSegment(i);
+    }
+}
+
+

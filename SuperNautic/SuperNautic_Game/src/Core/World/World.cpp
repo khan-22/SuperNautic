@@ -10,22 +10,17 @@
 
 World::World(ApplicationContext& context)
 	: _context{ context }
-	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
+	, _debugCamera{ 90.0f, context.window.getSize().x, context.window.getSize().y, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
-	, _timer(1280, 720)
+	, _timer(context.window.getSize().x, context.window.getSize().y, context.numPlayers)
+	, _progression(context.window.getSize().x, context.window.getSize().y, context.numPlayers)
 	, _track(context.track.get())
 	, _playerRTs(context.numPlayers)
 	, _playerParticleRenderers(context.numPlayers)
 	, _playerWindowRenderers(context.numPlayers)
-	, _playerParticles(context.numPlayers)
 	, _playerPointLights(context.numPlayers)
 	, _bDebugging(false)
 {
-	for (int i = 0; i < _playerParticles.size(); i++)
-	{
-		_playerParticles[i].init(500, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
-	}
-
 	for (int i = 0; i < context.numPlayers; i++)
 	{
 		for (int j = 0; j < 6; j++)
@@ -34,28 +29,33 @@ World::World(ApplicationContext& context)
 		}
 	}
 
-	// Create one player
-//	for (int i = 0; i < 5; i++)
-//	{
-//		if (sf::Joystick::isConnected(i)) {
-//			_players.emplace_back(i);
-//			_playerProgression.push_back(TrackProgression{ 0, _track });
-//			LOG(i);
-//		}
-//	}
-    for(size_t i = 0 ; i < _context.numPlayers; i++)
+	std::vector<glm::vec3> colors{ glm::vec3{ 1.0f, 0.0f, 0.0f },
+		glm::vec3{ 0.0f, 1.0f, 0.0f },
+		glm::vec3{ 0.0f, 0.0f, 1.0f },
+		glm::vec3{ 1.0f, 1.0f, 0.0f } };
+
+    for(int i = 0 ; i < _context.numPlayers; i++)
     {
-        _players.emplace_back(i);
+		_players.emplace_back(i, colors[i]);
         _playerProgression.push_back(TrackProgression{ 0, _track });
         LOG(i);
+
+		// Set ship position and rotation
+		_players[i].getShip().rotateAtStart(10.0f, glm::pi<float>() * 0.5f * i);
+
+		// Set ship engine cooldown
+		_players[i].getShip().setInactiveTime(2.0f);
     }
 
 	// TEST PLAYER
 
 	if (_players.size() == 0)
 	{
-		_players.emplace_back(10);
-		_playerProgression.push_back(TrackProgression{ 0, _track });
+		/*_players.emplace_back(10);
+		_playerProgression.push_back(TrackProgression{ 0, _track });*/
+
+		LOG_ERROR("No players detected!");
+		abort();
 	}
 
 	if (_players.size() == 1)
@@ -63,53 +63,53 @@ World::World(ApplicationContext& context)
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
-		_players[0].setScreenSize(1280, 720, 0, 0);
+		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y, 0, 0);
 	}
 	else if (_players.size() == 2)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
-		_players[0].setScreenSize(1280, 360, 0, 0);
+		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, 0);
 
 		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
 		_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
 		_playerWindowRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
-		_players[1].setScreenSize(1280, 360, 0, 360);
+		_players[1].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 	}
 	else if (_players.size() == 3)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
-		_players[0].setScreenSize(1280, 360, 0, 0);
+		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, 0);
 		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerWindowRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_players[1].setScreenSize(640, 360, 0, 360);
+		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 		_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_players[2].setScreenSize(640, 360, 640, 360);
+		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
 	else if (_players.size() == 4)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
-		_players[0].setScreenSize(640, 360, 0, 0);
+		_players[0].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, 0);
 		_playerRTs[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerWindowRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_players[1].setScreenSize(640, 360, 640, 360);
+		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 		_playerRTs[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_players[2].setScreenSize(640, 360, 640, 0);
+		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, 0);
 		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerWindowRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_players[3].setScreenSize(640, 360, 0, 360);
+		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 	}
 }
 
@@ -138,8 +138,6 @@ void World::update(float dt, sf::Window& window)
 			_playerProgression[i].update(lengthInSegment);
 			_players[i].setProgression(_playerProgression[i].getProgression());
 
-			// LOG("PROGRESSION: ", _playerProgression[i].getProgression());
-
 			// Update ship forward position and respawn position
 			_players[i].getShip().setForward(forward);
 			_players[i].getShip().setReturnPos(returnPos);
@@ -166,6 +164,8 @@ void World::update(float dt, sf::Window& window)
 			_players[i].update(dt);
 		}
 
+		std::vector<float> positions;
+
 		for (unsigned i = 0; i < _players.size(); ++i)
 		{
 			int k = 1;
@@ -177,7 +177,10 @@ void World::update(float dt, sf::Window& window)
 				}
 			}
 			_players[i].setPosition(k);
+			positions.push_back(_playerProgression[i].getProgression());
 		}
+
+		_progression.updatePositions(positions);
 
 		// Update debug camera
 		_debugCamera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
@@ -207,24 +210,11 @@ void World::update(float dt, sf::Window& window)
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
 
-	//static glm::vec3 currentPos = _players[0].getShip().getPosition();
-	//static glm::vec3 previousPos = currentPos;
-	//currentPos = glm::vec3{ _players[0].getShip().getMatrix() * glm::vec4{ 0.f,0.f,0.f,1.f } } - _players[0].getShip().getMeshForward() * 2.0f;//_players[0].getShip().getPosition();
-
-	//_testParticles.update(dt, currentPos, currentPos - previousPos);
-	for (int i = 0; i < _playerParticles.size(); i++)
-	{
-		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 1.9f;
-		_playerParticles[i].update(dt, particlePos);
-	}
-
-	//previousPos = currentPos;
+	_progression.updateCurrent();
 }
 
 void World::render()
 {
-	std::vector<PointLight> shipLights;
-
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
 		//Do not render the player's own ship if they are in first person, but render all other ships as normal
@@ -236,42 +226,11 @@ void World::render()
 			}
 		}
 	}
-
-    //////////////////////
-    // Copy-pasted from GuiPlayerJoinContainer::createWindows
-    static constexpr size_t MAX_PLAYERS = 4;
-    static constexpr unsigned char COLORS[4][MAX_PLAYERS] =
-    {
-        {255, 0, 0, 255},
-        {0, 255, 0, 255},
-        {0, 0, 255, 255},
-        {255, 255, 0, 255}
-    };
-	//////////////////////
-//	for (Player& player : _players)
-    assert(_players.size() <= MAX_PLAYERS);
-	for(size_t i = 0; i < _players.size(); i++)
-	{
-	    Player& player = _players[i];
-        unsigned char* c = (unsigned char*)COLORS[i];
-        glm::vec3 diffuseColor(c[0], c[1], c[2]);
-        diffuseColor /= 255.f;
-		//shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 3.0f, { 1.f,0.5f,0.f }, 1.f)); //TODO Don't remake lights each tick, retard
-//		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,0.f }, 1.5f));
-		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, diffuseColor, 1.5f));
-
-		// TEST
-		//shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{ -2,0,0,1 } }, { 0.f,0.5f,1.f }, 1.f));
-		//shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{ 0,0,0,1 } } +player.getShip().getMeshForward() * 2.0f, { 1.f,0.5f,1.f }, 1.f));
-		//shipLights.push_back(PointLight(glm::vec3{ player.getShip().getMatrix() * glm::vec4{0,0,0,1} } - player.getShip().getMeshForward() * 2.0f, { 1.f,0.0f,0.f }, 1.f));
-		///////
-	}
-
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		for (int j = 0; j < shipLights.size(); j++)
+		for (int j = 0; j < _players.size(); j++)
 		{
-			_playerRTs[i].pushPointLight(shipLights[j]);
+			_playerRTs[i].pushPointLight(_players[i].getShip().getPointLight());
 		}
 	}
 
@@ -298,42 +257,39 @@ void World::render()
 			_playerRTs[i].display(*_players[i].getCamera());
 			_playerRTs[i].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 		}
-		for (int i = 0; i < _playerParticleRenderers.size(); i++)
-		{
-			for (int j = 0; j < _players.size(); j++)
-			{
-				_playerParticleRenderers[i].render(_playerParticles[j]);
-				_playerParticleRenderers[i].display(*_players[i].getCamera());
-			}
-		}
-
+		
 		for (int i = 0; i < _playerWindowRenderers.size(); i++)
 		{
 			_playerWindowRenderers[i].display(*_players[i].getCamera());
 		}
+
+		for (int i = 0; i < _playerParticleRenderers.size(); i++)
+		{
+			for (int j = 0; j < _players.size(); j++)
+			{
+				_playerParticleRenderers[i].render(_players[i].getShip().getParticleSystem());
+				_playerParticleRenderers[i].display(*_players[i].getCamera());
+			}
+		}
+
 	}
 	else
 	{
 		_playerRTs[0].display(_debugCamera);
 		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 
+		for (int i = 0; i < _playerWindowRenderers.size(); i++)
+		{
+			_playerWindowRenderers[i].display(_debugCamera);
+		}
+
 		for (int j = 0; j < _players.size(); j++)
 		{
-			_playerParticleRenderers[0].render(_playerParticles[j]);
+			_playerParticleRenderers[0].render(_players[j].getShip().getParticleSystem());
 			_playerParticleRenderers[0].display(_debugCamera);
 		}
 
-		for (int i = 0; i < _playerWindowRenderers.size(); i++)
-		{
-			_playerWindowRenderers[i].display(*_players[i].getCamera());
-		}
 	}
-
-
-
-
-
-	// Should be done for each player before drawing particles.
 
 	GFX::SfmlRenderer sfml;
 	for (int i = 0; i < _players.size(); i++)
@@ -342,6 +298,7 @@ void World::render()
 	}
 
 	sfml.render(_timer);
+	sfml.render(_progression);
 
 	sfml.display(_context.window);
 }

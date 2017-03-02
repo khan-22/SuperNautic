@@ -32,6 +32,8 @@ public:
 
     void setOnElementSelect(const std::function<void(GuiElement*)>& func);
 
+    bool select(GuiElement* element);
+
 protected:
     std::vector<std::unique_ptr<GuiElement>> _elements;
     size_t _selection = -1;
@@ -47,6 +49,7 @@ protected:
 
 protected:
     virtual void handleEventCurrent(const sf::Event& event) override;
+    void activateSelection();
 
 private:
     std::function<void(GuiElement*)> _onElementSelectCallback = [](GuiElement*){};
@@ -58,7 +61,6 @@ private:
 
     void selectNext();
     void selectPrevious();
-    void activateSelection();
     virtual void activate() override;
     virtual void deactivate() override;
 };

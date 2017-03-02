@@ -29,48 +29,7 @@ void GuiHorizontalList::deselect()
 void GuiHorizontalList::handleEventCurrent(const sf::Event& event)
 {
     GuiContainer::handleEventCurrent(event);
-    if(event.type == sf::Event::KeyPressed)
-    {
-        switch(event.key.code)
-        {
-            case sf::Keyboard::Escape:
-            case sf::Keyboard::B:
-                toggleActivation();
-                break;
-
-            default:
-                break;
-        }
-    }
 }
-
-
-void GuiHorizontalList::activate()
-{
-//    if(!bHasSelection())
-//    {
-//        GuiContainer::select();
-//    }
-
-    if(bHasSelection())
-    {
-        getSelection().toggleActivation();
-    }
-}
-
-void GuiHorizontalList::deactivate()
-{
-//    if(!bHasSelection())
-//    {
-//        GuiContainer::select();
-//    }
-
-//    if(bHasSelection())
-//    {
-//        getSelection().toggleActivation();
-//    }
-}
-
 
 bool GuiHorizontalList::bIsSelectable() const
 {
@@ -119,7 +78,7 @@ void GuiHorizontalList::insert(std::unique_ptr<GuiElement>& element)
     }
 
     _elements.push_back(std::move(element));
-
+    updateVisuals();
 }
 
 void GuiHorizontalList::insert(std::vector<std::unique_ptr<GuiElement>>& elements)
@@ -133,15 +92,35 @@ void GuiHorizontalList::insert(std::vector<std::unique_ptr<GuiElement>>& element
 void GuiHorizontalList::onElementSelect()
 {
     GuiContainer::onElementSelect();
+    updateVisuals();
+}
 
+void GuiHorizontalList::updateVisuals()
+{
     _drawElements.clear();
 
-    GuiElement& selection = getSelection();
-    selection.setOrigin(selection.getBoundingRect().width / 2.f, selection.getBoundingRect().height / 2.f);
-    selection.setPosition(0.f, 0.f);
-    _drawElements.push_back(&selection);
+    GuiElement* selection;
+    size_t selectionId;
+    if(!bHasSelection())
+    {
+        assert(!_elements.empty());
+        selection = _elements.front().get();
+        selectionId = 0;
+    }
+    else
+    {
+        selection = &getSelection();
+        selectionId = _selection;
+    }
 
-    for(size_t i = _selection + 1; i < _elements.size() && i < _selection + (_maxVisibleElements + 1) / 2; i++)
+    sf::Vector2f selectionScale = selection->getScale();
+    sf::Vector2f selectionOrigin(selection->getBoundingRect().width / selectionScale.x, selection->getBoundingRect().height / selectionScale.y);
+    selectionOrigin /= 2.f;
+    selection->setOrigin(selectionOrigin);
+    selection->setPosition(0.f, 0.f);
+    _drawElements.push_back(selection);
+
+    for(size_t i = selectionId + 1; i < _elements.size() && i < selectionId + (_maxVisibleElements + 1) / 2; i++)
     {
         GuiElement& right = *_elements[i];
         right.setOrigin(right.getBoundingRect().width / 2.f, right.getBoundingRect().height / 2.f);
@@ -151,7 +130,7 @@ void GuiHorizontalList::onElementSelect()
     }
 
 
-    for(int i = _selection - 1; i >= 0 && i > int(_selection - (_maxVisibleElements + 1) / 2); i--)
+    for(int i = selectionId - 1; i >= 0 && i > int(selectionId - (_maxVisibleElements + 1) / 2); i--)
     {
         GuiElement& left = *_elements[i];
         left.setOrigin(left.getBoundingRect().width / 2.f, left.getBoundingRect().height / 2.f);

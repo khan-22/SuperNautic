@@ -10,6 +10,8 @@
 #include "GFX/Resources/VertexArrayObject.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
 
+#include "Core/Asset/LoadAssetFunctions.hpp"
+
 namespace GFX
 {
 
@@ -24,6 +26,14 @@ namespace GFX
 		void update(float dt, glm::vec3 position);
 
 		void render(RenderStates& states) override;
+
+		void start();
+		void stop();
+		void setBirthColor(glm::vec3 color);
+		void setDeathColor(glm::vec3 color);
+		void setBirthSize(float size);
+		void setDeathSize(float size);
+		void setLifeTime(float lifeTime);
 
 	protected:
 
@@ -45,12 +55,20 @@ namespace GFX
 		std::vector<ParticlePhysicsData>	_physParticles;
 		ParticleRenderData	_renderParticles;
 
+		TextureAsset	_texture;
+
 		GLuint		_particleCount;
 		GLfloat		_turbulence;
 		glm::vec3	_previousTurbulence;
 		GLfloat		_maxSpread;
 		GLfloat		_maxLifetime;
 
+		glm::vec3	_birthColor;
+		glm::vec3	_deathColor;
+		GLfloat		_birthSize;
+		GLfloat		_deathSize;
+
+		bool		_bIsRunning;
 		GLsizei		_sizeInBytes;
 		GLsizei		_positionsSizeInBytes;
 		GLsizei		_colorsSizeInBytes;

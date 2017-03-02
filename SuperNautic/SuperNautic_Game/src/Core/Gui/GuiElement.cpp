@@ -39,10 +39,18 @@ void GuiElement::toggleSelection()
     if(_bIsSelected)
     {
         select();
+        for(const auto& callback : _onSelectCallbacks)
+        {
+            callback();
+        }
     }
     else
     {
         deselect();
+        for(const auto& callback : _onDeselectCallbacks)
+        {
+            callback();
+        }
     }
 
 }
@@ -79,4 +87,14 @@ void GuiElement::toggleActivation()
         deactivate();
     }
 
+}
+
+void GuiElement::registerOnSelect(const std::function<void()>& callback)
+{
+    _onSelectCallbacks.push_back(callback);
+}
+
+void GuiElement::registerOnDeselect(const std::function<void()>& callback)
+{
+    _onDeselectCallbacks.push_back(callback);
 }

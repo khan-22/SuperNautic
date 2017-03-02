@@ -18,6 +18,8 @@ ShaderLoader::~ShaderLoader()
 
 Shader* ShaderLoader::loadShader(std::string shaderName)
 {
+	LOG("Starting work on: ", shaderName);
+
 	GLuint vertexShader		= 0U;
 	GLuint geometryShader	= 0U;
 	GLuint fragmentShader	= 0U;

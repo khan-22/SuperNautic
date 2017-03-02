@@ -8,6 +8,7 @@ WorldAudio::WorldAudio()
 	loadSound("Stranger Danger - Mellow Business.ogg");
 	_music.setBuffer(_musicbuffer);
 
+	_music.setVolume(50);
 	_music.setLoop(true);
 	play();
 }

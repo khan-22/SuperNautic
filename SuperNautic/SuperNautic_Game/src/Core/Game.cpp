@@ -20,10 +20,11 @@
 #include "GFX/Resources/Loaders/ShaderLoader.hpp"
 #include "GFX/Rendering/Transformable3D.hpp"
 
+#include "Core/Utility/VideoOptions.hpp"
 
 
 Game::Game()
-	: _window(sf::VideoMode(1280, 720), "Test window", sf::Style::Titlebar | sf::Style::Close, sf::ContextSettings(24U, 8U, 0U, 4U, 0U))
+	: _window()
 	, _context(_window)
 	, _quitTimer(0.f)
 	, _fps(60.f)
@@ -31,6 +32,9 @@ Game::Game()
 	, _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f))
 {
 	LOG("Game is being constructed...");
+
+    VideoOptions videoOptions(_window);
+    videoOptions.recreateWindow();
 }
 
 Game::~Game()
@@ -41,6 +45,8 @@ Game::~Game()
 
 bool Game::bInitialize()
 {
+
+
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 

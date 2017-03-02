@@ -1,6 +1,8 @@
+#include <algorithm>
 #include <glm\gtx\transform.hpp>
 
 #include "Core/Utility/Camera.h"
+#include "Core/Utility/Utilities.hpp"
 
 //Default constructor
 Camera::Camera()
@@ -33,6 +35,16 @@ glm::vec3 Camera::getPosition() const
 	return _pos;
 }
 
+glm::vec3 Camera::getDirection() const
+{
+	return _viewDir;
+}
+
+glm::vec3 Camera::getUp() const
+{
+	return _up;
+}
+
 //Returns the view matrix
 glm::mat4 Camera::getView() const
 {
@@ -55,6 +67,7 @@ glm::mat4 Camera::getVP() const
 void Camera::setPos(const glm::vec3 & newPos)
 {
 	_pos = newPos;
+
 	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
 }
 
@@ -83,7 +96,8 @@ void Camera::setUp(const glm::vec3 & newUp)
 void Camera::setViewDir(const glm::vec3 & newDir)
 {
 	_viewDir = newDir;
-	_view = glm::lookAt(_pos, _pos + _viewDir, _up);
+
+	_view = glm::lookAt(_pos, _pos + glm::normalize(_viewDir), _up);
 }
 
 //Sets the view dir with aging
@@ -114,3 +128,9 @@ void Camera::setAspectRatio(int width, int height)
 
 	_perspective = glm::perspective(glm::radians(_fov), (float)_viewWidth / _viewHeight, 0.1f, 1000.f);
 }
+
+void Camera::setView(const glm::mat4& view)
+{
+	_view = view;
+}
+

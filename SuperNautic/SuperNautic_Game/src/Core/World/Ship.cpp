@@ -1,4 +1,5 @@
 #include <math.h>
+#include <cstdlib>
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -11,7 +12,7 @@
 #include "Core/Geometry/RayIntersection.hpp"
 #include "Core/Utility/CollisionUtility.hpp"
 
-Ship::Ship()
+Ship::Ship(glm::vec3 color)
 	:	_destroyed{ false },
 		_stopped{ false },
 		_turningFactor{ 0.0f },
@@ -27,15 +28,15 @@ Ship::Ship()
 		_upDirection{ 0.0f, 1.0f, 0.0f },
 		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 200.0f, 6.0f, false},
 		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 100.0f, 6.0f, true },
-		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
+		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 40.0f, 10.0f, true },
 		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
 		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 5.0f },
 		_meshXZPosition{ glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 0, 0 }, 100.0f },
 		_minAcceleration{ 0.0f },
 		_maxAcceleration{ 100.0f },
-		_maxTurningSpeed{ 8.0f },
+		_maxTurningSpeed{ 20.0f },
 		_straighteningForce{ 3.0f },
-		_steerStraighteningForce{ 15.0f },
+		_steerStraighteningForce{ 10.0f },
 		_speedResistance{ 0.001f },
 		_preferredHeight{ 1.5f },
 		_engineCooldown{ 0 },
@@ -43,20 +44,27 @@ Ship::Ship()
 		_engineFlashTime{ 0 },
 		_bEngineFlash{ false },
 		_bEngineOverload { false },
+		_bObstacleCollision { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
-		_cooldownOnObstacleCollision{ 2.0f },
-		_surfaceSlope{ 0.0f, 0.0f, 3.0f },
-		_rayHeight{ 2.0f },
-		_rayAheadDistance{ 5.0f }
+		_cooldownOnObstacleCollision{ 1.0f },
+		_immunityoOnObstacleCollision{ 2.0f },
+		_immunityTimer{ 0.0f },
+		_blinkFrequency{ 0.1f },
+		_surfaceSlope{ 0.0f, 0.0f, 0.5f },
+		_rayHeight{ 5.0f },
+		_rayAheadDistance{ 5.0f },
+		_steeringCooldown{ 0.0f },
+		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
+		_shipColor{ color },
+		_engineLight{ glm::vec3{ 0.0f }, _shipColor, 1.0f },
+		_intensityOffset{ 1.0f, 1.0f, 20.0f },
+		_timeUntilIntensityUpdate{ 0.0f }
 {
 	setPosition(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
-}
 
-
-Ship::Ship(glm::vec3 position) : Ship{}
-{
-	setPosition(position);
+	_particleSystem.init(200, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.start();
 }
 
 void Ship::render(GFX::RenderStates& states)
@@ -64,7 +72,11 @@ void Ship::render(GFX::RenderStates& states)
 	// Update model's matrix
 	_shipModel.getModelAsset().get()->setModelMatrix(_transformMatrix);
 
-	_shipModel.render(states);
+	// Achieves blinking effecet
+	if (static_cast<int>(_immunityTimer / _blinkFrequency) % 2 == 0)
+	{
+		_shipModel.render(states);
+	}
 }
 
 void Ship::update(float dt)
@@ -79,6 +91,10 @@ void Ship::update(float dt)
 	trackSurface(dt);
 	updateDirectionsAndPositions(dt);
 
+	_shipCollisionShake.setMagnitude(_steeringCooldown);
+	_shipCollisionShake.setSpeed(_steeringCooldown);
+	_shipCollisionShake.update(dt);
+
 	// Create mesh rotation matrix from mesh up and forward directions
 	_meshMatrix = { glm::vec4{ glm::normalize(glm::cross(_meshUpDirection(), _meshForwardDirection())), 0.0f },
 						  glm::vec4{ _meshUpDirection(), 0.0f },
@@ -86,7 +102,7 @@ void Ship::update(float dt)
 						  glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 
 	// Update matrix
-	_transformMatrix = glm::translate(_meshPosition()) * _meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin());
+	_transformMatrix = glm::translate(_meshPosition()) * glm::translate(glm::vec3{ _meshMatrix * glm::vec4{ _shipCollisionShake(), 0.0f } }) *_meshMatrix * glm::scale(getScale()) * glm::translate(-getOrigin());
 
 	// Update bounding box
 	_boundingBox.center = _meshPosition();
@@ -98,11 +114,29 @@ void Ship::update(float dt)
 	_surfaceSlope.setTarget(glm::dot(_waypointDifference, _upDirection));
 	_surfaceSlope.update(dt);
 
-	float dot1 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[1]);
-	float dot2 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[2]);
-	float dot3 = glm::dot(_boundingBox.directions[2], _boundingBox.directions[1]);
-
 	checkObstacleCollision();
+
+	// Handle particle system and light variables
+	float interpolation = powf(clamp(_engineTemperature * 0.01f, 0.1f, 0.9f), 2.0f);
+	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
+	_engineLight.updateColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } *interpolation);
+
+	_particleSystem.setDeathColor(glm::vec3{0.0f});
+	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+
+	// Update random intensity offset
+	_timeUntilIntensityUpdate -= dt;
+	if (_timeUntilIntensityUpdate <= 0.0f)
+	{
+		_timeUntilIntensityUpdate += 0.02f + (static_cast<float>(rand()) / RAND_MAX) * 0.06f;
+		_intensityOffset.setTarget(static_cast<float>(rand()) / RAND_MAX);
+	}
+	_intensityOffset.update(dt);
+
+	_engineLight.changeIntensity(powf(_velocity * 0.03f, 1.5f) * 0.2f + _intensityOffset() * _velocity * 0.015f);
+
+	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
+	_engineLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -111,7 +145,7 @@ void Ship::update(float dt)
 
 void Ship::jump()
 {
-	if (_currentJumpCooldown <= 0.0f)
+	if (_currentJumpCooldown <= 0.0f && _steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 	{
 		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _trackForward);
 
@@ -265,7 +299,12 @@ const glm::vec3 Ship::getVelocity() const
 
 const glm::vec3 Ship::getCameraPosition() const
 {
-	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f/* + _velocity / 90.0f*/) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f) + _meshUpDirection() * (1.0f + _surfaceSlope() * 5.0f);
+	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f);
+}
+
+const glm::mat4 & Ship::getTransform() const
+{
+	return _transformMatrix;
 }
 
 SurfaceType Ship::getSurfaceType() const
@@ -310,10 +349,54 @@ const BoundingBox & Ship::getBoundingBox() const
 
 void Ship::obstacleCollision()
 {
-	if (_cooldownOnObstacleCollision > _engineCooldown)
+	if (_immunityTimer <= 0.0f)
 	{
 		_engineCooldown = _cooldownOnObstacleCollision;
+		_steeringCooldown = _cooldownOnObstacleCollision;
+		_immunityTimer = _immunityoOnObstacleCollision;
+		_bObstacleCollision = true;
 	}
+}
+
+bool Ship::checkIfCollided()
+{
+	if (_bObstacleCollision)
+	{
+		_bObstacleCollision = false;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+GFX::ParticleSystem& Ship::getParticleSystem()
+{
+	return _particleSystem;
+}
+
+PointLight Ship::getPointLight()
+{
+	return _engineLight;
+}
+
+const glm::vec3 & Ship::getColor()
+{
+	return _shipColor;
+}
+
+
+void Ship::rotateAtStart(float down, float angle)
+{
+	move(0, -down, 0);
+
+	glm::mat4 rotation = glm::rotate(angle, glm::vec3{ 0, 0, 1 });
+
+	setPosition(rotation * glm::vec4{ getPosition(), 0.0f });
+	_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
+	_meshUpDirection.setVector(_upDirection);
+	_cameraUpDirection.setVector(_upDirection);
 }
 
 void Ship::setWaypointDifference(const glm::vec3 & difference)
@@ -321,12 +404,34 @@ void Ship::setWaypointDifference(const glm::vec3 & difference)
 	_waypointDifference = difference;
 }
 
+void Ship::setSteeringCooldown(float cooldown)
+{
+	_steeringCooldown = cooldown;
+}
+
+void Ship::setInactiveTime(float inactiveTime)
+{
+	_inactiveTimer = inactiveTime;
+}
+
+float Ship::getSteeringCooldown()
+{
+	return _steeringCooldown;
+}
+
 void Ship::handleInputs(float dt)
 {
 	if (!_stopped)
 	{
-		// Update turning angle										reduce maneuverability at high acceleration
-		_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.3f) * dt;
+		if (_steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
+		{
+			// Update turning angle										reduce maneuverability at high acceleration
+			_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.0f) * dt;
+		}
+		else
+		{
+			_accelerationFactor = -1.0f;
+		}
 		// abs to preserve sign of _currentTurningAngle
 		_currentTurningAngle -= _steerStraighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
 
@@ -370,6 +475,22 @@ void Ship::handleCooldowns(float dt)
 	if (_currentJumpCooldown > 0.0f)
 	{
 		_currentJumpCooldown -= dt;
+	}
+
+	// Update steering cooldown
+	if (_steeringCooldown > 0.0f)
+	{
+		_steeringCooldown -= dt;
+	}
+
+	if (_immunityTimer > 0.0f)
+	{
+		_immunityTimer -= dt;
+	}
+
+	if (_inactiveTimer > 0.0f)
+	{
+		_inactiveTimer -= dt;
 	}
 }
 

@@ -10,6 +10,9 @@
 #include "Core/Io/Log.hpp"
 #include "GFX/Resources/Model.hpp"
 
+const unsigned int Track::_MIN_TRACK_LENGTH = 3000;
+const unsigned int Track::_MAX_TRACK_LENGTH = 1000000;
+
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	: _segmentHandler(segmentHandler)
@@ -56,8 +59,18 @@ unsigned int Track::getCurviness() const
 // Sets the track length in whole meters
 void Track::setLength(const unsigned int length)
 {
-	assert(length >= 3000 && length <= 1000000);
+	assert(length >= _MIN_TRACK_LENGTH && length <= _MAX_TRACK_LENGTH);
 	_targetLength = length;
+}
+
+unsigned int Track::getMaxLength()
+{
+    return _MAX_TRACK_LENGTH;
+}
+
+unsigned int Track::getMinLength()
+{
+    return _MIN_TRACK_LENGTH;
 }
 
 // Set randomization seed
@@ -661,11 +674,26 @@ void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowR
 		if (index >= 0 && index < _track.size())
 		{
 			renderer.render(*_track[index]);
+			std::vector<ObstacleInstance>& obstacles = _track[index]->getObstacles();
+			for (auto& obstacle : obstacles)
+			{
+				renderer.render(obstacle);
+			}
 		}
 	}
 
+	for (int i = 1; i < 100; i++)
+	{
+		int index = shipIndex + i;
+		if (index >= 0 && index < _track.size())
+		{
+			windowRenderer.render(*_track[index]);
+		}
+	}
+
+
 	int lowestIndex = shipIndex - 2;
-	int largestIndex = shipIndex + 30;
+	int largestIndex = shipIndex + 7;
 
 	for (auto& window : _segmentWindows)
 	{
