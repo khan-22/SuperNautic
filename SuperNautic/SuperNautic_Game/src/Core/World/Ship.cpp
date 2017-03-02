@@ -412,7 +412,7 @@ void Ship::updateDirectionsAndPositions(float dt)
 	_cameraForwardDirection.setBackupAxis(_upDirection);
 	_cameraForwardDirection.update(dt);
 
-	// Update forward/right position 
+	// Update forward/right position
 	_meshXZPosition.setTarget(getPosition());
 	_meshXZPosition.update(dt);
 
@@ -646,7 +646,7 @@ GFX::ParticleSystem& Ship::getParticleSystem()
 	return _particleSystem;
 }
 
-PointLight Ship::getPointLight()
+PointLight& Ship::getPointLight()
 {
 	return _engineLight;
 }
