@@ -23,6 +23,9 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
 {
     std::cout << "Welcome to MainMenu state." << std::endl;
 
+
+
+
     _guiContainer.setBackground(sf::Color::Magenta);
     sf::Text text;
     text.setFont(*_font.get());
@@ -60,6 +63,9 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     _guiContainer.toggleSelection();
     _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
 
+
+    _titleText.setOrigin(_titleText.getBoundingRect().width / 2.f, _titleText.getBoundingRect().height / 2.f);
+    _titleText.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
 }
 
 void MainMenuApplicationState::render()
