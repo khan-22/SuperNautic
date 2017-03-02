@@ -65,6 +65,7 @@ public:
 	void setWaypointDifference(const glm::vec3& difference);
 	void setSteeringCooldown(float cooldown);
 	float getSteeringCooldown();
+	bool checkIfCollided();
 
 private:
 	bool		_destroyed;
@@ -80,6 +81,7 @@ private:
 	float		_engineFlashTime;
 	bool		_bEngineFlash;
 	bool		_bEngineOverload;
+	bool		_bObstacleCollision;
 	float		_velocity;				// Current forward velocity
 	float		_timeSinceIntersection;	// Time since ray intersected track
 	float		_steeringCooldown;		// Time until ship can be controlled

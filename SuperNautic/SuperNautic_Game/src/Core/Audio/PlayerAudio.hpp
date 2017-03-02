@@ -13,7 +13,7 @@ public:
 	PlayerAudio();
 	~PlayerAudio();
 
-	enum Sounds {engine, overheat, crash, hit};
+	enum Sounds {engine, overheat, crash, obstacleCollision};
 
 	void playAudio(Sounds sound);
 
@@ -27,11 +27,11 @@ private:
 	sf::Sound _sEngine;
 	sf::Sound _sOverheat;
 	sf::Sound _sCrash;
-	sf::Sound _sHit;
+	sf::Sound _sObstacleCollision;
 	Asset<sf::SoundBuffer> _sbEngine;
 	Asset<sf::SoundBuffer> _sbOverheat;
 	Asset<sf::SoundBuffer> _sbCrash;
-	Asset<sf::SoundBuffer> _sbHit;
+	Asset<sf::SoundBuffer> _sbObstacleCollision;
 
 	void loadFromBuffers();
 

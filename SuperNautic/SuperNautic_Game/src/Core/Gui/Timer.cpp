@@ -3,18 +3,25 @@
 #include "Core/Gui/Timer.hpp"
 #include "Core/Asset/AssetCache.hpp"
 
-Timer::Timer(int windowWidth, int windowHeight) :
+Timer::Timer(int windowWidth, int windowHeight, int amountOfPlayers) :
 	SceneNode(),
+	_time(0),
 	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 {
 	_tTime.setFont(*_font.get());
 	_tTime.setFillColor(sf::Color::Cyan);
 	_tTime.setString("00:00:00");
-	_tTime.setPosition(static_cast<float>((windowWidth / 2) - 60 - (_tTime.getLocalBounds().width / 2)), 
-					   static_cast<float>(windowHeight / 10 * 9));
 	_tTime.setCharacterSize(windowWidth / 20);
+	_tTime.setOrigin(_tTime.getGlobalBounds().width / 2, _tTime.getGlobalBounds().height * 1.5);
 
-	_time = 0;
+	if (amountOfPlayers == 1)
+	{
+		_tTime.setPosition(static_cast<float>((windowWidth / 2)), static_cast<float>(windowHeight / 10 * 9));
+	}
+	else
+	{
+		_tTime.setPosition(static_cast<float>((windowWidth / 2)), static_cast<float>(windowHeight / 2));
+	}
 }
 
 Timer::~Timer()

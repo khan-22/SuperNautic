@@ -125,6 +125,11 @@ void Player::update(float dt)
 		_audio.playAudio(_audio.overheat);
 	}
 
+	if (_ship.checkIfCollided())
+	{
+		_audio.playAudio(_audio.obstacleCollision);
+	}
+
 	if (_bIsFirstPerson)
 	{
 		//First person
