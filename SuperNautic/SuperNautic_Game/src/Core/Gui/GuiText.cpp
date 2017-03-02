@@ -18,3 +18,14 @@ const std::string& GuiText::getText() const
 {
     return _text.getString();
 }
+
+
+void GuiText::renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const
+{
+    target.draw(_text, states);
+}
+
+sf::FloatRect GuiText::getBoundingRect() const
+{
+    return getWorldTransform().transformRect(_text.getGlobalBounds());
+}
