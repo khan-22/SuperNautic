@@ -5,6 +5,8 @@
 
 #include <memory>
 
+#include "glm/glm.hpp"
+
 #include "Core/Gui/GuiContainer.hpp"
 
 class GuiPlayerJoin;
@@ -14,7 +16,7 @@ class GuiPlayerJoinContainer : public GuiContainer
     public:
         struct Player
         {
-            unsigned char color[4]; // rgba
+            glm::vec4 color; // rgba
             unsigned int id;
         };
 

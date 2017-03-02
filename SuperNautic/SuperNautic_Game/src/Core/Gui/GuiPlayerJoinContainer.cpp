@@ -120,6 +120,7 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
                 p.color[k] = _COLORS[i][k];
             }
             p.id = j->getId();
+            players.push_back(p);
         }
     }
 
@@ -132,6 +133,11 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
         }
         p.id = 0;
         players.push_back(p);
+    }
+
+    for(Player& p : players)
+    {
+        p.color /= 255.f;
     }
 
     return players;
