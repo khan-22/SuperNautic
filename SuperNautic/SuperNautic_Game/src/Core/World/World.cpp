@@ -215,8 +215,6 @@ void World::update(float dt, sf::Window& window)
 
 void World::render()
 {
-	std::vector<PointLight> shipLights;
-
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
 		//Do not render the player's own ship if they are in first person, but render all other ships as normal
@@ -228,19 +226,11 @@ void World::render()
 			}
 		}
 	}
-
-	for(size_t i = 0; i < _players.size(); i++)
-	{
-	    Player& player = _players[i];
-
-		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 1.8f, player.getShip().getColor(), 1.5f));
-	}
-
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		for (int j = 0; j < shipLights.size(); j++)
+		for (int j = 0; j < _players.size(); j++)
 		{
-			_playerRTs[i].pushPointLight(shipLights[j]);
+			_playerRTs[i].pushPointLight(_players[i].getShip().getPointLight());
 		}
 	}
 

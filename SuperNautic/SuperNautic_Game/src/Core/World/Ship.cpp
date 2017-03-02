@@ -1,4 +1,5 @@
 #include <math.h>
+#include <cstdlib>
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -54,7 +55,10 @@ Ship::Ship(glm::vec3 color)
 		_rayAheadDistance{ 5.0f },
 		_steeringCooldown{ 0.0f },
 		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
-		_shipColor{ color }
+		_shipColor{ color },
+		_engineLight{ glm::vec3{ 0.0f }, _shipColor, 1.0f },
+		_intensityOffset{ 1.0f, 1.0f, 20.0f },
+		_timeUntilIntensityUpdate{ 0.0f }
 {
 	setPosition(0, 0, 1);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
@@ -112,12 +116,27 @@ void Ship::update(float dt)
 
 	checkObstacleCollision();
 
-	// Handle particle system variables
+	// Handle particle system and light variables
 	float interpolation = powf(clamp(_engineTemperature * 0.01f, 0.1f, 0.9f), 2.0f);
 	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
+	_engineLight.updateColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } *interpolation);
+
 	_particleSystem.setDeathColor(glm::vec3{0.0f});
 	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+
+	// Update random intensity offset
+	_timeUntilIntensityUpdate -= dt;
+	if (_timeUntilIntensityUpdate <= 0.0f)
+	{
+		_timeUntilIntensityUpdate += 0.02f + (static_cast<float>(rand()) / RAND_MAX) * 0.06f;
+		_intensityOffset.setTarget(static_cast<float>(rand()) / RAND_MAX);
+	}
+	_intensityOffset.update(dt);
+
+	_engineLight.changeIntensity(powf(_velocity * 0.03f, 1.5f) * 0.2f + _intensityOffset() * _velocity * 0.015f);
+
 	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
+	_engineLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -353,6 +372,11 @@ bool Ship::checkIfCollided()
 GFX::ParticleSystem& Ship::getParticleSystem()
 {
 	return _particleSystem;
+}
+
+PointLight Ship::getPointLight()
+{
+	return _engineLight;
 }
 
 const glm::vec3 & Ship::getColor()
