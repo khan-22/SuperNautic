@@ -29,10 +29,10 @@ World::World(ApplicationContext& context)
 		}
 	}
 
-	std::vector<glm::vec3> colors{ glm::vec3{ 1.0f, 0.0f, 0.0f },
-		glm::vec3{ 0.0f, 1.0f, 0.0f },
-		glm::vec3{ 0.0f, 0.0f, 1.0f },
-		glm::vec3{ 1.0f, 1.0f, 0.0f } };
+	std::vector<glm::vec3> colors{ glm::vec3{ 0.8f, 0.15f, 0.1f },
+		glm::vec3{ 0.1f, 0.8f, 0.1f },
+		glm::vec3{ 0.1f, 0.1f, 0.8f },
+		glm::vec3{ 0.8f, 0.8f, 0.1f } };
 
     for(int i = 0 ; i < _context.numPlayers; i++)
     {
@@ -41,7 +41,7 @@ World::World(ApplicationContext& context)
         LOG(i);
 
 		// Set ship position and rotation
-		_players[i].getShip().rotateAtStart(10.0f, glm::pi<float>() * 0.5f * i);
+		_players[i].getShip().rotateAtStart(7.0f, glm::pi<float>() * 0.5f * i);
 
 		// Set ship engine cooldown
 		_players[i].getShip().setInactiveTime(2.0f);
@@ -231,8 +231,7 @@ void World::render()
 		{
 			_playerRTs[i].pushPointLight(_players[j].getShip().getPointLight());
 
-			// Ignore for the moment
-			//_playerRTs[i].pushPointLight(_players[j].getShip().getWarningLight());
+			_playerRTs[i].pushPointLight(_players[j].getShip().getWarningLight());
 		}
 	}
 

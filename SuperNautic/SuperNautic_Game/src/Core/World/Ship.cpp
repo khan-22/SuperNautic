@@ -59,7 +59,12 @@ Ship::Ship(glm::vec3 color)
 		_engineLight{ glm::vec3{ 0.0f }, _shipColor, 1.0f },
 		_warningLight{ glm::vec3{ 0.0f }, glm::vec3{ 1.0f }, 2.0f },
 		_intensityOffset{ 1.0f, 1.0f, 20.0f },
-		_timeUntilIntensityUpdate{ 0.0f }
+		_timeUntilIntensityUpdate{ 0.0f },
+		_overheatTemperature{ 0.95f },
+		_warningLevel{ 0.8f },
+		_warningLightIntensity{ 2.0f },
+		_warningAccumulator{ 0.0f },
+		_engineBlinkAccumulator{ 0.0f }
 {
 	setPosition(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
@@ -118,7 +123,7 @@ void Ship::update(float dt)
 	checkObstacleCollision();
 
 	// Handle particle system and light variables
-	float interpolation = powf(clamp(_engineTemperature, 0.1f, 0.9f), 2.0f);
+	float interpolation = powf(clamp(_engineTemperature, 0.1f, 0.9f), 4.0f);
 	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
 	_engineLight.updateColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
 
@@ -135,13 +140,44 @@ void Ship::update(float dt)
 	_intensityOffset.update(dt);
 
 	// Add intensity offset
-	_engineLight.changeIntensity(powf(_velocity * 0.03f, 1.5f) * 0.2f + _intensityOffset() * _velocity * 0.015f);
+	_engineLight.changeIntensity(powf(_velocity * 0.03f, 1.1f) * 0.2f + _intensityOffset() * _velocity * 0.015f);
 
-	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
+
 	_engineLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
 
+	// Update warning light
+	float dangerLevel = std::max((_engineTemperature - _warningLevel) / (_overheatTemperature - _warningLevel), 0.0f);
+	_warningAccumulator += dangerLevel * 20.0f * dt;
+
+	while (_warningAccumulator > glm::pi<float>() * 2.0f)
+	{
+		_warningAccumulator -= glm::pi<float>() * 2.0f;
+	}
+
+	_engineBlinkAccumulator += 30.0f * dt;
+	while (_engineBlinkAccumulator > glm::pi<float>() * 2.0f)
+	{
+		_engineBlinkAccumulator -= glm::pi<float>() * 2.0f;
+	}
+
+	if (sinf(_engineBlinkAccumulator) > -0.2f && (dangerLevel > 0.0f || _engineCooldown > 0.0f))
+	{
+		_particleSystem.setBirthColor(glm::vec3{ 0.1f });
+		_particleSystem.setBirthSize(0.1f);
+	}
+
+	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
+
+	if (_engineCooldown > 0.0f)
+	{
+		_warningLight.changeIntensity(_engineCooldown * 0.2f);
+	}
+	else
+	{
+		_warningLight.changeIntensity(_warningLightIntensity * (powf(sinf(_warningAccumulator), 5.0f) + 1.0f) / 2.0f * dangerLevel);
+	}
+
 	_warningLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
-	_warningLight.toggleLight(true);
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -197,7 +233,7 @@ void Ship::obstacleCollision()
 {
 	if (_immunityTimer <= 0.0f)
 	{
-		_engineCooldown = std::max(_cooldownOnObstacleCollision, _engineCooldown);
+		//_engineCooldown = std::max(_cooldownOnObstacleCollision, _engineCooldown);
 		_steeringCooldown = _cooldownOnObstacleCollision;
 		_immunityTimer = _immunityoOnObstacleCollision;
 		_bObstacleCollision = true;
@@ -298,8 +334,19 @@ void Ship::handleTemperature(float dt)
 
 	difference += _currentSurfaceTemperature * 0.5f;
 
-	_engineTemperature += (difference == 0.0f ? 1.0f : (abs(difference) / difference)) *  powf(abs(difference), 2.0f) * dt;
+	_engineTemperature += (difference == 0.0f ? 1.0f : (abs(difference) / difference)) *  powf(abs(difference), 1.2f) * 0.2f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
+
+	if (_engineTemperature > _overheatTemperature)
+	{
+		_engineCooldown = 10.0f;
+	}
+
+	if (_engineCooldown > 0.0f)
+	{
+		_shipCollisionShake.setMagnitude(std::max(0.1f, _engineCooldown * 0.08f));
+		_shipCollisionShake.setSpeed(std::max(0.1f, _engineCooldown * 0.08f));
+	}
 }
 
 void Ship::rotateTowardTrackForward(float dt)
@@ -504,6 +551,10 @@ void Ship::setAcceleration(float accelerationFactor)
 	if (_engineCooldown < 0)
 	{
 		_accelerationFactor = clamp(accelerationFactor, -1.0f, 1.0f);
+	}
+	else
+	{
+		_accelerationFactor = -0.5f;
 	}
 }
 

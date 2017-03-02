@@ -145,6 +145,12 @@ private:
 	const float _cooldownOnObstacleCollision;
 	const float _immunityoOnObstacleCollision;
 
+	const float _overheatTemperature;	// Temperature at which engine overheats
+	const float _warningLevel;			// Temperature at which warning light starts blinking
+	const float _warningLightIntensity;	
+	float		_warningAccumulator;	// Used for calculating warning light intensity
+	float		_engineBlinkAccumulator;// Used for "blinking" particles at high temperatures
+
 	const float _blinkFrequency;	// How fast the ship blinks when immune to obstacle collision
 
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
