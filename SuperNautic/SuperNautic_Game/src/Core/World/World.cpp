@@ -159,6 +159,8 @@ void World::update(float dt, sf::Window& window)
 			_players[i].update(dt);
 		}
 
+		std::vector<float> progression;
+
 		for (unsigned i = 0; i < _players.size(); ++i)
 		{
 			int k = 1;
@@ -170,7 +172,10 @@ void World::update(float dt, sf::Window& window)
 				}
 			}
 			_players[i].setPosition(k);
+			progression.push_back(_playerProgression[i].getProgression());
 		}
+
+		_progression.updatePositions(progression);
 
 		// Update debug camera
 		_debugCamera.setPos(_players[0].getShip().getMeshPosition() - _players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
@@ -277,6 +282,7 @@ void World::render()
 	}
 
 	sfml.render(_timer);
+	sfml.render(_progression);
 
 	sfml.display(_context.window);
 }
