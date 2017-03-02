@@ -32,9 +32,7 @@ World::World(ApplicationContext& context)
     for(int i = 0 ; i < context.players.size(); i++)
     {
         GuiPlayerJoinContainer::Player player = context.players[i];
-        glm::vec3 color(player.color[0], player.color[1], player.color[2]);
-        color /= 255.f;
-		_players.emplace_back(player.id, color);
+		_players.emplace_back(player.id, glm::vec3(player.color));
         _playerProgression.push_back(TrackProgression{ 0, _track });
         LOG(i);
 
