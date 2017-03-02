@@ -41,14 +41,14 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
 
     GuiHorizontalList* seedList = new GuiHorizontalList();
-    seedList->setOnElementSelect([&](GuiElement* selection)
-    {
-        _selectedSeedInput = (GuiTextInput*)selection;
-        std::string text = _selectedSeedInput->getText();
-        LOG("Set new seed: \"", text, "\"");
-        _trackGenerator.setSeed(text);
-        _trackGenerator.generate();
-    });
+//    seedList->setOnElementSelect([&](GuiElement* selection)
+//    {
+//        _selectedSeedInput = (GuiTextInput*)selection;
+//        std::string text = _selectedSeedInput->getText();
+//        LOG("Set new seed: \"", text, "\"");
+//        _trackGenerator.setSeed(text);
+//        _trackGenerator.generate();
+//    });
 
 
 
@@ -85,16 +85,22 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         GuiTextInput* seedInput = _seedInputs[i];
         TrackPresetManager::Preset p = presets[i];
         seedInput->setText(p.seed);
-//        seedInput->setOnSelect([this, p]()
-//        {
-//            _curvinessInput->setValue(p.curviness);
-//            _lengthInput->setText(std::to_string(p.length));
-//
-//            _trackGenerator.setSeed(p.seed);
-//            _trackGenerator.setCurviness(p.curviness);
-//            _trackGenerator.setLength(p.length * 1000);
-//            _trackGenerator.generate();
-//        });
+        seedInput->registerOnSelect([this, p, seedInput]()
+        {
+            _selectedSeedInput = seedInput;
+            _curvinessInput->setValue(p.curviness);
+            std::string lengthText = std::to_string(p.length);
+            if(lengthText.size() < _lengthInput->getText().size())
+            {
+                lengthText.insert(0, _lengthInput->getText().size() - lengthText.size(), '0');
+            }
+            _lengthInput->setText(lengthText);
+
+            _trackGenerator.setSeed(p.seed);
+            _trackGenerator.setCurviness(p.curviness);
+            _trackGenerator.setLength(p.length * 1000);
+            _trackGenerator.generate();
+        });
 
         seedInput->setOnChange(onSeedChange);
 
@@ -174,9 +180,9 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
         size_t length = MIN_TRACK_LENGTH_KM + rand() % 50;
         std::string lengthText = std::to_string(length);
-        if(lengthText.size() < LENGTH_TEXT_LENGTH)
+        if(lengthText.size() < _lengthInput->getText().size())
         {
-            lengthText.insert(0, LENGTH_TEXT_LENGTH - lengthText.size(), '0');
+            lengthText.insert(0, _lengthInput->getText().size() - lengthText.size(), '0');
         }
         _lengthInput->setText(lengthText);
         _trackGenerator.setLength(length * 1000);
@@ -211,7 +217,23 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         GuiTextInput* seedInput = new GuiTextInput(_presetManager.getSeedLength(), GuiCharacterInput::CharacterFlags::ALL);
         seedInput->setText(_presetManager.getPresets().back().seed);
         seedInput->setOnChange(onSeedChange);
+        seedInput->registerOnSelect([this, p, seedInput]()
+        {
+            _selectedSeedInput = seedInput;
+            _curvinessInput->setValue(p.curviness);
 
+            std::string lengthText = std::to_string(p.length);
+            if(lengthText.size() < LENGTH_TEXT_LENGTH)
+            {
+                lengthText.insert(0, LENGTH_TEXT_LENGTH - lengthText.size(), '0');
+            }
+            _lengthInput->setText(lengthText);
+
+            _trackGenerator.setSeed(p.seed);
+            _trackGenerator.setCurviness(p.curviness);
+            _trackGenerator.setLength(p.length * 1000);
+            _trackGenerator.generate();
+        });
 
         auto seed = std::unique_ptr<GuiElement>(seedInput);
         seedList->insert(seed);
