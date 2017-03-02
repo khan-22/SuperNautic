@@ -4,6 +4,7 @@
 #define GUI_ELEMENT_HPP
 
 #include <functional>
+#include <vector>
 
 #include "Core/Gui/SceneNode.hpp"
 
