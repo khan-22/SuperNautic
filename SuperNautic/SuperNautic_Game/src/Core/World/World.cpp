@@ -47,8 +47,7 @@ World::World(ApplicationContext& context)
 		_players[i].getShip().setInactiveTime(2.0f);
     }
 
-	// TEST PLAYER
-
+	//Create a render target for each player
 	if (_players.size() == 0)
 	{
 		/*_players.emplace_back(10);
@@ -116,7 +115,7 @@ World::World(ApplicationContext& context)
 
 void World::handleEvent(const sf::Event& e)
 {
-
+	
 }
 
 void World::update(float dt, sf::Window& window)
@@ -164,8 +163,6 @@ void World::update(float dt, sf::Window& window)
 			_players[i].update(dt);
 		}
 
-		std::vector<float> positions;
-
 		for (unsigned i = 0; i < _players.size(); ++i)
 		{
 			int k = 1;
@@ -177,13 +174,10 @@ void World::update(float dt, sf::Window& window)
 				}
 			}
 			_players[i].setPosition(k);
-			positions.push_back(_playerProgression[i].getProgression());
 		}
 
-		_progression.updatePositions(positions);
-
 		// Update debug camera
-		_debugCamera.setPos(_players[0].getShip().getMeshPosition() -_players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
+		_debugCamera.setPos(_players[0].getShip().getMeshPosition() - _players[0].getShip().getCameraForward() * 12.0f + _players[0].getShip().getCameraUp() * 4.0f);
 
 		// Commenting this out fixes mouse movement and debug camera rotation desyncing
 		//_debugCamera.setUp(_players[0].getShip().getCameraUp());
@@ -218,7 +212,7 @@ void World::render()
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
 		//Do not render the player's own ship if they are in first person, but render all other ships as normal
-		for(int j = 0; j < _players.size(); j++)
+		for (int j = 0; j < _players.size(); j++)
 		{
 			if (!(i == j && _players[j]._bIsFirstPerson))
 			{
@@ -239,17 +233,6 @@ void World::render()
 		_track->render(_playerRTs[i], _playerWindowRenderers[i], _playerProgression[i].getCurrentSegment());
 	}
 
-
-	for (int i = 0; i < _playerRTs.size(); i++)
-	{
-		updateLightPos(_playerProgression[i], i);
-
-		for (int j = 0; j < _playerPointLights[i].size(); j++)
-		{
-			_playerRTs[i].pushPointLight(_playerPointLights[i][j]);
-		}
-	}
-
 	if (!_bDebugging)
 	{
 		for (int i = 0; i < _players.size(); i++)
@@ -257,7 +240,7 @@ void World::render()
 			_playerRTs[i].display(*_players[i].getCamera());
 			_playerRTs[i].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 		}
-		
+
 		for (int i = 0; i < _playerWindowRenderers.size(); i++)
 		{
 			_playerWindowRenderers[i].display(*_players[i].getCamera());
@@ -298,7 +281,6 @@ void World::render()
 	}
 
 	sfml.render(_timer);
-	sfml.render(_progression);
 
 	sfml.display(_context.window);
 }
@@ -311,21 +293,4 @@ bool World::bHasWon()
 void World::setTrack(Track * track)
 {
 	_track = track;
-}
-
-void World::updateLightPos(const TrackProgression& playerProgression, int playerIndex)
-{
-	std::vector<SegmentInstance*> instancesForLights;
-	for (long j = static_cast<long>(playerProgression.getCurrentSegment()); j <= static_cast<long>(playerProgression.getCurrentSegment()) + 5; ++j)
-	{
-		if (j >= 0 && j < _track->getNrOfSegments())
-		{
-			instancesForLights.push_back(_track->getInstance(static_cast<int>(j)));
-		}
-	}
-
-	for (int k = 0; k < instancesForLights.size(); k++)
-	{
-		_playerPointLights[playerIndex][k].setPosition(instancesForLights[k]->getModelMatrix() * glm::vec4(instancesForLights[k]->getParent()->getWaypoints()[0], 1.f));
-	}
 }

@@ -6,7 +6,7 @@
 #include "SFML/Graphics/RenderWindow.hpp"
 namespace sf
 {
-    class Event;
+	class Event;
 }
 
 #include <list>
@@ -30,7 +30,7 @@ struct ApplicationContext;
 class World
 {
 public:
-    World(ApplicationContext& context);
+	World(ApplicationContext& context);
 
 	void handleEvent(const sf::Event& e);
 	void update(float dt, sf::Window& window);
