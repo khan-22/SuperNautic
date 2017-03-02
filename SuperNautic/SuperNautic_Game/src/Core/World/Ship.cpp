@@ -125,7 +125,7 @@ void Ship::update(float dt)
 
 void Ship::jump()
 {
-	if (_currentJumpCooldown <= 0.0f && _steeringCooldown <= 0.0f)
+	if (_currentJumpCooldown <= 0.0f && _steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 	{
 		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _shipForward);
 
@@ -349,6 +349,19 @@ bool Ship::checkIfCollided()
 	}
 }
 
+
+void Ship::rotateAtStart(float down, float angle)
+{
+	move(0, -down, 0);
+
+	glm::mat4 rotation = glm::rotate(angle, glm::vec3{ 0, 0, 1 });
+
+	setPosition(rotation * glm::vec4{ getPosition(), 0.0f });
+	_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
+	_meshUpDirection.setVector(_upDirection);
+	_cameraUpDirection.setVector(_upDirection);
+}
+
 void Ship::setWaypointDifference(const glm::vec3 & difference)
 {
 	_waypointDifference = difference;
@@ -357,6 +370,11 @@ void Ship::setWaypointDifference(const glm::vec3 & difference)
 void Ship::setSteeringCooldown(float cooldown)
 {
 	_steeringCooldown = cooldown;
+}
+
+void Ship::setInactiveTime(float inactiveTime)
+{
+	_inactiveTimer = inactiveTime;
 }
 
 float Ship::getSteeringCooldown()
@@ -368,7 +386,7 @@ void Ship::handleInputs(float dt)
 {
 	if (!_stopped)
 	{
-		if (_steeringCooldown <= 0.0f)
+		if (_steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 		{
 			// Update turning angle										reduce maneuverability at high acceleration
 			_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.0f) * dt;
@@ -431,6 +449,11 @@ void Ship::handleCooldowns(float dt)
 	if (_immunityTimer > 0.0f)
 	{
 		_immunityTimer -= dt;
+	}
+
+	if (_inactiveTimer > 0.0f)
+	{
+		_inactiveTimer -= dt;
 	}
 }
 

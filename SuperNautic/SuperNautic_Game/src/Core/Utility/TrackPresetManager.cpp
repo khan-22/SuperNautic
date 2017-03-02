@@ -86,8 +86,8 @@ void TrackPresetManager::writeConfig()
 void TrackPresetManager::scrubPreset(Preset& preset)
 {
     preset.seed.resize(_MAX_SEED_LENGTH);
-    preset.curviness = clamp(preset.curviness, _MIN_CURVINESS, _MAX_CURVINESS);
-    preset.length = clamp(preset.length, _MIN_LENGTH, _MAX_LENGTH);
+    preset.curviness = clamp(static_cast<size_t>(preset.curviness), _MIN_CURVINESS, _MAX_CURVINESS);
+    preset.length = clamp(static_cast<size_t>(preset.length), _MIN_LENGTH, _MAX_LENGTH);
 }
 
 size_t TrackPresetManager::getSeedLength()

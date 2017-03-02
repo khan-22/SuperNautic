@@ -64,8 +64,13 @@ public:
 	void obstacleCollision();
 	void setWaypointDifference(const glm::vec3& difference);
 	void setSteeringCooldown(float cooldown);
+	void setInactiveTime(float inactiveTime);
 	float getSteeringCooldown();
 	bool checkIfCollided();
+
+	// Moves down units in -y direction, then rotates angle radians around z
+	// Used to position ship at start of race
+	void rotateAtStart(float down, float angle);
 
 private:
 	bool		_destroyed;
@@ -86,6 +91,7 @@ private:
 	float		_timeSinceIntersection;	// Time since ray intersected track
 	float		_steeringCooldown;		// Time until ship can be controlled
 	float		_immunityTimer;			// Time until ship will be able to collide with obstacles
+	float		_inactiveTimer;			// If >0, ship is inactive and cannot be controlled
 
 	glm::vec3					_trackForward;			// Forward direction of track
 	glm::vec3					_shipForward;			// Current forward direction of ship
