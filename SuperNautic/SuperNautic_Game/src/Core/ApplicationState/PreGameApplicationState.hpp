@@ -12,7 +12,7 @@
 #include "Core/Gui/GuiTrackGenerator.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
-
+#include "Core/Utility/TrackPresetManager.hpp"
 
 class GuiTextInput;
 class GuiSlider;
@@ -27,6 +27,7 @@ public:
     bool bHandleEvent(const sf::Event& event) override;
 
 private:
+    TrackPresetManager _presetManager;
     GuiContainer _guiContainer;
     GuiTrackGenerator _trackGenerator;
     Input _input;
