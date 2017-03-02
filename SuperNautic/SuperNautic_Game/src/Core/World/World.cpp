@@ -230,7 +230,7 @@ void World::render()
 	{
 		for (int j = 0; j < _players.size(); j++)
 		{
-			_playerRTs[i].pushPointLight(_players[i].getShip().getPointLight());
+			_playerRTs[i].pushPointLight(_players[j].getShip().getPointLight());
 		}
 	}
 
@@ -267,7 +267,7 @@ void World::render()
 		{
 			for (int j = 0; j < _players.size(); j++)
 			{
-				_playerParticleRenderers[i].render(_players[i].getShip().getParticleSystem());
+				_playerParticleRenderers[i].render(_players[j].getShip().getParticleSystem());
 				_playerParticleRenderers[i].display(*_players[i].getCamera());
 			}
 		}
