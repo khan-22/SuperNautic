@@ -63,12 +63,12 @@ void Track::setLength(const unsigned int length)
 	_targetLength = length;
 }
 
-static unsigned int Track::getMaxLength()
+unsigned int Track::getMaxLength()
 {
     return _MAX_TRACK_LENGTH;
 }
 
-static unsigned int Track::getMinLength()
+unsigned int Track::getMinLength()
 {
     return _MIN_TRACK_LENGTH;
 }
