@@ -1,6 +1,8 @@
 #include "Core/Audio/PlayerAudio.hpp"
 #include "Core/Asset/AssetCache.hpp"
 
+#include <algorithm>
+
 PlayerAudio::PlayerAudio() :
 	_sbEngine(AssetCache<sf::SoundBuffer, std::string>::get("engine")),
 	_sbCrash(AssetCache<sf::SoundBuffer, std::string>::get("crash")),
@@ -51,6 +53,7 @@ void PlayerAudio::playAudio(Sounds sound)
 
 void PlayerAudio::setPitch(Sounds sound, float pitchValue)
 {
+	float val = std::min(0.8f, std::max(2.f, pitchValue));
 	switch (sound)
 	{
 	case engine:

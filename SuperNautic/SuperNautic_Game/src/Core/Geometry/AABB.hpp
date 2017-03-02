@@ -49,7 +49,7 @@ struct AABB
 	}
 
 	// Test if a ray intersects any geometry in this box
-	RayIntersection triangleRayIntersection(const Ray& ray, const std::vector<unsigned>& modelIndices, const std::vector<SurfaceType>& temperatures, const RawMeshAsset& scene) const
+	RayIntersection triangleRayIntersection(const Ray& ray, const std::vector<unsigned>& modelIndices, const std::vector<float>& temperatures, const RawMeshAsset& scene) const
 	{
 		// Will hold final intersection
 		RayIntersection intersection{ false };
@@ -126,7 +126,7 @@ struct AABB
 					}
 					else
 					{
-						intersection._surface = SurfaceType::normal;
+						intersection._surface = 0.0f;
 					}
 
 					intersection._position = v0 * (1.0f - u - v) + v1 * u + v2 * v;

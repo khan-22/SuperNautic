@@ -10,10 +10,10 @@
 
 World::World(ApplicationContext& context)
 	: _context{ context }
-	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
+	, _debugCamera{ 90.0f, context.window.getSize().x, context.window.getSize().y, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
-	, _timer(1280, 720, context.numPlayers)
-	, _progression(1280, 720, context.numPlayers)
+	, _timer(context.window.getSize().x, context.window.getSize().y, context.numPlayers)
+	, _progression(context.window.getSize().x, context.window.getSize().y, context.numPlayers)
 	, _track(context.track.get())
 	, _playerRTs(context.numPlayers)
 	, _playerParticleRenderers(context.numPlayers)
@@ -62,53 +62,53 @@ World::World(ApplicationContext& context)
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
-		_players[0].setScreenSize(1280, 720, 0, 0);
+		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y, 0, 0);
 	}
 	else if (_players.size() == 2)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
-		_players[0].setScreenSize(1280, 360, 0, 0);
+		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, 0);
 
 		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
 		_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
 		_playerWindowRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
-		_players[1].setScreenSize(1280, 360, 0, 360);
+		_players[1].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 	}
 	else if (_players.size() == 3)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
-		_players[0].setScreenSize(1280, 360, 0, 0);
+		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, 0);
 		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerWindowRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_players[1].setScreenSize(640, 360, 0, 360);
+		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 		_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_players[2].setScreenSize(640, 360, 640, 360);
+		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
 	else if (_players.size() == 4)
 	{
 		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
-		_players[0].setScreenSize(640, 360, 0, 0);
+		_players[0].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, 0);
 		_playerRTs[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_playerWindowRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_players[1].setScreenSize(640, 360, 640, 360);
+		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 		_playerRTs[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_players[2].setScreenSize(640, 360, 640, 0);
+		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, 0);
 		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerParticleRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_playerWindowRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_players[3].setScreenSize(640, 360, 0, 360);
+		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 	}
 }
 
@@ -209,8 +209,6 @@ void World::update(float dt, sf::Window& window)
 
 void World::render()
 {
-	std::vector<PointLight> shipLights;
-
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
 		//Do not render the player's own ship if they are in first person, but render all other ships as normal
@@ -222,19 +220,11 @@ void World::render()
 			}
 		}
 	}
-
-	for(size_t i = 0; i < _players.size(); i++)
-	{
-	    Player& player = _players[i];
-
-		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 1.8f, player.getShip().getColor(), 1.5f));
-	}
-
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		for (int j = 0; j < shipLights.size(); j++)
+		for (int j = 0; j < _players.size(); j++)
 		{
-			_playerRTs[i].pushPointLight(shipLights[j]);
+			_playerRTs[i].pushPointLight(_players[j].getShip().getPointLight());
 		}
 	}
 
@@ -260,7 +250,7 @@ void World::render()
 		{
 			for (int j = 0; j < _players.size(); j++)
 			{
-				_playerParticleRenderers[i].render(_players[i].getShip().getParticleSystem());
+				_playerParticleRenderers[i].render(_players[j].getShip().getParticleSystem());
 				_playerParticleRenderers[i].display(*_players[i].getCamera());
 			}
 		}

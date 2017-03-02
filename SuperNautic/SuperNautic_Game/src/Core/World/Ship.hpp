@@ -13,6 +13,7 @@
 #include "GFX/Resources/TexturedModel.hpp"
 #include "GFX/Rendering/Renderable3D.hpp"
 #include "GFX/Resources/ParticleSystem.hpp"
+#include "GFX/Lighting/PointLight.hpp"
 #include "Core/Utility/SpringRotatedVector.hpp"
 #include "Core/Utility/SpringTranslatedVector.hpp"
 #include "Core/Geometry/BoundingBox.hpp"
@@ -59,7 +60,7 @@ public:
 	const glm::vec3 getVelocity() const;
 	const glm::vec3 getCameraPosition() const;
 	const glm::mat4& getTransform() const;
-	SurfaceType getSurfaceType() const;
+	float getSurfaceTemperature() const;
 	const BoundingBox& getBoundingBox() const;
 	void obstacleCollision();
 	void setWaypointDifference(const glm::vec3& difference);
@@ -68,6 +69,7 @@ public:
 	float getSteeringCooldown();
 	bool checkIfCollided();
 	GFX::ParticleSystem& getParticleSystem();
+	PointLight getPointLight();
 	const glm::vec3& getColor();
 
 	// Moves down units in -y direction, then rotates angle radians around z
@@ -96,6 +98,7 @@ private:
 	float		_inactiveTimer;			// If >0, ship is inactive and cannot be controlled
 
 	GFX::ParticleSystem			_particleSystem;
+	PointLight					_engineLight;
 
 	glm::vec3					_shipColor;
 
@@ -111,11 +114,13 @@ private:
 	SpringRotatedVector			_cameraForwardDirection;
 
 	SpringSmoothedValue			_surfaceSlope;			// Determines the height of the camera
+	SpringSmoothedValue			_intensityOffset;		// Offset for engine light intensity
+	float						_timeUntilIntensityUpdate;
 
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
 	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
 
-	SurfaceType _currentSurface{ SurfaceType::normal };
+	float _currentSurfaceTemperature{ 0.0f };
 
 	ShakeOffset	_shipCollisionShake;
 
