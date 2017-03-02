@@ -10,6 +10,8 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_speed(0),
 	_position(0),
 	_progression(0),
+	_offsetX(0),
+	_offsetY(0),
 	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf")),
 	_texture(AssetCache<sf::Texture, std::string>::get("heatchart.png"))
 {
