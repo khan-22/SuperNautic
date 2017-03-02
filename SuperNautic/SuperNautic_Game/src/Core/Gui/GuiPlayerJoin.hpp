@@ -15,32 +15,33 @@
 class GuiPlayerJoin : public GuiElement
 {
     public:
-        GuiPlayerJoin(unsigned char playerId);
+        GuiPlayerJoin();
 
         sf::FloatRect getBoundingRect() const override;
 
         void setColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
 
+        bool bIsAssigned() const;
+        bool bHasJoined() const;
 
-        void setOnJoin(const std::function<void(unsigned char)>& callback);
-        void setOnLeave(const std::function<void(unsigned char)>& callback);
+        unsigned int getId() const;
+
+        void assign(unsigned int playerId);
+        void unassign();
+
+        void toggleJoin();
 
     private:
         unsigned char _id;
         sf::Color _color;
         bool _bHasJoined = false;
-        Input _input;
+        bool _bIsAssigned = false;
         sf::RectangleShape _window;
-        std::function<void(unsigned char)> _joinCallback = [](unsigned char){};
-        std::function<void(unsigned char)> _leaveCallback = [](unsigned char){};
 
         virtual void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
-        virtual void updateCurrent() override;
 
         void join();
         void leave();
-
-
 };
 
 #endif //GUI_PLAYER_JOIN_HPP

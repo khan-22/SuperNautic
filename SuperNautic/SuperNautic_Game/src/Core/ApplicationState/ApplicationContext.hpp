@@ -11,6 +11,7 @@ namespace sf
 #include "Core/Track/SegmentHandler.hpp"
 #include "Core/Track/ObstacleHandler.hpp"
 #include "Core/Track/Track.hpp"
+#include "Core/Gui/GuiPlayerJoinContainer.hpp"
 
 struct ApplicationContext
 {
@@ -27,7 +28,7 @@ struct ApplicationContext
 
     std::unique_ptr<Track> track;
 
-    unsigned char numPlayers;
+    std::vector<GuiPlayerJoinContainer::Player> players;
 };
 
 

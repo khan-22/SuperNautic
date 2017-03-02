@@ -12,16 +12,16 @@ World::World(ApplicationContext& context)
 	: _context{ context }
 	, _debugCamera{ 90.0f, context.window.getSize().x, context.window.getSize().y, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
-	, _timer(context.window.getSize().x, context.window.getSize().y, context.numPlayers)
-	, _progression(context.window.getSize().x, context.window.getSize().y, context.numPlayers)
+	, _timer(context.window.getSize().x, context.window.getSize().y, context.players.size())
+	, _progression(context.window.getSize().x, context.window.getSize().y, context.players.size())
 	, _track(context.track.get())
-	, _playerRTs(context.numPlayers)
-	, _playerParticleRenderers(context.numPlayers)
-	, _playerWindowRenderers(context.numPlayers)
-	, _playerPointLights(context.numPlayers)
+	, _playerRTs(context.players.size())
+	, _playerParticleRenderers(context.players.size())
+	, _playerWindowRenderers(context.players.size())
+	, _playerPointLights(context.players.size())
 	, _bDebugging(false)
 {
-	for (int i = 0; i < context.numPlayers; i++)
+	for (int i = 0; i < context.players.size(); i++)
 	{
 		for (int j = 0; j < 6; j++)
 		{
@@ -29,14 +29,10 @@ World::World(ApplicationContext& context)
 		}
 	}
 
-	std::vector<glm::vec3> colors{ glm::vec3{ 1.0f, 0.0f, 0.0f },
-		glm::vec3{ 0.0f, 1.0f, 0.0f },
-		glm::vec3{ 0.0f, 0.0f, 1.0f },
-		glm::vec3{ 1.0f, 1.0f, 0.0f } };
-
-    for(int i = 0 ; i < _context.numPlayers; i++)
+    for(int i = 0 ; i < context.players.size(); i++)
     {
-		_players.emplace_back(i, colors[i]);
+        GuiPlayerJoinContainer::Player player = context.players[i];
+		_players.emplace_back(player.id, glm::vec3(player.color));
         _playerProgression.push_back(TrackProgression{ 0, _track });
         LOG(i);
 
@@ -115,7 +111,7 @@ World::World(ApplicationContext& context)
 
 void World::handleEvent(const sf::Event& e)
 {
-	
+
 }
 
 void World::update(float dt, sf::Window& window)
