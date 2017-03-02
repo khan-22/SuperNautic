@@ -93,18 +93,21 @@ World::World(ApplicationContext& context)
 		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_players[0].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, 0);
-		_playerRTs[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerWindowRenderers[1].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
-		_playerRTs[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, 0);
-		_playerRTs[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_playerParticleRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_playerWindowRenderers[3].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
+
+		_playerRTs[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_playerWindowRenderers[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, 0);
+
+		_playerRTs[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_playerParticleRenderers[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_playerWindowRenderers[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
+
+		_playerRTs[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_playerParticleRenderers[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_playerWindowRenderers[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
 }
 
