@@ -110,10 +110,6 @@ void Ship::update(float dt)
 	_surfaceSlope.setTarget(glm::dot(_waypointDifference, _upDirection));
 	_surfaceSlope.update(dt);
 
-	float dot1 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[1]);
-	float dot2 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[2]);
-	float dot3 = glm::dot(_boundingBox.directions[2], _boundingBox.directions[1]);
-
 	checkObstacleCollision();
 
 	// Handle particle system variables
