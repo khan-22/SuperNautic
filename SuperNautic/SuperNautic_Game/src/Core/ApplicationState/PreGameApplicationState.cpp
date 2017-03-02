@@ -14,10 +14,6 @@
 #include "Core/Utility/Camera.h"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 
-
-#include "Core/Gui/GuiTextInput.hpp"
-#include "Core/Gui/GuiHorizontalList.hpp"
-#include "Core/Gui/GuiSlider.hpp"
 #include "Core/Gui/GuiPlayerJoinContainer.hpp"
 
 PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
@@ -25,7 +21,6 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 , _trackGenerator(context.segmentHandler.get(), context.obstacleHandler.get())
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _input()
-, _numPlayers(0)
 , _guiContainer(_trackGenerator, _context.track.get())
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
@@ -33,7 +28,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     GuiButton* startButton = new GuiButton(sf::Text("Start", *_font.get()), [&]()
     {
         _stack.clear();
-        _context.numPlayers = _numPlayers == 0 ? 1 : _numPlayers;
+        _context.players = _players->getJoinedPlayers();
         _context.track = _trackGenerator.takeTrack();
         _stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context)));
     });
@@ -48,16 +43,8 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     });
     guiElements.emplace_back(backButton);
 
-    GuiPlayerJoinContainer* players = new GuiPlayerJoinContainer();
-    players->setOnJoin([this](unsigned char playerId)
-    {
-        _numPlayers++;
-    });
-    players->setOnLeave([this](unsigned char playerId)
-    {
-        _numPlayers--;
-    });
-    guiElements.emplace_back(players);
+    _players = new GuiPlayerJoinContainer();
+    guiElements.emplace_back(_players);
 
     sf::Vector2f pos(0.f, _guiContainer.getBoundingRect().top + _guiContainer.getBoundingRect().height);
     for(const std::unique_ptr<GuiElement>& e : guiElements)
@@ -144,5 +131,6 @@ bool PreGameApplicationState::bHandleEvent(const sf::Event& event)
         }
     }
     _guiContainer.handleEvent(event);
+    _players->handleEvent(event);
     return true;
 }
