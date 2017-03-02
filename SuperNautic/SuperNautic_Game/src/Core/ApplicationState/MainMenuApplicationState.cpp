@@ -19,6 +19,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _input()
+, _titleText("SUPERNAUTIC", _font)
 {
     std::cout << "Welcome to MainMenu state." << std::endl;
 
@@ -65,6 +66,7 @@ void MainMenuApplicationState::render()
 {
     GFX::SfmlRenderer renderer;
     renderer.render(_guiContainer);
+    renderer.render(_titleText);
     renderer.display(_context.window);
 //    _context.window.draw(_guiContainer);
 }
