@@ -71,13 +71,9 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     }
 
     _selectedSeedInput = _seedInputs.front();
-    LOG("Track: ", size_t(&_trackGenerator));
-
     auto onSeedChange = [this](const std::string& str)
     {
         LOG("Seed: \"", str, "\"");
-        LOG("Change: ", size_t(&_trackGenerator));
-        std::string merp = str;
         _trackGenerator.setSeed(str);
         _trackGenerator.generate();
     };
