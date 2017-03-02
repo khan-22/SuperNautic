@@ -46,8 +46,8 @@ Ship::Ship(glm::vec3 color)
 		_bEngineOverload { false },
 		_bObstacleCollision { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
-		_cooldownOnObstacleCollision{ 1.0f },
-		_immunityoOnObstacleCollision{ 2.0f },
+		_cooldownOnObstacleCollision{ 3.0f },
+		_immunityoOnObstacleCollision{ 4.0f },
 		_immunityTimer{ 0.0f },
 		_blinkFrequency{ 0.1f },
 		_surfaceSlope{ 0.0f, 0.0f, 0.5f },
@@ -91,8 +91,8 @@ void Ship::update(float dt)
 	trackSurface(dt);
 	updateDirectionsAndPositions(dt);
 
-	_shipCollisionShake.setMagnitude(_steeringCooldown);
-	_shipCollisionShake.setSpeed(_steeringCooldown);
+	_shipCollisionShake.setMagnitude(_steeringCooldown / _cooldownOnObstacleCollision);
+	_shipCollisionShake.setSpeed(_steeringCooldown / _cooldownOnObstacleCollision);
 	_shipCollisionShake.update(dt);
 
 	// Create mesh rotation matrix from mesh up and forward directions
