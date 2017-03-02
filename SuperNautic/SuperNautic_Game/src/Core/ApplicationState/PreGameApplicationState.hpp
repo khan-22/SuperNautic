@@ -15,8 +15,7 @@
 #include "Core/Utility/TrackPresetManager.hpp"
 
 
-class GuiTextInput;
-class GuiSlider;
+class GuiPlayerJoinContainer;
 
 class PreGameApplicationState : public ApplicationState
 {
@@ -31,13 +30,9 @@ private:
     TrackPresetManager _presetManager;
     GuiTrackGenerator _trackGenerator;
     GuiTrackGeneratorControls _guiContainer;
+    GuiPlayerJoinContainer* _players;
     Input _input;
     Asset<sf::Font> _font;
-    unsigned char _numPlayers;
-    std::vector<GuiTextInput*> _seedInputs;
-    GuiTextInput* _selectedSeedInput;
-    GuiTextInput* _lengthInput;
-    GuiSlider* _curvinessInput;
 
     GFX::SfmlRenderer _sfmlRenderer;
     GFX::ForwardRenderer _forwardRenderer;
