@@ -113,7 +113,10 @@ void GuiHorizontalList::updateVisuals()
         selectionId = _selection;
     }
 
-    selection->setOrigin(selection->getBoundingRect().width / 2.f, selection->getBoundingRect().height / 2.f);
+    sf::Vector2f selectionScale = selection->getScale();
+    sf::Vector2f selectionOrigin(selection->getBoundingRect().width / selectionScale.x, selection->getBoundingRect().height / selectionScale.y);
+    selectionOrigin /= 2.f;
+    selection->setOrigin(selectionOrigin);
     selection->setPosition(0.f, 0.f);
     _drawElements.push_back(selection);
 
