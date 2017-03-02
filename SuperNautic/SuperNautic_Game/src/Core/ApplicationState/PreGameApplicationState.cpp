@@ -71,10 +71,13 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     }
 
     _selectedSeedInput = _seedInputs.front();
+    LOG("Track: ", size_t(&_trackGenerator));
 
     auto onSeedChange = [this](const std::string& str)
     {
         LOG("Seed: \"", str, "\"");
+        LOG("Change: ", size_t(&_trackGenerator));
+        std::string merp = str;
         _trackGenerator.setSeed(str);
         _trackGenerator.generate();
     };
@@ -122,7 +125,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     }
     length->setText(lengthStr);
     _lengthInput = length;
-    length->setOnChange([this, length](const std::string& str)
+    length->setOnChange([this](const std::string& str)
     {
         std::stringstream sstream(str);
         size_t c;
@@ -205,7 +208,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     });
     guiElements.emplace_back(startButton);
 
-    GuiButton* saveButton = new GuiButton(sf::Text("Save", *_font.get()), [&, seedList]()
+    GuiButton* saveButton = new GuiButton(sf::Text("Save", *_font.get()), [this, seedList, onSeedChange]()
     {
         TrackPresetManager::Preset p;
         p.seed = _selectedSeedInput->getText();
@@ -234,6 +237,8 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
             _trackGenerator.setLength(p.length * 1000);
             _trackGenerator.generate();
         });
+
+        _seedInputs.push_back(seedInput);
 
         auto seed = std::unique_ptr<GuiElement>(seedInput);
         seedList->insert(seed);
