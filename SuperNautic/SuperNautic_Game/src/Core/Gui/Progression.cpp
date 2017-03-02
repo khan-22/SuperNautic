@@ -17,14 +17,14 @@ Progression::Progression(int windowWidth, int windowHeight, int amountOfPlayers)
 	}
 	else
 	{
-		_progressionOutline.setPosition(widthStep * 10, heightStep * 55);
+		_progressionOutline.setPosition(widthStep * 10, heightStep * 51);
 	}
 
 	for (int i = 0; i < amountOfPlayers; i++)
 	{
 		_positions.push_back(0);
 		_progressionMeter.push_back(sf::RectangleShape());
-		_progressionMeter[i].setSize(sf::Vector2f(widthStep, heightStep));
+		_progressionMeter[i].setSize(sf::Vector2f(widthStep / 2, heightStep));
 		_progressionMeter[i].setOrigin(0, 0);
 		switch (i)
 		{

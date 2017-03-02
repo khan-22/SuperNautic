@@ -53,7 +53,6 @@ private:
 	std::vector<GFX::DeferredRenderer>	_playerRTs;
 	std::vector<GFX::ParticleRenderer>	_playerParticleRenderers;
 	std::vector<GFX::WindowRenderer>	_playerWindowRenderers;
-	std::vector<GFX::ParticleSystem>	_playerParticles;
 
 	DebugCamera						_debugCamera;
 	bool							_bDebugging;

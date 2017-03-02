@@ -12,33 +12,49 @@ World::World(ApplicationContext& context)
 	: _context{ context }
 	, _debugCamera{ 90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _bHasWon(false)
-	, _timer(1280, 720)
+	, _timer(1280, 720, context.numPlayers)
+	, _progression(1280, 720, context.numPlayers)
 	, _track(context.track.get())
 	, _playerRTs(context.numPlayers)
 	, _playerParticleRenderers(context.numPlayers)
 	, _playerWindowRenderers(context.numPlayers)
-	, _playerParticles(context.numPlayers)
+	, _playerPointLights(context.numPlayers)
 	, _bDebugging(false)
 {
-	for (int i = 0; i < _playerParticles.size(); i++)
+	for (int i = 0; i < context.numPlayers; i++)
 	{
-		_playerParticles[i].init(500, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
-		_playerParticles[i].setBirthColor(glm::vec3(0.0f, 0.6f, 0.3f));
-		_playerParticles[i].start();
+		for (int j = 0; j < 6; j++)
+		{
+			_playerPointLights[i].push_back(PointLight({ 0.f, 0.f, 0.f }, { 0.3f, 0.8f, 1.0f }, 3.f));
+		}
 	}
 
-	for (size_t i = 0; i < _context.numPlayers; i++)
-	{
-		_players.emplace_back(i);
-		_playerProgression.push_back(TrackProgression{ 0, _track });
-		LOG(i);
-	}
+	std::vector<glm::vec3> colors{ glm::vec3{ 1.0f, 0.0f, 0.0f },
+		glm::vec3{ 0.0f, 1.0f, 0.0f },
+		glm::vec3{ 0.0f, 0.0f, 1.0f },
+		glm::vec3{ 1.0f, 1.0f, 0.0f } };
+
+    for(int i = 0 ; i < _context.numPlayers; i++)
+    {
+		_players.emplace_back(i, colors[i]);
+        _playerProgression.push_back(TrackProgression{ 0, _track });
+        LOG(i);
+
+		// Set ship position and rotation
+		_players[i].getShip().rotateAtStart(10.0f, glm::pi<float>() * 0.5f * i);
+
+		// Set ship engine cooldown
+		_players[i].getShip().setInactiveTime(2.0f);
+    }
 
 	//Create a render target for each player
 	if (_players.size() == 0)
 	{
-		_players.emplace_back(10);
-		_playerProgression.push_back(TrackProgression{ 0, _track });
+		/*_players.emplace_back(10);
+		_playerProgression.push_back(TrackProgression{ 0, _track });*/
+
+		LOG_ERROR("No players detected!");
+		abort();
 	}
 
 	if (_players.size() == 1)
@@ -121,8 +137,6 @@ void World::update(float dt, sf::Window& window)
 			_playerProgression[i].update(lengthInSegment);
 			_players[i].setProgression(_playerProgression[i].getProgression());
 
-			// LOG("PROGRESSION: ", _playerProgression[i].getProgression());
-
 			// Update ship forward position and respawn position
 			_players[i].getShip().setForward(forward);
 			_players[i].getShip().setReturnPos(returnPos);
@@ -190,13 +204,7 @@ void World::update(float dt, sf::Window& window)
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
 
-	for (int i = 0; i < _playerParticles.size(); i++)
-	{
-		glm::vec3 particlePos = _players[i].getShip().getMeshPosition() - _players[i].getShip().getMeshForward() * 1.9f;
-		_playerParticles[i].update(dt, particlePos);
-	}
-
-	//previousPos = currentPos;
+	_progression.updateCurrent();
 }
 
 void World::render()
@@ -215,27 +223,11 @@ void World::render()
 		}
 	}
 
-	//////////////////////
-	// Copy-pasted from GuiPlayerJoinContainer::createWindows
-	static constexpr size_t MAX_PLAYERS = 4;
-	static constexpr unsigned char COLORS[4][MAX_PLAYERS] =
+	for(size_t i = 0; i < _players.size(); i++)
 	{
-		{ 255, 0, 0, 255 },
-		{ 0, 255, 0, 255 },
-		{ 0, 0, 255, 255 },
-		{ 255, 255, 0, 255 }
-	};
-	//////////////////////
+	    Player& player = _players[i];
 
-	assert(_players.size() <= MAX_PLAYERS);
-	for (size_t i = 0; i < _players.size(); i++)
-	{
-		Player& player = _players[i];
-		const unsigned char* c = COLORS[i];
-		glm::vec3 diffuseColor(c[0], c[1], c[2]);
-		diffuseColor /= 255.f;
-		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 2.0f, diffuseColor, 1.5f));
-
+		shipLights.push_back(PointLight(player.getShip().getMeshPosition() - player.getShip().getMeshForward() * 1.8f, player.getShip().getColor(), 1.5f));
 	}
 
 	for (int i = 0; i < _playerRTs.size(); i++)
@@ -268,7 +260,7 @@ void World::render()
 		{
 			for (int j = 0; j < _players.size(); j++)
 			{
-				_playerParticleRenderers[i].render(_playerParticles[j]);
+				_playerParticleRenderers[i].render(_players[i].getShip().getParticleSystem());
 				_playerParticleRenderers[i].display(*_players[i].getCamera());
 			}
 		}
@@ -281,18 +273,17 @@ void World::render()
 
 		for (int i = 0; i < _playerWindowRenderers.size(); i++)
 		{
-			_playerWindowRenderers[i].display(*_players[i].getCamera());
+			_playerWindowRenderers[i].display(_debugCamera);
 		}
 
 		for (int j = 0; j < _players.size(); j++)
 		{
-			_playerParticleRenderers[0].render(_playerParticles[j]);
+			_playerParticleRenderers[0].render(_players[j].getShip().getParticleSystem());
 			_playerParticleRenderers[0].display(_debugCamera);
 		}
 
 	}
 
-	// Should be done for each player before drawing particles.
 	GFX::SfmlRenderer sfml;
 	for (int i = 0; i < _players.size(); i++)
 	{

@@ -11,7 +11,7 @@
 #include "Core/Geometry/RayIntersection.hpp"
 #include "Core/Utility/CollisionUtility.hpp"
 
-Ship::Ship()
+Ship::Ship(glm::vec3 color)
 	:	_destroyed{ false },
 		_stopped{ false },
 		_turningFactor{ 0.0f },
@@ -43,6 +43,7 @@ Ship::Ship()
 		_engineFlashTime{ 0 },
 		_bEngineFlash{ false },
 		_bEngineOverload { false },
+		_bObstacleCollision { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
 		_cooldownOnObstacleCollision{ 1.0f },
 		_immunityoOnObstacleCollision{ 2.0f },
@@ -52,16 +53,14 @@ Ship::Ship()
 		_rayHeight{ 5.0f },
 		_rayAheadDistance{ 5.0f },
 		_steeringCooldown{ 0.0f },
-		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f }
+		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
+		_shipColor{ color }
 {
 	setPosition(0, 0, 1);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
-}
 
-
-Ship::Ship(glm::vec3 position) : Ship{}
-{
-	setPosition(position);
+	_particleSystem.init(200, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.start();
 }
 
 void Ship::render(GFX::RenderStates& states)
@@ -111,11 +110,14 @@ void Ship::update(float dt)
 	_surfaceSlope.setTarget(glm::dot(_waypointDifference, _upDirection));
 	_surfaceSlope.update(dt);
 
-	float dot1 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[1]);
-	float dot2 = glm::dot(_boundingBox.directions[0], _boundingBox.directions[2]);
-	float dot3 = glm::dot(_boundingBox.directions[2], _boundingBox.directions[1]);
-
 	checkObstacleCollision();
+
+	// Handle particle system variables
+	float interpolation = powf(clamp(_engineTemperature * 0.01f, 0.1f, 0.9f), 2.0f);
+	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
+	_particleSystem.setDeathColor(glm::vec3{0.0f});
+	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -124,7 +126,7 @@ void Ship::update(float dt)
 
 void Ship::jump()
 {
-	if (_currentJumpCooldown <= 0.0f && _steeringCooldown <= 0.0f)
+	if (_currentJumpCooldown <= 0.0f && _steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 	{
 		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _shipForward);
 
@@ -331,7 +333,44 @@ void Ship::obstacleCollision()
 		_engineCooldown = _cooldownOnObstacleCollision;
 		_steeringCooldown = _cooldownOnObstacleCollision;
 		_immunityTimer = _immunityoOnObstacleCollision;
+		_bObstacleCollision = true;
 	}
+}
+
+bool Ship::checkIfCollided()
+{
+	if (_bObstacleCollision)
+	{
+		_bObstacleCollision = false;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+GFX::ParticleSystem& Ship::getParticleSystem()
+{
+	return _particleSystem;
+}
+
+const glm::vec3 & Ship::getColor()
+{
+	return _shipColor;
+}
+
+
+void Ship::rotateAtStart(float down, float angle)
+{
+	move(0, -down, 0);
+
+	glm::mat4 rotation = glm::rotate(angle, glm::vec3{ 0, 0, 1 });
+
+	setPosition(rotation * glm::vec4{ getPosition(), 0.0f });
+	_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
+	_meshUpDirection.setVector(_upDirection);
+	_cameraUpDirection.setVector(_upDirection);
 }
 
 void Ship::setWaypointDifference(const glm::vec3 & difference)
@@ -344,6 +383,11 @@ void Ship::setSteeringCooldown(float cooldown)
 	_steeringCooldown = cooldown;
 }
 
+void Ship::setInactiveTime(float inactiveTime)
+{
+	_inactiveTimer = inactiveTime;
+}
+
 float Ship::getSteeringCooldown()
 {
 	return _steeringCooldown;
@@ -353,7 +397,7 @@ void Ship::handleInputs(float dt)
 {
 	if (!_stopped)
 	{
-		if (_steeringCooldown <= 0.0f)
+		if (_steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 		{
 			// Update turning angle										reduce maneuverability at high acceleration
 			_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.0f) * dt;
@@ -416,6 +460,11 @@ void Ship::handleCooldowns(float dt)
 	if (_immunityTimer > 0.0f)
 	{
 		_immunityTimer -= dt;
+	}
+
+	if (_inactiveTimer > 0.0f)
+	{
+		_inactiveTimer -= dt;
 	}
 }
 
