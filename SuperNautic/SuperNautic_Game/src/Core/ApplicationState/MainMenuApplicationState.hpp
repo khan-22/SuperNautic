@@ -8,7 +8,9 @@
 #include "Core/ApplicationState/ApplicationState.hpp"
 #include "Core/Asset/Asset.hpp"
 #include "Core/Gui/GuiContainer.hpp"
+#include "Core/Gui/GuiText.hpp"
 #include "Core/Io/Input.hpp"
+
 
 class MainMenuApplicationState : public ApplicationState
 {
@@ -21,8 +23,9 @@ public:
 
 private:
     GuiContainer _guiContainer;
-    Input _input;
     Asset<sf::Font> _font;
+    GuiText _titleText;
+    Input _input;
 
 	int _playersActive;
 };
