@@ -69,7 +69,7 @@ public:
 	float getSteeringCooldown();
 	bool checkIfCollided();
 	GFX::ParticleSystem& getParticleSystem();
-	PointLight getPointLight();
+	PointLight& getPointLight();
 	const glm::vec3& getColor();
 
 	// Moves down units in -y direction, then rotates angle radians around z
