@@ -7,12 +7,13 @@
 
 #include "Core/ApplicationState/ApplicationState.hpp"
 #include "Core/Asset/Asset.hpp"
-#include "Core/Gui/GuiContainer.hpp"
+#include "Core/Gui/GuiTrackGeneratorControls.hpp"
 #include "Core/Io/Input.hpp"
 #include "Core/Gui/GuiTrackGenerator.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 #include "Core/Utility/TrackPresetManager.hpp"
+
 
 class GuiTextInput;
 class GuiSlider;
@@ -28,8 +29,8 @@ public:
 
 private:
     TrackPresetManager _presetManager;
-    GuiContainer _guiContainer;
     GuiTrackGenerator _trackGenerator;
+    GuiTrackGeneratorControls _guiContainer;
     Input _input;
     Asset<sf::Font> _font;
     unsigned char _numPlayers;

@@ -9,6 +9,9 @@
 #include "Core/Io/Log.hpp"
 #include "GFX/Resources/Model.hpp"
 
+const unsigned int Track::_MIN_TRACK_LENGTH = 3000;
+const unsigned int Track::_MAX_TRACK_LENGTH = 1000000;
+
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	: _segmentHandler(segmentHandler)
@@ -56,8 +59,18 @@ unsigned int Track::getCurviness() const
 // Sets the track length in whole meters
 void Track::setLength(const unsigned int length)
 {
-	assert(length >= 3000 && length <= 1000000);
+	assert(length >= _MIN_TRACK_LENGTH && length <= _MAX_TRACK_LENGTH);
 	_targetLength = length;
+}
+
+unsigned int Track::getMaxLength()
+{
+    return _MAX_TRACK_LENGTH;
+}
+
+unsigned int Track::getMinLength()
+{
+    return _MIN_TRACK_LENGTH;
 }
 
 // Set randomization seed
