@@ -13,7 +13,7 @@
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 #include "Core/Utility/TrackPresetManager.hpp"
-
+#include "Core/Gui/GuiToolTip.hpp"
 
 class GuiPlayerJoinContainer;
 
@@ -27,12 +27,13 @@ public:
     bool bHandleEvent(const sf::Event& event) override;
 
 private:
+    Asset<sf::Font> _font;
+    GuiToolTip _toolTip;
     TrackPresetManager _presetManager;
     GuiTrackGenerator _trackGenerator;
     GuiTrackGeneratorControls _guiContainer;
     GuiPlayerJoinContainer* _players;
     Input _input;
-    Asset<sf::Font> _font;
 
     GFX::SfmlRenderer _sfmlRenderer;
     GFX::ForwardRenderer _forwardRenderer;

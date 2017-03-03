@@ -72,6 +72,7 @@ public:
 	PointLight& getPointLight();
 	PointLight& getWarningLight();
 	const glm::vec3& getColor();
+	void setBounce(const glm::vec3& bounceVector);
 
 	// Moves down units in -y direction, then rotates angle radians around z
 	// Used to position ship at start of race
@@ -109,6 +110,9 @@ private:
 	glm::vec3					_upDirection;			// Current up direction
 	glm::vec3					_returnPos;				// Respawn position of ship
 	glm::vec3					_waypointDifference;	// Difference between waypoint direcitons, used to calculate track slope
+
+	glm::vec3					_bounceVector;			// Direction and strength of bouncing when collided with another ship
+	const float					_bounceDecay;			// Rate of decay on _bounceVector
 
 	SpringRotatedVector			_meshForwardDirection;	// Current facing direction
 	SpringRotatedVector			_meshUpDirection;		// Up direction of ship mesh

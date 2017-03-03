@@ -64,9 +64,11 @@ Ship::Ship(glm::vec3 color)
 		_warningLevel{ 0.8f },
 		_warningLightIntensity{ 2.0f },
 		_warningAccumulator{ 0.0f },
-		_engineBlinkAccumulator{ 0.0f }
+		_engineBlinkAccumulator{ 0.0f },
+		_bounceVector{ 0.0f },
+		_bounceDecay{ 1.0f }
 {
-	setPosition(0, 0, 10);
+	move(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 
 	_particleSystem.init(200, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
@@ -96,6 +98,15 @@ void Ship::update(float dt)
 
 	trackSurface(dt);
 	updateDirectionsAndPositions(dt);
+
+	glm::vec3 bounceDirection{ _bounceVector - glm::dot(_bounceVector, _upDirection) * _upDirection };
+	if (!bAlmostEqual(bounceDirection, glm::vec3{ 0.0f }))
+	{
+		_bounceVector = glm::normalize(bounceDirection) * glm::length(_bounceVector);
+		move(_bounceVector);
+		
+	}
+	_bounceVector -= _bounceVector * _bounceDecay * dt;
 
 	_shipCollisionShake.setMagnitude(_steeringCooldown / _cooldownOnObstacleCollision);
 	_shipCollisionShake.setSpeed(_steeringCooldown / _cooldownOnObstacleCollision);
@@ -194,6 +205,7 @@ void Ship::rotateAtStart(float down, float angle)
 	setPosition(rotation * glm::vec4{ getPosition(), 0.0f });
 	_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
 	_meshUpDirection.setVector(_upDirection);
+	_meshPosition.setVector(getPosition());
 	_cameraUpDirection.setVector(_upDirection);
 }
 
@@ -623,6 +635,14 @@ PointLight& Ship::getWarningLight()
 const glm::vec3 & Ship::getColor()
 {
 	return _shipColor;
+}
+
+void Ship::setBounce(const glm::vec3& bounceVector)
+{
+	_bounceVector = bounceVector;
+
+	_shipCollisionShake.setMagnitude(0.5f);
+	_shipCollisionShake.setSpeed(0.5f);
 }
 
 const BoundingBox & Ship::getBoundingBox() const
