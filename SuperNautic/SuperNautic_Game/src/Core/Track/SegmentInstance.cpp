@@ -64,6 +64,14 @@ void SegmentInstance::addObstacle(ObstacleInstance newObstacle)
 	_obstacles.push_back(newObstacle);
 }
 
+void SegmentInstance::decreaseObstacleSpeed()
+{
+	for (size_t i = 0; i < _obstacles.size(); i++)
+	{
+		_obstacles[i].decreaseSpeed();
+	}
+}
+
 bool SegmentInstance::bTestCollisionSphere(const SegmentInstance& other) const
 {
     for(const Sphere& a : _globalBoundingSpheres)

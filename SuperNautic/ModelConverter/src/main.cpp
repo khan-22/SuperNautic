@@ -73,7 +73,7 @@ void processPositions(std::vector<glm::vec3>& positions, const aiMesh* importedM
 	log(GREEN) << "\rPositions: 100%" << std::endl;
 }
 
-void processTexCoords(std::vector<glm::vec3>& texCoords, const aiMesh* importedMesh)
+void processTexCoords(std::vector<glm::vec3>& texCoords, const aiMesh* importedMesh, int zone)
 {
 	texCoords.reserve(texCoords.capacity() + importedMesh->mNumVertices);
 	if (importedMesh->mTextureCoords[0] != nullptr)
@@ -82,7 +82,15 @@ void processTexCoords(std::vector<glm::vec3>& texCoords, const aiMesh* importedM
 		for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
 		{
 			glm::vec3 uvw = toGLM(importedMesh->mTextureCoords[0][i]);
-			uvw.z = (float)(importedMesh->mMaterialIndex) + 0.1f;
+			if (zone == -1)
+			{
+				uvw.z = (float)(importedMesh->mMaterialIndex) + 0.1f;
+			}
+			else
+			{
+				uvw.z = (float)(zone) + 0.1f;
+				//log(YELLOW) << uvw.z << std::endl;
+			}
 			texCoords.push_back(uvw);
 
 			if (i >= importedMesh->mNumVertices / 2)
@@ -162,6 +170,9 @@ void processIndices(std::vector<glm::uvec3>& faces, std::vector<GLuint>& indices
 void testRead(const char* fileName);
 
 Mesh* accumulatedMesh = nullptr;
+Mesh* accumulatedZoneMesh = nullptr;
+int zoneNumber = -1;
+unsigned int indexOffset = 0;
 
 void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vector<Mesh>& meshes, glm::mat4 accumulatedTransform)
 {
@@ -171,7 +182,6 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 
 	const char* previousName = "";
 
-	unsigned int indexOffset = 0;
 
 	for (int meshIndex = 0; meshIndex < numMeshes; meshIndex++)
 	{
@@ -179,8 +189,27 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 
 		log(GREEN) << "-- Processing Mesh: " << currentNode->mName.C_Str() << std::endl;
 
+		bool isZone = false;
 		Mesh* current;
-		if (strcmp(previousName, currentNode->mName.C_Str()) == 0)
+		
+		// If it's a zone, we want it to merge with all other zones.
+		if (currentNode->mName.C_Str()[0] == 'Z')
+		{
+			isZone = true;
+			zoneNumber++;
+
+			if (meshes.size() == 0 || accumulatedZoneMesh == nullptr)
+			{
+				meshes.emplace_back();
+				accumulatedZoneMesh = &meshes.back();
+				indexOffset = 0;
+			}
+
+			current = accumulatedZoneMesh;
+
+			log(GREEN) << "This will be treated as a Zone! Number: " << zoneNumber << std::endl;
+		}
+		else if (strcmp(previousName, currentNode->mName.C_Str()) == 0)
 		{
 			log(GREEN) << "Name is the same as previous, adding to it" << std::endl;
 
@@ -196,21 +225,11 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 		{
 			log(GREEN) << "Name not recognized, adding to accumulated mesh" << std::endl;
 			
-			if (meshes.size() == 0)
+			if (meshes.size() == 0 || accumulatedMesh == nullptr)
 			{
 				meshes.emplace_back();
 				accumulatedMesh = &meshes.back();
 				indexOffset = 0;
-			}
-			else
-			{
-				if (accumulatedMesh == nullptr)
-				{
-					meshes.emplace_back();
-					accumulatedMesh = &meshes.back();
-					indexOffset = 0;
-				}
-
 			}
 			
 			current = accumulatedMesh;
@@ -221,9 +240,18 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 
 		glm::mat4 normalTransformation = glm::transpose(glm::inverse(accumulatedTransform));
 
+		
 
 		processPositions(current->positions, importedMesh, accumulatedTransform);
-		processTexCoords(current->texCoords, importedMesh);
+		
+		if (isZone)
+		{
+			processTexCoords(current->texCoords, importedMesh, zoneNumber);
+		}
+		else
+		{
+			processTexCoords(current->texCoords, importedMesh, -1);
+		}
 		processNormals(current->normals, importedMesh, normalTransformation);
 		processIndices(current->faces, current->indices, importedMesh, indexOffset);
 
@@ -330,6 +358,18 @@ bool convertFile(char* filePath)
 		processNodeCameras(importedData, cameras);
 
 	}
+
+	log(GREEN) << "-------------" << std::endl;
+	log(GREEN) << "Summary:" << std::endl;
+	log(GREEN) << "\tMeshes: " << meshes.size() << std::endl;
+	for (Mesh& mesh : meshes)
+	{
+		log(GREEN) << "\t\tVertices: " << mesh.positions.size() << " Indices: " << mesh.indices.size() << std::endl;
+	}
+	log(GREEN) << "\tLights: " << lights.size() << std::endl;
+	log(GREEN) << "\tCameras: " << cameras.size() << std::endl;
+
+
 	
 	Header header;
 	header.numMeshes  = static_cast<uint32_t>(meshes.size());
@@ -509,7 +549,7 @@ int main(int argc, char* argv[])
 	else
 	{
 #if _DEBUG
-		convertFile("s03_10degbend_helper_aa.fbx");
+		convertFile("s01_straight_ZONES_aa.fbx");
 		//gTransformCoordinates = true;
 #endif
 
