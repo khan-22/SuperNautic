@@ -213,7 +213,7 @@ void Ship::handleInputs(float dt)
 {
 	if (!_stopped)
 	{
-		if (_steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f && !_stopped)
+		if (_steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 		{
 			// Update turning angle										reduce maneuverability at high acceleration
 			_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.0f) * dt;
@@ -232,7 +232,7 @@ void Ship::handleInputs(float dt)
 	else
 	{
 		// Break if stopped
-		_accelerationFactor = 0.0f;
+		_accelerationFactor = -1.0f;
 		_currentTurningAngle -= 0.9f * _currentTurningAngle * dt;
 		_velocity -= 0.9f * _velocity * dt;
 	}

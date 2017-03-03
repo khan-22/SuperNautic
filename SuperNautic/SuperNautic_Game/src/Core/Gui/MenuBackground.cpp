@@ -38,7 +38,7 @@ void MenuBackground::update(float dtSeconds)
 {
     auto end = std::remove_if(_bubbles.begin(), _bubbles.end(), [](const Bubble& b)
     {
-        return b.visual.getPosition().y + b.visual.getRadius() < 0.f;
+       return b.visual.getPosition().y + b.visual.getRadius() < 0.f;
     });
     _bubbles.erase(end, _bubbles.end());
 
@@ -62,9 +62,6 @@ void MenuBackground::update(float dtSeconds)
     {
         generateBubble(y);
     }
-
-
-    return true;
 }
 
 void MenuBackground::generateBubble(float y)
