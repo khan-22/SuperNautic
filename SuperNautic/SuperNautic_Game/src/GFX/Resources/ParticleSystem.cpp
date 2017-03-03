@@ -76,12 +76,12 @@ void GFX::ParticleSystem::init(GLuint particleCount, glm::vec3 position, glm::ve
 		phys.life = -1.f;
 	}
 
-	update(0.f, position);
+	update(0.f, position, glm::vec3{0,0,0});
 
 	_texture = TextureCache::get("particle01.png");
 }
 
-void GFX::ParticleSystem::update(float dt, glm::vec3 position)
+void GFX::ParticleSystem::update(float dt, glm::vec3 position, glm::vec3 startVelocity)
 {
 	//const float 
 
@@ -99,25 +99,31 @@ void GFX::ParticleSystem::update(float dt, glm::vec3 position)
 
 				glm::vec3 relativeVelocity = phys.velocity - turbulence;
 
-				phys.velocity -= 0.5f * glm::dot(relativeVelocity, relativeVelocity) * glm::normalize(relativeVelocity) * dt;
+				phys.velocity -= 0.5f * relativeVelocity * dt;
 				//phys.color = lerp(phys.life / 5.f, glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 0.f, 0.f));
+
+				_renderParticles.positions[i] += (phys.velocity) * dt;
 			}
 			else
 			{
 				glm::vec3 spread = randomVector() * _maxSpread * (float)(rand() % 10) * 0.1f;
 
-				glm::vec3 velocity = (position - _previousPosition);
-				phys.velocity = velocity + spread;
+				glm::vec3 spawnInterval = (_previousPosition - position);
+				phys.velocity = startVelocity + spread;
 
 				double randomFactor = double(rand() % (int)(_particleCount)) / (double)(_particleCount);
 				phys.life = _maxLifetime * (0.8f + 0.3f * randomFactor);
 
+				double randomFactor2 = double(rand() % (int)(_particleCount)) / (double)(_particleCount);
+				float rf2 = (float)randomFactor2;
+
 				//phys.color = lerp(phys.life / 5.f, glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 0.f, 0.f));
 
-				_renderParticles.positions[i] = position - (velocity * (float)randomFactor);
+				_renderParticles.positions[i] = position + spawnInterval * (float)randomFactor;
+				_renderParticles.positions[i] += (phys.velocity * (float)randomFactor2) * dt;
 			}
 
-			_renderParticles.positions[i] += (phys.velocity) * dt;
+			
 			_renderParticles.colors[i] = lerp(phys.life / _maxLifetime, _deathColor, _birthColor);
 			_renderParticles.sizes[i] = lerp(phys.life / _maxLifetime, _deathSize, _birthSize);
 		}

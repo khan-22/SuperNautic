@@ -26,9 +26,9 @@ Ship::Ship(glm::vec3 color)
 		_trackForward{ 0.0f, 0.0f, 1.0f },
 		_shipForward{ 0.0f, 0.0f, 1.0f },
 		_upDirection{ 0.0f, 1.0f, 0.0f },
-		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 200.0f, 6.0f, false},
-		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 100.0f, 6.0f, true },
-		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 40.0f, 10.0f, true },
+		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 800.0f, 20.0f, false},
+		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 60.0f, 9.0f, true },
+		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
 		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
 		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 5.0f },
 		_meshXZPosition{ glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 0, 0 }, 100.0f },
@@ -357,11 +357,11 @@ void Ship::updateDirectionsAndPositions(float dt)
 
 	// Update mesh up direction
 	_meshUpDirection.setBackupAxis(_meshForwardDirection());
-	_meshUpDirection.setTarget(glm::rotate(-_currentTurningAngle * 1.0f, _shipForward) * glm::vec4{ _upDirection, 0.0f });
+	_meshUpDirection.setTarget(glm::rotate(-_currentTurningAngle * 0.6f, _shipForward) * glm::vec4{ _upDirection, 0.0f });
 	_meshUpDirection.update(dt);
 
 	// Update camera up direction
-	_cameraUpDirection.setBackupAxis(_meshForwardDirection());
+	_cameraUpDirection.setBackupAxis(_trackForward);
 	_cameraUpDirection.setTarget(_upDirection);
 	_cameraUpDirection.update(dt);
 
@@ -439,7 +439,7 @@ void Ship::handleLightsAndParticles(float dt)
 		_warningAccumulator -= glm::pi<float>() * 2.0f;
 	}
 
-	_engineBlinkAccumulator += 30.0f * dt;
+	_engineBlinkAccumulator += 15.0f * dt;
 	while (_engineBlinkAccumulator > glm::pi<float>() * 2.0f)
 	{
 		_engineBlinkAccumulator -= glm::pi<float>() * 2.0f;
@@ -461,13 +461,13 @@ void Ship::handleLightsAndParticles(float dt)
 	_particleSystem.setDeathColor(glm::vec3{ 0.0f });
 	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
 
-	if (sinf(_engineBlinkAccumulator) > -0.2f && (dangerLevel > 0.0f || _engineCooldown > 0.0f))
+	if (sinf(_engineBlinkAccumulator) > 0.0f && (dangerLevel > 0.0f || _engineCooldown > 0.0f))
 	{
 		_particleSystem.setBirthColor(glm::vec3{ 0.1f });
-		_particleSystem.setBirthSize(0.1f);
+		_particleSystem.setBirthSize(sinf(_engineBlinkAccumulator));
 	}
 
-	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
+	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.3f, 1.0f }, -_meshForwardDirection() * _velocity);
 }
 
 bool Ship::getOverload(float dt)
