@@ -61,11 +61,7 @@ void GuiTrackGenerator::generate()
         track->setLength(_length);
         track->setDifficulty(_difficulty);
         track->startNewTrack();
-        while(!_bDoAbortGenerate && !track->bGenerate())
-        {
-            std::cout << ".";
-        }
-        std::cout << std::endl;
+        while(!_bDoAbortGenerate && !track->bGenerate());
 
         if(_bDoAbortGenerate)
         {

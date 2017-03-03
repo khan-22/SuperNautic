@@ -74,8 +74,10 @@ private:
 
 	// The visual geometry for this segment
 	GFX::TexturedModel	_visual;
-	ModelAsset			_window;
+	ModelAsset			_windowModel;
 	bool				_bHasWindow;
+	ModelAsset			_zonesModel;
+	bool				_bHasZones;
 
 	// Indices in _scene.get()->meshes to the required meshes
 	unsigned				_baseVisual;

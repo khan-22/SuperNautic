@@ -80,6 +80,9 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
 void PreGameApplicationState::render()
 {
+    _sfmlRenderer.render(*_context.menuBackground);
+    _sfmlRenderer.display(_context.window);
+
     _forwardRenderer.render(_trackGenerator);
     static Camera garbageCam(glm::radians(90.f), 1280.f, 720.f);
     _forwardRenderer.display(garbageCam);
@@ -91,6 +94,7 @@ void PreGameApplicationState::render()
 
 bool PreGameApplicationState::bUpdate(float dtSeconds)
 {
+    _context.menuBackground->update(dtSeconds);
     _guiContainer.update();
     _trackGenerator.update(dtSeconds);
 

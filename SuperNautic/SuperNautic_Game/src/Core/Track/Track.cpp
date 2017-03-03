@@ -125,6 +125,7 @@ void Track::startNewTrack()
 	_prevIndex = -1;
 	_lastSegment = nullptr;
 	_octrees.clear();
+	_lengthAfterLastCall = 0.f;
 	for (unsigned int i = 0; i < _track.size(); i++)
 	{
 		delete _track[i];
@@ -198,6 +199,10 @@ bool Track::bGenerate()
 				{
 					placeObstacles();
 				}
+				// End segment
+				bInsertNormalSegment(_segmentHandler->infos().size() - 1, false);
+				bInsertNormalSegment(0, false);
+
 				LOG("Track generated. Length: ", _generatedLength);
 				return true;
 			}
@@ -402,6 +407,10 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 
 	// [0..1], 0 = at closest waypoint, 1 = at next waypoint
 	float interpolationValue = glm::dot(closest.direction, globalPosition - closest.position) / distanceToPlane;
+	if (distanceToPlane <= 0.0f)	// Protect against the case where the track runs out of waypoints ahead of the player
+	{
+		interpolationValue = 1.0f;
+	}
 
 	// Calculate current length in segment
 	lengthInSegment = 0.0f;
@@ -545,17 +554,23 @@ bool Track::bEndTrack()
 {
 	while (_generatedLength < _targetLength)
 	{
-		if (_endConnection == 'a' && !bInsertNormalSegment(0, true))
+		if (_endConnection == 'a')
 		{
-			deleteSegments(_endMargin + 400);
-			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-			return false;
+			if (!bInsertNormalSegment(0, true))
+			{
+				deleteSegments(_endMargin + 400);
+				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+				return false;
+			}
 		}
-		if (_endConnection == 'b' && !bInsertNormalSegment(1, true))
+		else if (_endConnection == 'b')
 		{
-			deleteSegments(_endMargin + 400);
-			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-			return false;
+			if (!bInsertNormalSegment(1, true))
+			{
+				deleteSegments(_endMargin + 400);
+				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+				return false;
+			}
 		}
 	}
 	return true;
