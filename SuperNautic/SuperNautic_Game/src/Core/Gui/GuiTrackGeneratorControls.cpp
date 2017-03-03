@@ -5,6 +5,7 @@
 #include "Core/Gui/GuiSlider.hpp"
 #include "Core/Gui/GuiHorizontalList.hpp"
 #include "Core/Gui/GuiButton.hpp"
+#include "Core/Gui/GuiText.hpp"
 
 GuiTrackGeneratorControls::GuiTrackGeneratorControls(GuiTrackGenerator& generator, Track* existingTrack)
 : GuiContainer()
@@ -78,6 +79,19 @@ void GuiTrackGeneratorControls::insertSeedList(const TrackPresetManager::Preset&
         insertSeedInput(&p);
     }
 
+    GuiText* label = new GuiText("Seed", FontCache::get("res/arial.ttf"));
+
+    label->setOrigin(label->getBoundingRect().width / 2.f, label->getBoundingRect().height);
+    sf::FloatRect seedListBounds = _seedList->getBoundingRect();
+    label->setPosition(seedListBounds.left + seedListBounds.width / 2.f, seedListBounds.top - label->getBoundingRect().height / 2.f);
+
+    _seedList->registerOnSelect([label](){label->toggleSelection(); label->setFillColor(255, 255, 255);});
+    _seedList->registerOnDeselect([label](){label->toggleSelection();});
+
+    std::unique_ptr<SceneNode> labelPtr(label);
+    _seedList->attachChild(labelPtr);
+
+
     std::unique_ptr<GuiElement> seedListPtr(_seedList);
     insert(seedListPtr);
 }
@@ -115,6 +129,18 @@ void GuiTrackGeneratorControls::insertLengthInput(const TrackPresetManager::Pres
         _generator.generate();
     });
     _lengthInput->setOrigin(_lengthInput->getBoundingRect().width / 2.f, _lengthInput->getBoundingRect().height / 2.f);
+    GuiText* label = new GuiText("Length  ", FontCache::get("res/arial.ttf"));
+
+    label->setOrigin(label->getBoundingRect().width, label->getBoundingRect().height / 2.f);
+    sf::FloatRect lengthBounds = _lengthInput->getBoundingRect();
+    label->setPosition(lengthBounds.left, _lengthInput->getPosition().y + lengthBounds.height / 2.f);
+
+    _lengthInput->registerOnSelect([label](){label->toggleSelection();});
+    _lengthInput->registerOnDeselect([label](){label->toggleSelection();});
+
+    std::unique_ptr<SceneNode> labelPtr(label);
+    _lengthInput->attachChild(labelPtr);
+
     std::unique_ptr<GuiElement> lengthInputPtr(_lengthInput);
     insert(lengthInputPtr);
 }

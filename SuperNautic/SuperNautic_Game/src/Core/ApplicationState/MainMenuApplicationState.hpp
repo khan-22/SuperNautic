@@ -23,7 +23,7 @@ public:
 
 private:
     GuiContainer _guiContainer;
-    Asset<sf::Font> _font;
+    FontAsset _font;
     GuiText _titleText;
     Input _input;
 
