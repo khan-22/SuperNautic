@@ -170,7 +170,9 @@ void processIndices(std::vector<glm::uvec3>& faces, std::vector<GLuint>& indices
 void testRead(const char* fileName);
 
 Mesh* accumulatedMesh = nullptr;
+Mesh* accumulatedZoneMesh = nullptr;
 int zoneNumber = -1;
+unsigned int indexOffset = 0;
 
 void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vector<Mesh>& meshes, glm::mat4 accumulatedTransform)
 {
@@ -180,7 +182,6 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 
 	const char* previousName = "";
 
-	unsigned int indexOffset = 0;
 
 	for (int meshIndex = 0; meshIndex < numMeshes; meshIndex++)
 	{
@@ -191,7 +192,24 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 		bool isZone = false;
 		Mesh* current;
 		
-		if (strcmp(previousName, currentNode->mName.C_Str()) == 0)
+		// If it's a zone, we want it to merge with all other zones.
+		if (currentNode->mName.C_Str()[0] == 'Z')
+		{
+			isZone = true;
+			zoneNumber++;
+
+			if (meshes.size() == 0 || accumulatedZoneMesh == nullptr)
+			{
+				meshes.emplace_back();
+				accumulatedZoneMesh = &meshes.back();
+				indexOffset = 0;
+			}
+
+			current = accumulatedZoneMesh;
+
+			log(GREEN) << "This will be treated as a Zone! Number: " << zoneNumber << std::endl;
+		}
+		else if (strcmp(previousName, currentNode->mName.C_Str()) == 0)
 		{
 			log(GREEN) << "Name is the same as previous, adding to it" << std::endl;
 
@@ -199,14 +217,6 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 		}
 		else if (containsSpecialName(currentNode->mName.C_Str()))
 		{
-			if (currentNode->mName.C_Str()[0] == 'Z')
-			{
-				isZone = true;
-				zoneNumber++;
-
-				log(GREEN) << "This will be treated as a Zone! Number: " << zoneNumber << std::endl;
-			}
-
 			meshes.emplace_back();
 			current = &meshes.back();
 			indexOffset = 0;
@@ -215,21 +225,11 @@ void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vec
 		{
 			log(GREEN) << "Name not recognized, adding to accumulated mesh" << std::endl;
 			
-			if (meshes.size() == 0)
+			if (meshes.size() == 0 || accumulatedMesh == nullptr)
 			{
 				meshes.emplace_back();
 				accumulatedMesh = &meshes.back();
 				indexOffset = 0;
-			}
-			else
-			{
-				if (accumulatedMesh == nullptr)
-				{
-					meshes.emplace_back();
-					accumulatedMesh = &meshes.back();
-					indexOffset = 0;
-				}
-
 			}
 			
 			current = accumulatedMesh;
@@ -358,6 +358,18 @@ bool convertFile(char* filePath)
 		processNodeCameras(importedData, cameras);
 
 	}
+
+	log(GREEN) << "-------------" << std::endl;
+	log(GREEN) << "Summary:" << std::endl;
+	log(GREEN) << "\tMeshes: " << meshes.size() << std::endl;
+	for (Mesh& mesh : meshes)
+	{
+		log(GREEN) << "\t\tVertices: " << mesh.positions.size() << " Indices: " << mesh.indices.size() << std::endl;
+	}
+	log(GREEN) << "\tLights: " << lights.size() << std::endl;
+	log(GREEN) << "\tCameras: " << cameras.size() << std::endl;
+
+
 	
 	Header header;
 	header.numMeshes  = static_cast<uint32_t>(meshes.size());
