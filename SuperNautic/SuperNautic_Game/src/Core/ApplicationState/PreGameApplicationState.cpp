@@ -18,10 +18,11 @@
 
 PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
-, _trackGenerator(context.segmentHandler.get(), context.obstacleHandler.get())
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
+, _toolTip(_font)
+, _trackGenerator(context.segmentHandler.get(), context.obstacleHandler.get())
 , _input()
-, _guiContainer(_trackGenerator, _context.track.get())
+, _guiContainer(_trackGenerator, &_toolTip, _context.track.get())
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
@@ -56,13 +57,25 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
     _guiContainer.insert(guiElements);
 
+
+
     sf::Vector2u windowSize = _context.window.getSize();
     sf::FloatRect guiBounds = _guiContainer.getBoundingRect();
     _guiContainer.setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height);
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y * 0.9f);
+
+    _toolTip.centerAt(windowSize.x / 2.f, windowSize.y * 0.95f);
+    _toolTip.registerTip(startButton, "Start the game.");
+    _toolTip.registerTip(backButton, "Go back to main menu.");
+    _toolTip.setCharacterSize(18);
+
+
+
     _guiContainer.select(startButton);
 
     _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f);
+
+
 }
 
 void PreGameApplicationState::render()
@@ -72,6 +85,7 @@ void PreGameApplicationState::render()
     _forwardRenderer.display(garbageCam);
 
     _sfmlRenderer.render(_guiContainer);
+    _sfmlRenderer.render(_toolTip);
     _sfmlRenderer.display(_context.window);
 }
 

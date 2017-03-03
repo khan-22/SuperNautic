@@ -5,9 +5,7 @@ GuiText::GuiText(const std::string& str, FontAsset font)
 : _font(font)
 , _text(str, *_font.get())
 {
-    _text.setOrigin(_text.getLocalBounds().left, _text.getLocalBounds().top);
-    _text.setPosition(0.f, 0.f);
-
+    setText(str);
 
     _text.setOutlineThickness(2.f);
     _text.setOutlineColor(sf::Color::Black);
@@ -18,6 +16,8 @@ GuiText::GuiText(const std::string& str, FontAsset font)
 void GuiText::setText(const std::string& str)
 {
     _text.setString(str);
+    _text.setOrigin(_text.getLocalBounds().left, _text.getLocalBounds().top);
+    _text.setPosition(0.f, 0.f);
 }
 
 const std::string& GuiText::getText() const

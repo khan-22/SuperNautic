@@ -11,6 +11,7 @@
 #include "Core/Io/Input.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 #include "Core/Utility/VideoOptions.hpp"
+#include "Core/Gui/GuiToolTip.hpp"
 
 class GuiTextInput;
 class GuiSlider;
@@ -31,6 +32,7 @@ private:
     Input _input;
     Asset<sf::Font> _font;
     GFX::SfmlRenderer _sfmlRenderer;
+    GuiToolTip  _toolTip;
 
     void applyOptions();
 };

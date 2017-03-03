@@ -20,6 +20,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _videoOptions(context.window)
+, _toolTip(_font)
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
@@ -87,12 +88,25 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
     sf::FloatRect guiBounds = _guiContainer.getBoundingRect();
     _guiContainer.setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height / 2.f);
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
+
+
+    _toolTip.centerAt(windowSize.x / 2.f, windowSize.y * 0.95f);
+    _toolTip.registerTip(resolutionList, "Set video resolution. Press A to apply.");
+    _toolTip.registerTip(fs, "Enable/disable fullscreen.");
+    _toolTip.registerTip(backButton, "Go back to main menu.");
+    _toolTip.setCharacterSize(18);
+
+
     _guiContainer.toggleSelection();
+
+
+
 }
 
 void VideoOptionsApplicationState::render()
 {
     _sfmlRenderer.render(_guiContainer);
+    _sfmlRenderer.render(_toolTip);
     _sfmlRenderer.display(_context.window);
 }
 
