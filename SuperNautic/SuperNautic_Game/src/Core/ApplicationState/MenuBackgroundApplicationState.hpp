@@ -21,15 +21,21 @@ public:
     bool bHandleEvent(const sf::Event& event) override;
 
 private:
+    static constexpr float _BUBBLE_RADIUS = 10.f;
     struct Bubble
     {
         sf::CircleShape visual;
         float sinePosition;
+        float oscillationAmplitude;
         float centerX;
     };
 
-    sf::RectangleShape _colorFill;
+    sf::RectangleShape _colorFillTop;
+    sf::RectangleShape _colorFillBot;
     std::vector<Bubble> _bubbles;
+
+
+    void generateBubble(float y);
 
 };
 
