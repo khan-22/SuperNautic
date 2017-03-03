@@ -6,8 +6,9 @@
 #include "Core/Gui/GuiHorizontalList.hpp"
 #include "Core/Gui/GuiButton.hpp"
 #include "Core/Gui/GuiText.hpp"
+#include "Core/Gui/GuiToolTip.hpp"
 
-GuiTrackGeneratorControls::GuiTrackGeneratorControls(GuiTrackGenerator& generator, Track* existingTrack)
+GuiTrackGeneratorControls::GuiTrackGeneratorControls(GuiTrackGenerator& generator, GuiToolTip* toolTip, Track* existingTrack)
 : GuiContainer()
 , _generator(generator)
 , _font(FontCache::get("res/arial.ttf"))
@@ -25,6 +26,10 @@ GuiTrackGeneratorControls::GuiTrackGeneratorControls(GuiTrackGenerator& generato
     insertRandSeedButton();
     insertShuffleButton();
     insertSaveButton();
+
+    registerToolTips(toolTip);
+
+
 
 
     // Make seedlist select the first seedinput element.
@@ -194,20 +199,21 @@ void GuiTrackGeneratorControls::insertDifficultyInput(const TrackPresetManager::
 
 void GuiTrackGeneratorControls::insertRandSeedButton()
 {
-    std::unique_ptr<GuiElement> button(new GuiButton(sf::Text("Random seed", *_font.get()), [this]()
+    _randSeedButton = new GuiButton(sf::Text("Random seed", *_font.get()), [this]()
     {
         std::string seed = randString(_presetManager.getSeedLength());
         _selectedSeedInput->setText(seed);
         _currentPreset->seed = seed;
         _generator.setSeed(seed);
         _generator.generate();
-    }));
+    });
+    std::unique_ptr<GuiElement> button(_randSeedButton);
     insert(button);
 }
 
 void GuiTrackGeneratorControls::insertShuffleButton()
 {
-    std::unique_ptr<GuiElement> button(new GuiButton(sf::Text("Shuffle", *_font.get()), [&]()
+    _shuffleButton = new GuiButton(sf::Text("Shuffle", *_font.get()), [&]()
     {
         std::string seed = randString(_presetManager.getSeedLength());
         _selectedSeedInput->setText(seed);
@@ -238,13 +244,14 @@ void GuiTrackGeneratorControls::insertShuffleButton()
 
 
         _generator.generate();
-    }));
+    });
+    std::unique_ptr<GuiElement> button(_shuffleButton);
     insert(button);
 }
 
 void GuiTrackGeneratorControls::insertSaveButton()
 {
-    std::unique_ptr<GuiElement> button(new GuiButton(sf::Text("Save", *_font.get()), [this]()
+    _saveButton = new GuiButton(sf::Text("Save", *_font.get()), [this]()
     {
         TrackPresetManager::Preset p;
         p.seed = _selectedSeedInput->getText();
@@ -255,7 +262,8 @@ void GuiTrackGeneratorControls::insertSaveButton()
         _presetManager.insert(p);
 
         insertSeedInput(&_presetManager.getPresets().back());
-    }));
+    });
+    std::unique_ptr<GuiElement> button(_saveButton);
     insert(button);
 }
 
@@ -287,4 +295,22 @@ void GuiTrackGeneratorControls::insertSeedInput(const TrackPresetManager::Preset
 
     std::unique_ptr<GuiElement> seedInputPtr(seedInput);
     _seedList->insert(seedInputPtr);
+}
+
+
+void GuiTrackGeneratorControls::registerToolTips(GuiToolTip* toolTip)
+{
+    if(toolTip == nullptr)
+    {
+        return;
+    }
+
+    toolTip->registerTip(_lengthInput, "Length of the track in kilometres. Edit the length by pressing A.");
+    toolTip->registerTip(_curvinessInput, "How much the track curves. A low curviness creates a straighter track. A high curviness creates a track with more curves.");
+    toolTip->registerTip(_difficultyInput, "How many obstacles the track has. A low difficulty creates an easy track with few obstacles. A high difficulty creates a hard track with many obstacles.");
+    toolTip->registerTip(_seedList, "Select a seed from which to generate the track. Edit the selected seed by pressing A.");
+    toolTip->registerTip(_randSeedButton, "Randomize the selected seed.");
+    toolTip->registerTip(_shuffleButton, "Randomize all parameters of the selected seed (including the seed itself).");
+    toolTip->registerTip(_saveButton, "Save the current seed and parameters. When saved, it will appear at the end (to the right) in the seed list.");
+
 }
