@@ -76,8 +76,8 @@ void WindowRenderer::display(Camera& camera)
 void GFX::WindowRenderer::outsidePass(Camera & camera)
 {
 	_outsideFrameBuffer.bindWrite();
+	glViewport(0, 0, _actualWidth, _actualHeight);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
 	Shader* shader = _outsideShader.get();
 	shader->bind();
@@ -105,11 +105,13 @@ void GFX::WindowRenderer::windowPass(Camera & camera)
 	Framebuffer::DEFAULT.bindWrite();
 	_outsideFrameBuffer.bindRead();
 	_outsideFrameBuffer.bindColorTextures();
+	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
 	Shader* shader = _windowShader.get();
 	shader->bind();
 	shader->setUniform("uCameraPos", camera.getPosition());
-	shader->setUniform("uReciprocWindow", glm::vec2(1.f / _window->getSize().x, 1.f / _window->getSize().y));
+	shader->setUniform("uReciprocWindow", glm::vec2(1.f / _actualWidth, 1.f / _actualHeight));
+
 	//shader->setUniform("uVP", camera.getVP());
 
 	for (auto windowDrawCall : _windowDrawCalls)
