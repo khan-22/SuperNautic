@@ -12,7 +12,7 @@ class Camera;		// Forward-decl
 
 namespace GFX
 {
-	class Renderable3D; // Forward-decl
+	struct TemperatureZone; // Forward-decl
 
 	class ZoneRenderer
 	{
@@ -22,13 +22,13 @@ namespace GFX
 
 		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
 
-		void render(Renderable3D& renderable);
+		void render(TemperatureZone& temperatureZone);
 		void display(Camera& camera);
 
 	protected:
 
 	private:
-		std::vector<Renderable3D*> _drawCalls;
+		std::vector<TemperatureZone*> _drawCalls;
 		ShaderAsset	_shader;
 
 		sf::RenderWindow* _window;

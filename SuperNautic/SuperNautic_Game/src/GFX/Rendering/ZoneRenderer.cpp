@@ -1,6 +1,6 @@
 #include "GFX/Rendering/ZoneRenderer.hpp"
 
-#include "GFX/Rendering/Renderable3D.hpp"
+#include "GFX/Resources/TemperatureZone.hpp"
 #include "Core/Utility/Camera.h"
 
 using namespace GFX;
@@ -37,9 +37,9 @@ void ZoneRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GL
 	_actualHeight = _height * windowHeight;
 }
 
-void ZoneRenderer::render(Renderable3D& renderable)
+void ZoneRenderer::render(TemperatureZone& temperatureZone)
 {
-	_drawCalls.push_back(&renderable);
+	_drawCalls.push_back(&temperatureZone);
 }
 
 void ZoneRenderer::display(Camera& camera)
@@ -51,12 +51,17 @@ void ZoneRenderer::display(Camera& camera)
 
 	glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
 
+	float uTemperatures[4] = { 1.0, 0.25, -0.25, -1.0 };
+
 	_shader.get()->bind();
 	for (auto drawCall : _drawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _shader.get()};
 
-		drawCall->render(states);
+		_shader.get()->setUniform("uTemperatures", drawCall->temperatures[0], 4);
+
+		drawCall->model.get()->setModelMatrix(drawCall->modelMatrix);
+		drawCall->model.get()->render(states);
 	}
 
 	_drawCalls.clear();
