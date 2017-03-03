@@ -54,8 +54,8 @@ TrackPresetManager::Preset GuiTrackGeneratorControls::getDefaultPreset(Track* ex
     else
     {
         defaultPreset.seed = "AAAAA";
-        defaultPreset.length = 10;
-        defaultPreset.curviness = 3;
+        defaultPreset.length = Track::_MIN_LENGTH;
+        defaultPreset.curviness = Track::_MAX_CURVINESS;
     }
 
     return defaultPreset;
@@ -92,7 +92,7 @@ std::string GuiTrackGeneratorControls::toLengthInputString(unsigned int length) 
 void GuiTrackGeneratorControls::insertLengthInput(const TrackPresetManager::Preset& defaultPreset)
 {
     static const size_t LENGTH_TEXT_LENGTH = 3;
-    static const size_t MIN_TRACK_LENGTH_KM = Track::getMinLength() / 1000;
+    static const size_t MIN_TRACK_LENGTH_KM = Track::_MIN_LENGTH / 1000;
     _lengthInput = new GuiTextInput(LENGTH_TEXT_LENGTH, GuiCharacterInput::CharacterFlags::DIGITS);
 
     _lengthInput->setText(toLengthInputString(defaultPreset.length));
@@ -120,7 +120,7 @@ void GuiTrackGeneratorControls::insertCurvinessInput(const TrackPresetManager::P
 {
     _curvinessInput = new GuiSlider
     (
-        0.f, 5.f,
+        Track::_MIN_CURVINESS, Track::_MAX_CURVINESS,
         50.f,
         6,
         sf::Text("Curviness  Low", *_font.get()),
@@ -144,7 +144,7 @@ void GuiTrackGeneratorControls::insertRandSeedButton()
 {
     std::unique_ptr<GuiElement> button(new GuiButton(sf::Text("Random seed", *_font.get()), [this]()
     {
-        std::string seed = randString(5);
+        std::string seed = randString(_presetManager.getSeedLength());
         _selectedSeedInput->setText(seed);
         _currentPreset->seed = seed;
         _generator.setSeed(seed);
@@ -157,11 +157,11 @@ void GuiTrackGeneratorControls::insertShuffleButton()
 {
     std::unique_ptr<GuiElement> button(new GuiButton(sf::Text("Shuffle", *_font.get()), [&]()
     {
-        std::string seed = randString(5);
+        std::string seed = randString(_presetManager.getSeedLength());
         _selectedSeedInput->setText(seed);
         _generator.setSeed(seed);
 
-        size_t length = Track::getMinLength() / 1000 + rand() % 50;
+        size_t length = Track::_MIN_LENGTH / 1000 + rand() % ((Track::_MAX_LENGTH - Track::_MIN_LENGTH) / 2);
         std::string lengthText = std::to_string(length);
         if(lengthText.size() < _lengthInput->getText().size())
         {
@@ -170,7 +170,7 @@ void GuiTrackGeneratorControls::insertShuffleButton()
         _lengthInput->setText(lengthText);
         _generator.setLength(length * 1000);
 
-        size_t curviness = rand() % 6;
+        size_t curviness = Track::_MIN_CURVINESS + rand() % (Track::_MAX_CURVINESS - Track::_MIN_CURVINESS);
         _curvinessInput->setValue(curviness);
         _generator.setCurviness(curviness);
 
