@@ -197,6 +197,13 @@ void VideoOptionsApplicationState::applyOptions()
     {
         _context.segmentHandler->loadSegment(i);
     }
+
+
+    sf::Vector2u size = _context.window.getSize();
+
+    _context.menuBackground.reset(new MenuBackground(size.x, size.y));
+    _guiContainer.setPosition(size.x / 2.f, size.y / 2.f);
+    _toolTip.centerAt(size.x / 2.f, size.y * 0.95f);
 }
 
 
