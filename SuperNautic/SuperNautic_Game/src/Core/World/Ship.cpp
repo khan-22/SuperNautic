@@ -606,12 +606,12 @@ GFX::ParticleSystem& Ship::getParticleSystem()
 	return _particleSystem;
 }
 
-PointLight Ship::getPointLight()
+PointLight& Ship::getPointLight()
 {
 	return _engineLight;
 }
 
-PointLight Ship::getWarningLight()
+PointLight& Ship::getWarningLight()
 {
 	return _warningLight;
 }

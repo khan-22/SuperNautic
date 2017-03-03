@@ -69,8 +69,8 @@ public:
 	float getSteeringCooldown();
 	bool checkIfCollided();
 	GFX::ParticleSystem& getParticleSystem();
-	PointLight getPointLight();
-	PointLight getWarningLight();
+	PointLight& getPointLight();
+	PointLight& getWarningLight();
 	const glm::vec3& getColor();
 
 	// Moves down units in -y direction, then rotates angle radians around z
@@ -147,7 +147,7 @@ private:
 
 	const float _overheatTemperature;	// Temperature at which engine overheats
 	const float _warningLevel;			// Temperature at which warning light starts blinking
-	const float _warningLightIntensity;	
+	const float _warningLightIntensity;
 	float		_warningAccumulator;	// Used for calculating warning light intensity
 	float		_engineBlinkAccumulator;// Used for "blinking" particles at high temperatures
 
