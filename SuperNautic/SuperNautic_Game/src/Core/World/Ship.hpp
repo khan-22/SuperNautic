@@ -35,6 +35,7 @@ public:
 	void stop();
 	void destroy();
 	void repair();
+	bool getStopped();
 
 	// [-1..1]
 	void setTurning(float turnFactor);
