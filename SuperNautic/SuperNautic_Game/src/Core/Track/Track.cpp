@@ -125,6 +125,7 @@ void Track::startNewTrack()
 	_prevIndex = -1;
 	_lastSegment = nullptr;
 	_octrees.clear();
+	_lengthAfterLastCall = 0.f;
 	for (unsigned int i = 0; i < _track.size(); i++)
 	{
 		delete _track[i];
