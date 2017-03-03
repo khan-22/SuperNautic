@@ -23,7 +23,7 @@ namespace GFX
 
 		void init(GLuint particleCount, glm::vec3 position, glm::vec3 velocity, GLfloat maxLifetime, GLfloat spread, GLfloat turbulence);
 
-		void update(float dt, glm::vec3 position);
+		void update(float dt, glm::vec3 position, glm::vec3 startVelocity);
 
 		void render(RenderStates& states) override;
 

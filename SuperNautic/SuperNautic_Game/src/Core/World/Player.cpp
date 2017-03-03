@@ -18,7 +18,7 @@ Player::Player(int id, glm::vec3 color) :
 
 Player::Player(const Player& other) : Player{ other._playerId, glm::vec3{0, 0, 0} }
 {
-
+	LOG_ERROR("Player copy constructor called! That is bad :(");
 }
 
 Player::~Player()
