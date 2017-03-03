@@ -164,5 +164,6 @@ private:
 	void rotateTowardTrackForward(float dt);
 	void updateDirectionsAndPositions(float dt);
 	void trackSurface(float dt);
+	void handleLightsAndParticles(float dt);
 };
 #endif // SHIP_HPP
