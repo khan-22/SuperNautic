@@ -17,9 +17,9 @@
 
 MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
-, _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
+, _font(FontCache::get("res/arial.ttf"))
 , _input()
-, _titleText("SUPERNAUTIC", _font)
+, _titleText("SUPERNAUTIC", FontCache::get("res/basictitlefont.ttf"))
 {
     std::cout << "Welcome to MainMenu state." << std::endl;
 
@@ -64,8 +64,10 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
 
 
+    _titleText.setCharacterSize(100);
     _titleText.setOrigin(_titleText.getBoundingRect().width / 2.f, _titleText.getBoundingRect().height / 2.f);
     _titleText.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
+    _titleText.setScale(1.5f, 1.f);
 }
 
 void MainMenuApplicationState::render()
