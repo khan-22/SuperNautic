@@ -162,11 +162,6 @@ void SegmentInstance::render(GFX::RenderStates & states)
 {
 	_parent->getVisualModel().getModelAsset().get()->setModelMatrix(_model);
 	_parent->getVisualModel().render(states);
-
-	/*for (size_t i = 0; i < _obstacles.size(); i++)
-	{
-		_obstacles[i].render(states);
-	}*/
 }
 
 const RayIntersection SegmentInstance::rayIntersectionTest(const Ray& ray) const

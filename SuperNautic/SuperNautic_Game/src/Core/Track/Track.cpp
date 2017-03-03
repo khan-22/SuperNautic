@@ -198,6 +198,10 @@ bool Track::bGenerate()
 				{
 					placeObstacles();
 				}
+				// End segment
+				bInsertNormalSegment(_segmentHandler->infos().size() - 1, false);
+				bInsertNormalSegment(0, false);
+
 				LOG("Track generated. Length: ", _generatedLength);
 				return true;
 			}
@@ -545,17 +549,23 @@ bool Track::bEndTrack()
 {
 	while (_generatedLength < _targetLength)
 	{
-		if (_endConnection == 'a' && !bInsertNormalSegment(0, true))
+		if (_endConnection == 'a')
 		{
-			deleteSegments(_endMargin + 400);
-			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-			return false;
+			if (!bInsertNormalSegment(0, true))
+			{
+				deleteSegments(_endMargin + 400);
+				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+				return false;
+			}
 		}
-		if (_endConnection == 'b' && !bInsertNormalSegment(1, true))
+		else if (_endConnection == 'b')
 		{
-			deleteSegments(_endMargin + 400);
-			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-			return false;
+			if (!bInsertNormalSegment(1, true))
+			{
+				deleteSegments(_endMargin + 400);
+				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+				return false;
+			}
 		}
 	}
 	return true;

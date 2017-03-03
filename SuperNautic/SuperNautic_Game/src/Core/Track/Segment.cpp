@@ -31,17 +31,35 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 	_scene = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_dataFileName);
 
 	// Get visual model asset
-	_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get("test3pipe.mat"));
-		//ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_visualFileName);
+	if (_segmentInfo->_visualFileName != "bigsegments/end_segment_aa.kmf")
+	{
+		_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get("test3pipe.mat"));
+	}
+	else
+	{
+		_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get("endSegment.mat"));
+	}
 
+	// Windows
 	if (_segmentInfo->_windowFileName != "E")
 	{
-		_window = ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_windowFileName);
+		_windowModel = ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_windowFileName);
 		_bHasWindow = true;
 	}
 	else
 	{
 		_bHasWindow = false;
+	}
+
+	//Zones
+	if (_segmentInfo->_zoneFileName != "E")
+	{
+		_zonesModel = ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_zoneFileName);
+		_bHasZones = true;
+	}
+	else
+	{
+		_bHasZones = false;
 	}
 
 	if (_scene.get()->cameras.size() < 1)
@@ -722,7 +740,7 @@ GFX::TexturedModel Segment::getVisualModel() const
 
 ModelAsset Segment::getWindowModel() const
 {
-	return _window;
+	return _windowModel;
 }
 
 bool Segment::bHasWindow() const
