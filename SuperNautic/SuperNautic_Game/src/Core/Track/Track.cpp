@@ -664,6 +664,7 @@ size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLen
 // Update obstacle rotations
 void Track::update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer)
 {
+	_track[firstPlayer]->decreaseObstacleSpeed();
 	for (size_t i = lastPlayer; i < _track.size() && i < firstPlayer + 6; i++)
 	{
 		_track[i]->update(dt);
@@ -703,9 +704,16 @@ void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowR
 	for (auto& window : _segmentWindows)
 	{
 		int windowIndex = static_cast<int>(window.segmentIndex);
-		if (windowIndex >= lowestIndex && windowIndex < largestIndex)
+		if (windowIndex >= lowestIndex )
 		{
-			windowRenderer.render(window);
+			if (windowIndex < largestIndex)
+			{
+				windowRenderer.render(window);
+			}
+			else
+			{
+				break;
+			}
 		}
 	}
 }

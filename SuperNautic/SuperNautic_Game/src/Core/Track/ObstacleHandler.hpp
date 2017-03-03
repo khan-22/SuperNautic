@@ -67,12 +67,7 @@ public:
 			float min = getMinRotSpeed(diff);
 			float max = getMaxRotSpeed(diff);
 			double scaled = (double)rand() / RAND_MAX;
-			float rotDir = 1;
-			if (rand() % 2 == 0)
-			{
-				rotDir = -1;
-			}
-			return ((max - min + 1) * scaled + min) * rotDir;
+			return (max - min + 1) * scaled + min;
 		}
 		int	getMaxInRow(float diff)
 		{
