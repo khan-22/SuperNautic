@@ -44,7 +44,7 @@ public:
 	SegmentInstance* getInstance(int index);
 	float getProgression() const;
 	void render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowRenderer, const int shipIndex);
-	void update(const float dt);
+	void update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer);
 
 
 	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos and length from start of segment

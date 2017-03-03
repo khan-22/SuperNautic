@@ -138,7 +138,7 @@ bool Track::bGenerate()
 	// Make the inital stretch straight
 	while (_generatedLength < 300)
 	{
-		bInsertNormalSegment(2, false);
+		bInsertNormalSegment(0, false);
 	}
 
 	int failedRecently = 0;
@@ -662,9 +662,9 @@ size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLen
 }
 
 // Update obstacle rotations
-void Track::update(const float dt)
+void Track::update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer)
 {
-	for (size_t i = 0; i < _track.size(); i++)
+	for (size_t i = lastPlayer; i < _track.size() && i < firstPlayer + 6; i++)
 	{
 		_track[i]->update(dt);
 	}

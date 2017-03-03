@@ -69,11 +69,6 @@ private:
 	Camera					_camera;
 	DebugCamera				_debugCamera;
 
-	//SegmentHandler			_segmentHandler;
-	//Track					_track;
-	//Camera		_camera;
-	//DebugCamera _debugCamera;
-
 	std::vector<PointLight>	_pointLights;
 
 	WorldAudio				_audio;

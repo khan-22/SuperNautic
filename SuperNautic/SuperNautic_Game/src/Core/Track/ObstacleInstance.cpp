@@ -1,6 +1,4 @@
 #include <glm/gtx/transform.hpp>
-//#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 #include "Core/Track/ObstacleInstance.hpp"
 
