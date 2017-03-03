@@ -24,7 +24,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
-    GuiHorizontalList* resolutionList = new GuiHorizontalList();
+    GuiHorizontalList* resolutionList = new GuiHorizontalList(3);
     for(const glm::ivec2& resolution : _videoOptions.getAllowedResolutions())
     {
         std::string text = std::to_string(resolution.x) + "x" + std::to_string(resolution.y);
