@@ -32,6 +32,7 @@ public:
 	int getTargetLength() const;
 	int getGeneratedLength() const;
 	unsigned int getCurviness() const;
+	unsigned int getDifficulty() const;
 	void setLength(const unsigned int length);
 	void setSeed(const std::string& seed);
 	const std::string& getSeed() const;

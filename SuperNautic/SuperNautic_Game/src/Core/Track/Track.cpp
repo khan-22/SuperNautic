@@ -63,6 +63,12 @@ unsigned int Track::getCurviness() const
     return _MAX_CURVINESS * _curviness;
 }
 
+unsigned int Track::getDifficulty() const
+{
+    return _MAX_DIFFICULTY * _difficulty;
+}
+
+
 // Sets the track length in whole meters
 void Track::setLength(const unsigned int length)
 {
