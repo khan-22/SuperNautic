@@ -71,7 +71,7 @@ Ship::Ship(glm::vec3 color)
 	move(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 
-	_particleSystem.init(200, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
 	_particleSystem.start();
 }
 
@@ -467,7 +467,7 @@ void Ship::handleLightsAndParticles(float dt)
 		_particleSystem.setBirthSize(sinf(_engineBlinkAccumulator));
 	}
 
-	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.3f, 1.0f }, -_meshForwardDirection() * _velocity);
+	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.3f, 1.0f }, -_meshForwardDirection() * (_velocity * 1.0f));
 }
 
 bool Ship::getOverload(float dt)
