@@ -1,13 +1,10 @@
 #include "Core/Utility/TrackPresetManager.hpp"
+#include "Core/Track/Track.hpp"
 #include "Core/Utility/FileUtility.hpp"
 #include "Core/Utility/Utilities.hpp"
 
 const char* const TrackPresetManager::_CONFIG_PATH = "tracks.cfg";
 const size_t TrackPresetManager::_MAX_SEED_LENGTH = 5;
-const size_t TrackPresetManager::_MIN_LENGTH = 3;
-const size_t TrackPresetManager::_MAX_LENGTH = 1000;
-const size_t TrackPresetManager::_MIN_CURVINESS = 0;
-const size_t TrackPresetManager::_MAX_CURVINESS = 5;
 
 
 TrackPresetManager::TrackPresetManager()
@@ -45,14 +42,17 @@ void TrackPresetManager::readConfig()
             break;
         }
 
-        unsigned int length;
         if(!_config.get("length" + iStr, preset.length))
         {
             break;
         }
 
-        unsigned int curviness;
         if(!_config.get("curviness" + iStr, preset.curviness))
+        {
+            break;
+        }
+
+        if(!_config.get("difficulty" + iStr, preset.difficulty))
         {
             break;
         }
@@ -78,6 +78,7 @@ void TrackPresetManager::writeConfig()
         _config.set("seed" + iStr, p.seed);
         _config.set("length" + iStr, p.length);
         _config.set("curviness" + iStr, p.curviness);
+        _config.set("difficulty" + iStr, p.difficulty);
     }
 
     _config.write(_CONFIG_PATH);
@@ -86,8 +87,9 @@ void TrackPresetManager::writeConfig()
 void TrackPresetManager::scrubPreset(Preset& preset)
 {
     preset.seed.resize(_MAX_SEED_LENGTH);
-    preset.curviness = clamp(static_cast<size_t>(preset.curviness), _MIN_CURVINESS, _MAX_CURVINESS);
-    preset.length = clamp(static_cast<size_t>(preset.length), _MIN_LENGTH, _MAX_LENGTH);
+    preset.curviness = clamp(static_cast<size_t>(preset.curviness), Track::_MIN_CURVINESS, Track::_MAX_CURVINESS);
+    preset.length = clamp(static_cast<size_t>(preset.length), Track::_MIN_LENGTH / 1000, Track::_MAX_LENGTH / 1000);
+    preset.difficulty = clamp(static_cast<size_t>(preset.difficulty), Track::_MIN_DIFFICULTY, Track::_MAX_DIFFICULTY);
 }
 
 size_t TrackPresetManager::getSeedLength()

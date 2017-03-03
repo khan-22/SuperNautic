@@ -26,6 +26,7 @@ private:
     GuiTextInput*       _selectedSeedInput;
     GuiTextInput*       _lengthInput;
     GuiSlider*          _curvinessInput;
+    GuiSlider*          _difficultyInput;
     GuiHorizontalList*  _seedList;
     std::list<TrackPresetManager::Preset> _presets;
     TrackPresetManager::Preset* _currentPreset;
@@ -35,6 +36,7 @@ private:
 
     void insertLengthInput(const TrackPresetManager::Preset& defaultPreset);
     void insertCurvinessInput(const TrackPresetManager::Preset& defaultPreset);
+    void insertDifficultyInput(const TrackPresetManager::Preset& defaultPreset);
     void insertRandSeedButton();
     void insertShuffleButton();
     void insertSaveButton();
