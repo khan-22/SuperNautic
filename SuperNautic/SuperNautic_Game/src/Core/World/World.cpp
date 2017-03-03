@@ -34,10 +34,11 @@ World::World(ApplicationContext& context)
 		glm::vec3{ 0.1f, 0.1f, 0.8f },
 		glm::vec3{ 0.8f, 0.8f, 0.1f } };
 
+	_players.reserve(context.players.size());
     for(int i = 0 ; i < context.players.size(); i++)
     {
         GuiPlayerJoinContainer::Player player = context.players[i];
-		_players.emplace_back(player.id, glm::vec3(player.color));
+		_players.emplace_back(player.id, colors[i]);
         _playerProgression.push_back(TrackProgression{ 0, _track });
         LOG(i);
 
@@ -165,6 +166,19 @@ void World::update(float dt, sf::Window& window)
 			_players[i].getShip().setSegments(instances);
 
 			_players[i].update(dt);
+
+			// Check for ship-ship collisions
+			for (unsigned j = i + 1; j < _players.size(); ++j)
+			{
+				if (bTestCollision(_players[i].getShip().getBoundingBox(), _players[j].getShip().getBoundingBox()))
+				{
+					if (!bAlmostEqual(_players[i].getShip().getBoundingBox().center - _players[j].getShip().getBoundingBox().center, glm::vec3{ 0.0f }))
+					{
+						_players[i].getShip().setBounce(glm::normalize(_players[i].getShip().getBoundingBox().center - _players[j].getShip().getBoundingBox().center) * 2.0f);
+						_players[j].getShip().setBounce(glm::normalize(_players[j].getShip().getBoundingBox().center - _players[i].getShip().getBoundingBox().center) * 2.0f);
+					}
+				}
+			}
 		}
 
 		std::vector<float> progression;
