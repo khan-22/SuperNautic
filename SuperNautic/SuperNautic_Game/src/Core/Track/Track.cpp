@@ -700,9 +700,16 @@ void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowR
 	for (auto& window : _segmentWindows)
 	{
 		int windowIndex = static_cast<int>(window.segmentIndex);
-		if (windowIndex >= lowestIndex && windowIndex < largestIndex)
+		if (windowIndex >= lowestIndex )
 		{
-			windowRenderer.render(window);
+			if (windowIndex < largestIndex)
+			{
+				windowRenderer.render(window);
+			}
+			else
+			{
+				break;
+			}
 		}
 	}
 }
