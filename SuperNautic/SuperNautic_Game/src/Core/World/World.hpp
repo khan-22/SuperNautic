@@ -19,6 +19,7 @@ namespace sf
 #include "Core/Gui/Timer.hpp"
 #include "Core/Gui/Progression.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
+#include "GFX/Rendering/ZoneRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/WindowRenderer.hpp"
 
@@ -54,6 +55,7 @@ private:
 	std::vector<TrackProgression>	_playerProgression;
 
 	std::vector<GFX::DeferredRenderer>	_playerRTs;
+	std::vector<GFX::ZoneRenderer>		_playerZoneRenderers;
 	std::vector<GFX::ParticleRenderer>	_playerParticleRenderers;
 	std::vector<GFX::WindowRenderer>	_playerWindowRenderers;
 
