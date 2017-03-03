@@ -42,6 +42,19 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
         }
     }
 
+    GuiText* resLabel = new GuiText("Resolution", FontCache::get("res/arial.ttf"));
+    resLabel->setOrigin(resLabel->getBoundingRect().width / 2.f, resLabel->getBoundingRect().height);
+    sf::FloatRect resBounds = resolutionList->getBoundingRect();
+    resLabel->setPosition(resBounds.left + resBounds.width / 2.f, resBounds.top - resLabel->getBoundingRect().height / 2.f);
+
+    resolutionList->registerOnSelect([resLabel](){resLabel->toggleSelection();});
+    resolutionList->registerOnDeselect([resLabel](){resLabel->toggleSelection();});
+
+    std::unique_ptr<SceneNode> resLabelPtr(resLabel);
+    resolutionList->attachChild(resLabelPtr);
+
+
+
     guiElements.emplace_back(resolutionList);
 
     GuiButton* fs = new GuiButton(sf::Text("Toggle Fullscreen", *_font.get()), [&]()
