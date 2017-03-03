@@ -23,6 +23,7 @@ class GuiTrackGenerator : public GFX::Renderable3D
         void setLength(unsigned int length);
         void setSeed(const std::string& seed);
         void setCurviness(unsigned int curviness);
+        void setDifficulty(unsigned int difficulty);
 
     private:
         bool _bDoAbortGenerate = false;
@@ -32,9 +33,10 @@ class GuiTrackGenerator : public GFX::Renderable3D
         std::unique_ptr<Track> _track;
         std::unique_ptr<TrackPreview> _preview;
 
-        unsigned int _length = 40000;
+        unsigned int _length = Track::_MIN_LENGTH;
         std::string	 _seed = "1";
-        unsigned int _curviness = 3;
+        unsigned int _curviness = Track::_MAX_CURVINESS;
+        unsigned int _difficulty = Track::_MIN_DIFFICULTY;
 
 };
 
