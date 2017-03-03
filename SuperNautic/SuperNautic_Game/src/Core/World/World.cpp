@@ -207,8 +207,21 @@ void World::update(float dt, sf::Window& window)
 	{
 		_bDebugging = false;
 	}
-
-	_track->update(dt);
+	// Get segment index of first and last player to send to track.update(...)
+	size_t max = 0, min = _track->getNrOfSegments() - 1;
+	for (size_t i = 0; i < _playerProgression.size(); i++)
+	{
+		size_t segment = _playerProgression[i].getCurrentSegment();
+		if (segment > max)
+		{
+			max = segment;
+		}
+		if (segment < min)
+		{
+			min = segment;
+		}
+	}
+	_track->update(dt, max, min);
 
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
