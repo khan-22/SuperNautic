@@ -22,10 +22,17 @@ class GuiText : public GuiElement
 
         virtual sf::FloatRect getBoundingRect() const override;
 
+        void setFillColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
+        void setOutlineThickness(float thickness);
+        void setOutlinecolor(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
 
     private:
         FontAsset _font;
         sf::Text _text;
+
+
+        virtual void select() override;
+        virtual void deselect() override;
 
         void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
