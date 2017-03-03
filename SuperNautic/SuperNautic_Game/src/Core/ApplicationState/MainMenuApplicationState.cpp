@@ -9,6 +9,7 @@
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/ApplicationState/PreGameApplicationState.hpp"
+#include "Core/ApplicationState/MenuBackgroundApplicationState.hpp"
 #include "Core/Asset/AssetCache.hpp"
 #include "Core/Gui/GuiButton.hpp"
 #include "Core/Utility/Camera.h"
@@ -23,7 +24,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
 {
     std::cout << "Welcome to MainMenu state." << std::endl;
 
-
+    _stack.push(std::unique_ptr<ApplicationState>(new MenuBackgroundApplicationState(_stack, _context)));
 
 
     _guiContainer.setBackground(sf::Color::Magenta);
@@ -68,6 +69,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     _titleText.setOrigin(_titleText.getBoundingRect().width / 2.f, _titleText.getBoundingRect().height / 2.f);
     _titleText.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
     _titleText.setScale(1.5f, 1.f);
+    _titleText.setOutlineThickness(0.f);
 }
 
 void MainMenuApplicationState::render()
