@@ -51,6 +51,11 @@ void GuiText::setOutlinecolor(unsigned char r, unsigned char g, unsigned char b,
     _text.setOutlineColor(sf::Color(r, g, b, a));
 }
 
+void GuiText::setCharacterSize(unsigned int size)
+{
+    _text.setCharacterSize(size);
+}
+
 void GuiText::select()
 {
     _text.setFillColor(sf::Color(200, 200, 90));
