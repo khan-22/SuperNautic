@@ -34,7 +34,6 @@ public:
 
 	Camera* getCamera();
 
-	void setProgression(float progression);
 	void setPosition(int position);
 
 	bool _bIsFirstPerson;

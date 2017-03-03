@@ -157,9 +157,7 @@ void Player::update(float dt)
 
 	// TODO: Apply ship shake
 
-    _hud.setHeat(_ship.getEngineTemperature() / 100);
     _hud.setSpeed(_ship.getSpeed());
-	_hud.setHeatWhite(_ship.getOverload(dt));
 	_hud.update();
 
 	float speed = _ship.getSpeed();
@@ -172,11 +170,6 @@ void Player::update(float dt)
 Camera* Player::getCamera()
 {
 	return _currentCamera;
-}
-
-void Player::setProgression(float progression)
-{
-	_hud.setProgression(progression);
 }
 
 void Player::setPosition(int position)
