@@ -130,6 +130,8 @@ bool Game::bInitialize()
         _context.segmentHandler->loadSegment(i);
     }
 
+    _context.menuBackground.reset(new MenuBackground(_context.window.getSize().x, _context.window.getSize().y));
+
 	_stateStack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stateStack, _context)));
 
 
