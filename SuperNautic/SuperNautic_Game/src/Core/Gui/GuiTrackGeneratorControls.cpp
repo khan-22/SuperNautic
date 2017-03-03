@@ -83,7 +83,7 @@ void GuiTrackGeneratorControls::insertSeedList(const TrackPresetManager::Preset&
 
     label->setOrigin(label->getBoundingRect().width / 2.f, label->getBoundingRect().height);
     sf::FloatRect seedListBounds = _seedList->getBoundingRect();
-    label->setPosition(seedListBounds.left + seedListBounds.width / 2.f, seedListBounds.top - label->getBoundingRect().height);
+    label->setPosition(seedListBounds.left + seedListBounds.width / 2.f, seedListBounds.top - label->getBoundingRect().height / 2.f);
 
     _seedList->registerOnSelect([label](){label->toggleSelection(); label->setFillColor(255, 255, 255);});
     _seedList->registerOnDeselect([label](){label->toggleSelection();});

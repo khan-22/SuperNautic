@@ -58,8 +58,8 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     sf::Vector2u windowSize = _context.window.getSize();
     sf::FloatRect guiBounds = _guiContainer.getBoundingRect();
-    _guiContainer.setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height / 2.f);
-    _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
+    _guiContainer.setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height);
+    _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y * 0.9f);
     _guiContainer.select(startButton);
 
     _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f);
