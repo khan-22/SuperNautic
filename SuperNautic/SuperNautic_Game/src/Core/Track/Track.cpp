@@ -664,6 +664,7 @@ size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLen
 // Update obstacle rotations
 void Track::update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer)
 {
+	_track[firstPlayer]->decreaseObstacleSpeed();
 	for (size_t i = lastPlayer; i < _track.size() && i < firstPlayer + 6; i++)
 	{
 		_track[i]->update(dt);
