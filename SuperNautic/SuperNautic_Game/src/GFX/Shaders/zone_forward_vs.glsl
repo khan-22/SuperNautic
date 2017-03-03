@@ -14,18 +14,26 @@ uniform mat4 uModel;
 
 uniform mat4 uMVP;
 
+uniform float uTemperatures[4];
+
 out VS_OUT
 {
-	vec3 position;
-	vec3 uv;
-	vec3 normal;
+	vec3	position;
+	vec3	uv;
+	vec3	normal;
+	vec3	color;
+	//int		id;
 } vs_out;
 
 void main()
 {
-	//We do not use the W component of the UVs, can be changed
-	vs_out.uv	  = vec3(uv.x, 1.0 - uv.y, uv.z); 
-	vs_out.normal = normal;
+	//vs_out.id		= int(uv.z);
+	float temperature	= uTemperatures[int(uv.z)];
+
+	//vs_out.color	= vec3(temperature / 2.0 + 0.5);
+	vs_out.color	= mix(vec3(0.0, 0.0, 1.0), vec3(1.0, 0.0, 0.0), temperature / 2.0 + 0.5);
+	vs_out.normal	= normal;
+	vs_out.uv		= vec3(uv.x, 1.0 - uv.y, uv.z); 
 
 	vs_out.position = (uModel * vec4(pos, 1.0f)).xyz;
 	gl_Position = uMVP * vec4(pos, 1.0f);

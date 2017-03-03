@@ -11,6 +11,8 @@ in VS_OUT
 	vec3 position;
 	vec3 uv;
 	vec3 normal;
+	vec3 color;
+	//int id;
 } fs_in;
 
 vec3 lightDir = vec3(-0.2, -0.2, -0.2);
@@ -31,13 +33,13 @@ void main()
 	
 	//float factor = max(dot(normalize(normal), -lightDir), 0.01);
 
-	int id = int(fs_in.uv.z);
+	outColor = vec4(fs_in.color, 1.0);
 
-	outColor = vec4(
-		float(id == 0) + 0.5, 
-		float(id == 1) + 0.5, 
-		float(id == 2) + 0.5, 
-		1.0);
+	//outColor = vec4(
+	//	float(fs_in.id == 0) + 0.5, 
+	//	float(fs_in.id == 1) + 0.5, 
+	//	float(fs_in.id == 2) + 0.5, 
+	//	1.0);
 	
 
 }
