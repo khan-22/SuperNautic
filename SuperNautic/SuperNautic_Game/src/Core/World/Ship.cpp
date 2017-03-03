@@ -213,7 +213,7 @@ void Ship::handleInputs(float dt)
 {
 	if (!_stopped)
 	{
-		if (_steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
+		if (_steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f && !_stopped)
 		{
 			// Update turning angle										reduce maneuverability at high acceleration
 			_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.0f) * dt;
@@ -237,7 +237,7 @@ void Ship::handleInputs(float dt)
 		_velocity -= 0.9f * _velocity * dt;
 	}
 
-	if (_velocity < 50)
+	if (_velocity < 50 && !_stopped)
 	{
 		_velocity = 50;
 	}
@@ -510,6 +510,11 @@ void Ship::destroy()
 void Ship::repair()
 {
 	_destroyed = false;
+}
+
+bool Ship::getStopped()
+{
+	return _stopped;
 }
 
 void Ship::setReturnPos(const glm::vec3& returnPos)

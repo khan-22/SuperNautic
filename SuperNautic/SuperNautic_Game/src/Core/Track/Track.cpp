@@ -402,6 +402,10 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 
 	// [0..1], 0 = at closest waypoint, 1 = at next waypoint
 	float interpolationValue = glm::dot(closest.direction, globalPosition - closest.position) / distanceToPlane;
+	if (distanceToPlane <= 0.0f)	// Protect against the case where the track runs out of waypoints ahead of the player
+	{
+		interpolationValue = 1.0f;
+	}
 
 	// Calculate current length in segment
 	lengthInSegment = 0.0f;

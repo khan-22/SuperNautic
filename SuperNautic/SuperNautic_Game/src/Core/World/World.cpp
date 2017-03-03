@@ -11,7 +11,7 @@
 World::World(ApplicationContext& context)
 	: _context{ context }
 	, _debugCamera{ 90.0f, context.window.getSize().x, context.window.getSize().y, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
-	, _bHasWon(false)
+	, _playersAtFinishLine(0)
 	, _timer(context.window.getSize().x, context.window.getSize().y, context.players.size())
 	, _progression(context.window.getSize().x, context.window.getSize().y, context.players.size())
 	, _track(context.track.get())
@@ -172,12 +172,19 @@ void World::update(float dt, sf::Window& window)
 
 			if (instances[1] == _track->getInstance(_track->getNrOfSegments() - 1))
 			{
-				_bHasWon = true;
+				if (!_players[i].getShip().getStopped())
+				{
+					++_playersAtFinishLine;
+				}
+				_players[i].getShip().stop();
 			}
 
 			// Set relevant segments
-			_players[i].getShip().setSegments(instances);
-
+			if (!_players[i].getShip().getStopped())
+			{
+				_players[i].getShip().setSegments(instances);
+			}
+			
 			_players[i].update(dt);
 
 			// Check for ship-ship collisions
@@ -343,7 +350,7 @@ void World::render()
 
 bool World::bHasWon()
 {
-	return _bHasWon;
+	return _playersAtFinishLine >= _players.size();
 }
 
 void World::setTrack(Track * track)

@@ -44,7 +44,8 @@ private:
 	Track*									_track;
 	std::vector<Player>						_players;
 	std::vector<std::vector<PointLight>>	_playerPointLights;
-	bool									_bHasWon;
+
+	unsigned								_playersAtFinishLine;
 
 	Timer									_timer;
 	Progression								_progression;
