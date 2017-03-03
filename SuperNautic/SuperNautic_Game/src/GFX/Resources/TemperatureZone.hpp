@@ -3,7 +3,7 @@
 #ifndef TEMPERATURE_ZONE_HPP
 #define TEMPERATURE_ZONE_HPP
 
-#include "GFX/Resources/Model.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
 
 #include <glm/glm.hpp>
 
@@ -11,7 +11,7 @@ namespace GFX
 {
 	struct TemperatureZone
 	{
-		Model		model;
+		ModelAsset	model;
 		glm::mat4	modelMatrix;
 		float		temperatures[4];
 
