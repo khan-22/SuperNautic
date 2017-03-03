@@ -13,11 +13,13 @@ class Track;
 class GuiTextInput;
 class GuiSlider;
 class GuiHorizontalList;
+class GuiToolTip;
+class GuiButton;
 
 class GuiTrackGeneratorControls : public GuiContainer
 {
 public:
-   GuiTrackGeneratorControls(GuiTrackGenerator& generator, Track* existingTrack = nullptr);
+   GuiTrackGeneratorControls(GuiTrackGenerator& generator, GuiToolTip* toolTip = nullptr, Track* existingTrack = nullptr);
 
 private:
     GuiTrackGenerator&  _generator;
@@ -26,7 +28,11 @@ private:
     GuiTextInput*       _selectedSeedInput;
     GuiTextInput*       _lengthInput;
     GuiSlider*          _curvinessInput;
+    GuiSlider*          _difficultyInput;
     GuiHorizontalList*  _seedList;
+    GuiButton*          _randSeedButton;
+    GuiButton*          _shuffleButton;
+    GuiButton*          _saveButton;
     std::list<TrackPresetManager::Preset> _presets;
     TrackPresetManager::Preset* _currentPreset;
 
@@ -35,9 +41,13 @@ private:
 
     void insertLengthInput(const TrackPresetManager::Preset& defaultPreset);
     void insertCurvinessInput(const TrackPresetManager::Preset& defaultPreset);
+    void insertDifficultyInput(const TrackPresetManager::Preset& defaultPreset);
     void insertRandSeedButton();
     void insertShuffleButton();
     void insertSaveButton();
+
+    void registerToolTips(GuiToolTip* toolTip);
+
 
     std::string toLengthInputString(unsigned int length) const;
 

@@ -59,6 +59,7 @@ void GuiTrackGenerator::generate()
         track->setCurviness(_curviness);
         track->setSeed(_seed);
         track->setLength(_length);
+        track->setDifficulty(_difficulty);
         track->startNewTrack();
         while(!_bDoAbortGenerate && !track->bGenerate())
         {
@@ -79,12 +80,7 @@ void GuiTrackGenerator::generate()
         return std::make_pair(std::move(track), std::move(nullPreview));
     };
 
-    // Multithreading not safe as of this moment
-    // because Track does OpenGL operations.
     _generation = std::async(std::launch::async, generationFunc);
-//    auto pair = generationFunc();
-//    _track.swap(pair.first);
-//    _preview->setTrack(*_track);
 }
 
 void GuiTrackGenerator::setLength(unsigned int length)
@@ -100,4 +96,9 @@ void GuiTrackGenerator::setSeed(const std::string& seed)
 void GuiTrackGenerator::setCurviness(unsigned int curviness)
 {
     _curviness = curviness;
+}
+
+void GuiTrackGenerator::setDifficulty(unsigned int difficulty)
+{
+    _difficulty = difficulty;
 }

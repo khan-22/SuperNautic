@@ -10,8 +10,15 @@
 #include "Core/Io/Log.hpp"
 #include "GFX/Resources/Model.hpp"
 
-const unsigned int Track::_MIN_TRACK_LENGTH = 3000;
-const unsigned int Track::_MAX_TRACK_LENGTH = 1000000;
+const unsigned int Track::_MIN_LENGTH = 3000;
+const unsigned int Track::_MAX_LENGTH = 1000000;
+
+const unsigned int Track::_MIN_CURVINESS = 0;
+const unsigned int Track::_MAX_CURVINESS = 5;
+
+const unsigned int Track::_MIN_DIFFICULTY = 0;
+const unsigned int Track::_MAX_DIFFICULTY = 5;
+
 
 // Real costructor
 Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
@@ -53,24 +60,20 @@ int Track::getGeneratedLength() const
 
 unsigned int Track::getCurviness() const
 {
-    return _curviness * 5.f;
+    return _MAX_CURVINESS * _curviness;
 }
+
+unsigned int Track::getDifficulty() const
+{
+    return _MAX_DIFFICULTY * _difficulty;
+}
+
 
 // Sets the track length in whole meters
 void Track::setLength(const unsigned int length)
 {
-	assert(length >= _MIN_TRACK_LENGTH && length <= _MAX_TRACK_LENGTH);
+	assert(length >= _MIN_LENGTH && length <= _MAX_LENGTH);
 	_targetLength = length;
-}
-
-unsigned int Track::getMaxLength()
-{
-    return _MAX_TRACK_LENGTH;
-}
-
-unsigned int Track::getMinLength()
-{
-    return _MIN_TRACK_LENGTH;
 }
 
 // Set randomization seed
@@ -101,15 +104,15 @@ const std::string & Track::getSeed() const
 // Sets the curviness of the track (0-5)
 void Track::setCurviness(const unsigned int curviness)
 {
-	assert(curviness >= 0 && curviness <= 5);
-	_curviness = curviness / 5.f;
+	assert(curviness >= _MIN_CURVINESS && curviness <= _MAX_CURVINESS);
+	_curviness = curviness / float(_MAX_CURVINESS);
 }
 
 // Sets the difficulty of the track (0-5)
 void Track::setDifficulty(const unsigned int difficulty)
 {
-	assert(difficulty >= 0 && difficulty <= 5);
-	_difficulty = difficulty / 5.f;
+	assert(difficulty >= _MIN_DIFFICULTY && difficulty <= _MAX_DIFFICULTY);
+	_difficulty = difficulty / float(_MAX_DIFFICULTY);
 }
 
 // Resets the track
@@ -135,7 +138,7 @@ bool Track::bGenerate()
 	// Make the inital stretch straight
 	while (_generatedLength < 300)
 	{
-		bInsertNormalSegment(2, false);
+		bInsertNormalSegment(0, false);
 	}
 
 	int failedRecently = 0;
@@ -570,7 +573,7 @@ void Track::placeObstacles()
 	int currentInRow = 0;
 	float leftOfArea = 0.f;
 	const float invDiff = 1 - _difficulty;
-	float padding = 0.f;
+	float backPadding = 0.f;
 	while (currentLength < _generatedLength - endLength)
 	{
 		if (leftOfArea > 10.f)
@@ -587,12 +590,12 @@ void Track::placeObstacles()
 				{
 					newObstacle = _obstacleHandler->getRandomObstacle(_difficulty);
 				} while (newObstacle == lastObstacleType);
-				padding = lastObstacleType->getPadding(_difficulty);
+				backPadding = lastObstacleType->getBackPadding(_difficulty);
 				lastObstacleType = newObstacle;
 				inRow = rand() % (newObstacle->getMaxInRow(_difficulty) + 1);
 				currentInRow = 1;
 			}
-			float lengthToNextObstacle = rand() % int(80 * invDiff + 10) + padding;
+			float lengthToNextObstacle = rand() % int(30 * invDiff + 10) + backPadding + newObstacle->getFrontPadding(_difficulty);
 			currentLength += lengthToNextObstacle;
 			index = findTrackIndex(currentLength, lastFullSegmentLength);
 
@@ -632,7 +635,7 @@ void Track::placeObstacles()
 
 			glm::mat4 modelMat = _track[index]->getModelMatrix() * glm::inverse(glm::lookAt(pos, pos + forward, glm::vec3(0, 1, 0))) * glm::rotate(glm::radians(float(rand() % 360)), glm::vec3(0, 0, 1));
 			_track[index]->addObstacle(ObstacleInstance(modelMat, newObstacle, _difficulty));
-			
+
 			leftOfArea -= lengthToNextObstacle;
 		}
 		else
@@ -659,9 +662,10 @@ size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLen
 }
 
 // Update obstacle rotations
-void Track::update(const float dt)
+void Track::update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer)
 {
-	for (size_t i = 0; i < _track.size(); i++)
+	_track[firstPlayer]->decreaseObstacleSpeed();
+	for (size_t i = lastPlayer; i < _track.size() && i < firstPlayer + 6; i++)
 	{
 		_track[i]->update(dt);
 	}

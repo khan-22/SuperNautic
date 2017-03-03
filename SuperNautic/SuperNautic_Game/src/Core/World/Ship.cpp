@@ -18,7 +18,7 @@ Ship::Ship(glm::vec3 color)
 		_turningFactor{ 0.0f },
 		_currentTurningAngle{ 0.0f },
 		_accelerationFactor{ 0.5f },
-		_jumpCooldown{ .8f },
+		_jumpCooldown{ .5f },
 		_currentJumpCooldown{ 0.0f },
 		_engineTemperature{ 0.0f },
 		_velocity{ 0.0f },
@@ -46,7 +46,7 @@ Ship::Ship(glm::vec3 color)
 		_bEngineOverload { false },
 		_bObstacleCollision { false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
-		_cooldownOnObstacleCollision{ 3.0f },
+		_cooldownOnObstacleCollision{ 2.0f },
 		_immunityoOnObstacleCollision{ 4.0f },
 		_immunityTimer{ 0.0f },
 		_blinkFrequency{ 0.1f },
@@ -57,10 +57,18 @@ Ship::Ship(glm::vec3 color)
 		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
 		_shipColor{ color },
 		_engineLight{ glm::vec3{ 0.0f }, _shipColor, 1.0f },
+		_warningLight{ glm::vec3{ 0.0f }, glm::vec3{ 1.0f }, 2.0f },
 		_intensityOffset{ 1.0f, 1.0f, 20.0f },
-		_timeUntilIntensityUpdate{ 0.0f }
+		_timeUntilIntensityUpdate{ 0.0f },
+		_overheatTemperature{ 0.95f },
+		_warningLevel{ 0.8f },
+		_warningLightIntensity{ 2.0f },
+		_warningAccumulator{ 0.0f },
+		_engineBlinkAccumulator{ 0.0f },
+		_bounceVector{ 0.0f },
+		_bounceDecay{ 1.0f }
 {
-	setPosition(0, 0, 10);
+	move(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 
 	_particleSystem.init(200, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
@@ -91,6 +99,15 @@ void Ship::update(float dt)
 	trackSurface(dt);
 	updateDirectionsAndPositions(dt);
 
+	glm::vec3 bounceDirection{ _bounceVector - glm::dot(_bounceVector, _upDirection) * _upDirection };
+	if (!bAlmostEqual(bounceDirection, glm::vec3{ 0.0f }))
+	{
+		_bounceVector = glm::normalize(bounceDirection) * glm::length(_bounceVector);
+		move(_bounceVector);
+		
+	}
+	_bounceVector -= _bounceVector * _bounceDecay * dt;
+
 	_shipCollisionShake.setMagnitude(_steeringCooldown / _cooldownOnObstacleCollision);
 	_shipCollisionShake.setSpeed(_steeringCooldown / _cooldownOnObstacleCollision);
 	_shipCollisionShake.update(dt);
@@ -116,27 +133,7 @@ void Ship::update(float dt)
 
 	checkObstacleCollision();
 
-	// Handle particle system and light variables
-	float interpolation = powf(clamp(_engineTemperature * 0.01f, 0.1f, 0.9f), 2.0f);
-	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
-	_engineLight.updateColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } *interpolation);
-
-	_particleSystem.setDeathColor(glm::vec3{0.0f});
-	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
-
-	// Update random intensity offset
-	_timeUntilIntensityUpdate -= dt;
-	if (_timeUntilIntensityUpdate <= 0.0f)
-	{
-		_timeUntilIntensityUpdate += 0.02f + (static_cast<float>(rand()) / RAND_MAX) * 0.06f;
-		_intensityOffset.setTarget(static_cast<float>(rand()) / RAND_MAX);
-	}
-	_intensityOffset.update(dt);
-
-	_engineLight.changeIntensity(powf(_velocity * 0.03f, 1.5f) * 0.2f + _intensityOffset() * _velocity * 0.015f);
-
-	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
-	_engineLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
+	handleLightsAndParticles(dt);
 
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
@@ -192,7 +189,7 @@ void Ship::obstacleCollision()
 {
 	if (_immunityTimer <= 0.0f)
 	{
-		_engineCooldown = std::max(_cooldownOnObstacleCollision, _engineCooldown);
+		//_engineCooldown = std::max(_cooldownOnObstacleCollision, _engineCooldown);
 		_steeringCooldown = _cooldownOnObstacleCollision;
 		_immunityTimer = _immunityoOnObstacleCollision;
 		_bObstacleCollision = true;
@@ -208,6 +205,7 @@ void Ship::rotateAtStart(float down, float angle)
 	setPosition(rotation * glm::vec4{ getPosition(), 0.0f });
 	_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
 	_meshUpDirection.setVector(_upDirection);
+	_meshPosition.setVector(getPosition());
 	_cameraUpDirection.setVector(_upDirection);
 }
 
@@ -288,63 +286,23 @@ void Ship::handleCooldowns(float dt)
 
 void Ship::handleTemperature(float dt)
 {
-	// Update engine temperature
-	float fieldAddition = 1.0f;
+	// Get difference between acceleration [0..1] and temperature [0..1]
+	float difference = (_accelerationFactor + 1.0f) / 2.0f - _engineTemperature;
 
-	if (getSurfaceTemperature() < -0.1f)
-	{
-		fieldAddition = 0.9f;
-	}
-	else if (getSurfaceTemperature() > 0.1f)
-	{
-		fieldAddition = 1.1f;
-	}
+	difference += _currentSurfaceTemperature * 0.5f;
 
-	float enginePower = ((_accelerationFactor + _velocity) / 2) * fieldAddition;
+	_engineTemperature += (difference == 0.0f ? 1.0f : (abs(difference) / difference)) *  powf(abs(difference), 1.2f) * 0.2f * dt;
+	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 
-	if (enginePower > _engineTemperature)
+	if (_engineTemperature > _overheatTemperature)
 	{
-		if (enginePower > _engineTemperature + 1)
-		{
-			_engineTemperature = (_engineTemperature * 24 + enginePower) / 25;
-		}
-		else
-		{
-			_engineTemperature += 1.f * dt;
-		}
-	}
-	else
-	{
-		if (enginePower < _engineTemperature - 1)
-		{
-			_engineTemperature = (_engineTemperature * 49 + enginePower) / 50;
-		}
-		else
-		{
-			_engineTemperature -= 1.f * dt;
-		}
+		_engineCooldown = 10.0f;
 	}
 
-	if (_engineTemperature > 80)
+	if (_engineCooldown > 0.0f)
 	{
-		_engineOverload += ((_engineTemperature - 80.f) / 20.f) * dt;
-		if (rand() % 500 + 1 < _engineOverload)
-		{
-			_engineCooldown = _engineOverload * _engineTemperature / 50;
-			_bEngineFlash = true;
-			_bEngineOverload = true;
-		}
-	}
-	else
-	{
-		if (_engineOverload > 0)
-		{
-			_engineOverload -= (100 - _engineTemperature) / 100 * dt;
-			if (_engineOverload < 0)
-			{
-				_engineOverload = 0;
-			}
-		}
+		_shipCollisionShake.setMagnitude(std::max(0.1f, _engineCooldown * 0.08f));
+		_shipCollisionShake.setSpeed(std::max(0.1f, _engineCooldown * 0.08f));
 	}
 }
 
@@ -453,59 +411,73 @@ void Ship::trackSurface(float dt)
 	}
 }
 
+void Ship::handleLightsAndParticles(float dt)
+{
+	float interpolation = powf(clamp(_engineTemperature, 0.1f, 0.9f), 4.0f);
+
+	// Engine light
+	// Update random intensity offset
+	_timeUntilIntensityUpdate -= dt;
+	if (_timeUntilIntensityUpdate <= 0.0f)
+	{
+		_timeUntilIntensityUpdate += 0.02f + (static_cast<float>(rand()) / RAND_MAX) * 0.06f;
+		_intensityOffset.setTarget(static_cast<float>(rand()) / RAND_MAX);
+	}
+
+	_intensityOffset.update(dt);
+
+	_engineLight.changeIntensity(powf(_velocity * 0.02f, 1.1f) * 0.2f + _intensityOffset() * _velocity * 0.015f);
+	_engineLight.updateColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } *interpolation);
+	_engineLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
+
+	// Warning light
+	float dangerLevel = std::max((_engineTemperature - _warningLevel) / (_overheatTemperature - _warningLevel), 0.0f);
+	_warningAccumulator += dangerLevel * 20.0f * dt;
+
+	while (_warningAccumulator > glm::pi<float>() * 2.0f)
+	{
+		_warningAccumulator -= glm::pi<float>() * 2.0f;
+	}
+
+	_engineBlinkAccumulator += 30.0f * dt;
+	while (_engineBlinkAccumulator > glm::pi<float>() * 2.0f)
+	{
+		_engineBlinkAccumulator -= glm::pi<float>() * 2.0f;
+	}
+
+	if (_engineCooldown > 0.0f)
+	{
+		_warningLight.changeIntensity(_engineCooldown * 0.2f);
+	}
+	else
+	{
+		_warningLight.changeIntensity(_warningLightIntensity * (powf(sinf(_warningAccumulator), 5.0f) + 1.0f) / 2.0f * dangerLevel);
+	}
+
+	_warningLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+
+	// Engine particles
+	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
+	_particleSystem.setDeathColor(glm::vec3{ 0.0f });
+	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+
+	if (sinf(_engineBlinkAccumulator) > -0.2f && (dangerLevel > 0.0f || _engineCooldown > 0.0f))
+	{
+		_particleSystem.setBirthColor(glm::vec3{ 0.1f });
+		_particleSystem.setBirthSize(0.1f);
+	}
+
+	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.8f, 1.0f });
+}
+
 bool Ship::getOverload(float dt)
 {
-	bool isWhite = false;
-
-	if (_engineCooldown > 0)
-	{
-		if (_engineFlashTime < 0)
-		{
-			float denominator = 1.f;
-
-			if (_engineCooldown > 1.f)
-			{
-				denominator = _engineCooldown;
-			}
-
-			_engineFlashTime = 0.5f / denominator;
-			_bEngineFlash = !_bEngineFlash;
-		}
-		_engineFlashTime -= dt;
-		isWhite = _bEngineFlash;
-
-		//_velocity *= 0.9999f * dt;
-	}
-	else if (_engineOverload > 0)
-	{
-		float denominator = 1.f;
-
-		if (_engineOverload > 1.f)
-		{
-			denominator = _engineOverload;
-		}
-
-		if (_engineFlashTime > 0.2f / denominator || _engineFlashTime < 0)
-		{
-			_engineFlashTime = 0.2f / denominator;
-			_bEngineFlash = !_bEngineFlash;
-		}
-
-		_engineFlashTime -= dt;
-		isWhite = _bEngineFlash;
-	}
-	return isWhite;
+	return false;
 }
 
 bool Ship::isEngineOverload()
 {
-	bool isOverload = false;
-	if (_bEngineOverload)
-	{
-		isOverload = true;
-		_bEngineOverload = false;
-	}
-	return isOverload;
+	return false;
 }
 
 void Ship::setForward(const glm::vec3& forwardDirection)
@@ -596,6 +568,10 @@ void Ship::setAcceleration(float accelerationFactor)
 	{
 		_accelerationFactor = clamp(accelerationFactor, -1.0f, 1.0f);
 	}
+	else
+	{
+		_accelerationFactor = -0.5f;
+	}
 }
 
 float Ship::getEngineTemperature()
@@ -651,9 +627,22 @@ PointLight& Ship::getPointLight()
 	return _engineLight;
 }
 
+PointLight& Ship::getWarningLight()
+{
+	return _warningLight;
+}
+
 const glm::vec3 & Ship::getColor()
 {
 	return _shipColor;
+}
+
+void Ship::setBounce(const glm::vec3& bounceVector)
+{
+	_bounceVector = bounceVector;
+
+	_shipCollisionShake.setMagnitude(0.5f);
+	_shipCollisionShake.setSpeed(0.5f);
 }
 
 const BoundingBox & Ship::getBoundingBox() const

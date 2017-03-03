@@ -54,6 +54,11 @@ void PointLight::toggleLight(bool bLightActive)
 	_bLightActive = bLightActive;
 }
 
+bool PointLight::bGetActive()
+{
+	return _bLightActive;
+}
+
 const PointLightProperties PointLight::getLightProperties()
 {
 	PointLightProperties Properties

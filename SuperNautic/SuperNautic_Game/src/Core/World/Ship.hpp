@@ -70,7 +70,9 @@ public:
 	bool checkIfCollided();
 	GFX::ParticleSystem& getParticleSystem();
 	PointLight& getPointLight();
+	PointLight& getWarningLight();
 	const glm::vec3& getColor();
+	void setBounce(const glm::vec3& bounceVector);
 
 	// Moves down units in -y direction, then rotates angle radians around z
 	// Used to position ship at start of race
@@ -99,6 +101,7 @@ private:
 
 	GFX::ParticleSystem			_particleSystem;
 	PointLight					_engineLight;
+	PointLight					_warningLight;
 
 	glm::vec3					_shipColor;
 
@@ -107,6 +110,9 @@ private:
 	glm::vec3					_upDirection;			// Current up direction
 	glm::vec3					_returnPos;				// Respawn position of ship
 	glm::vec3					_waypointDifference;	// Difference between waypoint direcitons, used to calculate track slope
+
+	glm::vec3					_bounceVector;			// Direction and strength of bouncing when collided with another ship
+	const float					_bounceDecay;			// Rate of decay on _bounceVector
 
 	SpringRotatedVector			_meshForwardDirection;	// Current facing direction
 	SpringRotatedVector			_meshUpDirection;		// Up direction of ship mesh
@@ -143,6 +149,12 @@ private:
 	const float _cooldownOnObstacleCollision;
 	const float _immunityoOnObstacleCollision;
 
+	const float _overheatTemperature;	// Temperature at which engine overheats
+	const float _warningLevel;			// Temperature at which warning light starts blinking
+	const float _warningLightIntensity;
+	float		_warningAccumulator;	// Used for calculating warning light intensity
+	float		_engineBlinkAccumulator;// Used for "blinking" particles at high temperatures
+
 	const float _blinkFrequency;	// How fast the ship blinks when immune to obstacle collision
 
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
@@ -156,5 +168,6 @@ private:
 	void rotateTowardTrackForward(float dt);
 	void updateDirectionsAndPositions(float dt);
 	void trackSurface(float dt);
+	void handleLightsAndParticles(float dt);
 };
 #endif // SHIP_HPP

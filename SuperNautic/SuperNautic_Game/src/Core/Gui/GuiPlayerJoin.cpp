@@ -3,9 +3,8 @@
 
 #include "Core/Gui/GuiPlayerJoin.hpp"
 
-GuiPlayerJoin::GuiPlayerJoin(unsigned char playerId)
-: _id(playerId)
-, _input(playerId)
+GuiPlayerJoin::GuiPlayerJoin()
+: _id(-1)
 {
     leave();
 
@@ -36,59 +35,57 @@ sf::FloatRect GuiPlayerJoin::getBoundingRect() const
     return getWorldTransform().transformRect(_window.getGlobalBounds());
 }
 
-void GuiPlayerJoin::updateCurrent()
-{
-    _input.update();
-    for(const sf::Event& e : _input.getEvents())
-    {
-        if(e.type == sf::Event::KeyPressed)
-        {
-            switch(e.key.code)
-            {
-//                case sf::Keyboard::A:
-//                    join();
-//                    break;
-
-                case sf::Keyboard::Y:
-//                    leave();
-                    if(_bHasJoined)
-                    {
-                        leave();
-                    }
-                    else
-                    {
-                        join();
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    }
-}
 
 void GuiPlayerJoin::join()
 {
     _window.setFillColor(_color);
     _bHasJoined = true;
-    _joinCallback(_id);
 }
 
 void GuiPlayerJoin::leave()
 {
     _window.setFillColor(sf::Color::Transparent);
     _bHasJoined = false;
-    _leaveCallback(_id);
 }
 
 
-void GuiPlayerJoin::setOnJoin(const std::function<void(unsigned char)>& callback)
+bool GuiPlayerJoin::bIsAssigned() const
 {
-    _joinCallback = callback;
+    return _bIsAssigned;
 }
 
-void GuiPlayerJoin::setOnLeave(const std::function<void(unsigned char)>& callback)
+bool GuiPlayerJoin::bHasJoined() const
 {
-    _leaveCallback = callback;
+    return _bHasJoined;
+}
+
+unsigned int GuiPlayerJoin::getId() const
+{
+    return _id;
+}
+
+void GuiPlayerJoin::assign(unsigned int playerId)
+{
+    _bIsAssigned = true;
+    _bHasJoined = false;
+    _id = playerId;
+}
+
+void GuiPlayerJoin::unassign()
+{
+    _bIsAssigned = false;
+    _id = -1;
+    leave();
+}
+
+void GuiPlayerJoin::toggleJoin()
+{
+    if(_bHasJoined)
+    {
+        leave();
+    }
+    else
+    {
+        join();
+    }
 }

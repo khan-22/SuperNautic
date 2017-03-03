@@ -20,6 +20,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _videoOptions(context.window)
+, _toolTip(_font)
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
@@ -41,6 +42,19 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
             resolutionList->GuiContainer::select((GuiElement*)buttonPtr);
         }
     }
+
+    GuiText* resLabel = new GuiText("Resolution", FontCache::get("res/arial.ttf"));
+    resLabel->setOrigin(resLabel->getBoundingRect().width / 2.f, resLabel->getBoundingRect().height);
+    sf::FloatRect resBounds = resolutionList->getBoundingRect();
+    resLabel->setPosition(resBounds.left + resBounds.width / 2.f, resBounds.top - resLabel->getBoundingRect().height / 2.f);
+
+    resolutionList->registerOnSelect([resLabel](){resLabel->toggleSelection();});
+    resolutionList->registerOnDeselect([resLabel](){resLabel->toggleSelection();});
+
+    std::unique_ptr<SceneNode> resLabelPtr(resLabel);
+    resolutionList->attachChild(resLabelPtr);
+
+
 
     guiElements.emplace_back(resolutionList);
 
@@ -74,12 +88,25 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
     sf::FloatRect guiBounds = _guiContainer.getBoundingRect();
     _guiContainer.setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height / 2.f);
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
+
+
+    _toolTip.centerAt(windowSize.x / 2.f, windowSize.y * 0.95f);
+    _toolTip.registerTip(resolutionList, "Set video resolution. Press A to apply.");
+    _toolTip.registerTip(fs, "Enable/disable fullscreen.");
+    _toolTip.registerTip(backButton, "Go back to main menu.");
+    _toolTip.setCharacterSize(18);
+
+
     _guiContainer.toggleSelection();
+
+
+
 }
 
 void VideoOptionsApplicationState::render()
 {
     _sfmlRenderer.render(_guiContainer);
+    _sfmlRenderer.render(_toolTip);
     _sfmlRenderer.display(_context.window);
 }
 
@@ -161,7 +188,7 @@ void VideoOptionsApplicationState::applyOptions()
     // manually for some reason.
     // TODO: Ask Timmie about it.
     _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt"));
-	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo1.txt"));
+	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
 
 	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
     {

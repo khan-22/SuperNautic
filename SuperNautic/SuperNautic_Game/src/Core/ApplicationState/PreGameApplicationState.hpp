@@ -13,10 +13,9 @@
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 #include "Core/Utility/TrackPresetManager.hpp"
+#include "Core/Gui/GuiToolTip.hpp"
 
-
-class GuiTextInput;
-class GuiSlider;
+class GuiPlayerJoinContainer;
 
 class PreGameApplicationState : public ApplicationState
 {
@@ -28,16 +27,13 @@ public:
     bool bHandleEvent(const sf::Event& event) override;
 
 private:
+    Asset<sf::Font> _font;
+    GuiToolTip _toolTip;
     TrackPresetManager _presetManager;
     GuiTrackGenerator _trackGenerator;
     GuiTrackGeneratorControls _guiContainer;
+    GuiPlayerJoinContainer* _players;
     Input _input;
-    Asset<sf::Font> _font;
-    unsigned char _numPlayers;
-    std::vector<GuiTextInput*> _seedInputs;
-    GuiTextInput* _selectedSeedInput;
-    GuiTextInput* _lengthInput;
-    GuiSlider* _curvinessInput;
 
     GFX::SfmlRenderer _sfmlRenderer;
     GFX::ForwardRenderer _forwardRenderer;

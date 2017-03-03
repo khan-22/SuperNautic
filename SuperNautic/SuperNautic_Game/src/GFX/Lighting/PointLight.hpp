@@ -35,6 +35,8 @@ public:
 
 	void toggleLight(bool bLightActive);
 
+	bool bGetActive();
+
 	//Returns a struct with all of the light's properties
 	const PointLightProperties getLightProperties();
 

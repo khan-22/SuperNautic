@@ -18,7 +18,7 @@ Player::Player(int id, glm::vec3 color) :
 
 Player::Player(const Player& other) : Player{ other._playerId, glm::vec3{0, 0, 0} }
 {
-
+	LOG_ERROR("Player copy constructor called! That is bad :(");
 }
 
 Player::~Player()
@@ -113,12 +113,12 @@ void Player::update(float dt)
 	_cameraVelocityDirectionShake.setSpeed(std::max((glm::length(_ship.getVelocity()) - 80.0f) * 0.01f, 0.0f));
 	_cameraVelocityDirectionShake.update(dt);
 
-	_cameraCollisionPositionShake.setMagnitude(_ship.getSteeringCooldown() / 3.f);
-	_cameraCollisionPositionShake.setSpeed(_ship.getSteeringCooldown() / 3.f);
+	_cameraCollisionPositionShake.setMagnitude(_ship.getSteeringCooldown() / 2.f);
+	_cameraCollisionPositionShake.setSpeed(_ship.getSteeringCooldown() / 2.f);
 	_cameraCollisionPositionShake.update(dt);
 
-	_cameraCollisionDirectionShake.setMagnitude(_ship.getSteeringCooldown() / 3.f);
-	_cameraCollisionDirectionShake.setSpeed(_ship.getSteeringCooldown() / 3.f);
+	_cameraCollisionDirectionShake.setMagnitude(_ship.getSteeringCooldown() / 2.f);
+	_cameraCollisionDirectionShake.setSpeed(_ship.getSteeringCooldown() / 2.f);
 	_cameraCollisionDirectionShake.update(dt);
 
 	if (_ship.isEngineOverload())

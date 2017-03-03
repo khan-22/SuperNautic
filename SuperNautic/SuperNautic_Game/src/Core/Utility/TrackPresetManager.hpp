@@ -15,6 +15,7 @@ public:
         std::string seed;
         unsigned int length; // in kilometres
         unsigned int curviness;
+        unsigned int difficulty;
     };
 
     TrackPresetManager();
@@ -28,10 +29,6 @@ public:
 private:
     static const char* const _CONFIG_PATH;
     static const size_t _MAX_SEED_LENGTH;
-    static const size_t _MIN_LENGTH;
-    static const size_t _MAX_LENGTH;
-    static const size_t _MIN_CURVINESS;
-    static const size_t _MAX_CURVINESS;
 
     ConfigFile  _config;
     std::vector<Preset> _presets;

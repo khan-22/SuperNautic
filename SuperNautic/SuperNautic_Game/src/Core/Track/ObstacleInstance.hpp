@@ -17,11 +17,15 @@ public:
 	void render(GFX::RenderStates& states) override;
 	std::vector<BoundingBox>& getBoundingBoxes() const;
 	const glm::mat4& getModelMatrix() const;
+	// Better to have this than sending a bool all the time
+	void decreaseSpeed();
 
 private:
 	glm::mat4					_modelMat;
 	ObstacleHandler::Obstacle*	_parent;
 	float						_rotSpeed;
+	int							_rotDir;
+	bool						_bDecreaseSpeed;
 };
 
 #endif // !OBSTACLEINSTANCE_HPP
