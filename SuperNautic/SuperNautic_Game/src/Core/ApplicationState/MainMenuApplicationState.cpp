@@ -9,7 +9,6 @@
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/ApplicationState/PreGameApplicationState.hpp"
-#include "Core/ApplicationState/MenuBackgroundApplicationState.hpp"
 #include "Core/Asset/AssetCache.hpp"
 #include "Core/Gui/GuiButton.hpp"
 #include "Core/Utility/Camera.h"
@@ -23,9 +22,6 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
 , _titleText("SUPERNAUTIC", FontCache::get("res/basictitlefont.ttf"))
 {
     std::cout << "Welcome to MainMenu state." << std::endl;
-
-    _stack.push(std::unique_ptr<ApplicationState>(new MenuBackgroundApplicationState(_stack, _context)));
-
 
     _guiContainer.setBackground(sf::Color::Magenta);
     sf::Text text;
@@ -77,6 +73,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
 void MainMenuApplicationState::render()
 {
     GFX::SfmlRenderer renderer;
+    renderer.render(*_context.menuBackground);
     renderer.render(_guiContainer);
     renderer.render(_titleText);
     renderer.display(_context.window);
@@ -85,6 +82,7 @@ void MainMenuApplicationState::render()
 
 bool MainMenuApplicationState::bUpdate(float dtSeconds)
 {
+    _context.menuBackground->update(dtSeconds);
 	int playersFound = 0;
 	for (int i = 0; i < 5; i++)
 	{

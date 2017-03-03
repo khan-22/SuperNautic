@@ -105,6 +105,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
 
 void VideoOptionsApplicationState::render()
 {
+    _sfmlRenderer.render(*_context.menuBackground);
     _sfmlRenderer.render(_guiContainer);
     _sfmlRenderer.render(_toolTip);
     _sfmlRenderer.display(_context.window);
@@ -112,6 +113,8 @@ void VideoOptionsApplicationState::render()
 
 bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
 {
+    _context.menuBackground->update(dtSeconds);
+
     _guiContainer.update();
 
     if(_input.checkActive())
