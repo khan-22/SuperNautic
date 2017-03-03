@@ -41,6 +41,8 @@ public:
 
 	void swapPerspective();
 
+	void shipCollision();
+
 private:
 	int				_playerId;
 	Input			_input;

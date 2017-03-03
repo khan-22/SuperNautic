@@ -189,6 +189,8 @@ void World::update(float dt, sf::Window& window)
 					{
 						_players[i].getShip().setBounce(glm::normalize(_players[i].getShip().getBoundingBox().center - _players[j].getShip().getBoundingBox().center) * 2.0f);
 						_players[j].getShip().setBounce(glm::normalize(_players[j].getShip().getBoundingBox().center - _players[i].getShip().getBoundingBox().center) * 2.0f);
+						// Play sound
+						_players[i].shipCollision();
 					}
 				}
 			}

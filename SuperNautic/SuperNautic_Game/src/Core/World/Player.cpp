@@ -188,3 +188,8 @@ void Player::swapPerspective()
 {
 	_bIsFirstPerson = !_bIsFirstPerson;
 }
+
+void Player::shipCollision()
+{
+	_audio.playAudio(PlayerAudio::Sounds::shipCollision);
+}
