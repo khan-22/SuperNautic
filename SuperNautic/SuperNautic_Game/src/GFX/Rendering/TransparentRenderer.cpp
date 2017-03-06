@@ -57,11 +57,11 @@ void TransparentRenderer::display(Camera& camera)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	_shader.get()->bind();
-	for (auto drawCall : _drawCalls)
+	for (int i = _drawCalls.size() - 1; i >= 0; --i)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _shader.get()};
 
-		drawCall->render(states);
+		_drawCalls[i]->render(states);
 	}
 
 	_drawCalls.clear();
