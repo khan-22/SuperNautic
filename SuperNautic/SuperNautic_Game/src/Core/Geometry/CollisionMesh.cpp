@@ -125,7 +125,7 @@ CollisionMesh::CollisionResult CollisionMesh::testCollisionSphereObbCollection(c
 
     for(size_t i = 1; i < obbCollection._spheres.size(); i++)
     {
-        if(::bTestCollision(sphere._spheres[0], obbCollection._spheres[i]))
+        if(::bTestCollision(sphere._spheres[0], obbCollection._spheres[i]) && ::bTestCollision(obbCollection._obbs[i - 1], sphere._spheres[0]))
         {
             return CollisionResult::COLLISION;
         }
@@ -141,8 +141,7 @@ CollisionMesh::CollisionResult CollisionMesh::testCollisionAxisAlignedPlaneObbCo
         return result;
     }
 
-    std::set<CollisionResult> resultsSphere;
-    std::set<CollisionResult> resultsObb;
+    std::set<CollisionResult> results;
     for(size_t i = 1; i < obbCollection._spheres.size(); i++)
     {
         CollisionResult resultSphere = convertPlaneCollisionDataToCollisionResult(::testCollision(obbCollection._spheres[i], axisAlignedPlane._axisAlignedPlane));
@@ -153,40 +152,30 @@ CollisionMesh::CollisionResult CollisionMesh::testCollisionAxisAlignedPlaneObbCo
             {
                 return resultObb;
             }
-            resultsObb.insert(resultObb);
+            results.insert(resultObb);
         }
         else
         {
-            resultsSphere.insert(resultSphere);
+            results.insert(resultSphere);
         }
     }
 
-    if(!resultsObb.empty())
+    if(results.empty())
     {
-        if(resultsObb.size() == 1)
-        {
-            return *resultsObb.begin();
-        }
-        // If there are OBBs on both sides of the plane, but none of them
-        // actually intersect the plane, then consider the OBB collection
-        // to be intersecting the plane anyway.
-        return CollisionResult::COLLISION;
+        // OBB collection is empty
+        return CollisionResult::NO_COLLISION;
     }
 
-    if(!resultsSphere.empty())
+
+    if(results.size() == 1)
     {
-        if(resultsSphere.size() == 1)
-        {
-            return *resultsSphere.begin();
-        }
-        // If there are bounding spheres on both sides of the plane, but none of them
-        // actually intersect the plane, then consider the OBB collection
-        // to be intersecting the plane anyway.
-        return CollisionResult::COLLISION;
+        return *results.begin();
     }
 
-    // OBB collection is empty
+    // There are OBBs on both sides of the plane, but none of themIf there are OBBs on both sides of the plane, but none of them
+    // actually intersect the plane. Consider this as a non-collision.
     return CollisionResult::NO_COLLISION;
+
 }
 
 CollisionMesh::CollisionResult CollisionMesh::testCollisionObbCollectionObbCollection(const CollisionMesh& c1, const CollisionMesh& c2)
