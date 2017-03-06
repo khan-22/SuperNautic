@@ -164,7 +164,7 @@ void Player::update(float dt)
 	float newFOV = 90.f + 40.f * (speed - 20.f) / 180.f;
 
 	_currentCamera->setFOV(newFOV);
-	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getSpeed() / 200 + .75);
+	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getSpeed() / 200 + .75f);
 }
 
 Camera* Player::getCamera()

@@ -124,8 +124,8 @@ void GFX::ParticleSystem::update(float dt, glm::vec3 position, glm::vec3 startVe
 			}
 
 			
-			_renderParticles.colors[i] = lerp(phys.life / _maxLifetime, _deathColor, _birthColor);
-			_renderParticles.sizes[i] = lerp(phys.life / _maxLifetime, _deathSize, _birthSize);
+			_renderParticles.colors[i] = lerp(static_cast<float>(phys.life) / _maxLifetime, _deathColor, _birthColor);
+			_renderParticles.sizes[i] = lerp(static_cast<float>(phys.life) / _maxLifetime, _deathSize, _birthSize);
 		}
 	}
 	else
@@ -139,7 +139,7 @@ void GFX::ParticleSystem::update(float dt, glm::vec3 position, glm::vec3 startVe
 				glm::vec3 relativeVelocity = phys.velocity - turbulence;
 				phys.velocity -= 0.5f * glm::dot(relativeVelocity, relativeVelocity) * glm::normalize(relativeVelocity) * dt;
 				
-				_renderParticles.sizes[i] = lerp(phys.life / _maxLifetime, _deathSize, _birthSize);
+				_renderParticles.sizes[i] = lerp(static_cast<float>(phys.life) / _maxLifetime, _deathSize, _birthSize);
 			}
 			else
 			{
@@ -147,7 +147,7 @@ void GFX::ParticleSystem::update(float dt, glm::vec3 position, glm::vec3 startVe
 			}
 
 			_renderParticles.positions[i] += (phys.velocity) * dt;
-			_renderParticles.colors[i] = lerp(phys.life / _maxLifetime, _deathColor, _birthColor);
+			_renderParticles.colors[i] = lerp(static_cast<float>(phys.life) / _maxLifetime, _deathColor, _birthColor);
 		}
 	}
 	

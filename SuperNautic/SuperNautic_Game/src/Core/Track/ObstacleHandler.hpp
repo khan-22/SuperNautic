@@ -52,7 +52,7 @@ public:
 		}
 		int getProbability(float diff) const
 		{
-			return _probability1 * (1 - diff) + _probability2 * diff;
+			return static_cast<int>(_probability1 * (1 - diff) + _probability2 * diff);
 		}
 		float getMinRotSpeed(float diff) const
 		{
@@ -67,11 +67,11 @@ public:
 			float min = getMinRotSpeed(diff);
 			float max = getMaxRotSpeed(diff);
 			double scaled = (double)rand() / RAND_MAX;
-			return (max - min + 1) * scaled + min;
+			return static_cast<float>((max - min + 1) * scaled + min);
 		}
 		int	getMaxInRow(float diff)
 		{
-			return _maxInRow1 * (1 - diff) + _maxInRow2 * diff;
+			return static_cast<int>(_maxInRow1 * (1 - diff) + _maxInRow2 * diff);
 		}
 		float getFrontPadding(float diff)
 		{

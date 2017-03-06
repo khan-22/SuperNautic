@@ -213,7 +213,7 @@ void GuiCharacterInput::setCharacter(char character)
     auto found = std::find(_characterLists.begin(), _characterLists.end(), flags);
     if(found != _characterLists.end())
     {
-        _currentCharacterListIndex = std::distance(_characterLists.begin(), found);
+        _currentCharacterListIndex = static_cast<unsigned char>(std::distance(_characterLists.begin(), found));
         if(flags == CharacterFlags::DIGITS)
         {
             _currentDigit = charIndex;

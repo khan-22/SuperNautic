@@ -48,7 +48,7 @@ void Line::render(RenderStates& states)
 	_texture.bind(0);
 
     _vao->bind();
-    glDrawElements(GL_POINTS, _numPoints, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_POINTS, static_cast<GLsizei>(_numPoints), GL_UNSIGNED_INT, 0);
     _vao->unbind();
 
 	_texture.unbind(0);
@@ -115,21 +115,21 @@ std::shared_ptr<GFX::VertexArrayObject> Line::generateVao(const std::vector<glm:
     size_t pointsSize = sizeof(points[0]) * points.size();
     size_t colorsSize = sizeof(colors[0]) * colors.size();
     size_t sizesSize = sizeof(sizes[0]) * sizes.size();
-    vao->addIndexBuffer(indicesSize, GL_STATIC_DRAW);
-    vao->addVertexBuffer(pointsSize + colorsSize + sizesSize, GL_STATIC_DRAW);
+    vao->addIndexBuffer(static_cast<GLsizei>(indicesSize), GL_STATIC_DRAW);
+    vao->addVertexBuffer(static_cast<GLsizei>(pointsSize + colorsSize + sizesSize), GL_STATIC_DRAW);
 
-    vao->sendDataToIndexBuffer(0, indicesSize, (void*)indices.data());
+    vao->sendDataToIndexBuffer(0, static_cast<GLsizei>(indicesSize), (void*)indices.data());
 
     size_t offset = 0;
-    vao->sendDataToBuffer(0, 0, offset, pointsSize, (void*)points.data(), 3, GL_FLOAT);
+    vao->sendDataToBuffer(0, 0, static_cast<GLuint>(offset), static_cast<GLsizei>(pointsSize), (void*)points.data(), 3, GL_FLOAT);
     offset += pointsSize;
 
-    vao->sendDataToBuffer(0, 1, offset, colorsSize, (void*)colors.data(), 3, GL_FLOAT);
+    vao->sendDataToBuffer(0, 1, static_cast<GLuint>(offset), static_cast<GLsizei>(colorsSize), (void*)colors.data(), 3, GL_FLOAT);
     offset += colorsSize;
 
-    vao->sendDataToBuffer(0, 2, offset, sizesSize, (void*)sizes.data(), 1, GL_FLOAT);
+    vao->sendDataToBuffer(0, 2, static_cast<GLuint>(offset), static_cast<GLsizei>(sizesSize), (void*)sizes.data(), 1, GL_FLOAT);
 
-    vao->setDrawCount(indices.size());
+    vao->setDrawCount(static_cast<GLuint>(indices.size()));
     return vao;
 }
 

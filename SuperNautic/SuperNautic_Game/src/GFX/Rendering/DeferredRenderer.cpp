@@ -39,13 +39,13 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
 
-	_actualX = _x * windowWidth;
-	_actualY = _y * windowHeight;
-	_actualWidth = _width  * windowWidth;
-	_actualHeight = _height * windowHeight;
+	_actualX = static_cast<GLsizei>(_x * windowWidth);
+	_actualY = static_cast<GLsizei>(_y * windowHeight);
+	_actualWidth = static_cast<GLsizei>(_width  * windowWidth);
+	_actualHeight = static_cast<GLsizei>(_height * windowHeight);
 
 	GLuint colorChannels[] = { 3, 4, 3 };
-	_frameBuffer.initialize(_width * windowWidth, _height * windowHeight, colorChannels, sizeof(colorChannels) / sizeof(colorChannels[0]));
+	_frameBuffer.initialize(static_cast<GLuint>(_width * windowWidth), static_cast<GLuint>(_height * windowHeight), colorChannels, static_cast<GLuint>(sizeof(colorChannels) / sizeof(colorChannels[0])));
 
 	GLfloat screenX1 = _x * 2.f - 1.f;
 	GLfloat screenY1 = _y * 2.f - 1.f;
@@ -153,7 +153,7 @@ void DeferredRenderer::geometryPass(Camera& camera, GLsizei width, GLsizei heigh
 	_frameBuffer.bindWrite();
 
 	//glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
-	glViewport(0, 0, _width * width, _height * height);
+	glViewport(0, 0, static_cast<GLsizei>(_width * width), static_cast<GLsizei>(_height * height));
 
 	glDisable(GL_BLEND);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

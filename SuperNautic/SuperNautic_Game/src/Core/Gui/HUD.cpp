@@ -17,7 +17,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 
 	_speedMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
 	_speedMeter.setFillColor(sf::Color(200, 200, 200, 255));
-	_speedMeter.setOrigin(_widthStep, _heightStep * 1.5);
+	_speedMeter.setOrigin(_widthStep, _heightStep * 1.5f);
 	_speedMeter.setPosition(_widthStep * 50 + _offsetX, _heightStep * 90 + _offsetY);
 
 	_speeder.setRadius(_widthStep / 2);
@@ -32,7 +32,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_tPosition.setFillColor(sf::Color::Cyan);
 	_tPosition.setString("0");
 	_tPosition.setOrigin(_tPosition.getGlobalBounds().width / 2, 0);
-	_tPosition.setPosition(windowWidth / 2, _heightStep);
+	_tPosition.setPosition(windowWidth / 2.0f, _heightStep);
 	_tPosition.setCharacterSize(windowWidth / 10);
 }
 
@@ -60,7 +60,7 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 
 	_speedMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
 	_speedMeter.setFillColor(sf::Color(200, 200, 200, 255));
-	_speedMeter.setOrigin(_widthStep, _heightStep * 1.5);
+	_speedMeter.setOrigin(_widthStep, _heightStep * 1.5f);
 	_speedMeter.setPosition(_widthStep * 50 + _offsetX, _heightStep * 90 + _offsetY);
 
 	_tSpeed.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
@@ -73,7 +73,7 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 
 void HUD::updateCurrent()
 {
-	_speeder.setPosition(_offsetX + _widthStep * 35 + _widthStep * 30 * (_speed - 50) / 150, _offsetY + _heightStep * 70 - _heightStep * 25 * sin(_speed / 250 * 3.1415));
+	_speeder.setPosition(static_cast<float>(_offsetX) + _widthStep * 35.0f + _widthStep * 30.0f * (_speed - 50.0f) / 150.0f, _offsetY + _heightStep * 70.0f - _heightStep * 25.0f * sinf(_speed / 250.0f * 3.1415f));
 
 	//_tSpeed.setString("Speed: " + std::to_string(_speed));
 }

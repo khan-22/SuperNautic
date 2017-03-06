@@ -112,13 +112,13 @@ std::shared_ptr<Model> Box::generateModel() const
     VertexArrayObject& vao = model->addMesh().getVertexArrayObject();
     size_t indicesSize = sizeof(indices[0]) * indices.size();
     size_t verticesSize = sizeof(vertices[0]) * vertices.size();
-    vao.addIndexBuffer(indicesSize, GL_STATIC_DRAW);
-    vao.addVertexBuffer(verticesSize, GL_STATIC_DRAW);
+    vao.addIndexBuffer(static_cast<GLsizei>(indicesSize), GL_STATIC_DRAW);
+    vao.addVertexBuffer(static_cast<GLsizei>(verticesSize), GL_STATIC_DRAW);
 
-    vao.sendDataToIndexBuffer(0, indicesSize, (void*)indices.data());
-    vao.sendDataToBuffer(0, 0, 0, verticesSize, vertices.data(), 3, GL_FLOAT);
+    vao.sendDataToIndexBuffer(0, static_cast<GLsizei>(indicesSize), (void*)indices.data());
+    vao.sendDataToBuffer(0, 0, 0, static_cast<GLsizei>(verticesSize), vertices.data(), 3, GL_FLOAT);
 
-    vao.setDrawCount(indices.size());
+    vao.setDrawCount(static_cast<GLuint>(indices.size()));
 
     return model;
 }

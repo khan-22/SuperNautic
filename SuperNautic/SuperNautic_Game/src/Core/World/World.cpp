@@ -12,8 +12,8 @@ World::World(ApplicationContext& context)
 	: _context{ context }
 	, _debugCamera{ 90.0f, context.window.getSize().x, context.window.getSize().y, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
 	, _playersAtFinishLine(0)
-	, _timer(context.window.getSize().x, context.window.getSize().y, context.players.size())
-	, _progression(context.window.getSize().x, context.window.getSize().y, context.players.size())
+	, _timer(context.window.getSize().x, context.window.getSize().y, static_cast<int>(context.players.size()))
+	, _progression(context.window.getSize().x, context.window.getSize().y, static_cast<int>(context.players.size()))
 	, _track(context.track.get())
 	, _playerRTs(context.players.size())
 	, _playerParticleRenderers(context.players.size())
@@ -256,7 +256,7 @@ void World::update(float dt, sf::Window& window)
 			min = segment;
 		}
 	}
-	_track->update(dt, max, min);
+	_track->update(dt, static_cast<unsigned>(max), static_cast<unsigned>(min));
 
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
