@@ -19,7 +19,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	//_speedMeter.setFillColor(sf::Color(200, 200, 200, 255));
 
 	_speeder.setFillColor(sf::Color::Transparent);
-	_speeder.setOutlineColor(sf::Color(255, 200, 100));
+	_speeder.setOutlineColor(sf::Color(255, 200, 100, 200));
 
 	for (size_t i = 0; i < _speedLine.getVertexCount(); i++)
 	{

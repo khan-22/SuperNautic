@@ -4,9 +4,10 @@
 #include "SFML/Graphics/RenderTarget.hpp"
 #include "SFML/Window/Event.hpp"
 
-
 #include "Core/Gui/GuiContainer.hpp"
 #include "Core/Gui/GuiElement.hpp"
+
+
 
 
 GuiContainer::GuiContainer(sf::Keyboard::Key nextKey, sf::Keyboard::Key previousKey)
@@ -78,6 +79,7 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
                 if(!bIsActive())
                 {
                     toggleActivation();
+                    _stepSound.play();
                 }
                 break;
 
@@ -86,6 +88,7 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
                 if(bIsActive())
                 {
                     toggleActivation();
+                    _stepSound.play();
                 }
                 break;
 
@@ -93,10 +96,12 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
                 if(event.key.code == _nextKey)
                 {
                     selectNext();
+                    _stepSound.play();
                 }
                 else if(event.key.code == _previousKey)
                 {
                     selectPrevious();
+                    _stepSound.play();
                 }
                 else if(bHasSelection())
                 {

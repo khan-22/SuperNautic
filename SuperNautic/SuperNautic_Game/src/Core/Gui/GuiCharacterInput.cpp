@@ -43,15 +43,19 @@ void GuiCharacterInput::handleEventCurrent(const sf::Event& event)
     switch(event.key.code)
     {
         case sf::Keyboard::Up:
+            _stepSound.play();
             selectPreviousCharacter();
             break;
         case sf::Keyboard::Down:
+            _stepSound.play();
             selectNextCharacter();
             break;
         case sf::Keyboard::Z:
+            _stepSound.play();
             selectPreviousCharacterList();
             break;
         case sf::Keyboard::X:
+            _stepSound.play();
             selectNextCharacterList();
             break;
         default:

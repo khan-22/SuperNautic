@@ -1,11 +1,26 @@
+#include "SFML/Audio/SoundBuffer.hpp"
+
 #include "Core/Gui/GuiElement.hpp"
+#include "Core/Asset/AssetCache.hpp"
+
+
+
+Asset<sf::SoundBuffer> GuiElement::_stepSoundBuffer;
+sf::Sound              GuiElement::_stepSound;
 
 GuiElement::GuiElement()
 : SceneNode()
 , _bIsSelected(false)
 , _bIsActive(false)
 {
-
+    {
+        static bool doOnce = ([]()
+        {
+            _stepSoundBuffer = AssetCache<sf::SoundBuffer, std::string>::get("menu");
+            _stepSound.setBuffer(*_stepSoundBuffer.get());
+            return true;
+        })();
+    }
 }
 
 GuiElement::~GuiElement()

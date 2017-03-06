@@ -35,12 +35,16 @@ private:
 	bool _bButtonA;
 	bool _bButtonB;
 	bool _bButtonY;
+	bool _bButtonL;
+	bool _bButtonR;
 	bool _bButtonStart;
 
 	bool _bLeftStickDormant;
 	bool _bAWasDormant;
 	bool _bBWasDormant;
 	bool _bYWasDormant;
+	bool _bLWasDormant;
+	bool _bRWasDormant;
 	bool _bStartWasDormant;
 
 	int _controllerId;
