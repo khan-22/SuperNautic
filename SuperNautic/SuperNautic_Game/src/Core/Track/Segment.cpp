@@ -747,3 +747,13 @@ bool Segment::bHasWindow() const
 {
 	return _bHasWindow;
 }
+
+ModelAsset Segment::getZonesModel() const
+{
+	return _zonesModel;
+}
+
+bool Segment::bHasZones() const
+{
+	return _bHasZones;
+}

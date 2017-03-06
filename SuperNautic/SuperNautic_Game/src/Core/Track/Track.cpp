@@ -469,7 +469,7 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	int rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
-	_generatedLength += static_cast<int>(segment->getLength());
+	_generatedLength += segment->getLength();
 	if (segment->bHasWindow())
 	{
 		_segmentWindows.push_back({ segment->getWindowModel(), static_cast<unsigned int>(_track.size()), tempInstance->getModelMatrix() });
