@@ -62,6 +62,8 @@ private:
 	void placeObstacles();
 	void placeBonusFields();
 	size_t findTrackIndex(const float totalLength, float & lastFullSegmentLength) const;
+    bool bInsertIntoOctree(SegmentInstance* segment);
+
 
 	std::vector<GFX::Window>				_segmentWindows;
 	SegmentHandler *						_segmentHandler;
@@ -81,6 +83,7 @@ private:
 	char									_endConnection;
 	int										_prevIndex;
 	const Segment *							_lastSegment;
+	std::unique_ptr<Octree<SegmentInstance*>> _octree;
 };
 
 #endif // !TRACK_HPP
