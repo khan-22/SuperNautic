@@ -13,6 +13,7 @@ namespace sf
 
 #include "Core/World/Player.hpp"
 #include "Core/Track/Track.hpp"
+#include "Core/Audio/CountdownAudio.hpp"
 #include "Core/Utility/Camera.h"
 #include "Core/Utility/DebugCamera.hpp"
 #include "Core/Track/TrackProgression.hpp"
@@ -35,6 +36,7 @@ class World
 {
 public:
 	World(ApplicationContext& context);
+	~World();
 
 	void handleEvent(const sf::Event& e);
 	void update(float dt, sf::Window& window);
@@ -53,6 +55,8 @@ private:
 	Timer									_timer;
 	Progression								_progression;
 
+	CountdownAudio							_countdown;
+
 	const ApplicationContext&				_context;
 
 	// Keeps track of indices and progress of players
@@ -60,10 +64,13 @@ private:
 
 	std::vector<GFX::ViewportPipeline>	_viewportPipelines;
 
-	std::vector<GFX::DeferredRenderer>	_playerRTs;
+	/*std::vector<GFX::DeferredRenderer>	_playerRTs;
 	std::vector<GFX::ZoneRenderer>		_playerZoneRenderers;
 	std::vector<GFX::ParticleRenderer>	_playerParticleRenderers;
-	std::vector<GFX::WindowRenderer>	_playerWindowRenderers;
+	std::vector<GFX::WindowRenderer>	_playerWindowRenderers;*/
+
+	uint64_t						_frameCount;
+	float							_playTime;
 
 	DebugCamera						_debugCamera;
 	bool							_bDebugging;

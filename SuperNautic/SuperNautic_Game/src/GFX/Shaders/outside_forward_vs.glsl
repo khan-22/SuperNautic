@@ -34,5 +34,5 @@ void main()
 
 	gl_Position = uMVP * vec4(pos, 1.0f);
 	
-	vs_out.dist = clamp(length(uCameraPos - vs_out.position) / 3000.0, 0.0, 1.0);
+	vs_out.dist = clamp(length(uCameraPos - vs_out.position) / 1000.0, 0.0, 1.0);
 }
