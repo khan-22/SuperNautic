@@ -36,6 +36,7 @@ class World
 {
 public:
 	World(ApplicationContext& context);
+	~World();
 
 	void handleEvent(const sf::Event& e);
 	void update(float dt, sf::Window& window);
@@ -63,10 +64,13 @@ private:
 
 	std::vector<GFX::ViewportPipeline>	_viewportPipelines;
 
-	std::vector<GFX::DeferredRenderer>	_playerRTs;
+	/*std::vector<GFX::DeferredRenderer>	_playerRTs;
 	std::vector<GFX::ZoneRenderer>		_playerZoneRenderers;
 	std::vector<GFX::ParticleRenderer>	_playerParticleRenderers;
-	std::vector<GFX::WindowRenderer>	_playerWindowRenderers;
+	std::vector<GFX::WindowRenderer>	_playerWindowRenderers;*/
+
+	uint64_t						_frameCount;
+	float							_playTime;
 
 	DebugCamera						_debugCamera;
 	bool							_bDebugging;

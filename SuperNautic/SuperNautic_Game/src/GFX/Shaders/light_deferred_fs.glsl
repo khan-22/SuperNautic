@@ -19,7 +19,7 @@ const float FOG_DISTANCE = 1500.0;
 const vec4 FOG_COLOR = vec4(0.3, 0.3, 0.3, 1.0);
 //const vec3 lightDir = vec3(0.0, 1.0, 0.0);
 
-const int NUM_LIGHTS = 4;
+const int NUM_LIGHTS = 8;
 struct PointLightData
 {
 	vec3 pos[NUM_LIGHTS];

@@ -15,13 +15,15 @@ World::World(ApplicationContext& context)
 	, _timer(context.window.getSize().x, context.window.getSize().y, static_cast<int>(context.players.size()))
 	, _progression(context.window.getSize().x, context.window.getSize().y, static_cast<int>(context.players.size()))
 	, _track(context.track.get())
-	, _playerRTs(context.players.size())
-	, _playerParticleRenderers(context.players.size())
-	, _playerWindowRenderers(context.players.size())
-	, _playerZoneRenderers(context.players.size())
+	//, _playerRTs(context.players.size())
+	//, _playerParticleRenderers(context.players.size())
+	//, _playerWindowRenderers(context.players.size())
+	//, _playerZoneRenderers(context.players.size())
 	, _playerPointLights(context.players.size())
 	, _viewportPipelines(context.players.size())
 	, _bDebugging(false)
+	, _frameCount(0)
+	, _playTime(0.f)
 {
 	for (int i = 0; i < context.players.size(); i++)
 	{
@@ -145,6 +147,16 @@ World::World(ApplicationContext& context)
 	}
 
 	_countdown.playCountdown();
+}
+
+World::~World()
+{
+	LOG("---------------------------");
+	LOG("Total Framecount that round was: ", _frameCount);
+	LOG("Total Playtime (s) that round was: ", _playTime);
+	LOG("Calculated average FPS: ", _frameCount / _playTime);
+	LOG("---------------------------");
+
 }
 
 
@@ -282,11 +294,13 @@ void World::update(float dt, sf::Window& window)
 	_timer.updateCurrent();
 
 	_progression.updateCurrent();
+
+	_playTime += dt;
 }
 
 void World::render()
 {
-	for (int i = 0; i < _playerRTs.size(); i++)
+	for (int i = 0; i < _viewportPipelines.size(); i++)
 	{
 		//Do not render the player's own ship if they are in first person, but render all other ships as normal
 		for (int j = 0; j < _players.size(); j++)
@@ -297,7 +311,7 @@ void World::render()
 			}
 		}
 	}
-	for (int i = 0; i < _playerRTs.size(); i++)
+	for (int i = 0; i < _viewportPipelines.size(); i++)
 	{
 		for (int j = 0; j < _players.size(); j++)
 		{
@@ -307,12 +321,12 @@ void World::render()
 		}
 	}
 
-	for (int i = 0; i < _playerRTs.size(); i++)
+	for (int i = 0; i < _viewportPipelines.size(); i++)
 	{
 		_track->render(_viewportPipelines[i], _playerProgression[i].getCurrentSegment());
 	}
 
-	for (int i = 0; i < _playerParticleRenderers.size(); i++)
+	for (int i = 0; i < _viewportPipelines.size(); i++)
 	{
 		for (int j = 0; j < _players.size(); j++)
 		{
@@ -373,6 +387,8 @@ void World::render()
 	sfml.render(_progression);
 
 	sfml.display(_context.window);
+
+	_frameCount++;
 }
 
 bool World::bHasWon()

@@ -151,11 +151,23 @@ void Game::run()
 	sf::Clock clock;
 	sf::Time deltaTime = clock.restart();
 
+	//sf::Clock performanceClock;
+	//float eventTime = 0.f;
+	//float updateTime = 0.f;
+	//float renderTime = 0.f;
+	//
+	//float totalTime = 0.f;
+	//sf::Clock totalClock;
+
 	while (_window.isOpen())
 	{
+		//performanceClock.restart();
 		handleEvents();
+		//eventTime += performanceClock.restart().asSeconds();
 		update(deltaTime.asSeconds());
+		//updateTime += performanceClock.restart().asSeconds();
 		render();
+		//renderTime += performanceClock.restart().asSeconds();
 
 		if(_stateStack.bIsEmpty())
         {
@@ -164,6 +176,15 @@ void Game::run()
 
 		deltaTime = clock.restart();
 	}
+
+	//totalTime = totalClock.restart().asSeconds();
+	//
+	//LOG("---------------");
+	//LOG("Event time: ", eventTime, "s,\t",	 100.f * eventTime / totalTime, "% of total");
+	//LOG("Update time: ", updateTime, "s,\t", 100.f * updateTime / totalTime, "% of total");
+	//LOG("Render time: ", renderTime, "s,\t", 100.f * renderTime / totalTime, "% of total");
+	//LOG("---------------");
+
 
 }
 
