@@ -45,7 +45,8 @@ void Input::update()
 		_leftStickX = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::X);
 		_leftStickY = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::Y);
 		_triggers = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::Z);
-		_dPad = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::PovY);
+		_dPadX = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::PovX);
+		_dPadY = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::PovY);
 
 		_events.clear();
 
@@ -59,9 +60,14 @@ void Input::update()
 			_triggers = 0.f;
 		}
 		
-		if (abs(_dPad) < thresh)
+		if (abs(_dPadX) < thresh)
 		{
-			_dPad = 0.f;
+			_dPadX = 0.f;
+		}
+
+		if (abs(_dPadY) < thresh)
+		{
+			_dPadY = 0.f;
 		}
 
 		sf::Event event;
@@ -179,8 +185,28 @@ void Input::update()
 			_bLeftStickDormant = true;
 		}
 
-		if (_dPad != 0.f && _bDPadDormant) {
-			if (_dPad > 0)
+		if (_dPadX != 0.f && _bDPadXDormant) {
+			if (_dPadX > 0)
+			{
+				event.type = sf::Event::KeyPressed;
+				event.key.code = sf::Keyboard::Right;
+				_events.push_back(event);
+			}
+			else
+			{
+				event.type = sf::Event::KeyPressed;
+				event.key.code = sf::Keyboard::Left;
+				_events.push_back(event);
+			}
+			_bDPadXDormant = false;
+		}
+		else if (_dPadX == 0)
+		{
+			_bDPadXDormant = true;
+		}
+
+		if (_dPadY != 0.f && _bDPadYDormant) {
+			if (_dPadY > 0)
 			{
 				event.type = sf::Event::KeyPressed;
 				event.key.code = sf::Keyboard::Up;
@@ -192,11 +218,11 @@ void Input::update()
 				event.key.code = sf::Keyboard::Down;
 				_events.push_back(event);
 			}
-			_bDPadDormant = false;
+			_bDPadYDormant = false;
 		}
-		else if (_dPad == 0)
+		else if (_dPadY == 0)
 		{
-			_bDPadDormant = true;
+			_bDPadYDormant = true;
 		}
 	}
 }

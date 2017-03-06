@@ -23,6 +23,7 @@ public:
 
 private:
 	float				_time;
+	float				_countdown;
 
 	Asset<sf::Font>		_font;
 
