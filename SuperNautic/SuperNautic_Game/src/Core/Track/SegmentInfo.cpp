@@ -2,12 +2,13 @@
 
 //Constructor
 SegmentInfo::SegmentInfo(std::string&& dataFileName, std::string&& visualFileName
-	, std::string&& windowFileName, std::string&& zoneFileName
+	, std::string&& materialFileName, std::string&& windowFileName, std::string&& zoneFileName
 	, char startConnection, char endConnection, int probability1, int probability2
 	, int minInRow1, int minInRow2, int maxInRow1, int maxInRow2
 	, int rotationOffset1, int rotationOffset2)
 	: _dataFileName{ dataFileName }
 	, _visualFileName{ visualFileName }
+	, _materialFileName{ materialFileName }
 	, _windowFileName{ windowFileName }
 	, _zoneFileName{ zoneFileName }
 	, _startConnection{ startConnection }

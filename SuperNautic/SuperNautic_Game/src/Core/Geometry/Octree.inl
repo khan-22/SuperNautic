@@ -1,14 +1,14 @@
 #include "Core/Io/Log.hpp"
 
 template<typename ElementT>
-Octree<ElementT>::Octree(const glm::vec3& center, float size)
+Octree<ElementT>::Octree(const glm::vec3& center, float size, float minNodeSize, unsigned short numElementsPerNode)
 : _bounds(BoundingBox
 (
     center,
     {glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), glm::vec3(0.f, 0.f, 1.f)},
     {size, size, size}
 ))
-, _root(center, size)
+, _root(center, size, minNodeSize, numElementsPerNode)
 {
 
 }
@@ -132,14 +132,22 @@ std::set<typename Octree<ElementT>::Node::ElementPtr> Octree<ElementT>::getUniqu
     return elements;
 }
 
+template<typename ElementT>
+void Octree<ElementT>::erase(const ElementT& element)
+{
+    _root.erase(element);
+}
+
 
 template<typename ElementT>
-Octree<ElementT>::Node::Node(const glm::vec3& center, float size)
+Octree<ElementT>::Node::Node(const glm::vec3& center, float size, float minNodeSize, unsigned short numMaxElements)
 : _center(center)
 , _size(size)
 , _xPlane(AxisAlignedPlane(AxisAlignedPlane::Axis::X, center.x))
 , _yPlane(AxisAlignedPlane(AxisAlignedPlane::Axis::Y, center.y))
 , _zPlane(AxisAlignedPlane(AxisAlignedPlane::Axis::Z, center.z))
+, _minSize(minNodeSize)
+, _numMaxElements(numMaxElements)
 {
 
 }
@@ -157,7 +165,7 @@ void Octree<ElementT>::Node::insert(ElementPtr element)
     }
 
     _elements.emplace_back(element);
-    if(getSize() >= _MAX_ELEMENTS && _size > _MIN_SIZE)
+    if(getSize() >= _numMaxElements && _size > _minSize)
     {
         split();
     }
@@ -258,7 +266,7 @@ void Octree<ElementT>::Node::split()
     _children.reserve(_NUM_CHILDREN);
     for(unsigned int i = 0; i < _NUM_CHILDREN; i++)
     {
-        _children.emplace_back(_center + CHILD_OFFSETS[i] * childSize, childSize);
+        _children.emplace_back(_center + CHILD_OFFSETS[i] * childSize, childSize, _minSize, _numMaxElements);
     }
 
     for(const ElementPtr& element : _elements)
@@ -287,3 +295,18 @@ unsigned int Octree<ElementT>::Node::getSize() const
     return _elements.size();
 }
 
+template<typename ElementT>
+void Octree<ElementT>::Node::erase(const ElementT& element)
+{
+    auto end = std::remove_if(_elements.begin(), _elements.end(), [&element](const ElementPtr& e)
+    {
+        return element == e->second;
+    });
+
+    _elements.erase(end, _elements.end());
+
+    for(Node& child : _children)
+    {
+        child.erase(element);
+    }
+}

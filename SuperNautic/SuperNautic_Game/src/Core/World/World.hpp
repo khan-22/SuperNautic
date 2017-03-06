@@ -18,13 +18,16 @@ namespace sf
 #include "Core/Track/TrackProgression.hpp"
 #include "Core/Gui/Timer.hpp"
 #include "Core/Gui/Progression.hpp"
-#include "GFX/Rendering/DeferredRenderer.hpp"
-#include "GFX/Rendering/ZoneRenderer.hpp"
+#include "GFX/Rendering/DeferredRenderer.hpp" 
+#include "GFX/Rendering/ZoneRenderer.hpp"	  
 #include "GFX/Rendering/ForwardRenderer.hpp"
-#include "GFX/Rendering/WindowRenderer.hpp"
+#include "GFX/Rendering/WindowRenderer.hpp"		
+#include "GFX/Rendering/TransparentRenderer.hpp"
+#include "GFX/Rendering/ParticleRenderer.hpp"	
 
-#include "GFX/Rendering/ParticleRenderer.hpp"
 #include "GFX/Resources/ParticleSystem.hpp"
+
+#include "GFX/Rendering/ViewportPipeline.hpp"
 
 struct ApplicationContext;
 
@@ -54,6 +57,8 @@ private:
 
 	// Keeps track of indices and progress of players
 	std::vector<TrackProgression>	_playerProgression;
+
+	std::vector<GFX::ViewportPipeline>	_viewportPipelines;
 
 	std::vector<GFX::DeferredRenderer>	_playerRTs;
 	std::vector<GFX::ZoneRenderer>		_playerZoneRenderers;

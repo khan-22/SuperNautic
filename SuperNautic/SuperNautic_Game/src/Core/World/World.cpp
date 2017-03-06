@@ -20,6 +20,7 @@ World::World(ApplicationContext& context)
 	, _playerWindowRenderers(context.players.size())
 	, _playerZoneRenderers(context.players.size())
 	, _playerPointLights(context.players.size())
+	, _viewportPipelines(context.players.size())
 	, _bDebugging(false)
 {
 	for (int i = 0; i < context.players.size(); i++)
@@ -62,70 +63,87 @@ World::World(ApplicationContext& context)
 
 	if (_players.size() == 1)
 	{
-		_playerRTs[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
-		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
-		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
-		_playerZoneRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+		//_playerRTs[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+		//_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+		//_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+		//_playerZoneRenderers[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
 		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y, 0, 0);
 	}
 	else if (_players.size() == 2)
 	{
-		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
-		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
-		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
-		_playerZoneRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		//_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		//_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		//_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		//_playerZoneRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, 0);
 
-		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
-		_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
-		_playerWindowRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
-		_playerZoneRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
+		//_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
+		//_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
+		//_playerWindowRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
+		//_playerZoneRenderers[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
+
+		_viewportPipelines[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f);
 		_players[1].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 	}
 	else if (_players.size() == 3)
 	{
-		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
-		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
-		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
-		_playerZoneRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		//_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		//_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		//_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+		//_playerZoneRenderers[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
+
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f);
 		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, 0);
 
-		_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_playerWindowRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_playerZoneRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		//_playerRTs[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		//_playerParticleRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		//_playerWindowRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		//_playerZoneRenderers[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+
+		_viewportPipelines[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 
-		_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerZoneRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		//_playerRTs[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		//_playerParticleRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		//_playerWindowRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		//_playerZoneRenderers[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		
+		_viewportPipelines[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
 	else if (_players.size() == 4)
 	{
-		_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
-		_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
-		_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
-		_playerZoneRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
+		//_playerRTs[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
+		//_playerParticleRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
+		//_playerWindowRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
+		//_playerZoneRenderers[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f);
 		_players[0].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, 0);
 
-		_playerRTs[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_playerWindowRenderers[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
-		_playerZoneRenderers[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		//_playerRTs[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		//_playerParticleRenderers[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		//_playerWindowRenderers[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+		//_playerZoneRenderers[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
+
+		_viewportPipelines[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f);
 		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, 0);
 
-		_playerRTs[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_playerParticleRenderers[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_playerWindowRenderers[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
-		_playerZoneRenderers[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		//_playerRTs[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		//_playerParticleRenderers[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		//_playerWindowRenderers[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		//_playerZoneRenderers[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
+		_viewportPipelines[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f);
 		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 
-		_playerRTs[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerParticleRenderers[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerWindowRenderers[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
-		_playerZoneRenderers[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		//_playerRTs[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		//_playerParticleRenderers[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		//_playerWindowRenderers[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+		//_playerZoneRenderers[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
+
+		_viewportPipelines[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
 }
@@ -273,7 +291,7 @@ void World::render()
 		{
 			if (!(i == j && _players[j]._bIsFirstPerson))
 			{
-				_playerRTs[i].render(_players[j].getShip());
+				_viewportPipelines[i].generalDeferred.render(_players[j].getShip());
 			}
 		}
 	}
@@ -281,20 +299,28 @@ void World::render()
 	{
 		for (int j = 0; j < _players.size(); j++)
 		{
-			_playerRTs[i].pushPointLight(_players[j].getShip().getPointLight());
+			_viewportPipelines[i].generalDeferred.pushPointLight(_players[j].getShip().getPointLight());
 
-			_playerRTs[i].pushPointLight(_players[j].getShip().getWarningLight());
+			_viewportPipelines[i].generalDeferred.pushPointLight(_players[j].getShip().getWarningLight());
 		}
 	}
 
 	for (int i = 0; i < _playerRTs.size(); i++)
 	{
-		_track->render(_playerRTs[i], _playerWindowRenderers[i], _playerProgression[i].getCurrentSegment());
+		_track->render(_viewportPipelines[i], _playerProgression[i].getCurrentSegment());
+	}
+
+	for (int i = 0; i < _playerParticleRenderers.size(); i++)
+	{
+		for (int j = 0; j < _players.size(); j++)
+		{
+			_viewportPipelines[i].particleForward.render(_players[j].getShip().getParticleSystem());
+		}
 	}
 
 	if (!_bDebugging)
 	{
-		for (int i = 0; i < _players.size(); i++)
+		/*for (int i = 0; i < _players.size(); i++)
 		{
 			_playerRTs[i].display(*_players[i].getCamera());
 			_playerRTs[i].blitDepthOnto(GFX::Framebuffer::DEFAULT);
@@ -312,29 +338,27 @@ void World::render()
 
 		for (int i = 0; i < _playerParticleRenderers.size(); i++)
 		{
-			for (int j = 0; j < _players.size(); j++)
-			{
-				_playerParticleRenderers[i].render(_players[j].getShip().getParticleSystem());
-				_playerParticleRenderers[i].display(*_players[i].getCamera());
-			}
+			_playerParticleRenderers[i].display(*_players[i].getCamera());
 		}
+*/
 
+		for (int i = 0; i < _players.size(); i++)
+		{
+			_viewportPipelines[i].display(*_players[i].getCamera());
+		}
 	}
 	else
 	{
-		_playerRTs[0].display(_debugCamera);
+		/*_playerRTs[0].display(_debugCamera);
 		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 
 		_playerZoneRenderers[0].display(_debugCamera);
 		
 		_playerWindowRenderers[0].display(_debugCamera);
 		
-		for (int j = 0; j < _players.size(); j++)
-		{
-			_playerParticleRenderers[0].render(_players[j].getShip().getParticleSystem());
-			_playerParticleRenderers[0].display(_debugCamera);
-		}
+		_playerParticleRenderers[0].display(_debugCamera);*/
 
+		_viewportPipelines[0].display(_debugCamera);
 	}
 
 	GFX::SfmlRenderer sfml;

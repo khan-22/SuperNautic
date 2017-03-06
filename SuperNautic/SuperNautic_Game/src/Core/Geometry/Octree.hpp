@@ -17,7 +17,7 @@ class Octree
 public:
     // Place cubic octree with its center at center
     // and size as its halflength.
-    Octree(const glm::vec3& center, float size);
+    Octree(const glm::vec3& center, float size, float minNodeSize = 0.5f, unsigned short numElementsPerNode = 5);
 
     // Insert element along with a collision mesh.
     // Return true if element is inserted. (insertion fails if mesh does not intersect octree).
@@ -43,22 +43,24 @@ public:
 		return _bounds.testCollision(mesh) == CollisionMesh::CollisionResult::COLLISION;
 	}
 
+	// Hobo erase all elements that compare equal to argument... Does not merge empty nodes. /shrug
+	void erase(const ElementT& element);
+
 private:
     class Node
     {
     public:
         using ElementPtr = std::shared_ptr<std::pair<CollisionMesh, ElementT>>;
 
-        Node(const glm::vec3& center, float size);
+        Node(const glm::vec3& center, float size, float minSize, unsigned short numMaxElements);
 
         void insert(ElementPtr element);
+        void erase(const ElementT& element);
         void getIntersectingLeafNodes(const CollisionMesh& mesh, std::vector<Node*>& leafNodes) const;
         const std::vector<ElementPtr>& getElements() const;
 
     private:
-        static constexpr unsigned int                   _MAX_ELEMENTS = 5;
         static constexpr unsigned int                   _NUM_CHILDREN = 8;
-        static constexpr float                          _MIN_SIZE = 0.5f;
 
         glm::vec3                                       _center;
         float                                           _size;
@@ -67,6 +69,8 @@ private:
         CollisionMesh                                   _zPlane;
         std::vector<ElementPtr>                         _elements;
         std::vector<Node>                               _children;
+        float                                           _minSize;
+        unsigned short                                  _numMaxElements;
 
         void split();
         bool bIsLeafNode() const;

@@ -131,6 +131,8 @@ void Track::startNewTrack()
 		delete _track[i];
 	}
 	_track.clear();
+
+	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength, 2000.f, 5));
 }
 
 // Generates the track
@@ -218,7 +220,7 @@ bool Track::bGenerate()
 
 	_lengthAfterLastCall = static_cast<int>(_generatedLength);
 	_totalProgress = (float)_generatedLength / _targetLength;
-	LOG("Progression: ", _totalProgress * 100);
+//	LOG("Progression: ", _totalProgress * 100);
 	return false;
 }
 
@@ -437,45 +439,64 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
 	if (testCollision)
 	{
-		//						const std::function<bool(const std::vector<ElementT*>&)>& predicate
-		/*auto predicate = [this](const std::function<bool(const std::vector<SegmentInstance*>&)>& segments)
-		{
-
-		};
-		for (size_t i = 0; i < _octrees.size(); i++)
-		{
-			if (_octrees[i].bInsertIf(tempInstance->getGlobalBoundingBoxes()[0], tempInstance, predicate))
-			{
-
-			}
-		}*/
-
-		for (unsigned int i = 0; i < _track.size() - 2; i++)
-		{
-			if (tempInstance->bTestCollision(*_track[i]))
-			{
-				delete tempInstance;
-				return false;
-			}
-		}
+		if(!bInsertIntoOctree(tempInstance))
+        {
+            delete tempInstance;
+            return false;
+        }
 	}
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
-	if(maxRotOffset == 0)
-    {
-        maxRotOffset = 1;
-    }
-	int rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
+	int rotVal = 0;
+	if(maxRotOffset != 0)
+	{
+		rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
+	}
 	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
-	_generatedLength += static_cast<int>(segment->getLength());
+	_generatedLength += segment->getLength();
 	if (segment->bHasWindow())
 	{
 		_segmentWindows.push_back({ segment->getWindowModel(), static_cast<unsigned int>(_track.size()), tempInstance->getModelMatrix() });
 	}
 	_track.push_back(tempInstance);
 	return true;
+}
+
+// Insert the segment into the octree if it does not collide with
+// anything in it.
+// Return true if segment is inserted.
+bool Track::bInsertIntoOctree(SegmentInstance* segment)
+{
+    CollisionMesh mesh(segment->getGlobalBoundingBoxes());
+    assert(_octree->bTestCollision(mesh));
+
+    return _octree->bInsertIf(mesh, segment, [this](const std::vector<SegmentInstance**>& collisions)
+    {
+        size_t numSegments = _track.size();
+        size_t size = collisions.size();
+        if(collisions.empty())
+        {
+            return true;
+        }
+
+        if(collisions.size() <= 2)
+        {
+            auto beginIt = _track.end() - collisions.size();
+            for(SegmentInstance** const c : collisions)
+            {
+                if(std::find(beginIt, _track.end(), *c) == _track.end())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    });
 }
 
 // Inserts a whole pre-defined structure at the end of the track
@@ -503,16 +524,15 @@ void Track::insertStructure(const int index)
 			const SegmentHandler::StructurePiece * p = s->pieces[j];
 			const Segment * segment = _segmentHandler->loadSegment(p->index);
 			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
-			for (unsigned int i = 0; i < _track.size() - 2; i++)
-			{
-				if (tempInstance->bTestCollision(*_track[i]))
-				{
-					delete tempInstance;
-					deleteSegments(static_cast<int>(_generatedLength) - startLength + 300);
-					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-					return;
-				}
-			}
+
+            if(!bInsertIntoOctree(tempInstance))
+            {
+                delete tempInstance;
+                deleteSegments(static_cast<int>(_generatedLength) - startLength + 300);
+                _endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+                return;
+            }
+
 			glm::mat4 modelEndMat = segment->getEndMatrix();
 			int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 			// Randomize angle from structure info
@@ -544,8 +564,16 @@ void Track::deleteSegments(const int lengthToDelete)
 		int segmentLength = static_cast<int>(_track.back()->getLength());
 		deletedLength += segmentLength;
 		_generatedLength -= segmentLength;
-		delete _track[_track.size() - 1];
+
+		_octree->erase(_track.back());
+		size_t index = _track.size() - 1;
+		delete _track[index];
 		_track.erase(_track.begin() + _track.size() - 1);
+		// Windows
+		if (_segmentWindows.back().segmentIndex == index)
+		{
+			_segmentWindows.pop_back();
+		}
 	}
 }
 
@@ -661,6 +689,12 @@ void Track::placeObstacles()
 	}
 }
 
+//
+void Track::placeBonusFields()
+{
+
+}
+
 size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLength) const
 {
 	float traversedLength = 0;
@@ -687,18 +721,18 @@ void Track::update(const float dt, const unsigned int firstPlayer, const unsigne
 }
 
 // Render the track
-void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowRenderer, const int shipIndex)
+void Track::render(GFX::ViewportPipeline& pipeline, const int shipIndex)
 {
 	for (int i = -2; i < 7; i++)
 	{
 		int index = shipIndex + i;
 		if (index >= 0 && index < _track.size())
 		{
-			renderer.render(*_track[index]);
+			pipeline.generalDeferred.render(*_track[index]);
 			std::vector<ObstacleInstance>& obstacles = _track[index]->getObstacles();
 			for (auto& obstacle : obstacles)
 			{
-				renderer.render(obstacle);
+				pipeline.transparentForward.render(obstacle);
 			}
 		}
 	}
@@ -708,7 +742,7 @@ void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowR
 		int index = shipIndex + i;
 		if (index >= 0 && index < _track.size())
 		{
-			windowRenderer.render(*_track[index]);
+			pipeline.windowForward.render(*_track[index]);
 		}
 	}
 
@@ -723,7 +757,7 @@ void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowR
 		{
 			if (windowIndex < largestIndex)
 			{
-				windowRenderer.render(window);
+				pipeline.windowForward.render(window);
 			}
 			else
 			{

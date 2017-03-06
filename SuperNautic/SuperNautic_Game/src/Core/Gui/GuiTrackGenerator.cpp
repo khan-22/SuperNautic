@@ -16,6 +16,12 @@ GuiTrackGenerator::~GuiTrackGenerator()
 
 std::unique_ptr<Track> GuiTrackGenerator::takeTrack()
 {
+    if(_generation.valid())
+    {
+        auto pair = _generation.get();
+        _track.swap(pair.first);
+    }
+
     std::unique_ptr<Track> ret = std::move(_track);
     _track.reset(new Track(_segmentHandler, _obstacleHandler));
 

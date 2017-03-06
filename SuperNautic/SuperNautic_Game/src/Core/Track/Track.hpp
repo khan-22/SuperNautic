@@ -8,9 +8,9 @@
 #include "Core/Track/SegmentHandler.hpp"
 #include "Core/Track/Segment.hpp"
 #include "Core/Track/SegmentInstance.hpp"
-#include "GFX/Rendering/DeferredRenderer.hpp"
-#include "GFX/Rendering/ForwardRenderer.hpp"
-#include "GFX/Rendering/WindowRenderer.hpp"
+
+#include "GFX/Rendering/ViewportPipeline.hpp"
+
 #include "GFX/Resources/Window.hpp"
 #include "Core/Geometry/Octree.hpp"
 #include "Core/Track/ObstacleHandler.hpp"
@@ -43,7 +43,7 @@ public:
 	int getNrOfSegments() const;
 	SegmentInstance* getInstance(int index);
 	float getProgression() const;
-	void render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowRenderer, const int shipIndex);
+	void render(GFX::ViewportPipeline& pipeline, const int shipIndex);
 	void update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer);
 
 
@@ -60,7 +60,10 @@ private:
 	void deleteSegments(const int lengthToDelete);
 	bool bEndTrack();
 	void placeObstacles();
+	void placeBonusFields();
 	size_t findTrackIndex(const float totalLength, float & lastFullSegmentLength) const;
+    bool bInsertIntoOctree(SegmentInstance* segment);
+
 
 	std::vector<GFX::Window>				_segmentWindows;
 	SegmentHandler *						_segmentHandler;
@@ -80,6 +83,7 @@ private:
 	char									_endConnection;
 	int										_prevIndex;
 	const Segment *							_lastSegment;
+	std::unique_ptr<Octree<SegmentInstance*>> _octree;
 };
 
 #endif // !TRACK_HPP
