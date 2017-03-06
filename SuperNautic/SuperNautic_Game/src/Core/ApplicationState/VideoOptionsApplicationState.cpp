@@ -13,6 +13,7 @@
 #include "Core/Asset/AssetCache.hpp"
 #include "Core/Gui/GuiButton.hpp"
 #include "Core/Gui/GuiHorizontalList.hpp"
+#include "Core/Gui/GuiSlider.hpp"
 
 #include "Core/Asset/LoadAssetFunctions.hpp"
 

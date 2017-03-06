@@ -11,6 +11,7 @@
 #include "Core/Io/Input.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 #include "Core/Utility/VideoOptions.hpp"
+#include "Core/Utility/AudioOptions.hpp"
 #include "Core/Gui/GuiToolTip.hpp"
 
 class GuiTextInput;
@@ -28,6 +29,7 @@ public:
 
 private:
     VideoOptions _videoOptions;
+    AudioOptions _audioOptions;
     GuiContainer _guiContainer;
     Input _input;
     Asset<sf::Font> _font;
