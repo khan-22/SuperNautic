@@ -11,7 +11,6 @@
 #include "Core/World/Player.hpp"
 #include "Core/Asset/LoadAssetFunctions.hpp"
 #include "Core/Utility/DebugCamera.hpp"
-#include "Core/Audio/WorldAudio.hpp"
 #include "Core/Track/Track.hpp"
 #include "Core/Track/SegmentHandler.hpp"
 #include "Core/Track/SegmentHandler.hpp"
@@ -70,8 +69,6 @@ private:
 	DebugCamera				_debugCamera;
 
 	std::vector<PointLight>	_pointLights;
-
-	WorldAudio				_audio;
 };
 
 #endif //GAME_HPP
