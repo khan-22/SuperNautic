@@ -484,7 +484,7 @@ bool Track::bInsertIntoOctree(SegmentInstance* segment)
         if(collisions.size() <= 2)
         {
             auto beginIt = _track.end() - collisions.size();
-            for(const SegmentInstance** c : collisions)
+            for(SegmentInstance** const c : collisions)
             {
                 if(std::find(beginIt, _track.end(), *c) == _track.end())
                 {
