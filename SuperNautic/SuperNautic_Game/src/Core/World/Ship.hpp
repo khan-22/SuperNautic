@@ -75,6 +75,9 @@ public:
 	const glm::vec3& getColor();
 	void setBounce(const glm::vec3& bounceVector);
 
+	GFX::ParticleSystem& getLeftParticleSystem();
+	GFX::ParticleSystem& getRightParticleSystem();
+
 	// Moves down units in -y direction, then rotates angle radians around z
 	// Used to position ship at start of race
 	void rotateAtStart(float down, float angle);
@@ -101,6 +104,8 @@ private:
 	float		_inactiveTimer;			// If >0, ship is inactive and cannot be controlled
 
 	GFX::ParticleSystem			_particleSystem;
+	GFX::ParticleSystem			_leftChemtrailParticleSystem;
+	GFX::ParticleSystem			_rightChemtrailParticleSystem;
 	PointLight					_engineLight;
 	PointLight					_warningLight;
 

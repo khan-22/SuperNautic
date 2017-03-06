@@ -76,6 +76,12 @@ Ship::Ship(glm::vec3 color)
 
 	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
 	_particleSystem.start();
+
+	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
+	_leftChemtrailParticleSystem.start();
+	_rightChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
+	_rightChemtrailParticleSystem.start();
+	
 }
 
 void Ship::render(GFX::RenderStates& states)
@@ -141,6 +147,7 @@ void Ship::update(float dt)
 	// Reset values to stop turning/acceleration if no input is provided
 	_turningFactor = 0.0f;
 	_accelerationFactor = 0.0f;
+
 }
 
 void Ship::jump()
@@ -478,6 +485,25 @@ void Ship::handleLightsAndParticles(float dt)
 	}
 
 	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.3f, 1.0f }, -_meshForwardDirection() * (_velocity * 1.0f));
+
+	_leftChemtrailParticleSystem.setBirthColor(glm::vec3(0.6f));
+	_leftChemtrailParticleSystem.setDeathColor(glm::vec3(0.0f));
+	_leftChemtrailParticleSystem.setBirthSize(clamp(_velocity - 180.f, 0.f, 15.f) * 0.01f);
+	_rightChemtrailParticleSystem.setBirthColor(glm::vec3(0.6f));
+	_rightChemtrailParticleSystem.setDeathColor(glm::vec3(0.0f));
+	_rightChemtrailParticleSystem.setBirthSize(clamp(_velocity - 180.f, 0.f, 15.f) * 0.01f);
+
+
+	/*if (_velocity < 150.f)
+	{
+		_leftChemtrailParticleSystem.setBirthSize(0.0f);
+		_rightChemtrailParticleSystem.setBirthSize(0.0f);
+	}*/
+
+	_leftChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ -1.28f, -0.42f, -1.2f, 1.0f },	glm::vec3(0.f));//-_meshForwardDirection() * (_velocity * 2.f));
+	_rightChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ 1.28f, -0.42f, -1.2f, 1.0f },	glm::vec3(0.f));//-_meshForwardDirection() * (_velocity * 2.f));
+	
+
 }
 
 bool Ship::getOverload(float dt)
@@ -662,6 +688,16 @@ void Ship::setBounce(const glm::vec3& bounceVector)
 
 	_shipCollisionShake.setMagnitude(0.5f);
 	_shipCollisionShake.setSpeed(0.5f);
+}
+
+GFX::ParticleSystem & Ship::getLeftParticleSystem()
+{
+	return _leftChemtrailParticleSystem;
+}
+
+GFX::ParticleSystem & Ship::getRightParticleSystem()
+{
+	return _rightChemtrailParticleSystem;
 }
 
 const BoundingBox & Ship::getBoundingBox() const
