@@ -4,7 +4,7 @@
 
 #include "Core/Utility/GeometryUtility.hpp"
 
-
+#include <numeric>
 
 
 Sphere generateBoundingSphere(const BoundingBox& obb)
