@@ -36,7 +36,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     }));
 
     text.setString("Options");
-    auto videoOptions = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
+    auto options = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.clear();
         _stack.push(std::unique_ptr<ApplicationState>(new OptionsApplicationState(_stack, _context)));
@@ -48,11 +48,11 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
         _stack.clear();
     }));
 
-    videoOptions->move(0.f, button1->getBoundingRect().height * 1.5f);
-    button2->setPosition(videoOptions->getPosition());
-    button2->move(0.f, videoOptions->getBoundingRect().height * 1.5f);
+    options->move(0.f, button1->getBoundingRect().height * 1.5f);
+    button2->setPosition(options->getPosition());
+    button2->move(0.f, options->getBoundingRect().height * 1.5f);
     _guiContainer.insert(button1);
-    _guiContainer.insert(videoOptions);
+    _guiContainer.insert(options);
     _guiContainer.insert(button2);
 
     sf::Vector2u windowSize = _context.window.getSize();
