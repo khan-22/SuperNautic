@@ -6,7 +6,7 @@ CountdownAudio::CountdownAudio() :
 	_sbCountdown(AssetCache<sf::SoundBuffer, std::string>::get("counter"))
 {
 	AudioOptions options;
-	setVolume(options.getMusicVolume());
+	setVolume(options.getEffectsVolume());
 
 	_sCountdown.setBuffer(*_sbCountdown.get());
 }
