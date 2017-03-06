@@ -462,11 +462,11 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
-	if(maxRotOffset == 0)
-    {
-        maxRotOffset = 1;
-    }
-	int rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
+	int rotVal = 0;
+	if(maxRotOffset != 0)
+	{
+		rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
+	}
 	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
 	_generatedLength += segment->getLength();
@@ -544,8 +544,14 @@ void Track::deleteSegments(const int lengthToDelete)
 		int segmentLength = static_cast<int>(_track.back()->getLength());
 		deletedLength += segmentLength;
 		_generatedLength -= segmentLength;
-		delete _track[_track.size() - 1];
+		size_t index = _track.size() - 1;
+		delete _track[index];
 		_track.erase(_track.begin() + _track.size() - 1);
+		// Windows
+		if (_segmentWindows.back().segmentIndex == index)
+		{
+			_segmentWindows.pop_back();
+		}
 	}
 }
 
