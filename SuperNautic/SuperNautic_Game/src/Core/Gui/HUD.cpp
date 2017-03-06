@@ -16,16 +16,10 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_widthStep = windowWidth / 100.f;
 	_heightStep = windowHeight / 100.f;
 
-	_speedMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
 	_speedMeter.setFillColor(sf::Color(200, 200, 200, 255));
-	_speedMeter.setOrigin(_widthStep, _heightStep * 1.5f);
-	_speedMeter.setPosition(_widthStep * 50 + _offsetX, _heightStep * 90 + _offsetY);
 
-	_speeder.setRadius(_widthStep / 4);
 	_speeder.setFillColor(sf::Color::Transparent);
-	_speeder.setOutlineThickness(_widthStep / 8);
 	_speeder.setOutlineColor(sf::Color(255, 200, 100));
-	_speeder.setOrigin(_widthStep / (_speeder.getRadius() + _speeder.getOutlineThickness()), _widthStep / (_speeder.getRadius() + _speeder.getOutlineThickness()));
 
 	for (size_t i = 0; i < _speedLine.getVertexCount(); i++)
 	{
@@ -34,15 +28,10 @@ HUD::HUD(int windowWidth, int windowHeight) :
 
 	_tSpeed.setFont(*_font.get());
 	_tSpeed.setFillColor(sf::Color::Red);
-	_tSpeed.setPosition(_widthStep * 75, _heightStep);
-	_tSpeed.setCharacterSize(windowWidth / 20);
 
 	_tPosition.setFont(*_font.get());
 	_tPosition.setFillColor(sf::Color::Cyan);
 	_tPosition.setString("0");
-	_tPosition.setOrigin(_tPosition.getGlobalBounds().width / 2, 0);
-	_tPosition.setPosition(windowWidth / 2.0f, _heightStep);
-	_tPosition.setCharacterSize(windowWidth / 10);
 }
 
 HUD::~HUD()
@@ -68,20 +57,23 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_offsetY = offsetY;
 
 	_speedMeter.setSize(sf::Vector2f(_widthStep * 3, _heightStep / 2));
-	_speedMeter.setFillColor(sf::Color(200, 200, 200, 255));
 	_speedMeter.setOrigin(_widthStep, _heightStep * 1.5f);
 	_speedMeter.setPosition(_widthStep * 50 + _offsetX, _heightStep * 90 + _offsetY);
 
 	_tSpeed.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
 	_tSpeed.setPosition(_widthStep * 75 + _offsetX, _heightStep + _offsetY);
 
+	_speeder.setRadius(_widthStep / 4);
+	_speeder.setOutlineThickness(_widthStep / 8);
+	_speeder.setOrigin(_widthStep / (_speeder.getRadius() + _speeder.getOutlineThickness()), _widthStep / (_speeder.getRadius() + _speeder.getOutlineThickness()));
+
 	for (size_t i = 0; i < _speedLine.getVertexCount(); i++)
 	{
 		_speedLine[i].position = sf::Vector2f(static_cast<float>(_offsetX) + _widthStep * 35.0f + _widthStep * 30.0f * (i) / 150.0f, _offsetY + _heightStep * 70.0f - _heightStep * 25.0f * sinf((i + 50) / 250.0f * 3.1415f));
 	}
 
-	_tPosition.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
 	_tPosition.setOrigin(_tPosition.getGlobalBounds().width / 2, 0);
+	_tPosition.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
 	_tPosition.setPosition(static_cast<float>(_widthStep * 50 + _offsetX), static_cast<float>(0 + _offsetY));
 }
 
@@ -89,6 +81,7 @@ void HUD::updateCurrent()
 {
 	_speeder.setPosition(static_cast<float>(_offsetX) + _widthStep * 35.0f + _widthStep * 30.0f * (_speed - 50.0f) / 150.0f, _offsetY + _heightStep * 70.0f - _heightStep * 25.0f * sinf(_speed / 250.0f * 3.1415f));
 
+	_tPosition.setString(std::to_string(_position));
 	//_tSpeed.setString("Speed: " + std::to_string(_speed));
 }
 
