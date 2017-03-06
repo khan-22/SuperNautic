@@ -155,8 +155,6 @@ void Player::update(float dt)
 	glm::vec3 newDir = glm::normalize(glm::vec4{ _currentCamera->getDirection(), 0.0f } + toCameraSpace * glm::vec4{ _cameraVelocityDirectionShake() + _cameraCollisionDirectionShake(), 0.0f });
 	_currentCamera->setView(glm::lookAt(newPos, newPos + newDir, _currentCamera->getUp()));
 
-	// TODO: Apply ship shake
-
     _hud.setSpeed(_ship.getSpeed());
 	_hud.update();
 

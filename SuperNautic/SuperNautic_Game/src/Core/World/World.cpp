@@ -46,9 +46,6 @@ World::World(ApplicationContext& context)
 
 		// Set ship position and rotation
 		_players[i].getShip().rotateAtStart(7.0f, glm::pi<float>() * 0.5f * i);
-
-		// Set ship engine cooldown
-		_players[i].getShip().setInactiveTime(2.0f);
     }
 
 	//Create a render target for each player
