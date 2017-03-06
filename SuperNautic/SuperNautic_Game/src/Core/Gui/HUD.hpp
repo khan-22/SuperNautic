@@ -8,6 +8,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
 
 #include "Core/Gui/SceneNode.hpp"
 #include "Core/Asset/Asset.hpp"
@@ -32,15 +33,17 @@ private:
 	int					_offsetX;
 	int					_offsetY;
 	float				_speed;
-	int					_position;
+	//int					_position;
 
-	Asset<sf::Font>		_font;
+	//Asset<sf::Font>		_font;
 
-	sf::RectangleShape	_speedMeter;
+	//sf::RectangleShape	_speedMeter;
 	sf::CircleShape		_speeder;
 
-	sf::Text			_tSpeed;
-	sf::Text			_tPosition;
+	sf::VertexArray		_speedLine;
+
+	//sf::Text			_tSpeed;
+	//sf::Text			_tPosition;
 
 };
 

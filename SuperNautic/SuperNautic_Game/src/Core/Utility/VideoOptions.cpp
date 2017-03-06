@@ -75,6 +75,7 @@ void VideoOptions::recreateWindow()
 {
     uint32_t style = _bIsFullscreen ? sf::Style::Fullscreen : sf::Style::Titlebar | sf::Style::Close;
     _window.create(sf::VideoMode(_resolution.x, _resolution.y), _TITLE, style, _CONTEXT_SETTINGS);
+    _window.setMouseCursorVisible(!_bIsFullscreen);
 }
 
 
