@@ -22,7 +22,7 @@ std::unordered_map<std::string, std::vector<unsigned> Segment::*> Segment::nameT
 bool Segment::mappingsCreated { false };
 
 
-// Loads a segment from an fbx file
+// Loads a segment from a .kmf file
 Segment::Segment(const SegmentInfo* segmentInfo)
 {
 	_segmentInfo = segmentInfo;
@@ -31,14 +31,7 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 	_scene = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_dataFileName);
 
 	// Get visual model asset
-	if (_segmentInfo->_visualFileName != "bigsegments/end_segment_aa.kmf")
-	{
-		_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get("test3pipe.mat"));
-	}
-	else
-	{
-		_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get("endSegment.mat"));
-	}
+	_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get(_segmentInfo->_materialFileName));
 
 	// Windows
 	if (_segmentInfo->_windowFileName != "E")
@@ -201,9 +194,6 @@ WaypointInfo Segment::findClosestWaypoint(const glm::vec3& position) const
 
 	return closest;
 }
-
-// Renders the segment at the position of an instance
-// TODO
 
 // Initializes nameToIndex and nameToVecIndex
 void Segment::initializeMappings()

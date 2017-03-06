@@ -667,6 +667,12 @@ void Track::placeObstacles()
 	}
 }
 
+// 
+void Track::placeBonusFields()
+{
+
+}
+
 size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLength) const
 {
 	float traversedLength = 0;
