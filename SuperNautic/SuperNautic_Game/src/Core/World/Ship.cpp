@@ -195,9 +195,12 @@ void Ship::checkObstacleCollision()
 
 void Ship::obstacleCollision()
 {
+	if (_immunityTimer <= 0.0f)
+	{
 		_steeringCooldown = _cooldownOnObstacleCollision;
 		_immunityTimer = _immunityoOnObstacleCollision;
 		_bObstacleCollision = true;
+	}
 }
 
 void Ship::rotateAtStart(float down, float angle)
