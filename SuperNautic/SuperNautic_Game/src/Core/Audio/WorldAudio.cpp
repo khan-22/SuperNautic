@@ -2,13 +2,16 @@
 #include <SFML/Audio/SoundBufferRecorder.hpp>
 
 #include "Core/Audio/WorldAudio.hpp"
+#include "Core/Utility/AudioOptions.hpp"
 
 WorldAudio::WorldAudio()
 {
 	loadSound("Stranger Danger - Mellow Business.ogg");
 	_music.setBuffer(_musicbuffer);
 
-	_music.setVolume(50);
+
+	AudioOptions options;
+	setVolume(options.getMusicVolume());
 	_music.setLoop(true);
 	play();
 }
@@ -33,4 +36,9 @@ void WorldAudio::loadSound(std::string filename)
 {
 	std::string folder = "./res/audio/music/";
 	_musicbuffer.loadFromFile(folder + filename);
+}
+
+void WorldAudio::setVolume(float volume)
+{
+    _music.setVolume(volume * 100.f);
 }

@@ -14,6 +14,9 @@ public:
 	void play();
 	void stop();
 	void loadSound(std::string filename);
+
+	// [0, 1]
+	void setVolume(float volume);
 protected:
 
 private:
