@@ -3,7 +3,7 @@
 #ifndef PLAYER_AUDIO_HPP
 #define PLAYER_AUDIO_HPP
 
-#include <SFML\Audio.hpp>
+#include <SFML/Audio.hpp>
 
 #include "Core/Asset/Asset.hpp"
 
@@ -17,8 +17,9 @@ public:
 
 	void playAudio(Sounds sound);
 
-	void setPitch(Sounds sound, float pitchValue);
-	void setVolume(Sounds sound, float volumeValue);
+	void setPitch(Sounds sound, float pitch);
+	void setVolume(float volume);
+	void setVolume(Sounds sound, float volume);
 
 
 protected:

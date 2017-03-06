@@ -67,7 +67,7 @@ Ship::Ship(glm::vec3 color)
 		_engineBlinkAccumulator{ 0.0f },
 		_bounceVector{ 0.0f },
 		_bounceDecay{ 1.0f },
-		_inactiveAtStart{ 4.0f }
+		_inactiveAtStart{ 3.5f }
 {
 	move(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
