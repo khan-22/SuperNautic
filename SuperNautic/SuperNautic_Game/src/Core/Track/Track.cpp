@@ -687,18 +687,18 @@ void Track::update(const float dt, const unsigned int firstPlayer, const unsigne
 }
 
 // Render the track
-void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowRenderer, const int shipIndex)
+void Track::render(GFX::ViewportPipeline& pipeline, const int shipIndex)
 {
 	for (int i = -2; i < 7; i++)
 	{
 		int index = shipIndex + i;
 		if (index >= 0 && index < _track.size())
 		{
-			renderer.render(*_track[index]);
+			pipeline.generalDeferred.render(*_track[index]);
 			std::vector<ObstacleInstance>& obstacles = _track[index]->getObstacles();
 			for (auto& obstacle : obstacles)
 			{
-				renderer.render(obstacle);
+				pipeline.transparentForward.render(obstacle);
 			}
 		}
 	}
@@ -708,7 +708,7 @@ void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowR
 		int index = shipIndex + i;
 		if (index >= 0 && index < _track.size())
 		{
-			windowRenderer.render(*_track[index]);
+			pipeline.windowForward.render(*_track[index]);
 		}
 	}
 
@@ -723,7 +723,7 @@ void Track::render(GFX::DeferredRenderer& renderer, GFX::WindowRenderer& windowR
 		{
 			if (windowIndex < largestIndex)
 			{
-				windowRenderer.render(window);
+				pipeline.windowForward.render(window);
 			}
 			else
 			{
