@@ -1,5 +1,6 @@
 #include "Core/Audio/PlayerAudio.hpp"
 #include "Core/Asset/AssetCache.hpp"
+#include "Core/Utility/AudioOptions.hpp"
 
 #include <algorithm>
 
@@ -13,8 +14,8 @@ PlayerAudio::PlayerAudio() :
 
 	_sEngine.setLoop(true);
 
-	setVolume(50);
-
+	AudioOptions options;
+	setVolume(options.getEffectsVolume() * 100.f);
 	playAudio(Sounds::engine);
 }
 

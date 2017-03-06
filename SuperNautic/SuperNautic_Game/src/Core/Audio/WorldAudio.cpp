@@ -2,6 +2,7 @@
 #include <SFML/Audio/SoundBufferRecorder.hpp>
 
 #include "Core/Audio/WorldAudio.hpp"
+#include "Core/Utility/AudioOptions.hpp"
 #include "Core/Asset/AssetCache.hpp"
 
 WorldAudio::WorldAudio() :
@@ -10,7 +11,9 @@ WorldAudio::WorldAudio() :
 	loadSound("Stranger Danger - Mellow Business.ogg");
 	_music.setBuffer(_musicbuffer);
 
-	setVolume(50);
+
+	AudioOptions options;
+	setVolume(options.getMusicVolume());
 
 	_music.setLoop(true);
 	playMusic();
@@ -46,6 +49,6 @@ void WorldAudio::playCountdown()
 
 void WorldAudio::setVolume(float volume)
 {
-	_music.setVolume(volume);
-	_sCountdown.setVolume(volume);
+	_music.setVolume(volume * 100.f);
+	_sCountdown.setVolume(volume * 100.f);
 }

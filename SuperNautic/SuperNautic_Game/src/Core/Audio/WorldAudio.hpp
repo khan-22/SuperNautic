@@ -17,15 +17,17 @@ public:
 	void stopMusic();
 	void loadSound(std::string filename);
 
+
 	void playCountdown();
 
+	// [0, 1]
 	void setVolume(float volume);
 protected:
 
 private:
 	sf::SoundBuffer _musicbuffer;
 	sf::Sound		_music;
-	
+
 	sf::Sound _sCountdown;
 	Asset<sf::SoundBuffer> _sbCountdown;
 };

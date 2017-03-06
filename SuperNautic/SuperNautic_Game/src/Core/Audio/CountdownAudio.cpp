@@ -1,10 +1,12 @@
 #include "Core/Audio/CountdownAudio.hpp"
 #include "Core/Asset/AssetCache.hpp"
+#include "Core/Utility/AudioOptions.hpp"
 
 CountdownAudio::CountdownAudio() :
 	_sbCountdown(AssetCache<sf::SoundBuffer, std::string>::get("counter"))
 {
-	setVolume(25);
+	AudioOptions options;
+	setVolume(options.getMusicVolume());
 
 	_sCountdown.setBuffer(*_sbCountdown.get());
 }
@@ -21,7 +23,7 @@ void CountdownAudio::playCountdown()
 
 void CountdownAudio::setVolume(float volume)
 {
-	_sCountdown.setVolume(volume);
+	_sCountdown.setVolume(volume * 100.f);
 }
 
 bool CountdownAudio::isPlaying()
@@ -30,6 +32,6 @@ bool CountdownAudio::isPlaying()
 	{
 		return true;
 	}
-	
+
 	return false;
 }

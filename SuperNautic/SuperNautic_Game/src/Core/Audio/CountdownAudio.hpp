@@ -15,6 +15,7 @@ public:
 
 	void playCountdown();
 
+	// [0, 1]
 	void setVolume(float volume);
 
 	bool isPlaying();
