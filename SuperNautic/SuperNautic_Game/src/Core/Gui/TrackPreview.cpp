@@ -26,7 +26,7 @@ void TrackPreview::setTrack(Track& track)
     std::vector<glm::vec3> points;
     for(size_t i = 0; i < track.getNrOfSegments(); i++)
     {
-        SegmentInstance* instance = track.getInstance(i);
+        SegmentInstance* instance = track.getInstance(static_cast<int>(i));
 
         for(const glm::vec3& waypoint : instance->getParent()->getWaypoints())
         {

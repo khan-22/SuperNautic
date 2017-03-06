@@ -1,13 +1,15 @@
 #include "Core/Track/SegmentInfo.hpp"
 
 //Constructor
-SegmentInfo::SegmentInfo(std::string&& dataFileName, std::string&& visualFileName, std::string&& windowFileName
+SegmentInfo::SegmentInfo(std::string&& dataFileName, std::string&& visualFileName
+	, std::string&& windowFileName, std::string&& zoneFileName
 	, char startConnection, char endConnection, int probability1, int probability2
 	, int minInRow1, int minInRow2, int maxInRow1, int maxInRow2
 	, int rotationOffset1, int rotationOffset2)
 	: _dataFileName{ dataFileName }
 	, _visualFileName{ visualFileName }
 	, _windowFileName{ windowFileName }
+	, _zoneFileName{ zoneFileName }
 	, _startConnection{ startConnection }
 	, _endConnection{ endConnection }
 	, _probability1{ probability1 }

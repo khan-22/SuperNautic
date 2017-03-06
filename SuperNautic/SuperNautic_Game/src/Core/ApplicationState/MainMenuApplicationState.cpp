@@ -23,9 +23,6 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
 {
     std::cout << "Welcome to MainMenu state." << std::endl;
 
-
-
-
     _guiContainer.setBackground(sf::Color::Magenta);
     sf::Text text;
     text.setFont(*_font.get());
@@ -59,6 +56,8 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     _guiContainer.insert(button2);
 
     sf::Vector2u windowSize = _context.window.getSize();
+    sf::FloatRect guiBounds = _guiContainer.getBoundingRect();
+    _guiContainer.setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height / 2.f);
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
     _guiContainer.toggleSelection();
     _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
@@ -68,11 +67,13 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     _titleText.setOrigin(_titleText.getBoundingRect().width / 2.f, _titleText.getBoundingRect().height / 2.f);
     _titleText.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
     _titleText.setScale(1.5f, 1.f);
+    _titleText.setOutlineThickness(0.f);
 }
 
 void MainMenuApplicationState::render()
 {
     GFX::SfmlRenderer renderer;
+    renderer.render(*_context.menuBackground);
     renderer.render(_guiContainer);
     renderer.render(_titleText);
     renderer.display(_context.window);
@@ -81,6 +82,7 @@ void MainMenuApplicationState::render()
 
 bool MainMenuApplicationState::bUpdate(float dtSeconds)
 {
+    _context.menuBackground->update(dtSeconds);
 	int playersFound = 0;
 	for (int i = 0; i < 5; i++)
 	{

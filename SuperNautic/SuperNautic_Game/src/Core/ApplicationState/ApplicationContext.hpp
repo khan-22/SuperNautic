@@ -12,6 +12,7 @@ namespace sf
 #include "Core/Track/ObstacleHandler.hpp"
 #include "Core/Track/Track.hpp"
 #include "Core/Gui/GuiPlayerJoinContainer.hpp"
+#include "Core/Gui/MenuBackground.hpp"
 
 struct ApplicationContext
 {
@@ -29,6 +30,8 @@ struct ApplicationContext
     std::unique_ptr<Track> track;
 
     std::vector<GuiPlayerJoinContainer::Player> players;
+
+    std::unique_ptr<MenuBackground> menuBackground;
 };
 
 

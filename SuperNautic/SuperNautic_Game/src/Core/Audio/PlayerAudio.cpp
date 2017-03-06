@@ -5,18 +5,18 @@
 
 PlayerAudio::PlayerAudio() :
 	_sbEngine(AssetCache<sf::SoundBuffer, std::string>::get("engine")),
-	_sbCrash(AssetCache<sf::SoundBuffer, std::string>::get("crash")),
-	_sbObstacleCollision(AssetCache<sf::SoundBuffer, std::string>::get("hit")),
+	_sbShipCollision(AssetCache<sf::SoundBuffer, std::string>::get("shipCollision")),
+	_sbObstacleCollision(AssetCache<sf::SoundBuffer, std::string>::get("obstacleCollision")),
 	_sbOverheat(AssetCache<sf::SoundBuffer, std::string>::get("overheat"))
 {
 	loadFromBuffers();
 
 	_sEngine.setLoop(true);
 
-	setVolume(Sounds::crash, 80);
-	setVolume(Sounds::engine, 80);
-	setVolume(Sounds::obstacleCollision, 80);
-	setVolume(Sounds::overheat, 80);
+	setVolume(Sounds::shipCollision, 50);
+	setVolume(Sounds::engine, 50);
+	setVolume(Sounds::obstacleCollision, 50);
+	setVolume(Sounds::overheat, 50);
 
 	playAudio(Sounds::engine);
 }
@@ -34,9 +34,9 @@ void PlayerAudio::playAudio(Sounds sound)
 		_sEngine.setPlayingOffset(sf::milliseconds(0));
 		_sEngine.play();
 		break;
-	case crash:
-		_sCrash.setPlayingOffset(sf::milliseconds(0));
-		_sCrash.play();
+	case shipCollision:
+		_sShipCollision.setPlayingOffset(sf::milliseconds(0));
+		_sShipCollision.play();
 		break;
 	case obstacleCollision:
 		_sObstacleCollision.setPlayingOffset(sf::milliseconds(0));
@@ -59,8 +59,8 @@ void PlayerAudio::setPitch(Sounds sound, float pitchValue)
 	case engine:
 		_sEngine.setPitch(pitchValue);
 		break;
-	case crash:
-		_sCrash.setPitch(pitchValue);
+	case shipCollision:
+		_sShipCollision.setPitch(pitchValue);
 		break;
 	case obstacleCollision:
 		_sObstacleCollision.setPitch(pitchValue);
@@ -80,8 +80,8 @@ void PlayerAudio::setVolume(Sounds sound, float volumeValue)
 	case engine:
 		_sEngine.setVolume(volumeValue);
 		break;
-	case crash:
-		_sCrash.setVolume(volumeValue);
+	case shipCollision:
+		_sShipCollision.setVolume(volumeValue);
 		break;
 	case obstacleCollision:
 		_sObstacleCollision.setVolume(volumeValue);
@@ -97,7 +97,7 @@ void PlayerAudio::setVolume(Sounds sound, float volumeValue)
 void PlayerAudio::loadFromBuffers()
 {
 	_sEngine.setBuffer(*_sbEngine.get());
-	_sCrash.setBuffer(*_sbCrash.get());
+	_sShipCollision.setBuffer(*_sbShipCollision.get());
 	_sObstacleCollision.setBuffer(*_sbObstacleCollision.get());
 	_sOverheat.setBuffer(*_sbOverheat.get());
 }

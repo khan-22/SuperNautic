@@ -232,12 +232,12 @@ void Ship::handleInputs(float dt)
 	else
 	{
 		// Break if stopped
-		_accelerationFactor = 0.0f;
+		_accelerationFactor = -1.0f;
 		_currentTurningAngle -= 0.9f * _currentTurningAngle * dt;
 		_velocity -= 0.9f * _velocity * dt;
 	}
 
-	if (_velocity < 50)
+	if (_velocity < 50 && !_stopped)
 	{
 		_velocity = 50;
 	}
@@ -510,6 +510,11 @@ void Ship::destroy()
 void Ship::repair()
 {
 	_destroyed = false;
+}
+
+bool Ship::getStopped()
+{
+	return _stopped;
 }
 
 void Ship::setReturnPos(const glm::vec3& returnPos)

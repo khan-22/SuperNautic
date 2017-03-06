@@ -34,7 +34,7 @@ Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	, _endMatrix(glm::mat4())
 {
 	//_octrees.push_back(Octree<SegmentInstance*>(glm::vec3(0, 0, 0), 10000));
-	_progressionLength = 1500.f;
+	_progressionLength = 1500;
 }
 
 // Destructor
@@ -49,23 +49,23 @@ Track::~Track()
 // Gets the targeted track length in whole meters
 int Track::getTargetLength() const
 {
-	return _targetLength;
+	return static_cast<int>(_targetLength);
 }
 
 // Gets the generated track length in whole meters
 int Track::getGeneratedLength() const
 {
-	return _generatedLength;
+	return static_cast<int>(_generatedLength);
 }
 
 unsigned int Track::getCurviness() const
 {
-    return _MAX_CURVINESS * _curviness;
+    return static_cast<unsigned>(_MAX_CURVINESS * _curviness);
 }
 
 unsigned int Track::getDifficulty() const
 {
-    return _MAX_DIFFICULTY * _difficulty;
+    return static_cast<unsigned>(_MAX_DIFFICULTY * _difficulty);
 }
 
 
@@ -73,7 +73,7 @@ unsigned int Track::getDifficulty() const
 void Track::setLength(const unsigned int length)
 {
 	assert(length >= _MIN_LENGTH && length <= _MAX_LENGTH);
-	_targetLength = length;
+	_targetLength = static_cast<float>(length);
 }
 
 // Set randomization seed
@@ -89,7 +89,7 @@ void Track::setSeed(const std::string& seed)
 		unsigned int intSeed = 0;
 		for (unsigned int i = 0; i < seed.length(); i++)
 		{
-			intSeed += (unsigned int)((seed[i] - 65) * powf(10, i));
+			intSeed += (unsigned int)((seed[i] - 65) * static_cast<unsigned>(powf(10, static_cast<float>(i))));
 		}
 		srand(intSeed);
 	}
@@ -125,6 +125,7 @@ void Track::startNewTrack()
 	_prevIndex = -1;
 	_lastSegment = nullptr;
 	_octrees.clear();
+	_lengthAfterLastCall = 0;
 	for (unsigned int i = 0; i < _track.size(); i++)
 	{
 		delete _track[i];
@@ -171,7 +172,7 @@ bool Track::bGenerate()
 				{
 					if (failedRecently > 0)
 					{
-						failedRecently -= _lastSegment->getLength();
+						failedRecently -= static_cast<int>(_lastSegment->getLength());
 						if (failedRecently < 0)
 						{
 							failedRecently = 0;
@@ -198,6 +199,10 @@ bool Track::bGenerate()
 				{
 					placeObstacles();
 				}
+				// End segment
+				bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, false);
+				bInsertNormalSegment(0, false);
+
 				LOG("Track generated. Length: ", _generatedLength);
 				return true;
 			}
@@ -211,7 +216,7 @@ bool Track::bGenerate()
 		}
 	}
 
-	_lengthAfterLastCall = _generatedLength;
+	_lengthAfterLastCall = static_cast<int>(_generatedLength);
 	_totalProgress = (float)_generatedLength / _targetLength;
 	LOG("Progression: ", _totalProgress * 100);
 	return false;
@@ -402,6 +407,10 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 
 	// [0..1], 0 = at closest waypoint, 1 = at next waypoint
 	float interpolationValue = glm::dot(closest.direction, globalPosition - closest.position) / distanceToPlane;
+	if (distanceToPlane <= 0.0f)	// Protect against the case where the track runs out of waypoints ahead of the player
+	{
+		interpolationValue = 1.0f;
+	}
 
 	// Calculate current length in segment
 	lengthInSegment = 0.0f;
@@ -472,7 +481,7 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 // Inserts a whole pre-defined structure at the end of the track
 void Track::insertStructure(const int index)
 {
-	int startLength = _generatedLength;
+	int startLength = static_cast<int>(_generatedLength);
 	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
 	// Randomize how many times the structure should be looped
 	int min = s->minInRow;
@@ -499,7 +508,7 @@ void Track::insertStructure(const int index)
 				if (tempInstance->bTestCollision(*_track[i]))
 				{
 					delete tempInstance;
-					deleteSegments(_generatedLength - startLength + 300);
+					deleteSegments(static_cast<int>(_generatedLength) - startLength + 300);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					return;
 				}
@@ -532,7 +541,7 @@ void Track::deleteSegments(const int lengthToDelete)
 	int deletedLength = 0;
 	while (deletedLength <= lengthToDelete && _generatedLength > 500)
 	{
-		int segmentLength = _track.back()->getLength();
+		int segmentLength = static_cast<int>(_track.back()->getLength());
 		deletedLength += segmentLength;
 		_generatedLength -= segmentLength;
 		delete _track[_track.size() - 1];
@@ -545,17 +554,23 @@ bool Track::bEndTrack()
 {
 	while (_generatedLength < _targetLength)
 	{
-		if (_endConnection == 'a' && !bInsertNormalSegment(0, true))
+		if (_endConnection == 'a')
 		{
-			deleteSegments(_endMargin + 400);
-			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-			return false;
+			if (!bInsertNormalSegment(0, true))
+			{
+				deleteSegments(_endMargin + 400);
+				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+				return false;
+			}
 		}
-		if (_endConnection == 'b' && !bInsertNormalSegment(1, true))
+		else if (_endConnection == 'b')
 		{
-			deleteSegments(_endMargin + 400);
-			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-			return false;
+			if (!bInsertNormalSegment(1, true))
+			{
+				deleteSegments(_endMargin + 400);
+				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+				return false;
+			}
 		}
 	}
 	return true;
@@ -641,7 +656,7 @@ void Track::placeObstacles()
 		else
 		{
 			currentLength += rand() % (int(500 * invDiff) + 50) + 70;
-			leftOfArea = rand() % (int(600 * _difficulty) + 50) + 100;
+			leftOfArea = static_cast<float>(rand() % (int(600 * _difficulty) + 50) + 100);
 		}
 	}
 }

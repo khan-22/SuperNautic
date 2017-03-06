@@ -33,5 +33,5 @@ void GuiToolTip::center()
     sf::FloatRect bounds = getBoundingRect();
     setOrigin(bounds.width / 2.f, bounds.height / 2.f);
 
-    setPosition(_centerX, _centerY);
+    setPosition(static_cast<float>(_centerX), static_cast<float>(_centerY));
 }

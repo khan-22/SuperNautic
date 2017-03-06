@@ -31,10 +31,10 @@ void ZoneRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GL
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
 
-	_actualX = _x * windowWidth;
-	_actualY = _y * windowHeight;
-	_actualWidth = _width  * windowWidth;
-	_actualHeight = _height * windowHeight;
+	_actualX = static_cast<GLsizei>(_x * windowWidth);
+	_actualY = static_cast<GLsizei>(_y * windowHeight);
+	_actualWidth = static_cast<GLsizei>(_width  * windowWidth);
+	_actualHeight = static_cast<GLsizei>(_height * windowHeight);
 }
 
 void ZoneRenderer::render(TemperatureZone& temperatureZone)
@@ -49,7 +49,7 @@ void ZoneRenderer::display(Camera& camera)
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
 
-	glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
+	glViewport(static_cast<GLint>(_x * windowWidth), static_cast<GLint>(_y * windowHeight), static_cast<GLsizei>(_width * windowWidth), static_cast<GLsizei>(_height * windowHeight));
 
 	float uTemperatures[4] = { 1.0, 0.25, -0.25, -1.0 };
 

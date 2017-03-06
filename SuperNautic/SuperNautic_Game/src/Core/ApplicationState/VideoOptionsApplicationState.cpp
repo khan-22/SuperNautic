@@ -24,7 +24,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
-    GuiHorizontalList* resolutionList = new GuiHorizontalList();
+    GuiHorizontalList* resolutionList = new GuiHorizontalList(3);
     for(const glm::ivec2& resolution : _videoOptions.getAllowedResolutions())
     {
         std::string text = std::to_string(resolution.x) + "x" + std::to_string(resolution.y);
@@ -90,7 +90,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
 
 
-    _toolTip.centerAt(windowSize.x / 2.f, windowSize.y * 0.95f);
+    _toolTip.centerAt(static_cast<size_t>(windowSize.x / 2.f), static_cast<size_t>(windowSize.y * 0.95f));
     _toolTip.registerTip(resolutionList, "Set video resolution. Press A to apply.");
     _toolTip.registerTip(fs, "Enable/disable fullscreen.");
     _toolTip.registerTip(backButton, "Go back to main menu.");
@@ -105,6 +105,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
 
 void VideoOptionsApplicationState::render()
 {
+    _sfmlRenderer.render(*_context.menuBackground);
     _sfmlRenderer.render(_guiContainer);
     _sfmlRenderer.render(_toolTip);
     _sfmlRenderer.display(_context.window);
@@ -112,6 +113,8 @@ void VideoOptionsApplicationState::render()
 
 bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
 {
+    _context.menuBackground->update(dtSeconds);
+
     _guiContainer.update();
 
     if(_input.checkActive())
@@ -187,13 +190,20 @@ void VideoOptionsApplicationState::applyOptions()
     // SegmentHandler and ObstacleHandler have to be reloaded
     // manually for some reason.
     // TODO: Ask Timmie about it.
-    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt"));
+    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos2.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
 
 	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
     {
-        _context.segmentHandler->loadSegment(i);
+        _context.segmentHandler->loadSegment(static_cast<unsigned>(i));
     }
+
+
+    sf::Vector2u size = _context.window.getSize();
+
+    _context.menuBackground.reset(new MenuBackground(size.x, size.y));
+    _guiContainer.setPosition(size.x / 2.f, size.y / 2.f);
+    _toolTip.centerAt(static_cast<size_t>(size.x / 2.f), static_cast<size_t>(size.y * 0.95f));
 }
 
 

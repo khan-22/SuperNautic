@@ -20,7 +20,7 @@ void GuiText::setText(const std::string& str)
     _text.setPosition(0.f, 0.f);
 }
 
-const std::string& GuiText::getText() const
+const std::string GuiText::getText() const
 {
     return _text.getString();
 }

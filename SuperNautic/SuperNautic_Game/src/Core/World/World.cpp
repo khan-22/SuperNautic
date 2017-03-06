@@ -11,9 +11,9 @@
 World::World(ApplicationContext& context)
 	: _context{ context }
 	, _debugCamera{ 90.0f, context.window.getSize().x, context.window.getSize().y, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 } }
-	, _bHasWon(false)
-	, _timer(context.window.getSize().x, context.window.getSize().y, context.players.size())
-	, _progression(context.window.getSize().x, context.window.getSize().y, context.players.size())
+	, _playersAtFinishLine(0)
+	, _timer(context.window.getSize().x, context.window.getSize().y, static_cast<int>(context.players.size()))
+	, _progression(context.window.getSize().x, context.window.getSize().y, static_cast<int>(context.players.size()))
 	, _track(context.track.get())
 	, _playerRTs(context.players.size())
 	, _playerParticleRenderers(context.players.size())
@@ -153,7 +153,6 @@ void World::update(float dt, sf::Window& window)
 			// Update progression
 			_playerProgression[i].setCurrentSegment(segmentIndex);
 			_playerProgression[i].update(lengthInSegment);
-			_players[i].setProgression(_playerProgression[i].getProgression());
 
 			// Update ship forward position and respawn position
 			_players[i].getShip().setForward(forward);
@@ -172,12 +171,19 @@ void World::update(float dt, sf::Window& window)
 
 			if (instances[1] == _track->getInstance(_track->getNrOfSegments() - 1))
 			{
-				_bHasWon = true;
+				if (!_players[i].getShip().getStopped())
+				{
+					++_playersAtFinishLine;
+				}
+				_players[i].getShip().stop();
 			}
 
 			// Set relevant segments
-			_players[i].getShip().setSegments(instances);
-
+			if (!_players[i].getShip().getStopped())
+			{
+				_players[i].getShip().setSegments(instances);
+			}
+			
 			_players[i].update(dt);
 
 			// Check for ship-ship collisions
@@ -189,6 +195,8 @@ void World::update(float dt, sf::Window& window)
 					{
 						_players[i].getShip().setBounce(glm::normalize(_players[i].getShip().getBoundingBox().center - _players[j].getShip().getBoundingBox().center) * 2.0f);
 						_players[j].getShip().setBounce(glm::normalize(_players[j].getShip().getBoundingBox().center - _players[i].getShip().getBoundingBox().center) * 2.0f);
+						// Play sound
+						_players[i].shipCollision();
 					}
 				}
 			}
@@ -248,7 +256,7 @@ void World::update(float dt, sf::Window& window)
 			min = segment;
 		}
 	}
-	_track->update(dt, max, min);
+	_track->update(dt, static_cast<unsigned>(max), static_cast<unsigned>(min));
 
 	_timer.updateTime(dt);
 	_timer.updateCurrent();
@@ -343,7 +351,7 @@ void World::render()
 
 bool World::bHasWon()
 {
-	return _bHasWon;
+	return _playersAtFinishLine >= _players.size();
 }
 
 void World::setTrack(Track * track)

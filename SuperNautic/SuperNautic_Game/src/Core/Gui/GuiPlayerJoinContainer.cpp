@@ -117,7 +117,7 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
             Player p;
             for(size_t k = 0; k < 4; k++)
             {
-                p.color[k] = _COLORS[i][k];
+                p.color[static_cast<glm::length_t>(k)] = _COLORS[i][k];
             }
             p.id = j->getId();
             players.push_back(p);
@@ -129,7 +129,7 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
         Player p;
         for(size_t k = 0; k < 4; k++)
         {
-            p.color[k] = _COLORS[0][k];
+            p.color[static_cast<glm::length_t>(k)] = _COLORS[0][k];
         }
         p.id = 0;
         players.push_back(p);

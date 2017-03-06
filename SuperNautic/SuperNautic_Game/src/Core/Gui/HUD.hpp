@@ -6,9 +6,8 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
 
 #include "Core/Gui/SceneNode.hpp"
 #include "Core/Asset/Asset.hpp"
@@ -20,12 +19,9 @@ public:
 	HUD(int windowWidth, int windowHeight);
 	~HUD();
 
-	void setHeat(float heat);
 	void setSpeed(float speed);
 	void setPosition(int position);
-	void setProgression(float progression);
 	void setScreenSize(int width, int height, int offsetX, int offsetY);
-	void setHeatWhite(bool isWhite);
 
 	void updateCurrent() override;
 	void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
@@ -35,28 +31,13 @@ private:
 	float				_heightStep;
 	int					_offsetX;
 	int					_offsetY;
-	float				_sizeY;
-	float				_heat;
 	float				_speed;
 	int					_position;
-	float				_progression;
-	float				_progressionPosX;
-	float				_heatSizeY;
-	float				_heatSizeX;
-	float				_heatPosY;
-	float				_heatPosX;
-	bool				_bWhiteHeat;
 
 	Asset<sf::Font>		_font;
-	Asset<sf::Texture>	_texture;
-
-	sf::RectangleShape	_progressionOutline;
-	sf::RectangleShape	_progressionMeter;
-
-	sf::RectangleShape	_heatOutline;
-	sf::RectangleShape	_heatMeter;
 
 	sf::RectangleShape	_speedMeter;
+	sf::CircleShape		_speeder;
 
 	sf::Text			_tSpeed;
 	sf::Text			_tPosition;
