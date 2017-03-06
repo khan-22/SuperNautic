@@ -45,7 +45,7 @@ void Input::update()
 		_leftStickX = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::X);
 		_leftStickY = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::Y);
 		_triggers = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::Z);
-		_dPad = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::R);
+		_dPad = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::PovY);
 
 		_events.clear();
 
