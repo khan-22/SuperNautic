@@ -31,6 +31,7 @@ private:
 	float _leftStickX;
 	float _leftStickY;
 	float _triggers;
+	float _dPad;
 
 	bool _bButtonA;
 	bool _bButtonB;
@@ -40,6 +41,7 @@ private:
 	bool _bButtonStart;
 
 	bool _bLeftStickDormant;
+	bool _bDPadDormant;
 	bool _bAWasDormant;
 	bool _bBWasDormant;
 	bool _bYWasDormant;

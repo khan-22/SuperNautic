@@ -42,20 +42,26 @@ void Input::update()
 		_bButtonL = sf::Joystick::isButtonPressed(_controllerId, 4);
 		_bButtonR = sf::Joystick::isButtonPressed(_controllerId, 5);
 		_bButtonStart = sf::Joystick::isButtonPressed(_controllerId, 7);
-		_leftStickX = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::X);
-		_leftStickY = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Y);
-		_triggers = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Z);
+		_leftStickX = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::X);
+		_leftStickY = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::Y);
+		_triggers = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::Z);
+		_dPad = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::R);
 
 		_events.clear();
 
 		if (abs(_leftStickX) < thresh)
 		{
-			_leftStickX = 0;
+			_leftStickX = 0.f;
 		}
 
 		if (abs(_triggers) < 5)
 		{
-			_triggers = 0;
+			_triggers = 0.f;
+		}
+		
+		if (abs(_dPad) < thresh)
+		{
+			_dPad = 0.f;
 		}
 
 		sf::Event event;
@@ -171,6 +177,26 @@ void Input::update()
 		else if (_leftStickX > -thresh && _leftStickX < thresh && _leftStickY > -thresh && _leftStickY < thresh)
 		{
 			_bLeftStickDormant = true;
+		}
+
+		if (_dPad != 0.f && _bDPadDormant) {
+			if (_dPad > 0)
+			{
+				event.type = sf::Event::KeyPressed;
+				event.key.code = sf::Keyboard::Up;
+				_events.push_back(event);
+			}
+			else
+			{
+				event.type = sf::Event::KeyPressed;
+				event.key.code = sf::Keyboard::Down;
+				_events.push_back(event);
+			}
+			_bDPadDormant = false;
+		}
+		else if (_dPad == 0)
+		{
+			_bDPadDormant = true;
 		}
 	}
 }
