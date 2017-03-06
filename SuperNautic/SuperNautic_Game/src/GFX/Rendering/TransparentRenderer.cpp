@@ -16,7 +16,7 @@ TransparentRenderer::~TransparentRenderer()
 
 void TransparentRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
 {
-	_shader = ShaderCache::get("zone_forward");
+	_shader = ShaderCache::get("transparent_forward");
 	_shader.get()->bind();
     _shader.get()->setSampler("uDiffuse", 0);
     _shader.get()->setSampler("uSpecular", 1);
@@ -53,6 +53,9 @@ void TransparentRenderer::display(Camera& camera)
 
 	float uTemperatures[4] = { 1.0, 0.25, -0.25, -1.0 };
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	_shader.get()->bind();
 	for (auto drawCall : _drawCalls)
 	{
@@ -62,5 +65,8 @@ void TransparentRenderer::display(Camera& camera)
 	}
 
 	_drawCalls.clear();
+
+	glDisable(GL_BLEND);
+
 	glViewport(0, 0, windowWidth, windowHeight);
 }
