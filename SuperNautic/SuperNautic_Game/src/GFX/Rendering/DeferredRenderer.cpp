@@ -1,6 +1,6 @@
 #include "GFX/Rendering/DeferredRenderer.hpp"
 
-#define NUMOFLIGHTS 4
+#define NUMOFLIGHTS 8
 
 using namespace GFX;
 
