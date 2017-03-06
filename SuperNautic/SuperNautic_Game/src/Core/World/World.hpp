@@ -22,6 +22,7 @@ namespace sf
 #include "GFX/Rendering/ZoneRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
 #include "GFX/Rendering/WindowRenderer.hpp"
+#include "GFX/Rendering/TransparentRenderer.hpp"
 
 #include "GFX/Rendering/ParticleRenderer.hpp"
 #include "GFX/Resources/ParticleSystem.hpp"
