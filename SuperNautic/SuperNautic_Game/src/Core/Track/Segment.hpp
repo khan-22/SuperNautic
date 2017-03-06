@@ -62,9 +62,13 @@ public:
 
 	GFX::TexturedModel getVisualModel() const;
 
-	ModelAsset	getWindowModel() const;
+	ModelAsset getWindowModel() const;
 
 	bool bHasWindow() const;
+
+	ModelAsset getZonesModel() const;
+
+	bool bHasZones() const;
 
 private:
 	const SegmentInfo*	_segmentInfo;

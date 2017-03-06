@@ -23,6 +23,9 @@ public:
     // Generate collision mesh from an OBB
     CollisionMesh(const BoundingBox& obb);
 
+    // Generate collision mesh from a collection of OBBs
+    CollisionMesh(const std::vector<BoundingBox>& obbs);
+
     // Generate collision mesh from a sphere
     CollisionMesh(const Sphere& sphere);
 
@@ -38,12 +41,13 @@ private:
         OBB,
         SPHERE,
         AXIS_ALIGNED_PLANE,
+        OBB_COLLECTION
     };
 
-    Sphere              _sphere;
-    BoundingBox         _obb;
-    AxisAlignedPlane    _axisAlignedPlane;
-    Type                _type;
+    std::vector<Sphere>             _spheres;
+    std::vector<BoundingBox>        _obbs;
+    AxisAlignedPlane                _axisAlignedPlane;
+    Type                            _type;
 
     // OBB-OBB collision check
     static CollisionResult testCollisionObbObb(const CollisionMesh& obb1, const CollisionMesh& obb2);
@@ -62,6 +66,20 @@ private:
 
     // AxisAlignedPlane-AxisAlignedPlane collision check
     static CollisionResult testCollisionAxisAlignedPlaneAxisAlignedPlane(const CollisionMesh& axisAlignedPlane1, const CollisionMesh& axisAlignedPlane2);
+
+
+    // Obb-ObbCollection collision check
+    static CollisionResult testCollisionObbObbCollection(const CollisionMesh& obb, const CollisionMesh& obbCollection);
+
+    // Sphere-ObbCollection collision check
+    static CollisionResult testCollisionSphereObbCollection(const CollisionMesh& sphere, const CollisionMesh& obbCollection);
+
+    // AxisAlignedPlane-ObbCollection collision check
+    static CollisionResult testCollisionAxisAlignedPlaneObbCollection(const CollisionMesh& axisAlignedPlane, const CollisionMesh& obbCollection);
+
+    // ObbCollection-ObbCollection collision check
+    static CollisionResult testCollisionObbCollectionObbCollection(const CollisionMesh& c1, const CollisionMesh& c2);
+
 
     // Convert PlaneCollisionData from CollisionUtility functions to
     // CollisionResult data of this class.

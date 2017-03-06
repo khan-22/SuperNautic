@@ -188,3 +188,10 @@ std::vector<ObstacleInstance>& SegmentInstance::getObstacles()
 {
 	return _obstacles;
 }
+
+void SegmentInstance::removeObstacle(size_t i)
+{
+	assert(i < _obstacles.size());
+
+	_obstacles.erase(_obstacles.begin() + i);
+}
