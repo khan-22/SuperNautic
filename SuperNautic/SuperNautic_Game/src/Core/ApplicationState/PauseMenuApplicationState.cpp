@@ -27,11 +27,6 @@ PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stac
     text.setFont(*_font.get());
     text.setFillColor(sf::Color::White);
 
-    text.setString("Resume");
-    auto resume = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
-    {
-        _stack.pop();
-    }));
 
     text.setString("Quit race");
     auto quit = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
@@ -40,8 +35,6 @@ PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stac
         _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
     }));
 
-    quit->move(0.f, resume->getBoundingRect().height * 1.5f);
-    _guiContainer.insert(resume);
     _guiContainer.insert(quit);
 
     _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
