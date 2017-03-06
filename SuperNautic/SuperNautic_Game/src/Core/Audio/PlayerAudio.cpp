@@ -1,5 +1,6 @@
 #include "Core/Audio/PlayerAudio.hpp"
 #include "Core/Asset/AssetCache.hpp"
+#include "Core/Utility/AudioOptions.hpp"
 
 #include <algorithm>
 
@@ -13,11 +14,8 @@ PlayerAudio::PlayerAudio() :
 
 	_sEngine.setLoop(true);
 
-	setVolume(Sounds::shipCollision, 50);
-	setVolume(Sounds::engine, 50);
-	setVolume(Sounds::obstacleCollision, 50);
-	setVolume(Sounds::overheat, 50);
-
+	AudioOptions options;
+	setVolume(options.getEffectsVolume() * 100.f);
 	playAudio(Sounds::engine);
 }
 
@@ -73,21 +71,29 @@ void PlayerAudio::setPitch(Sounds sound, float pitchValue)
 	}
 }
 
-void PlayerAudio::setVolume(Sounds sound, float volumeValue)
+void PlayerAudio::setVolume(float volume)
+{
+	_sEngine.setVolume(volume);
+	_sShipCollision.setVolume(volume);
+	_sObstacleCollision.setVolume(volume);
+	_sOverheat.setVolume(volume);
+}
+
+void PlayerAudio::setVolume(Sounds sound, float volume)
 {
 	switch (sound)
 	{
 	case engine:
-		_sEngine.setVolume(volumeValue);
+		_sEngine.setVolume(volume);
 		break;
 	case shipCollision:
-		_sShipCollision.setVolume(volumeValue);
+		_sShipCollision.setVolume(volume);
 		break;
 	case obstacleCollision:
-		_sObstacleCollision.setVolume(volumeValue);
+		_sObstacleCollision.setVolume(volume);
 		break;
 	case overheat:
-		_sOverheat.setVolume(volumeValue);
+		_sOverheat.setVolume(volume);
 		break;
 	default:
 		break;

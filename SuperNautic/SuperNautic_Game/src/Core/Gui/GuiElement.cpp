@@ -2,7 +2,7 @@
 
 #include "Core/Gui/GuiElement.hpp"
 #include "Core/Asset/AssetCache.hpp"
-
+#include "Core/Utility/AudioOptions.hpp"
 
 
 Asset<sf::SoundBuffer> GuiElement::_stepSoundBuffer;
@@ -18,6 +18,8 @@ GuiElement::GuiElement()
         {
             _stepSoundBuffer = AssetCache<sf::SoundBuffer, std::string>::get("menu");
             _stepSound.setBuffer(*_stepSoundBuffer.get());
+            AudioOptions options;
+            _stepSound.setVolume(options.getEffectsVolume() * 100.f);
             return true;
         })();
     }
@@ -112,4 +114,10 @@ void GuiElement::registerOnSelect(const std::function<void()>& callback)
 void GuiElement::registerOnDeselect(const std::function<void()>& callback)
 {
     _onDeselectCallbacks.push_back(callback);
+}
+
+
+void GuiElement::setStepVolume(float volume)
+{
+    _stepSound.setVolume(volume * 100.f);
 }

@@ -47,7 +47,7 @@ void GuiSlider::setValue(float value)
     float previousValue = _value;
     _value = clamp(value, _min, _min + _valueSize);
 
-    size_t numSteps = static_cast<size_t>(std::fabs(_value / _step));
+    size_t numSteps = static_cast<size_t>(std::fabs(_value / _step) + 0.5f);
     _value = _step * numSteps;
 
     _slider.setSize(sf::Vector2f(_stepWidth * numSteps, _SLIDER_HEIGHT));

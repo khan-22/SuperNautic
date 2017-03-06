@@ -13,6 +13,7 @@ namespace sf
 #include "Core/Track/Track.hpp"
 #include "Core/Gui/GuiPlayerJoinContainer.hpp"
 #include "Core/Gui/MenuBackground.hpp"
+#include "Core/Audio/WorldAudio.hpp"
 
 struct ApplicationContext
 {
@@ -32,6 +33,8 @@ struct ApplicationContext
     std::vector<GuiPlayerJoinContainer::Player> players;
 
     std::unique_ptr<MenuBackground> menuBackground;
+
+	WorldAudio audio;
 };
 
 

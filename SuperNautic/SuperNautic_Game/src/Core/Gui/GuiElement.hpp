@@ -27,6 +27,9 @@ public:
     void registerOnSelect(const std::function<void()>& callback);
     void registerOnDeselect(const std::function<void()>& callback);
 
+    // [0, 1]
+    static void setStepVolume(float volume);
+
 protected:
     static Asset<sf::SoundBuffer> _stepSoundBuffer;
     static sf::Sound              _stepSound;

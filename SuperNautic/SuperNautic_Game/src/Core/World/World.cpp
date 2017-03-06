@@ -104,6 +104,8 @@ World::World(ApplicationContext& context)
 		_viewportPipelines[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
+
+	_countdown.playCountdown();
 }
 
 World::~World()
@@ -244,7 +246,10 @@ void World::update(float dt, sf::Window& window)
 	}
 	_track->update(dt, static_cast<unsigned>(max), static_cast<unsigned>(min));
 
-	_timer.updateTime(dt);
+	if (!_countdown.isPlaying())
+	{
+		_timer.updateTime(dt);
+	}
 	_timer.updateCurrent();
 
 	_progression.updateCurrent();

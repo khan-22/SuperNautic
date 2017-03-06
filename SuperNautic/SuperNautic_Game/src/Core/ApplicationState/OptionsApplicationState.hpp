@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef VIDEO_OPTIONS_APPLICATION_STATE_HPP
-#define VIDEO_OPTIONS_APPLICATION_STATE_HPP
+#ifndef OPTIONS_APPLICATION_STATE_HPP
+#define OPTIONS_APPLICATION_STATE_HPP
 
 #include "SFML/Graphics/Font.hpp"
 
@@ -11,15 +11,16 @@
 #include "Core/Io/Input.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 #include "Core/Utility/VideoOptions.hpp"
+#include "Core/Utility/AudioOptions.hpp"
 #include "Core/Gui/GuiToolTip.hpp"
 
 class GuiTextInput;
 class GuiSlider;
 
-class VideoOptionsApplicationState : public ApplicationState
+class OptionsApplicationState : public ApplicationState
 {
 public:
-    VideoOptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context);
+    OptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context);
 
     void render() override;
     bool bUpdate(float dtSeconds) override;
@@ -28,6 +29,7 @@ public:
 
 private:
     VideoOptions _videoOptions;
+    AudioOptions _audioOptions;
     GuiContainer _guiContainer;
     Input _input;
     Asset<sf::Font> _font;
@@ -38,4 +40,4 @@ private:
 };
 
 
-#endif //VIDEO_OPTIONS_APPLICATION_STATE_HPP
+#endif //OPTIONS_APPLICATION_STATE_HPP

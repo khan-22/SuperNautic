@@ -6,17 +6,18 @@
 #include "SFML/Graphics/Text.hpp"
 #include "SFML/Window/Event.hpp"
 
-#include "Core/ApplicationState/VideoOptionsApplicationState.hpp"
+#include "Core/ApplicationState/OptionsApplicationState.hpp"
 #include "Core/ApplicationState/MainMenuApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/Asset/AssetCache.hpp"
 #include "Core/Gui/GuiButton.hpp"
 #include "Core/Gui/GuiHorizontalList.hpp"
+#include "Core/Gui/GuiSlider.hpp"
 
 #include "Core/Asset/LoadAssetFunctions.hpp"
 
-VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
+OptionsApplicationState::OptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _videoOptions(context.window)
@@ -66,6 +67,34 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
     guiElements.emplace_back(fs);
 
 
+    GuiSlider* musicVolume = new GuiSlider
+    (
+        0.f, 1.f, 50.f, 11,
+        sf::Text("Music volume    Low", *_font.get()),
+        sf::Text("High", *_font.get())
+    );
+    musicVolume->setValue(_audioOptions.getMusicVolume());
+    musicVolume->setOnChange([this](float v)
+    {
+        _audioOptions.setMusicVolume(v);
+        _context.audio.setVolume(v);
+    });
+    guiElements.emplace_back(musicVolume);
+
+    GuiSlider* effectsVolume = new GuiSlider
+    (
+        0.f, 1.f, 50.f, 11,
+        sf::Text("Effects volume    Low", *_font.get()),
+        sf::Text("High", *_font.get())
+    );
+    effectsVolume->setValue(_audioOptions.getEffectsVolume());
+    effectsVolume->setOnChange([this](float v)
+    {
+        _audioOptions.setEffectsVolume(v);
+        GuiElement::setStepVolume(v);
+    });
+    guiElements.emplace_back(effectsVolume);
+
     GuiButton* backButton = new GuiButton(sf::Text("Back", *_font.get()), [&]()
     {
         _stack.clear();
@@ -103,7 +132,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
 
 }
 
-void VideoOptionsApplicationState::render()
+void OptionsApplicationState::render()
 {
     _sfmlRenderer.render(*_context.menuBackground);
     _sfmlRenderer.render(_guiContainer);
@@ -111,7 +140,7 @@ void VideoOptionsApplicationState::render()
     _sfmlRenderer.display(_context.window);
 }
 
-bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
+bool OptionsApplicationState::bUpdate(float dtSeconds)
 {
     _context.menuBackground->update(dtSeconds);
 
@@ -146,7 +175,7 @@ bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
     return true;
 }
 
-bool VideoOptionsApplicationState::bHandleEvent(const sf::Event& event)
+bool OptionsApplicationState::bHandleEvent(const sf::Event& event)
 {
     if(event.type == sf::Event::KeyPressed)
     {
@@ -169,7 +198,7 @@ bool VideoOptionsApplicationState::bHandleEvent(const sf::Event& event)
     return true;
 }
 
-void VideoOptionsApplicationState::applyOptions()
+void OptionsApplicationState::applyOptions()
 {
     _videoOptions.recreateWindow();
 

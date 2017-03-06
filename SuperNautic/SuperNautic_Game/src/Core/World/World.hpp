@@ -13,6 +13,7 @@ namespace sf
 
 #include "Core/World/Player.hpp"
 #include "Core/Track/Track.hpp"
+#include "Core/Audio/CountdownAudio.hpp"
 #include "Core/Utility/Camera.h"
 #include "Core/Utility/DebugCamera.hpp"
 #include "Core/Track/TrackProgression.hpp"
@@ -53,6 +54,8 @@ private:
 
 	Timer									_timer;
 	Progression								_progression;
+
+	CountdownAudio							_countdown;
 
 	const ApplicationContext&				_context;
 
