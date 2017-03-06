@@ -34,7 +34,7 @@ struct ApplicationContext
 
     std::unique_ptr<MenuBackground> menuBackground;
 
-	WorldAudio _audio;
+	WorldAudio audio;
 };
 
 
