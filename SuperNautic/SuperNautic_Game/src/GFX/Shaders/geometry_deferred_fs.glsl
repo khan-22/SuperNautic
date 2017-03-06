@@ -28,6 +28,6 @@ void main()
 	
 	
 	diffuseOut		= vec4(diffuse.rgb, illumination.r);
-	diffuseOut.rgb += (specular + normal).rgb * 0.f;
+	//diffuseOut.rgb += (specular + normal).rgb * 0.f;
 
 }
