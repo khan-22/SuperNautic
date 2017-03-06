@@ -314,3 +314,35 @@ void GuiTrackGeneratorControls::registerToolTips(GuiToolTip* toolTip)
     toolTip->registerTip(_saveButton, "Save the current seed and parameters. When saved, it will appear at the end (to the right) in the seed list.");
 
 }
+
+void GuiTrackGeneratorControls::handleEventCurrent(const sf::Event& event)
+{
+    GuiContainer::handleEventCurrent(event);
+
+    if(!bIsActive() && event.type == sf::Event::KeyPressed)
+    {
+        switch(event.key.code)
+        {
+            case sf::Keyboard::Z:
+            {
+                sf::Event e;
+                e.type = sf::Event::KeyPressed;
+                e.key.code = sf::Keyboard::Left;
+                _seedList->handleEvent(e);
+                break;
+            }
+
+            case sf::Keyboard::X:
+            {
+                sf::Event e;
+                e.type = sf::Event::KeyPressed;
+                e.key.code = sf::Keyboard::Right;
+                _seedList->handleEvent(e);
+                break;
+            }
+
+            default:
+                break;
+        }
+    }
+}

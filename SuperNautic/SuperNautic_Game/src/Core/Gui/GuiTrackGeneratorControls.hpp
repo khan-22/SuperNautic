@@ -21,6 +21,9 @@ class GuiTrackGeneratorControls : public GuiContainer
 public:
    GuiTrackGeneratorControls(GuiTrackGenerator& generator, GuiToolTip* toolTip = nullptr, Track* existingTrack = nullptr);
 
+protected:
+    void handleEventCurrent(const sf::Event& event) override;
+
 private:
     GuiTrackGenerator&  _generator;
     FontAsset           _font;

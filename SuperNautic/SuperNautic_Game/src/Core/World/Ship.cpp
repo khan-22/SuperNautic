@@ -66,10 +66,13 @@ Ship::Ship(glm::vec3 color)
 		_warningAccumulator{ 0.0f },
 		_engineBlinkAccumulator{ 0.0f },
 		_bounceVector{ 0.0f },
-		_bounceDecay{ 1.0f }
+		_bounceDecay{ 1.0f },
+		_inactiveAtStart{ 4.0f }
 {
 	move(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+
+	setInactiveTime(_inactiveAtStart);
 
 	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
 	_particleSystem.start();
@@ -529,22 +532,17 @@ void Ship::setReturnPos(const glm::vec3& returnPos)
 	_returnPos = returnPos;
 }
 
-const glm::vec3 Ship::getCameraForward() const
-{
-	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope());
-}
-
 const glm::vec3& Ship::getMeshPosition() const
 {
 	return _meshPosition();
 }
 
-const glm::vec3 & Ship::getMeshForward() const
+const glm::vec3& Ship::getMeshForward() const
 {
 	return _meshForwardDirection();
 }
 
-const glm::vec3 & Ship::getMeshUp() const
+const glm::vec3& Ship::getMeshUp() const
 {
 	return _meshUpDirection();
 }
@@ -554,9 +552,18 @@ const glm::vec3 Ship::getVelocity() const
 	return _velocity * _meshForwardDirection();
 }
 
+
+const glm::vec3 Ship::getCameraForward() const
+{
+	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope() - 
+		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * glm::cross(_cameraUpDirection(), _cameraForwardDirection()) * 6.0f);
+}
+
 const glm::vec3 Ship::getCameraPosition() const
 {
-	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) + _cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f);
+	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) + 
+		_cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f) + 
+		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f));
 }
 
 const glm::mat4 & Ship::getTransform() const

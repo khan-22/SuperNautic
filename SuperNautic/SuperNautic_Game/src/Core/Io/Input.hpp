@@ -31,16 +31,24 @@ private:
 	float _leftStickX;
 	float _leftStickY;
 	float _triggers;
+	float _dPadX;
+	float _dPadY;
 
 	bool _bButtonA;
 	bool _bButtonB;
 	bool _bButtonY;
+	bool _bButtonL;
+	bool _bButtonR;
 	bool _bButtonStart;
 
 	bool _bLeftStickDormant;
+	bool _bDPadXDormant;
+	bool _bDPadYDormant;
 	bool _bAWasDormant;
 	bool _bBWasDormant;
 	bool _bYWasDormant;
+	bool _bLWasDormant;
+	bool _bRWasDormant;
 	bool _bStartWasDormant;
 
 	int _controllerId;

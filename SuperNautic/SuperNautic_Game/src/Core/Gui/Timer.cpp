@@ -6,6 +6,7 @@
 Timer::Timer(int windowWidth, int windowHeight, int amountOfPlayers) :
 	SceneNode(),
 	_time(0.0f),
+	_countdown(4.0f),
 	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 {
 	_tTime.setFont(*_font.get());
@@ -31,7 +32,13 @@ Timer::~Timer()
 
 void Timer::updateTime(float dt)
 {
-	_time += dt;
+	if (_countdown > 0) {
+		_countdown -= dt;
+	}
+	else
+	{
+		_time += dt;
+	}
 }
 
 void Timer::updateCurrent()
