@@ -216,7 +216,7 @@ bool Track::bGenerate()
 
 	_lengthAfterLastCall = _generatedLength;
 	_totalProgress = (float)_generatedLength / _targetLength;
-	LOG("Progression: ", _totalProgress * 100);
+//	LOG("Progression: ", _totalProgress * 100);
 	return false;
 }
 
