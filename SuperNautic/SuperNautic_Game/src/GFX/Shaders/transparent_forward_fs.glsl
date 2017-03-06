@@ -17,10 +17,10 @@ in VS_OUT
 
 void main()
 {
-	vec4 diffuse	  = texture(uDiffuse, fs_in.uv);
-	vec4 specular	  = texture(uSpecular, fs_in.uv);
-	vec4 normal		  = texture(uNormal, fs_in.uv);
-	vec4 illumination = texture(uIllumination, fs_in.uv);
+	vec4 diffuse	  = texture(uDiffuse,		fs_in.uv);
+	vec4 specular	  = texture(uSpecular,		fs_in.uv);
+	vec4 normal		  = texture(uNormal,		fs_in.uv);
+	vec4 illumination = texture(uIllumination,	fs_in.uv);
 
 	outColor		= diffuse;
 }
