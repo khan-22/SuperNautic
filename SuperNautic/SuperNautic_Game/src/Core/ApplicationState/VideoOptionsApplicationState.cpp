@@ -67,6 +67,34 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
     guiElements.emplace_back(fs);
 
 
+    GuiSlider* musicVolume = new GuiSlider
+    (
+        0.f, 1.f, 50.f, 11,
+        sf::Text("Music volume    Low", *_font.get()),
+        sf::Text("High", *_font.get())
+    );
+    musicVolume->setValue(_audioOptions.getMusicVolume());
+    musicVolume->setOnChange([this](float v)
+    {
+        _audioOptions.setMusicVolume(v);
+        _context.audio.setVolume(v);
+    });
+    guiElements.emplace_back(musicVolume);
+
+    GuiSlider* effectsVolume = new GuiSlider
+    (
+        0.f, 1.f, 50.f, 11,
+        sf::Text("Effects volume    Low", *_font.get()),
+        sf::Text("High", *_font.get())
+    );
+    effectsVolume->setValue(_audioOptions.getEffectsVolume());
+    effectsVolume->setOnChange([this](float v)
+    {
+        _audioOptions.setEffectsVolume(v);
+        GuiElement::setStepVolume(v);
+    });
+    guiElements.emplace_back(effectsVolume);
+
     GuiButton* backButton = new GuiButton(sf::Text("Back", *_font.get()), [&]()
     {
         _stack.clear();
