@@ -5,14 +5,14 @@
 
 Timer::Timer(int windowWidth, int windowHeight, int amountOfPlayers) :
 	SceneNode(),
-	_time(0),
+	_time(0.0f),
 	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 {
 	_tTime.setFont(*_font.get());
 	_tTime.setFillColor(sf::Color::Cyan);
 	_tTime.setString("00:00:00");
 	_tTime.setCharacterSize(windowWidth / 20);
-	_tTime.setOrigin(_tTime.getGlobalBounds().width / 2, _tTime.getGlobalBounds().height * 1.5);
+	_tTime.setOrigin(_tTime.getGlobalBounds().width / 2.0f, _tTime.getGlobalBounds().height * 1.5f);
 
 	if (amountOfPlayers == 1)
 	{

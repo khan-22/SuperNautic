@@ -24,27 +24,21 @@ Progression::Progression(int windowWidth, int windowHeight, int amountOfPlayers)
 	{
 		_positions.push_back(0);
 		_progressionMeter.push_back(sf::RectangleShape());
+		_progressionMeter[i].setSize(sf::Vector2f(widthStep / 2, heightStep * 2));
+		_progressionMeter[i].setOrigin(0, heightStep * .5f);
 		switch (i)
 		{
 		case 0:
-			_progressionMeter[i].setFillColor(sf::Color::Red);
-			_progressionMeter[i].setSize(sf::Vector2f(widthStep / 2, heightStep * 3));
-			_progressionMeter[i].setOrigin(0, heightStep * 1.f);
+			_progressionMeter[i].setFillColor(sf::Color(255, 0, 0, 200));
 			break;
 		case 1:
-			_progressionMeter[i].setFillColor(sf::Color::Green);
-			_progressionMeter[i].setSize(sf::Vector2f(widthStep / 2, heightStep * 2.5));
-			_progressionMeter[i].setOrigin(0, heightStep * 0.75f);
+			_progressionMeter[i].setFillColor(sf::Color(0, 255, 0, 200));
 			break;
 		case 2:
-			_progressionMeter[i].setFillColor(sf::Color::Blue);
-			_progressionMeter[i].setSize(sf::Vector2f(widthStep / 2, heightStep * 2));
-			_progressionMeter[i].setOrigin(0, heightStep * 0.5f);
+			_progressionMeter[i].setFillColor(sf::Color(0, 0, 255, 200));
 			break;
 		case 3:
-			_progressionMeter[i].setFillColor(sf::Color::Yellow);
-			_progressionMeter[i].setSize(sf::Vector2f(widthStep / 2, heightStep * 1.5));
-			_progressionMeter[i].setOrigin(0, heightStep * 0.25f);
+			_progressionMeter[i].setFillColor(sf::Color(255, 255, 0, 200));
 			break;
 		default:
 			_progressionMeter[i].setFillColor(sf::Color::White);

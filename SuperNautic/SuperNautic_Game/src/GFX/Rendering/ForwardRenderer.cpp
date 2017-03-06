@@ -41,7 +41,7 @@ void ForwardRenderer::display(Camera& camera)
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
 
-	glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
+	glViewport(static_cast<GLint>(_x * windowWidth), static_cast<GLint>(_y * windowHeight), static_cast<GLsizei>(_width * windowWidth), static_cast<GLsizei>(_height * windowHeight));
 
 	_shader.get()->bind();
 	for (auto drawCall : _drawCalls)

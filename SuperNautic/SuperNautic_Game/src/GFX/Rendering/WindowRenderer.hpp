@@ -14,7 +14,7 @@ class Camera;		// Forward-decl
 namespace GFX
 {
 	struct Window;			// Forward-decl
-	struct Renderable3D;	// Forward-decl
+	class Renderable3D;	// Forward-decl
 
 	class WindowRenderer
 	{

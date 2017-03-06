@@ -42,20 +42,20 @@ Model* ModelLoader::loadModel(std::string filePath)
 	std::vector<RawVertexData>& rawMeshes = rawModel.get()->meshes;
 	for (auto& rawMesh : rawMeshes)
 	{
-		GLsizei positionSize = rawMesh.vertices.size() * sizeof(rawMesh.vertices[0]);
-		GLsizei texCoordSize = rawMesh.texCoords.size() * sizeof(rawMesh.texCoords[0]);
-		GLsizei normalSize	 = rawMesh.normals.size() * sizeof(rawMesh.normals[0]);
-		GLsizei totalVertexSize = positionSize + texCoordSize + normalSize;
+		GLsizei positionSize = static_cast<GLsizei>(rawMesh.vertices.size() * sizeof(rawMesh.vertices[0]));
+		GLsizei texCoordSize = static_cast<GLsizei>(rawMesh.texCoords.size() * sizeof(rawMesh.texCoords[0]));
+		GLsizei normalSize	 = static_cast<GLsizei>(rawMesh.normals.size() * sizeof(rawMesh.normals[0]));
+		GLsizei totalVertexSize = static_cast<GLsizei>(positionSize + texCoordSize + normalSize);
 
 		GLsizei totalIndexSize =
-			rawMesh.indices.size() * sizeof(rawMesh.indices[0]);
+			static_cast<GLsizei>(rawMesh.indices.size() * sizeof(rawMesh.indices[0]));
 
 		VertexArrayObject& newMesh = newModel->addMesh().getVertexArrayObject();
 		newMesh.addVertexBuffer(totalVertexSize, GL_STATIC_DRAW);
 		newMesh.addIndexBuffer(totalIndexSize, GL_STATIC_DRAW);
 
 		newMesh.sendDataToIndexBuffer(0, totalIndexSize, rawMesh.indices.data());
-		newMesh.setDrawCount(rawMesh.indices.size());
+		newMesh.setDrawCount(static_cast<GLuint>(rawMesh.indices.size()));
 
 		GLsizei currentOffset = 0U;
 		newMesh.sendDataToBuffer(0, 0, currentOffset, positionSize, rawMesh.vertices.data(), 3, GL_FLOAT);
@@ -156,12 +156,12 @@ std::vector<ModelLoader::Grouping> GFX::ModelLoader::generateGroupings(RawMeshCo
 		RawVertexData& rawMesh = rawModel->meshes[i];
 
 		GLsizei sizeOfMesh = 0;
-		sizeOfMesh += rawMesh.vertices.size() * sizeof(rawMesh.vertices[0]);
-		sizeOfMesh += rawMesh.texCoords.size() * sizeof(rawMesh.texCoords[0]);
-		sizeOfMesh += rawMesh.normals.size() * sizeof(rawMesh.normals[0]);
+		sizeOfMesh += static_cast<GLsizei>(rawMesh.vertices.size() * sizeof(rawMesh.vertices[0]));
+		sizeOfMesh += static_cast<GLsizei>(rawMesh.texCoords.size() * sizeof(rawMesh.texCoords[0]));
+		sizeOfMesh += static_cast<GLsizei>(rawMesh.normals.size() * sizeof(rawMesh.normals[0]));
 
 		GLsizei sizeOfIndices = 0;
-		sizeOfIndices += rawMesh.indices.size() * sizeof(rawMesh.indices[0]);
+		sizeOfIndices += static_cast<GLsizei>(rawMesh.indices.size() * sizeof(rawMesh.indices[0]));
 
 		bool belongsToAGrouping = false;
 		for (auto& group : groupings)

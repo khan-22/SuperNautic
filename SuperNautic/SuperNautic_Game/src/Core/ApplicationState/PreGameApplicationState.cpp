@@ -64,7 +64,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     _guiContainer.setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height);
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y * 0.9f);
 
-    _toolTip.centerAt(windowSize.x / 2.f, windowSize.y * 0.95f);
+    _toolTip.centerAt(static_cast<size_t>(windowSize.x / 2.f), static_cast<size_t>(windowSize.y * 0.95f));
     _toolTip.registerTip(startButton, "Start the game.");
     _toolTip.registerTip(backButton, "Go back to main menu.");
     _toolTip.setCharacterSize(18);
@@ -84,7 +84,7 @@ void PreGameApplicationState::render()
     _sfmlRenderer.display(_context.window);
 
     _forwardRenderer.render(_trackGenerator);
-    static Camera garbageCam(glm::radians(90.f), 1280.f, 720.f);
+    static Camera garbageCam(glm::radians(90.f), 1280, 720);
     _forwardRenderer.display(garbageCam);
 
     _sfmlRenderer.render(_guiContainer);

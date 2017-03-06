@@ -44,7 +44,7 @@ void GFX::Framebuffer::initialize(GLuint width, GLuint height, GLuint colorChann
 
 	glGenTextures(numColorAttachments, _textures);
 
-	for (int i = 0; i < numColorAttachments; i++)
+	for (unsigned i = 0; i < numColorAttachments; i++)
 	{
 		GLuint channelCount = colorChannels[i];
 		

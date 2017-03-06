@@ -37,10 +37,10 @@ void WindowRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, 
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
 
-	_actualX = _x * windowWidth;
-	_actualY = _y * windowHeight;
-	_actualWidth = _width  * windowWidth;
-	_actualHeight = _height * windowHeight;
+	_actualX = static_cast<GLsizei>(_x) * windowWidth;
+	_actualY = static_cast<GLsizei>(_y) * windowHeight;
+	_actualWidth = static_cast<GLsizei>(_width)  * windowWidth;
+	_actualHeight = static_cast<GLsizei>(_height) * windowHeight;
 
 	GLuint colorChannels[] = { 3 };
 	_outsideFrameBuffer.initialize(_actualWidth, _actualHeight, colorChannels, sizeof(colorChannels) / sizeof(colorChannels[0]));

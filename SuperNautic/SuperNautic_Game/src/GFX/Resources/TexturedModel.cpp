@@ -27,9 +27,9 @@ void TexturedModel::renderStandard(RenderStates& states)
     for(size_t i = 0; i < model._meshes.size(); i++)
     {
         const Material& material = *_material.get();
-        material.bind(i);
+        material.bind(static_cast<unsigned>(i));
         model._meshes[i]->render();
-        material.unbind(i);
+        material.unbind(static_cast<unsigned>(i));
     }
 }
 

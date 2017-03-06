@@ -130,7 +130,7 @@ void GuiHorizontalList::updateVisuals()
     }
 
 
-    for(int i = selectionId - 1; i >= 0 && i > int(selectionId - (_maxVisibleElements + 1) / 2); i--)
+    for(int i = static_cast<int>(selectionId - 1); i >= 0 && i > int(selectionId - (_maxVisibleElements + 1) / 2); i--)
     {
         GuiElement& left = *_elements[i];
         left.setOrigin(left.getBoundingRect().width / 2.f, left.getBoundingRect().height / 2.f);

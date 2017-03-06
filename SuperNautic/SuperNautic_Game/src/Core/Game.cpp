@@ -127,7 +127,7 @@ bool Game::bInitialize()
 
 	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
     {
-        _context.segmentHandler->loadSegment(i);
+        _context.segmentHandler->loadSegment(static_cast<unsigned>(i));
     }
 
     _context.menuBackground.reset(new MenuBackground(_context.window.getSize().x, _context.window.getSize().y));
