@@ -546,37 +546,15 @@ void Track::insertStructure(const int index)
 			const SegmentHandler::StructurePiece * p = s->pieces[j];
 			const Segment * segment = _segmentHandler->loadSegment(p->index);
 			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
-<<<<<<< HEAD
 
             if(!bInsertIntoOctree(tempInstance))
             {
                 delete tempInstance;
-                deleteSegments(_generatedLength - startLength + 300);
+                deleteSegments(static_cast<int>(_generatedLength) - startLength + 300);
                 _endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
                 return;
             }
-//			for (unsigned int i = 0; i < _track.size() - 2; i++)
-//			{
-//				if (tempInstance->bTestCollision(*_track[i]))
-//				{
-//					delete tempInstance;
-//					deleteSegments(_generatedLength - startLength + 300);
-//					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-//					return;
-//				}
-//			}
-=======
-			for (unsigned int i = 0; i < _track.size() - 2; i++)
-			{
-				if (tempInstance->bTestCollision(*_track[i]))
-				{
-					delete tempInstance;
-					deleteSegments(static_cast<int>(_generatedLength) - startLength + 300);
-					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-					return;
-				}
-			}
->>>>>>> refs/remotes/origin/master
+
 			glm::mat4 modelEndMat = segment->getEndMatrix();
 			int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 			// Randomize angle from structure info
@@ -608,13 +586,10 @@ void Track::deleteSegments(const int lengthToDelete)
 		int segmentLength = static_cast<int>(_track.back()->getLength());
 		deletedLength += segmentLength;
 		_generatedLength -= segmentLength;
-<<<<<<< HEAD
+
 		_octree->erase(_track.back());
-		delete _track[_track.size() - 1];
-=======
 		size_t index = _track.size() - 1;
 		delete _track[index];
->>>>>>> refs/remotes/origin/master
 		_track.erase(_track.begin() + _track.size() - 1);
 		// Windows
 		if (_segmentWindows.back().segmentIndex == index)
@@ -736,7 +711,7 @@ void Track::placeObstacles()
 	}
 }
 
-// 
+//
 void Track::placeBonusFields()
 {
 
