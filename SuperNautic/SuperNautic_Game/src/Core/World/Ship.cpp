@@ -159,11 +159,14 @@ void Ship::checkObstacleCollision()
 	// Check every relevant instance
 	for (SegmentInstance* segment : _segmentsToTest)
 	{
+		// Prevent further checking after first collision
+		bool collided{ false };
+
 		// For every obstacle
-		for (unsigned i = 0; i < segment->getObstacles().size(); ++i)
+		for (unsigned i = 0; !collided && i < segment->getObstacles().size(); ++i)
 		{
 			// For every bounding box in this obstacle
-			for (unsigned j = 0; j < segment->getObstacles()[i].getBoundingBoxes().size(); ++j)
+			for (unsigned j = 0; !collided && j < segment->getObstacles()[i].getBoundingBoxes().size(); ++j)
 			{
 				BoundingBox& localBox = segment->getObstacles()[i].getBoundingBoxes()[j];
 
@@ -178,7 +181,12 @@ void Ship::checkObstacleCollision()
 				// Test ship bounding box against obstacle's bounding box in global space
 				if (bTestCollision(_boundingBox, globalBox))
 				{
-					obstacleCollision();
+					if (_immunityTimer <= 0.0f)
+					{
+						obstacleCollision();
+						segment->removeObstacle(i);
+						collided = true;
+					}
 				}
 			}
 		}
@@ -187,13 +195,9 @@ void Ship::checkObstacleCollision()
 
 void Ship::obstacleCollision()
 {
-	if (_immunityTimer <= 0.0f)
-	{
-		//_engineCooldown = std::max(_cooldownOnObstacleCollision, _engineCooldown);
 		_steeringCooldown = _cooldownOnObstacleCollision;
 		_immunityTimer = _immunityoOnObstacleCollision;
 		_bObstacleCollision = true;
-	}
 }
 
 void Ship::rotateAtStart(float down, float angle)
