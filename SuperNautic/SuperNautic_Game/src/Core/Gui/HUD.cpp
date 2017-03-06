@@ -10,6 +10,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_position(0),
 	_offsetX(0),
 	_offsetY(0),
+	_speedLine(sf::LineStrip, 150),
 	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 {
 	_widthStep = windowWidth / 100.f;
@@ -20,8 +21,16 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_speedMeter.setOrigin(_widthStep, _heightStep * 1.5f);
 	_speedMeter.setPosition(_widthStep * 50 + _offsetX, _heightStep * 90 + _offsetY);
 
-	_speeder.setRadius(_widthStep / 2);
-	_speeder.setFillColor(sf::Color::Red);
+	_speeder.setRadius(_widthStep / 4);
+	_speeder.setFillColor(sf::Color::Transparent);
+	_speeder.setOutlineThickness(_widthStep / 8);
+	_speeder.setOutlineColor(sf::Color(255, 200, 100));
+	_speeder.setOrigin(_widthStep / (_speeder.getRadius() + _speeder.getOutlineThickness()), _widthStep / (_speeder.getRadius() + _speeder.getOutlineThickness()));
+
+	for (size_t i = 0; i < _speedLine.getVertexCount(); i++)
+	{
+		_speedLine[i].color = sf::Color(0, 100, 200, 100);
+	}
 
 	_tSpeed.setFont(*_font.get());
 	_tSpeed.setFillColor(sf::Color::Red);
@@ -66,6 +75,11 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_tSpeed.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
 	_tSpeed.setPosition(_widthStep * 75 + _offsetX, _heightStep + _offsetY);
 
+	for (size_t i = 0; i < _speedLine.getVertexCount(); i++)
+	{
+		_speedLine[i].position = sf::Vector2f(static_cast<float>(_offsetX) + _widthStep * 35.0f + _widthStep * 30.0f * (i) / 150.0f, _offsetY + _heightStep * 70.0f - _heightStep * 25.0f * sinf((i + 50) / 250.0f * 3.1415f));
+	}
+
 	_tPosition.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
 	_tPosition.setOrigin(_tPosition.getGlobalBounds().width / 2, 0);
 	_tPosition.setPosition(static_cast<float>(_widthStep * 50 + _offsetX), static_cast<float>(0 + _offsetY));
@@ -81,5 +95,6 @@ void HUD::updateCurrent()
 void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) const
 {
 	target.draw(_tPosition);
+	target.draw(_speedLine);
 	target.draw(_speeder);
 }

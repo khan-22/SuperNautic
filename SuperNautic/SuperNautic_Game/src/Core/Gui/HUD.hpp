@@ -8,6 +8,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/ConvexShape.hpp>
 
 #include "Core/Gui/SceneNode.hpp"
 #include "Core/Asset/Asset.hpp"
@@ -38,6 +39,8 @@ private:
 
 	sf::RectangleShape	_speedMeter;
 	sf::CircleShape		_speeder;
+
+	sf::VertexArray		_speedLine;
 
 	sf::Text			_tSpeed;
 	sf::Text			_tPosition;
