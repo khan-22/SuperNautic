@@ -439,33 +439,11 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
 	if (testCollision)
 	{
-		//						const std::function<bool(const std::vector<ElementT*>&)>& predicate
-		/*auto predicate = [this](const std::function<bool(const std::vector<SegmentInstance*>&)>& segments)
-		{
-
-		};
-		for (size_t i = 0; i < _octrees.size(); i++)
-		{
-			if (_octrees[i].bInsertIf(tempInstance->getGlobalBoundingBoxes()[0], tempInstance, predicate))
-			{
-
-			}
-		}*/
-
 		if(!bInsertIntoOctree(tempInstance))
         {
             delete tempInstance;
             return false;
         }
-
-//		for (unsigned int i = 0; i < _track.size() - 2; i++)
-//		{
-//			if (tempInstance->bTestCollision(*_track[i]))
-//			{
-//				delete tempInstance;
-//				return false;
-//			}
-//		}
 	}
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
