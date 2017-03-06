@@ -10,8 +10,8 @@ MenuBackground::MenuBackground(size_t width, size_t height)
 : _width(width)
 , _height(height)
 {
-    _colorFillTop.setSize(sf::Vector2f(_width, _height / 2.f));
-    _colorFillBot.setSize(sf::Vector2f(_width, _height / 2.f));
+    _colorFillTop.setSize(sf::Vector2f(static_cast<float>(_width), _height / 2.f));
+    _colorFillBot.setSize(sf::Vector2f(static_cast<float>(_width), _height / 2.f));
 
     _colorFillTop.setPosition(0.f, 0.f);
     _colorFillBot.setPosition(0.f, _height / 2.f);
@@ -21,7 +21,7 @@ MenuBackground::MenuBackground(size_t width, size_t height)
     _colorFillTop.setFillColor(colorTop);
     _colorFillBot.setFillColor(colorBot);
 
-    generateBubble(_height);
+    generateBubble(static_cast<float>(_height));
 }
 
 void MenuBackground::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -66,12 +66,12 @@ void MenuBackground::update(float dtSeconds)
 
 void MenuBackground::generateBubble(float y)
 {
-    float xPos = rand() % _width;
+    float xPos = static_cast<float>(rand() % _width);
     Bubble bubble;
     bubble.visual.setRadius(_BUBBLE_RADIUS);
     bubble.visual.setPosition(xPos, y);
     bubble.centerX = xPos;
-    bubble.sinePosition = rand() % 5000;
+    bubble.sinePosition = static_cast<float>(rand() % 5000);
     bubble.oscillationAmplitude = 5.f + rand() % 50;
     bubble.visual.setFillColor(sf::Color(255, 255, 255, 10));
     bubble.visual.setOutlineColor(sf::Color(255, 255, 255, 50));

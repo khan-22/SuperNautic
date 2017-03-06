@@ -157,26 +157,19 @@ void Player::update(float dt)
 
 	// TODO: Apply ship shake
 
-    _hud.setHeat(_ship.getEngineTemperature() / 100);
     _hud.setSpeed(_ship.getSpeed());
-	_hud.setHeatWhite(_ship.getOverload(dt));
 	_hud.update();
 
 	float speed = _ship.getSpeed();
 	float newFOV = 90.f + 40.f * (speed - 20.f) / 180.f;
 
 	_currentCamera->setFOV(newFOV);
-	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getEngineTemperature() / 100 + 1);
+	_audio.setPitch(PlayerAudio::Sounds::engine, _ship.getSpeed() / 200 + .75f);
 }
 
 Camera* Player::getCamera()
 {
 	return _currentCamera;
-}
-
-void Player::setProgression(float progression)
-{
-	_hud.setProgression(progression);
 }
 
 void Player::setPosition(int position)
@@ -187,4 +180,9 @@ void Player::setPosition(int position)
 void Player::swapPerspective()
 {
 	_bIsFirstPerson = !_bIsFirstPerson;
+}
+
+void Player::shipCollision()
+{
+	_audio.playAudio(PlayerAudio::Sounds::shipCollision);
 }

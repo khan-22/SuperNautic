@@ -60,6 +60,7 @@ private:
 	void deleteSegments(const int lengthToDelete);
 	bool bEndTrack();
 	void placeObstacles();
+	void placeBonusFields();
 	size_t findTrackIndex(const float totalLength, float & lastFullSegmentLength) const;
     bool bInsertIntoOctree(SegmentInstance* segment);
 

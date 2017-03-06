@@ -8,7 +8,8 @@
 class SegmentInfo
 {
 public:
-	SegmentInfo(std::string&& dataFileName, std::string&& visualFileName, std::string&& windowFileName
+	SegmentInfo(std::string&& dataFileName, std::string&& visualFileName
+		, std::string&& materialFileName, std::string&& windowFileName, std::string&& zoneFileName
 		, char startConnection, char endConnection, int probability1, int probability2
 		, int minInRow1, int minInRow2, int maxInRow1, int maxInRow2
 		, int rotationOffset1, int rotationOffset2);
@@ -20,7 +21,9 @@ public:
 
 	std::string		_dataFileName;
 	std::string		_visualFileName;
+	std::string		_materialFileName;
 	std::string		_windowFileName;
+	std::string		_zoneFileName;
 	char			_startConnection;
 	char			_endConnection;
 	int				_probability1;

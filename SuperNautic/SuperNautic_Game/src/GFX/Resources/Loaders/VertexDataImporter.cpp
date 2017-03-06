@@ -78,7 +78,7 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 	in.read((char*)&header, sizeof(Header));
 //	fread_s(&header, sizeof(Header), sizeof(Header), 1, in);
 
-	for (int i = 0; i < header.numMeshes; i++)
+	for (unsigned i = 0; i < header.numMeshes; i++)
 	{
 		collection->meshes.emplace_back();
 		RawVertexData& currentMesh = collection->meshes.back();
@@ -113,7 +113,7 @@ RawMeshCollection* VertexDataImporter::importVertexData(std::string filepath)
 //		fread_s(&currentMesh.indices[0], currentMesh.indices.size() * sizeof(currentMesh.indices[0]), sizeof(currentMesh.indices[0]), currentMesh.indices.size(), in);
 	}
 
-	for (int i = 0; i < header.numCameras; i++)
+	for (unsigned i = 0; i < header.numCameras; i++)
 	{
 		collection->cameras.emplace_back();
 		glm::mat4& cameraMat = collection->cameras.back();

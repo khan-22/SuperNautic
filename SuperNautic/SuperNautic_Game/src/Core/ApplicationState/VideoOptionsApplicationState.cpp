@@ -90,7 +90,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
 
 
-    _toolTip.centerAt(windowSize.x / 2.f, windowSize.y * 0.95f);
+    _toolTip.centerAt(static_cast<size_t>(windowSize.x / 2.f), static_cast<size_t>(windowSize.y * 0.95f));
     _toolTip.registerTip(resolutionList, "Set video resolution. Press A to apply.");
     _toolTip.registerTip(fs, "Enable/disable fullscreen.");
     _toolTip.registerTip(backButton, "Go back to main menu.");
@@ -190,12 +190,12 @@ void VideoOptionsApplicationState::applyOptions()
     // SegmentHandler and ObstacleHandler have to be reloaded
     // manually for some reason.
     // TODO: Ask Timmie about it.
-    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos4.txt", "Segments/ConnectionTypes.txt"));
+    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos1.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
 
 	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
     {
-        _context.segmentHandler->loadSegment(i);
+        _context.segmentHandler->loadSegment(static_cast<unsigned>(i));
     }
 
 
@@ -203,7 +203,7 @@ void VideoOptionsApplicationState::applyOptions()
 
     _context.menuBackground.reset(new MenuBackground(size.x, size.y));
     _guiContainer.setPosition(size.x / 2.f, size.y / 2.f);
-    _toolTip.centerAt(size.x / 2.f, size.y * 0.95f);
+    _toolTip.centerAt(static_cast<size_t>(size.x / 2.f), static_cast<size_t>(size.y * 0.95f));
 }
 
 

@@ -128,9 +128,9 @@ void GuiTrackGeneratorControls::insertLengthInput(const TrackPresetManager::Pres
             c = MIN_TRACK_LENGTH_KM;
         }
 
-        _currentPreset->length = c;
-        _lengthInput->setText(toLengthInputString(c));
-        _generator.setLength(c * 1000);
+        _currentPreset->length = static_cast<unsigned>(c);
+        _lengthInput->setText(toLengthInputString(static_cast<unsigned>(c)));
+        _generator.setLength(static_cast<unsigned>(c) * 1000);
         _generator.generate();
     });
     _lengthInput->setOrigin(_lengthInput->getBoundingRect().width / 2.f, _lengthInput->getBoundingRect().height / 2.f);
@@ -154,18 +154,18 @@ void GuiTrackGeneratorControls::insertCurvinessInput(const TrackPresetManager::P
 {
     _curvinessInput = new GuiSlider
     (
-        Track::_MIN_CURVINESS, Track::_MAX_CURVINESS,
+		static_cast<float>(Track::_MIN_CURVINESS), static_cast<float>(Track::_MAX_CURVINESS),
         50.f,
         6,
         sf::Text("Curviness  Low", *_font.get()),
         sf::Text("High", *_font.get())
     );
-    _curvinessInput->setValue(defaultPreset.curviness);
+    _curvinessInput->setValue(static_cast<float>(defaultPreset.curviness));
     _curvinessInput->setOnChange([this](float c)
     {
         LOG("Curviness: ", (int)c);
-        _currentPreset->curviness = c;
-        _generator.setCurviness(c);
+        _currentPreset->curviness = static_cast<unsigned>(c);
+        _generator.setCurviness(static_cast<unsigned>(c));
         _generator.generate();
     });
 
@@ -177,18 +177,18 @@ void GuiTrackGeneratorControls::insertDifficultyInput(const TrackPresetManager::
 {
     _difficultyInput = new GuiSlider
     (
-        Track::_MIN_DIFFICULTY, Track::_MAX_DIFFICULTY,
+		static_cast<float>(Track::_MIN_DIFFICULTY), static_cast<float>(Track::_MAX_DIFFICULTY),
         50.f,
         6,
         sf::Text("Difficulty  Low", *_font.get()),
         sf::Text("High", *_font.get())
     );
-    _difficultyInput->setValue(defaultPreset.difficulty);
+    _difficultyInput->setValue(static_cast<float>(defaultPreset.difficulty));
     _difficultyInput->setOnChange([this](float c)
     {
         LOG("Difficulty: ", (int)c);
-        _currentPreset->difficulty = c;
-        _generator.setDifficulty(c);
+        _currentPreset->difficulty = static_cast<unsigned>(c);
+        _generator.setDifficulty(static_cast<unsigned>(c));
         _generator.generate();
     });
 
@@ -226,21 +226,21 @@ void GuiTrackGeneratorControls::insertShuffleButton()
             lengthText.insert(0, _lengthInput->getText().size() - lengthText.size(), '0');
         }
         _lengthInput->setText(lengthText);
-        _generator.setLength(length * 1000);
+        _generator.setLength(static_cast<unsigned>(length * 1000));
 
         size_t curviness = Track::_MIN_CURVINESS + rand() % (Track::_MAX_CURVINESS - Track::_MIN_CURVINESS);
-        _curvinessInput->setValue(curviness);
-        _generator.setCurviness(curviness);
+        _curvinessInput->setValue(static_cast<float>(curviness));
+        _generator.setCurviness(static_cast<unsigned>(curviness));
 
         size_t difficulty = Track::_MIN_DIFFICULTY + rand() % (Track::_MAX_DIFFICULTY - Track::_MIN_DIFFICULTY);
-        _difficultyInput->setValue(difficulty);
-        _generator.setDifficulty(difficulty);
+        _difficultyInput->setValue(static_cast<float>(difficulty));
+        _generator.setDifficulty(static_cast<unsigned>(difficulty));
 
 
         _currentPreset->seed = seed;
-        _currentPreset->length = length;
-        _currentPreset->curviness = curviness;
-        _currentPreset->difficulty = difficulty;
+        _currentPreset->length = static_cast<unsigned>(length);
+        _currentPreset->curviness = static_cast<unsigned>(curviness);
+        _currentPreset->difficulty = static_cast<unsigned>(difficulty);
 
 
         _generator.generate();
@@ -255,8 +255,8 @@ void GuiTrackGeneratorControls::insertSaveButton()
     {
         TrackPresetManager::Preset p;
         p.seed = _selectedSeedInput->getText();
-        p.curviness = _curvinessInput->getValue();
-        p.difficulty = _difficultyInput->getValue();
+        p.curviness = static_cast<unsigned>(_curvinessInput->getValue());
+        p.difficulty = static_cast<unsigned>(_difficultyInput->getValue());
         std::stringstream sstream(_lengthInput->getText());
         sstream >> p.length;
         _presetManager.insert(p);
@@ -282,8 +282,8 @@ void GuiTrackGeneratorControls::insertSeedInput(const TrackPresetManager::Preset
         _selectedSeedInput = seedInput;
         _currentPreset = (TrackPresetManager::Preset*)preset;
 
-        _curvinessInput->setValue(preset->curviness);
-        _difficultyInput->setValue(preset->difficulty);
+        _curvinessInput->setValue(static_cast<float>(preset->curviness));
+        _difficultyInput->setValue(static_cast<float>(preset->difficulty));
         _lengthInput->setText(toLengthInputString(preset->length));
 
         _generator.setSeed(preset->seed);

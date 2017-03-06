@@ -22,7 +22,7 @@ std::unordered_map<std::string, std::vector<unsigned> Segment::*> Segment::nameT
 bool Segment::mappingsCreated { false };
 
 
-// Loads a segment from an fbx file
+// Loads a segment from a .kmf file
 Segment::Segment(const SegmentInfo* segmentInfo)
 {
 	_segmentInfo = segmentInfo;
@@ -31,17 +31,28 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 	_scene = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_dataFileName);
 
 	// Get visual model asset
-	_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get("test3pipe.mat"));
-		//ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_visualFileName);
+	_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get(_segmentInfo->_materialFileName));
 
+	// Windows
 	if (_segmentInfo->_windowFileName != "E")
 	{
-		_window = ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_windowFileName);
+		_windowModel = ModelCache::get(std::string{ "Segments/" } + _segmentInfo->_windowFileName);
 		_bHasWindow = true;
 	}
 	else
 	{
 		_bHasWindow = false;
+	}
+
+	//Zones
+	if (_segmentInfo->_zoneFileName != "E")
+	{
+		_zonesModel = ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_zoneFileName);
+		_bHasZones = true;
+	}
+	else
+	{
+		_bHasZones = false;
 	}
 
 	if (_scene.get()->cameras.size() < 1)
@@ -183,9 +194,6 @@ WaypointInfo Segment::findClosestWaypoint(const glm::vec3& position) const
 
 	return closest;
 }
-
-// Renders the segment at the position of an instance
-// TODO
 
 // Initializes nameToIndex and nameToVecIndex
 void Segment::initializeMappings()
@@ -722,10 +730,20 @@ GFX::TexturedModel Segment::getVisualModel() const
 
 ModelAsset Segment::getWindowModel() const
 {
-	return _window;
+	return _windowModel;
 }
 
 bool Segment::bHasWindow() const
 {
 	return _bHasWindow;
+}
+
+ModelAsset Segment::getZonesModel() const
+{
+	return _zonesModel;
+}
+
+bool Segment::bHasZones() const
+{
+	return _bHasZones;
 }

@@ -34,12 +34,13 @@ public:
 
 	Camera* getCamera();
 
-	void setProgression(float progression);
 	void setPosition(int position);
 
 	bool _bIsFirstPerson;
 
 	void swapPerspective();
+
+	void shipCollision();
 
 private:
 	int				_playerId;
