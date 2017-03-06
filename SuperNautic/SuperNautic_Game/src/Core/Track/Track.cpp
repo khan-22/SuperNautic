@@ -131,6 +131,8 @@ void Track::startNewTrack()
 		delete _track[i];
 	}
 	_track.clear();
+
+	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength, 2000.f, 5));
 }
 
 // Generates the track
@@ -446,14 +448,20 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 			}
 		}*/
 
-		for (unsigned int i = 0; i < _track.size() - 2; i++)
-		{
-			if (tempInstance->bTestCollision(*_track[i]))
-			{
-				delete tempInstance;
-				return false;
-			}
-		}
+		if(!bInsertIntoOctree(tempInstance))
+        {
+            delete tempInstance;
+            return false;
+        }
+
+//		for (unsigned int i = 0; i < _track.size() - 2; i++)
+//		{
+//			if (tempInstance->bTestCollision(*_track[i]))
+//			{
+//				delete tempInstance;
+//				return false;
+//			}
+//		}
 	}
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
@@ -472,6 +480,41 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	}
 	_track.push_back(tempInstance);
 	return true;
+}
+
+// Insert the segment into the octree if it does not collide with
+// anything in it.
+// Return true if segment is inserted.
+bool Track::bInsertIntoOctree(SegmentInstance* segment)
+{
+    CollisionMesh mesh(segment->getGlobalBoundingBoxes());
+    assert(_octree->bTestCollision(mesh));
+
+    return _octree->bInsertIf(mesh, segment, [this](const std::vector<SegmentInstance**>& collisions)
+    {
+        size_t numSegments = _track.size();
+        size_t size = collisions.size();
+        if(collisions.empty())
+        {
+            return true;
+        }
+
+        if(collisions.size() <= 2)
+        {
+            auto beginIt = _track.end() - collisions.size();
+            for(const SegmentInstance** c : collisions)
+            {
+                if(std::find(beginIt, _track.end(), *c) == _track.end())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    });
 }
 
 // Inserts a whole pre-defined structure at the end of the track
@@ -499,16 +542,24 @@ void Track::insertStructure(const int index)
 			const SegmentHandler::StructurePiece * p = s->pieces[j];
 			const Segment * segment = _segmentHandler->loadSegment(p->index);
 			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
-			for (unsigned int i = 0; i < _track.size() - 2; i++)
-			{
-				if (tempInstance->bTestCollision(*_track[i]))
-				{
-					delete tempInstance;
-					deleteSegments(_generatedLength - startLength + 300);
-					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-					return;
-				}
-			}
+
+            if(!bInsertIntoOctree(tempInstance))
+            {
+                delete tempInstance;
+                deleteSegments(_generatedLength - startLength + 300);
+                _endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+                return;
+            }
+//			for (unsigned int i = 0; i < _track.size() - 2; i++)
+//			{
+//				if (tempInstance->bTestCollision(*_track[i]))
+//				{
+//					delete tempInstance;
+//					deleteSegments(_generatedLength - startLength + 300);
+//					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+//					return;
+//				}
+//			}
 			glm::mat4 modelEndMat = segment->getEndMatrix();
 			int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 			// Randomize angle from structure info
@@ -540,6 +591,7 @@ void Track::deleteSegments(const int lengthToDelete)
 		int segmentLength = _track.back()->getLength();
 		deletedLength += segmentLength;
 		_generatedLength -= segmentLength;
+		_octree->erase(_track.back());
 		delete _track[_track.size() - 1];
 		_track.erase(_track.begin() + _track.size() - 1);
 	}
