@@ -1,5 +1,6 @@
 #include "Core/Audio/PlayerAudio.hpp"
 #include "Core/Asset/AssetCache.hpp"
+#include "Core/Utility/AudioOptions.hpp"
 
 #include <algorithm>
 
@@ -13,10 +14,12 @@ PlayerAudio::PlayerAudio() :
 
 	_sEngine.setLoop(true);
 
-	setVolume(Sounds::shipCollision, 50);
-	setVolume(Sounds::engine, 50);
-	setVolume(Sounds::obstacleCollision, 50);
-	setVolume(Sounds::overheat, 50);
+	AudioOptions options;
+	float volume = options.getEffectsVolume() * 100.f;
+	setVolume(Sounds::shipCollision, volume);
+	setVolume(Sounds::engine, volume);
+	setVolume(Sounds::obstacleCollision, volume);
+	setVolume(Sounds::overheat, volume);
 
 	playAudio(Sounds::engine);
 }
