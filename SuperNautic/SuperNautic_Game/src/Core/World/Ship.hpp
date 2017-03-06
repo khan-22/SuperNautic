@@ -158,6 +158,8 @@ private:
 
 	const float _blinkFrequency;	// How fast the ship blinks when immune to obstacle collision
 
+	const float _inactiveAtStart;	// The time from ship spawn until it can be controlled
+
 	std::vector<SegmentInstance*> _segmentsToTest;	// Segments to test intersection against
 
 	void checkObstacleCollision();
