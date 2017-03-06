@@ -6,7 +6,7 @@
 #include "SFML/Graphics/Text.hpp"
 #include "SFML/Window/Event.hpp"
 
-#include "Core/ApplicationState/VideoOptionsApplicationState.hpp"
+#include "Core/ApplicationState/OptionsApplicationState.hpp"
 #include "Core/ApplicationState/MainMenuApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
@@ -17,7 +17,7 @@
 
 #include "Core/Asset/LoadAssetFunctions.hpp"
 
-VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
+OptionsApplicationState::OptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _videoOptions(context.window)
@@ -132,7 +132,7 @@ VideoOptionsApplicationState::VideoOptionsApplicationState(ApplicationStateStack
 
 }
 
-void VideoOptionsApplicationState::render()
+void OptionsApplicationState::render()
 {
     _sfmlRenderer.render(*_context.menuBackground);
     _sfmlRenderer.render(_guiContainer);
@@ -140,7 +140,7 @@ void VideoOptionsApplicationState::render()
     _sfmlRenderer.display(_context.window);
 }
 
-bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
+bool OptionsApplicationState::bUpdate(float dtSeconds)
 {
     _context.menuBackground->update(dtSeconds);
 
@@ -175,7 +175,7 @@ bool VideoOptionsApplicationState::bUpdate(float dtSeconds)
     return true;
 }
 
-bool VideoOptionsApplicationState::bHandleEvent(const sf::Event& event)
+bool OptionsApplicationState::bHandleEvent(const sf::Event& event)
 {
     if(event.type == sf::Event::KeyPressed)
     {
@@ -198,7 +198,7 @@ bool VideoOptionsApplicationState::bHandleEvent(const sf::Event& event)
     return true;
 }
 
-void VideoOptionsApplicationState::applyOptions()
+void OptionsApplicationState::applyOptions()
 {
     _videoOptions.recreateWindow();
 

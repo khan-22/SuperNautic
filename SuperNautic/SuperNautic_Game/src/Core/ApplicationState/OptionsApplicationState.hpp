@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef VIDEO_OPTIONS_APPLICATION_STATE_HPP
-#define VIDEO_OPTIONS_APPLICATION_STATE_HPP
+#ifndef OPTIONS_APPLICATION_STATE_HPP
+#define OPTIONS_APPLICATION_STATE_HPP
 
 #include "SFML/Graphics/Font.hpp"
 
@@ -17,10 +17,10 @@
 class GuiTextInput;
 class GuiSlider;
 
-class VideoOptionsApplicationState : public ApplicationState
+class OptionsApplicationState : public ApplicationState
 {
 public:
-    VideoOptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context);
+    OptionsApplicationState(ApplicationStateStack& stack, ApplicationContext& context);
 
     void render() override;
     bool bUpdate(float dtSeconds) override;
@@ -40,4 +40,4 @@ private:
 };
 
 
-#endif //VIDEO_OPTIONS_APPLICATION_STATE_HPP
+#endif //OPTIONS_APPLICATION_STATE_HPP

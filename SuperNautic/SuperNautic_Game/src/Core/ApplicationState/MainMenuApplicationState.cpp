@@ -5,7 +5,7 @@
 #include "SFML/Window/Event.hpp"
 
 #include "Core/ApplicationState/MainMenuApplicationState.hpp"
-#include "Core/ApplicationState/VideoOptionsApplicationState.hpp"
+#include "Core/ApplicationState/OptionsApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/ApplicationState/PreGameApplicationState.hpp"
@@ -35,11 +35,11 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
         _stack.push(std::unique_ptr<ApplicationState>(new PreGameApplicationState(_stack, _context)));
     }));
 
-    text.setString("Video options");
+    text.setString("Options");
     auto videoOptions = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.clear();
-        _stack.push(std::unique_ptr<ApplicationState>(new VideoOptionsApplicationState(_stack, _context)));
+        _stack.push(std::unique_ptr<ApplicationState>(new OptionsApplicationState(_stack, _context)));
     }));
 
     text.setString("Quit");
