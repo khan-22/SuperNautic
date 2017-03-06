@@ -16,6 +16,7 @@
 #include "Core/Gui/GuiElement.hpp"
 
 
+
 class GuiContainer : public GuiElement
 {
 public:
@@ -52,6 +53,7 @@ protected:
     void activateSelection();
 
 private:
+
     std::function<void(GuiElement*)> _onElementSelectCallback = [](GuiElement*){};
     sf::Keyboard::Key _nextKey;
     sf::Keyboard::Key _previousKey;

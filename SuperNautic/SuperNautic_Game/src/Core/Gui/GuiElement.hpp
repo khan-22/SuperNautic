@@ -6,7 +6,10 @@
 #include <functional>
 #include <vector>
 
+#include "SFML/Audio/Sound.hpp"
+
 #include "Core/Gui/SceneNode.hpp"
+#include "Core/Asset/Asset.hpp"
 
 class GuiElement : public SceneNode
 {
@@ -23,6 +26,10 @@ public:
 
     void registerOnSelect(const std::function<void()>& callback);
     void registerOnDeselect(const std::function<void()>& callback);
+
+protected:
+    static Asset<sf::SoundBuffer> _stepSoundBuffer;
+    static sf::Sound              _stepSound;
 
 private:
     bool _bIsSelected;
