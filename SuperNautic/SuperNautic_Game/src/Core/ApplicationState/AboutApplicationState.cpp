@@ -79,6 +79,7 @@ void AboutApplicationState::render()
 bool AboutApplicationState::bUpdate(float dtSeconds)
 {
     _context.menuBackground->update(dtSeconds);
+    return true;
 }
 
 bool AboutApplicationState::bHandleEvent(const sf::Event& event)
