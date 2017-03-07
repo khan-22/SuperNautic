@@ -29,6 +29,7 @@ namespace sf
 #include "GFX/Resources/ParticleSystem.hpp"
 
 #include "GFX/Rendering/ViewportPipeline.hpp"
+#include "GFX/Rendering/RenderPass.hpp"
 
 struct ApplicationContext;
 
@@ -64,7 +65,7 @@ private:
 
 	std::vector<GFX::ViewportPipeline>		_viewportPipelines;
 	GFX::Framebuffer						_resultFramebuffer;
-
+	GFX::RenderPass							_invertPass;
 
 	/*std::vector<GFX::DeferredRenderer>	_playerRTs;
 	std::vector<GFX::ZoneRenderer>		_playerZoneRenderers;
