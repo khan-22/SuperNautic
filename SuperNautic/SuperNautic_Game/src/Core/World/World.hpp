@@ -60,9 +60,11 @@ private:
 	const ApplicationContext&				_context;
 
 	// Keeps track of indices and progress of players
-	std::vector<TrackProgression>	_playerProgression;
+	std::vector<TrackProgression>			_playerProgression;
 
-	std::vector<GFX::ViewportPipeline>	_viewportPipelines;
+	std::vector<GFX::ViewportPipeline>		_viewportPipelines;
+	GFX::Framebuffer						_resultFramebuffer;
+
 
 	/*std::vector<GFX::DeferredRenderer>	_playerRTs;
 	std::vector<GFX::ZoneRenderer>		_playerZoneRenderers;

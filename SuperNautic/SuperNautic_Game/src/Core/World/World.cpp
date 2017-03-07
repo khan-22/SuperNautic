@@ -60,6 +60,9 @@ World::World(ApplicationContext& context)
 		abort();
 	}
 
+	GLuint resultColorChannels[] = { 3 };
+	_resultFramebuffer.initialize(0, 0, resultColorChannels, sizeof(resultColorChannels) / sizeof(resultColorChannels[0]));
+
 	if (_players.size() == 1)
 	{
 		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f);
@@ -104,6 +107,7 @@ World::World(ApplicationContext& context)
 		_viewportPipelines[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f);
 		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
+
 
 	_countdown.playCountdown();
 }
