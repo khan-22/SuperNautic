@@ -30,7 +30,7 @@ Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	, _targetLength(10000)
 	, _generatedLength(0)
 	, _totalProgress(0.f)
-	, _endMargin(400)
+	, _endMargin(600)
 	, _endMatrix(glm::mat4())
 {
 	//_octrees.push_back(Octree<SegmentInstance*>(glm::vec3(0, 0, 0), 10000));
@@ -132,7 +132,7 @@ void Track::startNewTrack()
 	}
 	_track.clear();
 
-	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength, 2000.f, 5));
+	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength + 2000, 2000.f, 5));
 }
 
 // Generates the track
@@ -210,6 +210,7 @@ bool Track::bGenerate()
 			}
 			else
 			{
+				failedRecently += 400;
 				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 				_endConnection = _track.back()->getParent()->getEnd();
 				_prevIndex = index;
@@ -449,7 +450,7 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
 	int rotVal = 0;
-	if(maxRotOffset != 0)
+	if (maxRotOffset != 0)
 	{
 		rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	}
@@ -570,7 +571,7 @@ void Track::deleteSegments(const int lengthToDelete)
 		delete _track[index];
 		_track.erase(_track.begin() + _track.size() - 1);
 		// Windows
-		if (_segmentWindows.back().segmentIndex == index)
+		if (_segmentWindows.size() >= 1 && _segmentWindows.back().segmentIndex == index)
 		{
 			_segmentWindows.pop_back();
 		}
@@ -580,25 +581,31 @@ void Track::deleteSegments(const int lengthToDelete)
 // Tries to end the track with a straight path
 bool Track::bEndTrack()
 {
-	while (_generatedLength < _targetLength)
+	// Make sur the currently last segment is of end type a
+	if (_endConnection != 'a')
 	{
-		if (_endConnection == 'a')
+		for (size_t i = 1; i < _segmentHandler->infos().size(); i++)
 		{
-			if (!bInsertNormalSegment(0, true))
+			const Segment * s = _segmentHandler->loadSegment(i);
+			if (s->getStart() == _endConnection && s->getEnd() == 'a')
 			{
-				deleteSegments(_endMargin + 400);
-				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-				return false;
+				if (!bInsertNormalSegment(i, true))
+				{
+					deleteSegments(_endMargin + 400);
+					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+					return false;
+				}
 			}
 		}
-		else if (_endConnection == 'b')
+	}
+	// Insert straight track 
+	while (_generatedLength < _targetLength)
+	{
+		if (!bInsertNormalSegment(0, true))
 		{
-			if (!bInsertNormalSegment(1, true))
-			{
-				deleteSegments(_endMargin + 400);
-				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-				return false;
-			}
+			deleteSegments(_endMargin + 400);
+			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+			return false;
 		}
 	}
 	return true;

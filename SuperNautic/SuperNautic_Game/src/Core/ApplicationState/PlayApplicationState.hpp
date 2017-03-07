@@ -19,6 +19,7 @@ public:
 private:
     World			_world;
     Input           _input;
+    bool            _bHasRaceEnded;
 };
 
 

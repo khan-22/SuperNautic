@@ -19,12 +19,12 @@ namespace sf
 #include "Core/Track/TrackProgression.hpp"
 #include "Core/Gui/Timer.hpp"
 #include "Core/Gui/Progression.hpp"
-#include "GFX/Rendering/DeferredRenderer.hpp" 
-#include "GFX/Rendering/ZoneRenderer.hpp"	  
+#include "GFX/Rendering/DeferredRenderer.hpp"
+#include "GFX/Rendering/ZoneRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
-#include "GFX/Rendering/WindowRenderer.hpp"		
+#include "GFX/Rendering/WindowRenderer.hpp"
 #include "GFX/Rendering/TransparentRenderer.hpp"
-#include "GFX/Rendering/ParticleRenderer.hpp"	
+#include "GFX/Rendering/ParticleRenderer.hpp"
 
 #include "GFX/Resources/ParticleSystem.hpp"
 
@@ -44,6 +44,9 @@ public:
 
 	bool bHasWon();
 	void setTrack(Track * track);
+
+	void pause();
+	void resume();
 
 private:
 	Track*									_track;

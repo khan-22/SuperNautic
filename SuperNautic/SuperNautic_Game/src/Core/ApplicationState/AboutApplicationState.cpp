@@ -65,7 +65,11 @@ AboutApplicationState::AboutApplicationState(ApplicationStateStack& stack, Appli
     _guiGraph.attachChild(theTeam);
 
 
-
+    pos.y += 20.f;
+    auto contact = std::unique_ptr<SceneNode>(new GuiText("Contact: supernautic@pahlavan.se", _font));
+    contact->setOrigin(contact->getBoundingRect().width / 2.f, contact->getBoundingRect().height / 2.f);
+    contact->setPosition(pos);
+    _guiGraph.attachChild(contact);
 }
 
 void AboutApplicationState::render()
