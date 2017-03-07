@@ -42,6 +42,9 @@ public:
 
 	void shipCollision();
 
+	void pause();
+	void resume();
+
 private:
 	int				_playerId;
 	Input			_input;

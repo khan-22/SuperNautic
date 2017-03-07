@@ -124,6 +124,24 @@ void World::handleEvent(const sf::Event& e)
 
 }
 
+void World::pause()
+{
+    _countdown.pause();
+    for(Player& p : _players)
+    {
+        p.pause();
+    }
+}
+
+void World::resume()
+{
+    _countdown.resume();
+    for(Player& p : _players)
+    {
+        p.resume();
+    }
+}
+
 void World::update(float dt, sf::Window& window)
 {
 	if (!_countdown.isPlaying())
@@ -138,7 +156,6 @@ void World::update(float dt, sf::Window& window)
     {
 		for(Player& p : _players)
         {
-            float timeLeft = _countdown.getTimeLeft();
             p.getShip().setInactiveTime(_countdown.getTimeLeft());
         }
     }

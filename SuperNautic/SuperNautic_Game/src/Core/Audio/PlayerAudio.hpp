@@ -21,6 +21,8 @@ public:
 	void setVolume(float volume);
 	void setVolume(Sounds sound, float volume);
 
+	void pause();
+	void resume();
 
 protected:
 

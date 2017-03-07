@@ -22,6 +22,10 @@ public:
 	float getTimeLeft() const;
 
 	bool isPlaying();
+
+	void pause();
+	void resume();
+
 protected:
 
 private:

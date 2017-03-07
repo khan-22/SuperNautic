@@ -25,6 +25,17 @@ Player::~Player()
 {
 }
 
+
+void Player::pause()
+{
+    _audio.pause();
+}
+
+void Player::resume()
+{
+    _audio.resume();
+}
+
 void Player::render(GFX::DeferredRenderer& renderer) //OBSOLETE?
 {
 	renderer.render(_ship);
@@ -41,7 +52,7 @@ void Player::setScreenSize(int screenWidth, int screenHeight, int offsetX, int o
 	_hud.setScreenSize(screenWidth, screenHeight, offsetX, offsetY);
 }
 
-void Player::setId(int id) 
+void Player::setId(int id)
 {
 	_input.setControllerId(id);
 }
@@ -148,8 +159,8 @@ void Player::update(float dt)
 
 	// Apply camera shake
 	glm::mat4 toCameraSpace{ glm::vec4{ glm::normalize(glm::cross(_currentCamera->getUp(), _currentCamera->getDirection())), 0.0f },
-							 glm::vec4{ _currentCamera->getUp(), 0.0f }, 
-							 glm::vec4{ _currentCamera->getDirection(), 0.0f }, 
+							 glm::vec4{ _currentCamera->getUp(), 0.0f },
+							 glm::vec4{ _currentCamera->getDirection(), 0.0f },
 							 glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 	glm::vec3 newPos = glm::vec4{ _currentCamera->getPosition(), 0.0f } + toCameraSpace * glm::vec4{ _cameraVelocityPositionShake() + _cameraCollisionPositionShake(), 0.0f };
 	glm::vec3 newDir = glm::normalize(glm::vec4{ _currentCamera->getDirection(), 0.0f } + toCameraSpace * glm::vec4{ _cameraVelocityDirectionShake() + _cameraCollisionDirectionShake(), 0.0f });
