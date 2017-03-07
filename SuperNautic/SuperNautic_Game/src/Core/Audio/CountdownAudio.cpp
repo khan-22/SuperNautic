@@ -35,3 +35,8 @@ bool CountdownAudio::isPlaying()
 
 	return false;
 }
+
+float CountdownAudio::getTimeLeft() const
+{
+    return (_sbCountdown.get()->getDuration() - _sCountdown.getPlayingOffset()).asSeconds();
+}

@@ -18,6 +18,9 @@ public:
 	// [0, 1]
 	void setVolume(float volume);
 
+	// seconds
+	float getTimeLeft() const;
+
 	bool isPlaying();
 protected:
 
