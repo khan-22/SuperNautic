@@ -7,6 +7,8 @@ const float AudioOptions::_DEFAULT_MUSIC_VOLUME = 1.f;
 const float AudioOptions::_DEFAULT_EFFECTS_VOLUME = 1.f;
 
 AudioOptions::AudioOptions()
+: _musicVolume(_DEFAULT_MUSIC_VOLUME)
+, _effectsVolume(_DEFAULT_EFFECTS_VOLUME)
 {
     readConfig();
 }

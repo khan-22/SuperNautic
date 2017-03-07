@@ -27,6 +27,8 @@ const glm::ivec2 VideoOptions::_DEFAULT_RESOLUTION = _ALLOWED_RESOLUTIONS[0];
 
 VideoOptions::VideoOptions(sf::Window& window)
 : _window(window)
+, _bIsFullscreen(_B_IS_FULLSCREEN)
+, _resolution(_DEFAULT_RESOLUTION)
 {
     readConfig();
 }
