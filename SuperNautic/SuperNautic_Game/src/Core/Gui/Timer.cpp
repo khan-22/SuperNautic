@@ -12,7 +12,7 @@ Timer::Timer(int windowWidth, int windowHeight, int amountOfPlayers) :
 	_tTime.setFont(*_font.get());
 	_tTime.setFillColor(sf::Color::Cyan);
 	_tTime.setString("00:00:00");
-	_tTime.setCharacterSize(windowWidth / 20);
+	_tTime.setCharacterSize(windowWidth / 50);
 	_tTime.setOrigin(_tTime.getGlobalBounds().width / 2.0f, _tTime.getGlobalBounds().height * 1.5f);
 
 	if (amountOfPlayers == 1)

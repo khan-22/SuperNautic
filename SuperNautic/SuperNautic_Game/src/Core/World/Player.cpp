@@ -156,6 +156,7 @@ void Player::update(float dt)
 	_currentCamera->setView(glm::lookAt(newPos, newPos + newDir, _currentCamera->getUp()));
 
     _hud.setSpeed(_ship.getSpeed());
+	_hud.setHeat(_ship.getEngineTemperature());
 	_hud.update();
 
 	float speed = _ship.getSpeed();
