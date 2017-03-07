@@ -23,6 +23,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 , _trackGenerator(context.segmentHandler.get(), context.obstacleHandler.get())
 , _input()
 , _guiContainer(_trackGenerator, &_toolTip, _context.track.get())
+, _title("Lobby", _font)
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
@@ -70,6 +71,9 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     _toolTip.setCharacterSize(18);
 
 
+    _title.setCharacterSize(50);
+    _title.setOrigin(_title.getBoundingRect().width / 2.f, _title.getBoundingRect().height / 2.f);
+    _title.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
 
     _guiContainer.select(startButton);
 
@@ -89,6 +93,7 @@ void PreGameApplicationState::render()
 
     _sfmlRenderer.render(_guiContainer);
     _sfmlRenderer.render(_toolTip);
+    _sfmlRenderer.render(_title);
     _sfmlRenderer.display(_context.window);
 }
 

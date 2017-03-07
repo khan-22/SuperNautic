@@ -1,4 +1,3 @@
-
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -46,7 +45,7 @@ Game::~Game()
 bool Game::bInitialize()
 {
 
-
+	
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 
@@ -124,11 +123,6 @@ bool Game::bInitialize()
 
     _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos3.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
-
-	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
-    {
-        _context.segmentHandler->loadSegment(static_cast<unsigned>(i));
-    }
 
     _context.menuBackground.reset(new MenuBackground(_context.window.getSize().x, _context.window.getSize().y));
 

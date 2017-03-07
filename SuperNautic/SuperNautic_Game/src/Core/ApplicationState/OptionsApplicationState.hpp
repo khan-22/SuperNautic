@@ -13,6 +13,7 @@
 #include "Core/Utility/VideoOptions.hpp"
 #include "Core/Utility/AudioOptions.hpp"
 #include "Core/Gui/GuiToolTip.hpp"
+#include "Core/Gui/GuiText.hpp"
 
 class GuiTextInput;
 class GuiSlider;
@@ -35,6 +36,7 @@ private:
     Asset<sf::Font> _font;
     GFX::SfmlRenderer _sfmlRenderer;
     GuiToolTip  _toolTip;
+    GuiText _title;
 
     void applyOptions();
 };

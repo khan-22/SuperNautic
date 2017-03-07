@@ -22,6 +22,7 @@ OptionsApplicationState::OptionsApplicationState(ApplicationStateStack& stack, A
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _videoOptions(context.window)
 , _toolTip(_font)
+, _title("Options", _font)
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
@@ -126,10 +127,11 @@ OptionsApplicationState::OptionsApplicationState(ApplicationStateStack& stack, A
     _toolTip.setCharacterSize(18);
 
 
+    _title.setCharacterSize(50);
+    _title.setOrigin(_title.getBoundingRect().width / 2.f, _title.getBoundingRect().height / 2.f);
+    _title.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
+
     _guiContainer.toggleSelection();
-
-
-
 }
 
 void OptionsApplicationState::render()
@@ -137,6 +139,7 @@ void OptionsApplicationState::render()
     _sfmlRenderer.render(*_context.menuBackground);
     _sfmlRenderer.render(_guiContainer);
     _sfmlRenderer.render(_toolTip);
+    _sfmlRenderer.render(_title);
     _sfmlRenderer.display(_context.window);
 }
 
@@ -219,14 +222,11 @@ void OptionsApplicationState::applyOptions()
     // SegmentHandler and ObstacleHandler have to be reloaded
     // manually for some reason.
     // TODO: Ask Timmie about it.
+	_context.segmentHandler.reset();
+	_context.obstacleHandler.reset();
+
     _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos3.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
-
-	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
-    {
-        _context.segmentHandler->loadSegment(static_cast<unsigned>(i));
-    }
-
 
     sf::Vector2u size = _context.window.getSize();
 
