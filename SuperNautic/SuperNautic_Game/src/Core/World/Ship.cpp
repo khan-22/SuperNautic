@@ -26,7 +26,7 @@ Ship::Ship(glm::vec3 color)
 		_trackForward{ 0.0f, 0.0f, 1.0f },
 		_shipForward{ 0.0f, 0.0f, 1.0f },
 		_upDirection{ 0.0f, 1.0f, 0.0f },
-		_meshForwardDirection{ glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 800.0f, 20.0f, false},
+		_meshForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 800.0f, 20.0f, false},
 		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 60.0f, 9.0f, true },
 		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
 		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
@@ -45,7 +45,7 @@ Ship::Ship(glm::vec3 color)
 		_bEngineFlash{ false },
 		_bEngineOverload { false },
 		_bObstacleCollision { false },
-		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3> { glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f } },std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
+		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
 		_cooldownOnObstacleCollision{ 2.0f },
 		_immunityoOnObstacleCollision{ 4.0f },
 		_immunityTimer{ 0.0f },
@@ -578,7 +578,6 @@ const glm::vec3 Ship::getVelocity() const
 	return _velocity * _meshForwardDirection();
 }
 
-
 const glm::vec3 Ship::getCameraForward() const
 {
 	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope() - 
@@ -592,7 +591,7 @@ const glm::vec3 Ship::getCameraPosition() const
 		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f));
 }
 
-const glm::mat4 & Ship::getTransform() const
+const glm::mat4& Ship::getTransform() const
 {
 	return _transformMatrix;
 }
@@ -677,7 +676,7 @@ PointLight& Ship::getWarningLight()
 	return _warningLight;
 }
 
-const glm::vec3 & Ship::getColor()
+const glm::vec3& Ship::getColor()
 {
 	return _shipColor;
 }
@@ -690,17 +689,17 @@ void Ship::setBounce(const glm::vec3& bounceVector)
 	_shipCollisionShake.setSpeed(0.5f);
 }
 
-GFX::ParticleSystem & Ship::getLeftParticleSystem()
+GFX::ParticleSystem& Ship::getLeftParticleSystem()
 {
 	return _leftChemtrailParticleSystem;
 }
 
-GFX::ParticleSystem & Ship::getRightParticleSystem()
+GFX::ParticleSystem& Ship::getRightParticleSystem()
 {
 	return _rightChemtrailParticleSystem;
 }
 
-const BoundingBox & Ship::getBoundingBox() const
+const BoundingBox& Ship::getBoundingBox() const
 {
 	return _boundingBox;
 }
