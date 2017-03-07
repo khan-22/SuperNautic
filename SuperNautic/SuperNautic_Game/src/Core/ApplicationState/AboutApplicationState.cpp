@@ -57,18 +57,10 @@ AboutApplicationState::AboutApplicationState(ApplicationStateStack& stack, Appli
         auto author = std::unique_ptr<SceneNode>(new GuiText(authorStr, _font));
         author->setOrigin(author->getBoundingRect().width / 2.f, author->getBoundingRect().height / 2.f);
         author->setPosition(pos);
-//        pos.y += author->getBoundingRect().height * 1.5f;
         pos.y += 40.f;
 
         _guiGraph.attachChild(author);
     }
-
-
-//    auto about = std::unique_ptr<SceneNode>(new GuiText(aboutText.str(), _font));
-//    about->setOrigin(about->getBoundingRect().width / 2.f, about->getBoundingRect().height / 2.f);
-//    about->setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
-//    _guiGraph.attachChild(about);
-
     _guiGraph.attachChild(about);
     _guiGraph.attachChild(theTeam);
 
