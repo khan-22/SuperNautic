@@ -93,6 +93,12 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 		_connections.insert(temp);
 	}
 	infoFile.close();
+
+	// Load all segments
+	for (size_t i = 0; i < _segmentInfos.size(); ++i)
+	{
+		loadSegment(static_cast<unsigned>(i));
+	}
 }
 
 // Destructor

@@ -43,8 +43,8 @@ Ship::Ship(glm::vec3 color)
 		_engineOverload{ 0 },
 		_engineFlashTime{ 0 },
 		_bEngineFlash{ false },
-		_bEngineOverload { false },
-		_bObstacleCollision { false },
+		_bEngineOverload{ false },
+		_bObstacleCollision{ false },
 		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
 		_cooldownOnObstacleCollision{ 2.0f },
 		_immunityoOnObstacleCollision{ 4.0f },
@@ -81,7 +81,6 @@ Ship::Ship(glm::vec3 color)
 	_leftChemtrailParticleSystem.start();
 	_rightChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
 	_rightChemtrailParticleSystem.start();
-	
 }
 
 void Ship::render(GFX::RenderStates& states)

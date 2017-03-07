@@ -127,9 +127,6 @@ OptionsApplicationState::OptionsApplicationState(ApplicationStateStack& stack, A
 
 
     _guiContainer.toggleSelection();
-
-
-
 }
 
 void OptionsApplicationState::render()
@@ -219,14 +216,11 @@ void OptionsApplicationState::applyOptions()
     // SegmentHandler and ObstacleHandler have to be reloaded
     // manually for some reason.
     // TODO: Ask Timmie about it.
+	_context.segmentHandler.reset();
+	_context.obstacleHandler.reset();
+
     _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos1.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
-
-	for(size_t i = 0; i < _context.segmentHandler->infos().size(); i++)
-    {
-        _context.segmentHandler->loadSegment(static_cast<unsigned>(i));
-    }
-
 
     sf::Vector2u size = _context.window.getSize();
 
