@@ -14,8 +14,10 @@ ParticleRenderer::~ParticleRenderer()
 {
 }
 
-void ParticleRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
+void ParticleRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer)
 {
+	_resultFramebuffer = resultFramebuffer;
+
 	_shader = ShaderCache::get("particle_forward");
 	_shader.get()->bind();
 
@@ -34,6 +36,8 @@ void ParticleRenderer::render(Renderable3D& renderable)
 void ParticleRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
+
+	_resultFramebuffer->bindWrite();
 
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;

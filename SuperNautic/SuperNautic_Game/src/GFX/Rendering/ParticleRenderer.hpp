@@ -8,6 +8,8 @@
 
 #include "Core/Asset/LoadAssetFunctions.hpp"
 
+#include "GFX/Rendering/Framebuffer.hpp"
+
 class Camera;		// Forward-decl
 
 namespace GFX
@@ -20,7 +22,7 @@ namespace GFX
 		ParticleRenderer();
 		~ParticleRenderer();
 
-		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
+		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer);
 
 		void render(Renderable3D& renderable);
 		void display(Camera& camera);
@@ -30,6 +32,8 @@ namespace GFX
 	private:
 		std::vector<Renderable3D*> _drawCalls;
 		ShaderAsset	_shader;
+
+		Framebuffer* _resultFramebuffer;
 
 		sf::RenderWindow* _window;
 		GLfloat _x;
