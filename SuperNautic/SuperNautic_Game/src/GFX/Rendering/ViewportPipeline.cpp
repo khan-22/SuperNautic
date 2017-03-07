@@ -8,15 +8,16 @@ GFX::ViewportPipeline::~ViewportPipeline()
 {
 }
 
-void GFX::ViewportPipeline::initialize(sf::RenderWindow * window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
+void GFX::ViewportPipeline::initialize(sf::RenderWindow * window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer)
 {
 	_window = window;
+	_resultFramebuffer = resultFramebuffer;
 
-	generalDeferred.initialize(window, x, y, width, height);
-	zoneForward.initialize(window, x, y, width, height);
-	windowForward.initialize(window, x, y, width, height);
-	transparentForward.initialize(window, x, y, width, height);
-	particleForward.initialize(window, x, y, width, height);
+	generalDeferred.initialize(window, x, y, width, height, resultFramebuffer);
+	zoneForward.initialize(window, x, y, width, height, resultFramebuffer);
+	windowForward.initialize(window, x, y, width, height, resultFramebuffer);
+	transparentForward.initialize(window, x, y, width, height, resultFramebuffer);
+	particleForward.initialize(window, x, y, width, height, resultFramebuffer);
 }
 
 void GFX::ViewportPipeline::display(Camera& camera)
@@ -28,4 +29,7 @@ void GFX::ViewportPipeline::display(Camera& camera)
 	windowForward.display(camera);
 	transparentForward.display(camera);
 	particleForward.display(camera);
+
+
+
 }

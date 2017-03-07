@@ -23,7 +23,7 @@ namespace GFX
 		ViewportPipeline();
 		~ViewportPipeline();
 
-		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
+		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer);
 
 		GFX::DeferredRenderer		generalDeferred;
 		GFX::ZoneRenderer			zoneForward;
@@ -36,7 +36,7 @@ namespace GFX
 	private:
 		sf::RenderWindow*	_window;
 
-
+		Framebuffer*		_resultFramebuffer;
 
 	};
 }
