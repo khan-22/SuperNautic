@@ -48,11 +48,16 @@ PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stac
     _title.setCharacterSize(50);
     _title.setOrigin(_title.getBoundingRect().width / 2.f, _title.getBoundingRect().height / 2.f);
     _title.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
+
+    _background.setSize(sf::Vector2f(windowSize.x, windowSize.y));
+    _background.setPosition(0.f, 0.f);
+    _background.setFillColor(sf::Color(0, 0, 0, 180));
 }
 
 void PauseMenuApplicationState::render()
 {
     GFX::SfmlRenderer renderer;
+    renderer.render(_background);
     renderer.render(_guiContainer);
     renderer.render(_title);
     renderer.display(_context.window);
