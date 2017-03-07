@@ -59,9 +59,9 @@ private:
 	TextureAsset			_texture;
 	GFX::TexturedModel		_texturedModel;
 
-	GFX::ForwardRenderer	_forwardRenderer;
-	GFX::DeferredRenderer	_deferredRenderer;
-	GFX::ParticleRenderer	_particleRenderer;
+	//GFX::ForwardRenderer	_forwardRenderer;
+	//GFX::DeferredRenderer	_deferredRenderer;
+	//GFX::ParticleRenderer	_particleRenderer;
 
 	GFX::ParticleSystem		_testParticles;
 
