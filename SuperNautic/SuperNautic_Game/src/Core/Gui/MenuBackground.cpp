@@ -17,7 +17,7 @@ MenuBackground::MenuBackground(size_t width, size_t height)
     _colorFillBot.setPosition(0.f, _height / 2.f);
 
     sf::Color colorTop(11, 68, 87, 255);
-    sf::Color colorBot(27, 173, 222, 255);
+    sf::Color colorBot(27 / 2, 173 / 2, 222 / 2, 255);
     _colorFillTop.setFillColor(colorTop);
     _colorFillBot.setFillColor(colorBot);
 
@@ -27,11 +27,11 @@ MenuBackground::MenuBackground(size_t width, size_t height)
 void MenuBackground::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(_colorFillBot, states);
+    target.draw(_colorFillTop, states);
     for(const Bubble& bubble : _bubbles)
     {
         target.draw(bubble.visual, states);
     }
-    target.draw(_colorFillTop, states);
 }
 
 void MenuBackground::update(float dtSeconds)
