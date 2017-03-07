@@ -15,8 +15,10 @@ WindowRenderer::~WindowRenderer()
 {
 }
 
-void WindowRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
+void WindowRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer)
 {
+	_resultFramebuffer = resultFramebuffer;
+
 	_windowShader = ShaderCache::get("window_forward");
 	_windowShader.get()->bind();
     _windowShader.get()->setSampler("uOutsideBuffer", 0);
@@ -102,7 +104,9 @@ void GFX::WindowRenderer::outsidePass(Camera & camera)
 
 void GFX::WindowRenderer::windowPass(Camera & camera)
 {
-	Framebuffer::DEFAULT.bindWrite();
+	assert(_window != nullptr);
+
+	_resultFramebuffer->bindWrite();
 	_outsideFrameBuffer.bindRead();
 	_outsideFrameBuffer.bindColorTextures();
 	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
