@@ -13,10 +13,11 @@
 #include "Core/Gui/GuiButton.hpp"
 #include "Core/Utility/Camera.h"
 #include "GFX/Rendering/SfmlRenderer.hpp"
+#include "Core/World/World.hpp"
 
-
-PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
+PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stack, ApplicationContext& context, World& world)
 : ApplicationState(stack, context)
+, _world(world)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _input()
 , _title("Paused", _font)
@@ -52,6 +53,8 @@ PauseMenuApplicationState::PauseMenuApplicationState(ApplicationStateStack& stac
     _background.setSize(sf::Vector2f(windowSize.x, windowSize.y));
     _background.setPosition(0.f, 0.f);
     _background.setFillColor(sf::Color(0, 0, 0, 180));
+
+    _world.pause();
 }
 
 void PauseMenuApplicationState::render()
@@ -98,6 +101,7 @@ bool PauseMenuApplicationState::bHandleEvent(const sf::Event& event)
         case sf::Keyboard::Escape:
         case sf::Keyboard::B:
             _stack.pop();
+            _world.resume();
             return false;
 
         default:

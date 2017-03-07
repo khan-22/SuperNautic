@@ -232,6 +232,7 @@ void OptionsApplicationState::applyOptions()
 
     _context.menuBackground.reset(new MenuBackground(size.x, size.y));
     _guiContainer.setPosition(size.x / 2.f, size.y / 2.f);
+    _title.setPosition(size.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
     _toolTip.centerAt(static_cast<size_t>(size.x / 2.f), static_cast<size_t>(size.y * 0.95f));
 }
 

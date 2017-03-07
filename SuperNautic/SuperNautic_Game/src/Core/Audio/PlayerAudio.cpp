@@ -24,6 +24,34 @@ PlayerAudio::~PlayerAudio()
 
 }
 
+void PlayerAudio::pause()
+{
+    _sEngine.pause();
+    _sShipCollision.pause();
+    _sObstacleCollision.pause();
+    _sOverheat.pause();
+}
+
+void PlayerAudio::resume()
+{
+    if(_sEngine.getStatus() == sf::Sound::Paused)
+    {
+        _sEngine.play();
+    }
+    if(_sShipCollision.getStatus() == sf::Sound::Paused)
+    {
+        _sShipCollision.play();
+    }
+    if(_sObstacleCollision.getStatus() == sf::Sound::Paused)
+    {
+        _sObstacleCollision.play();
+    }
+    if(_sOverheat.getStatus() == sf::Sound::Paused)
+    {
+        _sOverheat.play();
+    }
+}
+
 void PlayerAudio::playAudio(Sounds sound)
 {
 	switch (sound)
