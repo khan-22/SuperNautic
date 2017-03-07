@@ -6,6 +6,7 @@
 
 #include "Core/ApplicationState/MainMenuApplicationState.hpp"
 #include "Core/ApplicationState/OptionsApplicationState.hpp"
+#include "Core/ApplicationState/AboutApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
 #include "Core/ApplicationState/PreGameApplicationState.hpp"
@@ -29,7 +30,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     text.setFillColor(sf::Color::White);
 
     text.setString("Play");
-    auto button1 = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
+    auto play = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.pop();
         _stack.push(std::unique_ptr<ApplicationState>(new PreGameApplicationState(_stack, _context)));
@@ -42,18 +43,28 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
         _stack.push(std::unique_ptr<ApplicationState>(new OptionsApplicationState(_stack, _context)));
     }));
 
+    text.setString("About");
+    auto about = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
+    {
+        _stack.clear();
+        _stack.push(std::unique_ptr<ApplicationState>(new AboutApplicationState(_stack, _context)));
+    }));
+
     text.setString("Quit");
-    auto button2 = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
+    auto quit = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
         _stack.clear();
     }));
 
-    options->move(0.f, button1->getBoundingRect().height * 1.5f);
-    button2->setPosition(options->getPosition());
-    button2->move(0.f, options->getBoundingRect().height * 1.5f);
-    _guiContainer.insert(button1);
+    options->move(0.f, play->getBoundingRect().height * 1.5f);
+    about->setPosition(options->getPosition());
+    about->move(0.f, options->getBoundingRect().height * 1.5f);
+    quit->setPosition(about->getPosition());
+    quit->move(0.f, about->getBoundingRect().height * 1.5f);
+    _guiContainer.insert(play);
     _guiContainer.insert(options);
-    _guiContainer.insert(button2);
+    _guiContainer.insert(about);
+    _guiContainer.insert(quit);
 
     sf::Vector2u windowSize = _context.window.getSize();
     sf::FloatRect guiBounds = _guiContainer.getBoundingRect();
@@ -65,7 +76,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
 
     _titleText.setCharacterSize(100);
     _titleText.setOrigin(_titleText.getBoundingRect().width / 2.f, _titleText.getBoundingRect().height / 2.f);
-    _titleText.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
+    _titleText.setPosition(windowSize.x / 2.f, windowSize.y / 4.f);
     _titleText.setScale(1.5f, 1.f);
     _titleText.setOutlineThickness(0.f);
 }
