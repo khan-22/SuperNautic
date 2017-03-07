@@ -23,7 +23,7 @@ void GFX::ViewportPipeline::initialize(sf::RenderWindow * window, GLfloat x, GLf
 void GFX::ViewportPipeline::display(Camera& camera)
 {
 	generalDeferred.display(camera);
-	generalDeferred.blitDepthOnto(GFX::Framebuffer::DEFAULT);
+	generalDeferred.blitDepthOnto(*_resultFramebuffer);
 
 	zoneForward.display(camera);
 	windowForward.display(camera);
