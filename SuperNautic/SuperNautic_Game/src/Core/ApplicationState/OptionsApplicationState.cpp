@@ -225,7 +225,7 @@ void OptionsApplicationState::applyOptions()
 	_context.segmentHandler.reset();
 	_context.obstacleHandler.reset();
 
-    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos1.txt", "Segments/ConnectionTypes.txt"));
+    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos3.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
 
     sf::Vector2u size = _context.window.getSize();
