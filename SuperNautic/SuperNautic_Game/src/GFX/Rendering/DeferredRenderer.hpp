@@ -22,7 +22,7 @@ namespace GFX
 		DeferredRenderer();
 		~DeferredRenderer();
 
-		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
+		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer);
 		void pushPointLight(PointLight& pointLight);
 
 		void render(Renderable3D& renderable);
@@ -38,6 +38,7 @@ namespace GFX
 		ShaderAsset	_lightPassShader;
 
 		Framebuffer _frameBuffer;
+		Framebuffer* _resultFramebuffer;
 
 		sf::RenderWindow* _window;
 		GLfloat _x;

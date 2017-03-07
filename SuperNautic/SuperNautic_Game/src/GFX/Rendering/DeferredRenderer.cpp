@@ -13,8 +13,10 @@ DeferredRenderer::~DeferredRenderer()
 {
 }
 
-void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
+void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer)
 {
+	_resultFramebuffer = resultFramebuffer;
+
 	_geometryPassShader = ShaderCache::get("geometry_deferred");
 	_lightPassShader = ShaderCache::get("light_deferred");
 
@@ -135,7 +137,7 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	//*************** LIGHT PASS *******************//
 	//**********************************************//
 
-	Framebuffer::DEFAULT.bindWrite();
+	_resultFramebuffer->bindWrite();
 	_frameBuffer.bindRead();
 	_frameBuffer.bindColorTextures();
 
