@@ -14,6 +14,7 @@
 #include "GFX/Rendering/SfmlRenderer.hpp"
 #include "Core/Utility/TrackPresetManager.hpp"
 #include "Core/Gui/GuiToolTip.hpp"
+#include "Core/Gui/GuiText.hpp"
 
 class GuiPlayerJoinContainer;
 
@@ -33,6 +34,8 @@ private:
     GuiTrackGenerator _trackGenerator;
     GuiTrackGeneratorControls _guiContainer;
     GuiPlayerJoinContainer* _players;
+    GuiText            _title;
+
     Input _input;
 
     GFX::SfmlRenderer _sfmlRenderer;

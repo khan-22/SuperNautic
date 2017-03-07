@@ -65,7 +65,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
 
     _titleText.setCharacterSize(100);
     _titleText.setOrigin(_titleText.getBoundingRect().width / 2.f, _titleText.getBoundingRect().height / 2.f);
-    _titleText.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
+    _titleText.setPosition(windowSize.x / 2.f, windowSize.y / 4.f);
     _titleText.setScale(1.5f, 1.f);
     _titleText.setOutlineThickness(0.f);
 }

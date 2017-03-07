@@ -19,6 +19,7 @@ VictoryApplicationState::VictoryApplicationState(ApplicationStateStack& stack, A
 : ApplicationState(stack, context)
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _input()
+, _title("Finish!", _font)
 {
     std::cout << "Welcome to Victory state." << std::endl;
 
@@ -50,12 +51,17 @@ VictoryApplicationState::VictoryApplicationState(ApplicationStateStack& stack, A
 
     sf::Vector2u windowSize = _context.window.getSize();
     _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
+
+    _title.setCharacterSize(50);
+    _title.setOrigin(_title.getBoundingRect().width / 2.f, _title.getBoundingRect().height / 2.f);
+    _title.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
 }
 
 void VictoryApplicationState::render()
 {
     GFX::SfmlRenderer renderer;
     renderer.render(_guiContainer);
+    renderer.render(_title);
     renderer.display(_context.window);
 }
 

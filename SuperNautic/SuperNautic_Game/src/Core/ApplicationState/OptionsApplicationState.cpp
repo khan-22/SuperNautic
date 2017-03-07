@@ -22,6 +22,7 @@ OptionsApplicationState::OptionsApplicationState(ApplicationStateStack& stack, A
 , _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 , _videoOptions(context.window)
 , _toolTip(_font)
+, _title("Options", _font)
 {
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
@@ -126,6 +127,10 @@ OptionsApplicationState::OptionsApplicationState(ApplicationStateStack& stack, A
     _toolTip.setCharacterSize(18);
 
 
+    _title.setCharacterSize(50);
+    _title.setOrigin(_title.getBoundingRect().width / 2.f, _title.getBoundingRect().height / 2.f);
+    _title.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
+
     _guiContainer.toggleSelection();
 
 
@@ -137,6 +142,7 @@ void OptionsApplicationState::render()
     _sfmlRenderer.render(*_context.menuBackground);
     _sfmlRenderer.render(_guiContainer);
     _sfmlRenderer.render(_toolTip);
+    _sfmlRenderer.render(_title);
     _sfmlRenderer.display(_context.window);
 }
 
