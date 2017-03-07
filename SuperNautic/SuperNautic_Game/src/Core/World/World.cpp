@@ -126,6 +126,23 @@ void World::handleEvent(const sf::Event& e)
 
 void World::update(float dt, sf::Window& window)
 {
+	if (!_countdown.isPlaying())
+	{
+		_timer.updateTime(dt);
+		for(Player& p : _players)
+        {
+            p.getShip().setInactiveTime(0.f);
+        }
+	}
+	else
+    {
+		for(Player& p : _players)
+        {
+            float timeLeft = _countdown.getTimeLeft();
+            p.getShip().setInactiveTime(_countdown.getTimeLeft());
+        }
+    }
+
 	if (!_bDebugging)
 	{
 		// Update players
@@ -171,7 +188,7 @@ void World::update(float dt, sf::Window& window)
 			{
 				_players[i].getShip().setSegments(instances);
 			}
-			
+
 			_players[i].update(dt);
 
 			// Check for ship-ship collisions
@@ -246,10 +263,7 @@ void World::update(float dt, sf::Window& window)
 	}
 	_track->update(dt, static_cast<unsigned>(max), static_cast<unsigned>(min));
 
-	if (!_countdown.isPlaying())
-	{
-		_timer.updateTime(dt);
-	}
+
 	_timer.updateCurrent();
 
 	_progression.updateCurrent();
@@ -330,9 +344,9 @@ void World::render()
 		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 
 		_playerZoneRenderers[0].display(_debugCamera);
-		
+
 		_playerWindowRenderers[0].display(_debugCamera);
-		
+
 		_playerParticleRenderers[0].display(_debugCamera);*/
 
 		_viewportPipelines[0].display(_debugCamera);
