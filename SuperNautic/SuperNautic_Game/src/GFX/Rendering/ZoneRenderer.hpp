@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "Core/Asset/LoadAssetFunctions.hpp"
+#include "GFX/Rendering/Framebuffer.hpp"
 
 class Camera;		// Forward-decl
 
@@ -20,7 +21,7 @@ namespace GFX
 		ZoneRenderer();
 		~ZoneRenderer();
 
-		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
+		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer);
 
 		void render(TemperatureZone& temperatureZone);
 		void display(Camera& camera);
@@ -30,6 +31,8 @@ namespace GFX
 	private:
 		std::vector<TemperatureZone*> _drawCalls;
 		ShaderAsset	_shader;
+
+		Framebuffer* _resultFramebuffer;
 
 		sf::RenderWindow* _window;
 		GLfloat _x;

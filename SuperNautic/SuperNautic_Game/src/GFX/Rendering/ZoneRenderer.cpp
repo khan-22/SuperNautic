@@ -14,8 +14,10 @@ ZoneRenderer::~ZoneRenderer()
 {
 }
 
-void ZoneRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
+void ZoneRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer)
 {
+	_resultFramebuffer = resultFramebuffer;
+
 	_shader = ShaderCache::get("zone_forward");
 	_shader.get()->bind();
     _shader.get()->setSampler("uDiffuse", 0);
@@ -45,6 +47,8 @@ void ZoneRenderer::render(TemperatureZone& temperatureZone)
 void ZoneRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
+
+	_resultFramebuffer->bindWrite();
 
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
