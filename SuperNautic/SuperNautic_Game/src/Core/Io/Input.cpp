@@ -59,7 +59,7 @@ void Input::update()
 		{
 			_triggers = 0.f;
 		}
-		
+
 		if (abs(_dPadX) < thresh)
 		{
 			_dPadX = 0.f;

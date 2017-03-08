@@ -115,7 +115,7 @@ void PreGameApplicationState::render()
 bool PreGameApplicationState::bUpdate(float dtSeconds)
 {
     _context.menuBackground->update(dtSeconds);
-    _guiContainer.update();
+    _guiContainer.update(dtSeconds);
     _trackGenerator.update(dtSeconds);
 
     if(_input.checkActive())

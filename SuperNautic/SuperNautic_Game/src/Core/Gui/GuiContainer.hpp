@@ -59,7 +59,7 @@ private:
     sf::Keyboard::Key _previousKey;
 
     virtual void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
-    virtual void updateCurrent() override;
+    virtual void updateCurrent(float dtSeconds) override;
 
     void selectNext();
     void selectPrevious();

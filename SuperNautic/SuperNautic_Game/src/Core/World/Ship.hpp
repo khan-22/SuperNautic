@@ -170,7 +170,7 @@ private:
 
 	void checkObstacleCollision();
 
-	// Helper functions for update()
+	// Helper functions for update(float dtSeconds)
 	void handleInputs(float dt);
 	void handleCooldowns(float dt);
 	void handleTemperature(float dt);
