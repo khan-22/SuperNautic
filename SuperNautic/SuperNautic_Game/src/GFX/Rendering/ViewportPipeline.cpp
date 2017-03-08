@@ -38,6 +38,6 @@ void GFX::ViewportPipeline::display(Camera& camera)
 	transparentForward.display(camera);
 	particleForward.display(camera);
 
-	_darkZonePass.perform();
+//	_darkZonePass.perform();
 
 }
