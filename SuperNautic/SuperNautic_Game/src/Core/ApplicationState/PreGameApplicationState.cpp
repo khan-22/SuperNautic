@@ -38,16 +38,14 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     guiElements.emplace_back(startButton);
 
     GuiHorizontalList* songList = new GuiHorizontalList();
-    std::vector<std::string> playList = {"Stranger Danger - Mellow Business", "Stranger Danger - Haste"};
-//    for(std::string song : _context.audio.getPlaylist())
-    for(std::string song : playList)
+    for(const std::string& song : _context.audio.getPlaylist())
     {
-        auto guiSong = std::unique_ptr<GuiElement>(new GuiText(song, _font));
-        guiSong->registerOnSelect([&context, song]()
+        GuiText* songText = new GuiText(song, _font);
         {
-            context.audio.changeSong(song);
+            context.audio.changeSong(songText->getText());
         });
-        songList->insert(guiSong);
+        auto songTextPtr = std::unique_ptr<GuiElement>(songText);
+        songList->insert(songTextPtr);
     }
     guiElements.emplace_back(songList);
 
