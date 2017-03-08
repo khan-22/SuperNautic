@@ -273,9 +273,9 @@ void World::update(float dt, sf::Window& window)
 	_track->update(dt, static_cast<unsigned int>(max), static_cast<unsigned int>(min));
 
 
-	_timer.updateCurrent();
+	_timer.updateCurrent(dt);
 
-	_progression.updateCurrent();
+	_progression.updateCurrent(dt);
 
 	_playTime += dt;
 }

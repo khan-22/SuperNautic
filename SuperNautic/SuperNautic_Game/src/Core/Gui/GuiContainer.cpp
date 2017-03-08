@@ -30,11 +30,11 @@ GuiContainer::~GuiContainer()
     _elements.clear();
 }
 
-void GuiContainer::updateCurrent()
+void GuiContainer::updateCurrent(float dtSeconds)
 {
     for(std::unique_ptr<GuiElement>& element : _elements)
     {
-        element->update();
+        element->update(dtSeconds);
     }
 }
 

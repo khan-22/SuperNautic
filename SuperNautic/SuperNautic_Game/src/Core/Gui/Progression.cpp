@@ -59,7 +59,7 @@ void Progression::updatePositions(std::vector<float> positions)
 	}
 }
 
-void Progression::updateCurrent()
+void Progression::updateCurrent(float dtSeconds)
 {
 	for (int i = 0; i < _progressionMeter.size(); i++)
 	{

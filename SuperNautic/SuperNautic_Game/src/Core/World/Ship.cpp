@@ -14,7 +14,7 @@
 #include "Core/Utility/CollisionUtility.hpp"
 
 Ship::Ship(glm::vec3 color)
-	: 
+	:
 	_destroyed{ false },
 	_stopped{ false },
 	_turningFactor{ 0.0f },
@@ -312,7 +312,7 @@ void Ship::handleTemperature(float dt)
 
 	difference += _currentSurfaceTemperature * 3.5f;
 
-	_engineTemperature += (difference == 0.0f ? 1.0f : (abs(difference) / difference)) *  powf(abs(difference), 1.2f) * 0.2f * dt;
+	_engineTemperature += (difference == 0.0f ? 1.0f : (std::fabs(difference) / difference)) *  powf(std::fabs(difference), 1.2f) * 0.2f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 
 	if (_engineTemperature > _overheatTemperature)
@@ -514,7 +514,7 @@ bool Ship::getOverload(float dt)
 
 bool Ship::isEngineOverload()
 {
-	if (_bEngineOverload) 
+	if (_bEngineOverload)
 	{
 		_bEngineOverload = false;
 		return true;

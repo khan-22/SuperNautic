@@ -35,21 +35,21 @@ void SceneNode::clearChildren()
     _children.clear();
 }
 
-void SceneNode::update()
+void SceneNode::update(float dtSeconds)
 {
-    updateCurrent();
-	updateChildren();
+    updateCurrent(dtSeconds);
+	updateChildren(dtSeconds);
 }
 
-void SceneNode::updateCurrent()
+void SceneNode::updateCurrent(float dtSeconds)
 {
 }
 
-void SceneNode::updateChildren()
+void SceneNode::updateChildren(float dtSeconds)
 {
 	for(std::unique_ptr<SceneNode>& child : _children)
     {
-        child->update();
+        child->update(dtSeconds);
     }
 }
 
