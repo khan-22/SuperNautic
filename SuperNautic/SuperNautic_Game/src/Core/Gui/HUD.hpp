@@ -10,8 +10,12 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 
+#include "glm/glm.hpp"
+
+
 #include "Core/Gui/SceneNode.hpp"
 #include "Core/Asset/Asset.hpp"
+
 
 
 class HUD : public SceneNode
@@ -25,10 +29,13 @@ public:
 	void setPosition(int position);
 	void setScreenSize(int width, int height, int offsetX, int offsetY);
 
-	void updateCurrent() override;
+	void updateCurrent(float dtSeconds) override;
 	void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
+    static const glm::vec4 _MIN_SPEEDER_COLOR;
+    static const glm::vec4 _MAX_SPEEDER_COLOR;
+
 	float				_widthStep;
 	float				_heightStep;
 	int					_offsetX;
@@ -46,6 +53,8 @@ private:
 
 	sf::RectangleShape	_heatOverlay;
 	Asset<sf::Texture>	_heatOverlayTexture;
+
+	float               _overHeatTimer;
 
 	//sf::Text			_tSpeed;
 	//sf::Text			_tPosition;
