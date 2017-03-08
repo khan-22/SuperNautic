@@ -287,7 +287,7 @@ void World::update(float dt, sf::Window& window)
 	_playTime += dt;
 
 
-	//_invertPass.setEffectFactor(_players[0].getShip().getSpeed() / 200.f);
+	//_darkZonePass.setEffectFactor(_players[0].getShip().getSpeed() / 200.f);
 }
 
 void World::render()
