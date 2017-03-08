@@ -1,7 +1,7 @@
 #include "Core/Utility/SpringTranslatedVector.hpp"
 
-SpringTranslatedVector::SpringTranslatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& slowAxis, float springConstant, float slowSpringConstant)
-	: _vector{ vector }, _target{ target }, _springConstant{ springConstant }, _velocity{ 0 }, _slowAxis{ slowAxis }, _slowSpringConstant{ slowSpringConstant }, _slowVelocity{ 0 }
+SpringTranslatedVector::SpringTranslatedVector(const glm::vec3& vector, const glm::vec3& target, const glm::vec3& alternateAxis, float springConstant, float alternateSpringConstant)
+	: _vector{ vector }, _target{ target }, _springConstant{ springConstant }, _velocity{ 0 }, _alternateAxis{ alternateAxis }, _alternateSpringConstant{ alternateSpringConstant }, _alternateVelocity{ 0 }
 {
 
 }
@@ -11,10 +11,10 @@ void SpringTranslatedVector::update(float dt)
 
 	// http://mathproofs.blogspot.se/2013/07/critically-damped-spring-smoothing.html
 	_velocity = (_velocity - _springConstant * _springConstant * dt * (-toTarget)) / powf(1 + _springConstant * dt, 2.0f);
-	_slowVelocity = (_slowVelocity - _slowSpringConstant * _slowSpringConstant * dt * (-toTarget)) / powf(1 + _slowSpringConstant * dt, 2.0f);
+	_alternateVelocity = (_alternateVelocity - _alternateSpringConstant * _alternateSpringConstant * dt * (-toTarget)) / powf(1 + _alternateSpringConstant * dt, 2.0f);
 
-	glm::vec3 movementAlongSlowAxis{ glm::dot(_slowVelocity, _slowAxis) * _slowAxis };
-	glm::vec3 otherMovement{ _velocity - glm::dot(_velocity, _slowAxis) * _slowAxis };
+	glm::vec3 movementAlongSlowAxis{ glm::dot(_alternateVelocity, _alternateAxis) * _alternateAxis };
+	glm::vec3 otherMovement{ _velocity - glm::dot(_velocity, _alternateAxis) * _alternateAxis };
 
 	_vector = _vector + (otherMovement + movementAlongSlowAxis) * dt;
 }
@@ -39,12 +39,17 @@ void SpringTranslatedVector::setSpringConstant(float springConstant)
 	_springConstant = springConstant;
 }
 
+void SpringTranslatedVector::setAlternateSpringConstant(float alternateSpringConstant)
+{
+	_alternateSpringConstant = alternateSpringConstant;
+}
+
 void SpringTranslatedVector::setVector(const glm::vec3& vector)
 {
 	_vector = vector;
 }
 
-void SpringTranslatedVector::setSlowAxis(const glm::vec3& slowAxis)
+void SpringTranslatedVector::setAlternateAxis(const glm::vec3& slowAxis)
 {
-	_slowAxis = slowAxis;
+	_alternateAxis = slowAxis;
 }

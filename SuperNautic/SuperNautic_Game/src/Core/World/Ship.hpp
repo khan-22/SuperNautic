@@ -127,9 +127,12 @@ private:
 
 	SpringSmoothedValue			_surfaceSlope;			// Determines the height of the camera
 	SpringSmoothedValue			_intensityOffset;		// Offset for engine light intensity
+	SpringSmoothedValue			_meshSpringValue;		// Spring value for mesh position
 	float						_timeUntilIntensityUpdate;
 
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
+
+	bool						_jumping;				// True if the ship is currently jumping
 
 	float _currentSurfaceTemperature{ 0.0f };
 
@@ -148,8 +151,7 @@ private:
 	const float _speedResistance;			// 'Air resistance'
 	const float _preferredHeight;			// Desired ship height above track
 
-	const float _rayHeight;			// Height above ship of the origin of the rays used for intersection
-	const float _rayAheadDistance;	// Distance ahead of ship the second ray starts
+	const float _rayHeight;			// Height above ship of the origin of the ray used for intersection
 
 	const float _cooldownOnObstacleCollision;
 	const float _immunityoOnObstacleCollision;

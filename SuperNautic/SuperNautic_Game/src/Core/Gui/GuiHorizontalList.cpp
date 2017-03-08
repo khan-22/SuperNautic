@@ -38,7 +38,8 @@ bool GuiHorizontalList::bIsSelectable() const
 
 void GuiHorizontalList::updateSize()
 {
-    _marginBetweenElements = _maxElementWidth * 0.5f;
+//    _marginBetweenElements = _maxElementWidth * 0.5f;
+    _marginBetweenElements = 20.f;
     _elementStepX = _marginBetweenElements + _maxElementWidth;
     sf::Vector2f size(_maxElementWidth * _maxVisibleElements + _marginBetweenElements * (_maxVisibleElements - 1), _maxElementHeight);
 

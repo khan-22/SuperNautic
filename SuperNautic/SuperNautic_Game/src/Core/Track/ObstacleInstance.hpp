@@ -14,6 +14,7 @@ public:
 	ObstacleInstance(const glm::mat4& m, ObstacleHandler::Obstacle* parent, float diff);
 	virtual ~ObstacleInstance();
 	void update(const float dt);
+	void decreaseSpeed(const float dt);
 	void render(GFX::RenderStates& states) override;
 	std::vector<BoundingBox>& getBoundingBoxes() const;
 	const glm::mat4& getModelMatrix() const;

@@ -1,5 +1,6 @@
 #include <math.h>
 #include <cstdlib>
+#include <algorithm>
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -13,60 +14,62 @@
 #include "Core/Utility/CollisionUtility.hpp"
 
 Ship::Ship(glm::vec3 color)
-	:	_destroyed{ false },
-		_stopped{ false },
-		_turningFactor{ 0.0f },
-		_currentTurningAngle{ 0.0f },
-		_accelerationFactor{ 0.5f },
-		_jumpCooldown{ .5f },
-		_currentJumpCooldown{ 0.0f },
-		_engineTemperature{ 0.0f },
-		_velocity{ 0.0f },
-		_timeSinceIntersection{ 0.0f },
-		_trackForward{ 0.0f, 0.0f, 1.0f },
-		_shipForward{ 0.0f, 0.0f, 1.0f },
-		_upDirection{ 0.0f, 1.0f, 0.0f },
-		_meshForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 800.0f, 20.0f, false},
-		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 60.0f, 9.0f, true },
-		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
-		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
-		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f },glm::vec3{0,1,0}, 100.0f, 5.0f },
-		_minAcceleration{ 0.0f },
-		_maxAcceleration{ 100.0f },
-		_maxTurningSpeed{ 20.0f },
-		_straighteningForce{ 3.0f },
-		_steerStraighteningForce{ 10.0f },
-		_speedResistance{ 0.001f },
-		_preferredHeight{ 1.5f },
-		_engineCooldown{ 0 },
-		_engineOverload{ 0 },
-		_engineFlashTime{ 0 },
-		_bEngineFlash{ false },
-		_bEngineOverload{ false },
-		_bObstacleCollision{ false },
-		_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
-		_cooldownOnObstacleCollision{ 2.0f },
-		_immunityoOnObstacleCollision{ 4.0f },
-		_immunityTimer{ 0.0f },
-		_blinkFrequency{ 0.1f },
-		_surfaceSlope{ 0.0f, 0.0f, 0.5f },
-		_rayHeight{ 1.0f },
-		_rayAheadDistance{ 5.0f },
-		_steeringCooldown{ 0.0f },
-		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
-		_shipColor{ color },
-		_engineLight{ glm::vec3{ 0.0f }, _shipColor, 1.0f },
-		_warningLight{ glm::vec3{ 0.0f }, glm::vec3{ 1.0f }, 2.0f },
-		_intensityOffset{ 1.0f, 1.0f, 20.0f },
-		_timeUntilIntensityUpdate{ 0.0f },
-		_overheatTemperature{ 0.95f },
-		_warningLevel{ 0.8f },
-		_warningLightIntensity{ 2.0f },
-		_warningAccumulator{ 0.0f },
-		_engineBlinkAccumulator{ 0.0f },
-		_bounceVector{ 0.0f },
-		_bounceDecay{ 1.0f },
-		_inactiveAtStart{ 3.5f }
+	: 
+	_destroyed{ false },
+	_stopped{ false },
+	_turningFactor{ 0.0f },
+	_currentTurningAngle{ 0.0f },
+	_accelerationFactor{ 0.5f },
+	_jumpCooldown{ .5f },
+	_currentJumpCooldown{ 0.0f },
+	_engineTemperature{ 0.0f },
+	_velocity{ 0.0f },
+	_timeSinceIntersection{ 0.0f },
+	_trackForward{ 0.0f, 0.0f, 1.0f },
+	_shipForward{ 0.0f, 0.0f, 1.0f },
+	_upDirection{ 0.0f, 1.0f, 0.0f },
+	_meshForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 800.0f, 20.0f, false },
+	_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 60.0f, 9.0f, true },
+	_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
+	_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
+	_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0, 1, 0 }, 5.0f, 100.0f },
+	_minAcceleration{ 0.0f },
+	_maxAcceleration{ 100.0f },
+	_maxTurningSpeed{ 20.0f },
+	_straighteningForce{ 3.0f },
+	_steerStraighteningForce{ 10.0f },
+	_speedResistance{ 0.001f },
+	_preferredHeight{ 1.5f },
+	_engineCooldown{ 0 },
+	_engineOverload{ 0 },
+	_engineFlashTime{ 0 },
+	_bEngineFlash{ false },
+	_bEngineOverload{ false },
+	_bObstacleCollision{ false },
+	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
+	_cooldownOnObstacleCollision{ 2.0f },
+	_immunityoOnObstacleCollision{ 4.0f },
+	_immunityTimer{ 0.0f },
+	_blinkFrequency{ 0.1f },
+	_surfaceSlope{ 0.0f, 0.0f, 0.5f },
+	_meshSpringValue{ 100.0f, 100.0f, 2.0f },
+	_rayHeight{ 5.0f },
+	_steeringCooldown{ 0.0f },
+	_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
+	_shipColor{ color },
+	_engineLight{ glm::vec3{ 0.0f }, _shipColor, 1.0f },
+	_warningLight{ glm::vec3{ 0.0f }, glm::vec3{ 1.0f }, 2.0f },
+	_intensityOffset{ 1.0f, 1.0f, 20.0f },
+	_timeUntilIntensityUpdate{ 0.0f },
+	_overheatTemperature{ 0.95f },
+	_warningLevel{ 0.8f },
+	_warningLightIntensity{ 2.0f },
+	_warningAccumulator{ 0.0f },
+	_engineBlinkAccumulator{ 0.0f },
+	_bounceVector{ 0.0f },
+	_bounceDecay{ 1.0f },
+	_inactiveAtStart{ 3.5f },
+	_jumping{ false }
 {
 	move(0, 0, 10);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
@@ -152,6 +155,9 @@ void Ship::jump()
 {
 	if (_currentJumpCooldown <= 0.0f && _steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 	{
+		_jumping = true;
+		_meshSpringValue.setValue(5.0f);
+
 		glm::mat4 rotation = glm::rotate(glm::pi<float>(), _trackForward);
 
 		_upDirection = rotation * glm::vec4{ _upDirection, 0.0f };
@@ -304,14 +310,15 @@ void Ship::handleTemperature(float dt)
 	// Get difference between acceleration [0..1] and temperature [0..1]
 	float difference = (_accelerationFactor + 1.0f) / 2.0f - _engineTemperature;
 
-	difference += _currentSurfaceTemperature * 0.5f;
+	difference += _currentSurfaceTemperature * 5.5f;
 
 	_engineTemperature += (difference == 0.0f ? 1.0f : (abs(difference) / difference)) *  powf(abs(difference), 1.2f) * 0.2f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 
 	if (_engineTemperature > _overheatTemperature)
 	{
-		_engineCooldown = 10.0f;
+		_engineCooldown = 4.0f;
+		_bEngineOverload = true;
 	}
 
 	if (_engineCooldown > 0.0f)
@@ -361,11 +368,20 @@ void Ship::updateDirectionsAndPositions(float dt)
 	glm::vec3 visualTurningDirection = glm::rotate(_currentTurningAngle * 0.5f, _upDirection) * glm::vec4{ _shipForward, 0.0f };
 	move(velocityDirection * _velocity * dt);
 
+	if (_jumping && glm::dot((_meshPosition() - getPosition()), _upDirection) < _velocity * 0.12f)
+	{
+		_jumping = false;
+	}
+
+	_meshSpringValue.setTarget(_jumping ? 5.0f : 100.0f);
+	_meshSpringValue.update(dt);
+
 	// Update mesh position
 	_meshPosition.setTarget(getPosition());
-	_meshPosition.setSlowAxis(_upDirection);
+	_meshPosition.setAlternateAxis(_shipForward);
+	//_meshPosition.setSpringConstant(5.0f + 300.0f / powf(std::max(0.01f, glm::length((_meshPosition() - getPosition()) - glm::dot((_meshPosition() - getPosition()), _shipForward) * _shipForward)), 1.0f));
+	_meshPosition.setSpringConstant(_meshSpringValue());
 	_meshPosition.update(dt);
-	_meshPosition.setVector(getPosition());
 
 	// Update mesh forward direction
 	_meshForwardDirection.setTarget(visualTurningDirection);
@@ -417,7 +433,7 @@ void Ship::trackSurface(float dt)
 		_shipForward = glm::normalize(_shipForward - glm::dot(_shipForward, _upDirection) * _upDirection);
 
 		// Move up/down to the correct track height
-		move(_upDirection * (_preferredHeight - (atShipIntersection._length - _rayHeight)));
+		setPosition( atShipIntersection._position + _upDirection * (_preferredHeight));
 	}
 }
 
@@ -479,24 +495,16 @@ void Ship::handleLightsAndParticles(float dt)
 
 	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.3f, 1.0f }, -_meshForwardDirection() * (_velocity * 1.0f));
 
-	_leftChemtrailParticleSystem.setBirthColor(glm::vec3(0.6f));
+	// Chemtrail particles
+	_leftChemtrailParticleSystem.setBirthColor(glm::vec3(0.05f));
 	_leftChemtrailParticleSystem.setDeathColor(glm::vec3(0.0f));
 	_leftChemtrailParticleSystem.setBirthSize(clamp(_velocity - 180.f, 0.f, 15.f) * 0.01f);
-	_rightChemtrailParticleSystem.setBirthColor(glm::vec3(0.6f));
+	_rightChemtrailParticleSystem.setBirthColor(glm::vec3(0.05f));
 	_rightChemtrailParticleSystem.setDeathColor(glm::vec3(0.0f));
 	_rightChemtrailParticleSystem.setBirthSize(clamp(_velocity - 180.f, 0.f, 15.f) * 0.01f);
 
-
-	/*if (_velocity < 150.f)
-	{
-		_leftChemtrailParticleSystem.setBirthSize(0.0f);
-		_rightChemtrailParticleSystem.setBirthSize(0.0f);
-	}*/
-
-	_leftChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ -1.28f, -0.42f, -1.2f, 1.0f },	glm::vec3(0.f));//-_meshForwardDirection() * (_velocity * 2.f));
-	_rightChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ 1.28f, -0.42f, -1.2f, 1.0f },	glm::vec3(0.f));//-_meshForwardDirection() * (_velocity * 2.f));
-
-
+	_leftChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ -1.28f, -0.42f, -1.2f, 1.0f }, -_meshForwardDirection() * (_velocity * 0.5f));
+	_rightChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ 1.28f, -0.42f, -1.2f, 1.0f }, -_meshForwardDirection() * (_velocity * 0.5f));
 }
 
 bool Ship::getOverload(float dt)
@@ -506,6 +514,11 @@ bool Ship::getOverload(float dt)
 
 bool Ship::isEngineOverload()
 {
+	if (_bEngineOverload) 
+	{
+		_bEngineOverload = false;
+		return true;
+	}
 	return false;
 }
 
@@ -580,7 +593,7 @@ const glm::vec3 Ship::getCameraForward() const
 const glm::vec3 Ship::getCameraPosition() const
 {
 	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) +
-		_cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f) +
+		_cameraUpDirection() * (2.0f + _surfaceSlope() * 5.0f) +
 		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f));
 }
 

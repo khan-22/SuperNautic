@@ -10,7 +10,7 @@ struct RayIntersection
 {
 	glm::vec3	_position;
 	glm::vec3	_normal;
-	float _surface;
+	float		_surface;
 	bool		_hit{ false };
 	float		_length;
 

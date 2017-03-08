@@ -125,6 +125,7 @@ void Track::startNewTrack()
 	_prevIndex = -1;
 	_lastSegment = nullptr;
 	_lengthAfterLastCall = 0.f;
+	_lengthWithCurrentConnectionType = 0.f;
 	for (unsigned int i = 0; i < _track.size(); i++)
 	{
 		delete _track[i];
@@ -140,12 +141,12 @@ void Track::startNewTrack()
 bool Track::bGenerate()
 {
 	// Make the inital stretch straight
-	while (_generatedLength < 300)
+	while (_generatedLength < 400.f)
 	{
 		bInsertNormalSegment(0, false);
 	}
 
-	int failedRecently = 0;
+	float failedRecently = 0.f;
 	// Create random path
 	while (_generatedLength - _lengthAfterLastCall < _progressionLength)
 	{
@@ -158,27 +159,27 @@ bool Track::bGenerate()
 			// Randomize nr of same segment type in a row
 			inRow = getInRow(index);
 
-			for (int i = 0; i < inRow; i++)
+			for (unsigned int i = 0; i < inRow; i++)
 			{
 				if (!bInsertNormalSegment(index, true))
 				{
-					if (failedRecently != 0)
+					if (failedRecently > 0.1f)
 					{
-						failedRecently += 400;
+						failedRecently += 400.f;
 					}
-					failedRecently += 500;
+					failedRecently += 500.f;
 					deleteSegments(failedRecently);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					break;
 				}
 				else
 				{
-					if (failedRecently > 0)
+					if (failedRecently > 0.1f)
 					{
-						failedRecently -= static_cast<int>(_lastSegment->getLength());
-						if (failedRecently < 0)
+						failedRecently -= _lastSegment->getLength();
+						if (failedRecently < 0.f)
 						{
-							failedRecently = 0;
+							failedRecently = 0.f;
 						}
 					}
 				}
@@ -189,7 +190,12 @@ bool Track::bGenerate()
 		{
 			insertStructure(index - static_cast<int>(_segmentHandler->infos().size()));
 		}
-		_endConnection = _track.back()->getParent()->getEnd();
+		char newConnection = _track.back()->getParent()->getEnd();
+		if (newConnection != _endConnection)
+		{
+			_lengthWithCurrentConnectionType = 0.f;
+		}
+		_endConnection = newConnection;
 		_prevIndex = index;
 		_lastSegment = _track.back()->getParent();
 
@@ -198,7 +204,7 @@ bool Track::bGenerate()
 		{
 			if (bEndTrack())
 			{
-				if (_difficulty > 0.05)
+				if (_difficulty > 0.05f)
 				{
 					placeObstacles();
 				}
@@ -211,18 +217,22 @@ bool Track::bGenerate()
 			}
 			else
 			{
-				failedRecently += 400;
+				failedRecently += 400.f;
 				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-				_endConnection = _track.back()->getParent()->getEnd();
+				char newConnection = _track.back()->getParent()->getEnd();
+				if (newConnection != _endConnection)
+				{
+					_lengthWithCurrentConnectionType = 0.f;
+				}
+				_endConnection = newConnection;
 				_prevIndex = index;
 				_lastSegment = _track.back()->getParent();
 			}
 		}
 	}
 
-	_lengthAfterLastCall = static_cast<int>(_generatedLength);
-	_totalProgress = (float)_generatedLength / _targetLength;
-//	LOG("Progression: ", _totalProgress * 100);
+	_lengthAfterLastCall = _generatedLength;
+	_totalProgress = _generatedLength / _targetLength;
 	return false;
 }
 
@@ -248,25 +258,30 @@ float Track::getProgression() const
 int Track::getIndex() const
 {
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
-	int nonZeroProbSegments = 0;
-	for (unsigned int i = 0; i < infos.size(); i++)
-	{
-		if (infos[i].getProbaility(_curviness) != 0)
-		{
-			nonZeroProbSegments++;
-		}
-	}
-	if (nonZeroProbSegments >= 2)
-	{
+	//int nonZeroProbSegments = 0;
+	//for (unsigned int i = 0; i < infos.size(); i++)
+	//{
+	//	if (infos[i].getProbaility(_curviness) != 0)
+	//	{
+	//		nonZeroProbSegments++;
+	//	}
+	//}
+	//if (nonZeroProbSegments >= 2)
+	//{
 		// Finding valid segments based on connection type
 		std::vector<int> validSegments = std::vector<int>();
 		// Normal segments
 		for (unsigned int i = 0; i < infos.size(); i++)
 		{
-			if (infos[i]._startConnection == _endConnection && infos[i].getProbaility(_curviness) != 0
+			if (infos[i]._startConnection == _endConnection
+				&& infos[i].getProbaility(_curviness) != 0
 				&& _segmentHandler->loadSegment(i) != _lastSegment)
 			{
-				validSegments.push_back(i);
+				if ((infos[i]._endConnection != _endConnection && _lengthWithCurrentConnectionType >= 500.f)
+					|| infos[i]._endConnection == _endConnection)
+				{
+					validSegments.push_back(i);
+				}
 			}
 		}
 		// Structures
@@ -312,16 +327,16 @@ int Track::getIndex() const
 				int test = _segmentHandler->getStructure(validSegments[i] - static_cast<int>(infos.size()))->getProbability(_curviness);
 				if (r - tested < test)
 				{
-					return i;
+					return validSegments[i];
 				}
 				tested += test;
 			}
 		}
-	}
-	else
-	{
-		return 0;
-	}
+	//}
+	//else
+	//{
+	//	return 0;
+	//}
 
 	//This should never ever run!
 	assert(true);
@@ -453,15 +468,16 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
-	int rotVal = 0;
+	float rotVal = 0.f;
 	if (maxRotOffset != 0)
 	{
 		rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	}
-	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
+	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
 
 	_generatedLength += segment->getLength();
+	_lengthWithCurrentConnectionType += segment->getLength();
 	_track.push_back(tempInstance);
 	return true;
 }
@@ -504,7 +520,7 @@ bool Track::bInsertIntoOctree(SegmentInstance* segment)
 // Inserts a whole pre-defined structure at the end of the track
 void Track::insertStructure(const int index)
 {
-	int startLength = static_cast<int>(_generatedLength);
+	float startLength = _generatedLength;
 	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
 	// Randomize how many times the structure should be looped
 	int min = s->minInRow;
@@ -530,7 +546,7 @@ void Track::insertStructure(const int index)
             if(!bInsertIntoOctree(tempInstance))
             {
                 delete tempInstance;
-                deleteSegments(static_cast<int>(_generatedLength) - startLength + 300);
+                deleteSegments(_generatedLength - startLength + 300.f);
                 _endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
                 return;
             }
@@ -541,12 +557,12 @@ void Track::insertStructure(const int index)
 			// Randomize angle from structure info
 			int minRot = p->minRotation / angle;
 			int maxRot = p->maxRotation / angle;
-			double scaled = (double)rand() / RAND_MAX;
+			scaled = (double)rand() / RAND_MAX;
 			float rotVal = static_cast<float>(((maxRot - minRot) * scaled + minRot) * angle);
 			// Finalizing
 			glm::mat4 rotMat = glm::rotate(glm::radians(rotVal * rotationDir), glm::vec3(0, 0, 1));
 			_endMatrix = _endMatrix * modelEndMat * rotMat;
-			_generatedLength += static_cast<int>(segment->getLength());
+			_generatedLength += segment->getLength();
 			_track.push_back(tempInstance);
 
 			// Terminating if target length is approaching
@@ -588,10 +604,10 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 }
 
 // Deletes a certain length of the track (from the end)
-void Track::deleteSegments(const int lengthToDelete)
+void Track::deleteSegments(const float lengthToDelete)
 {
-	int deletedLength = 0;
-	while (deletedLength <= lengthToDelete && _generatedLength > 500)
+	float deletedLength = 0.f;
+	while (deletedLength <= lengthToDelete && _generatedLength > 500.f)
 	{
 		int segmentLength = static_cast<int>(_track.back()->getLength());
 		deletedLength += segmentLength;
@@ -605,6 +621,11 @@ void Track::deleteSegments(const int lengthToDelete)
 		if (_segmentWindows.size() >= 1 && _segmentWindows.back().segmentIndex == index)
 		{
 			_segmentWindows.pop_back();
+		}
+		// Temperature zones
+		if (_temperatureZones.size() >= 1 && _temperatureZones.back().segmentIndex == index)
+		{
+			_temperatureZones.pop_back();
 		}
 	}
 }
@@ -622,7 +643,7 @@ bool Track::bEndTrack()
 			{
 				if (!bInsertNormalSegment(i, true))
 				{
-					deleteSegments(_endMargin + 400);
+					deleteSegments(_endMargin + 500);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					return false;
 				}
@@ -634,7 +655,7 @@ bool Track::bEndTrack()
 	{
 		if (!bInsertNormalSegment(0, true))
 		{
-			deleteSegments(_endMargin + 400);
+			deleteSegments(_endMargin + 500);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 			return false;
 		}
@@ -752,25 +773,31 @@ size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLen
 void Track::update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer)
 {
 	// Obstacles
-	for (unsigned int i = lastPlayer; i < _track.size() && i < firstPlayer + 6; ++i)
+	for (unsigned int i = lastPlayer; i < _track.size() && i < firstPlayer + 7; ++i)
 	{
 		_track[i]->update(dt);
+	}
+	for (unsigned int i = lastPlayer; i <= firstPlayer; ++i)
+	{
+		_track[i]->decreaseSpeed(dt);
 	}
 	// Temperature zones
 	for (unsigned int i = 0; i < _temperatureZones.size(); ++i)
 	{
-		if (i >= lastPlayer)
+		if (_temperatureZones[i].segmentIndex >= lastPlayer)
 		{
-			if (i <= firstPlayer)
+			if (_temperatureZones[i].segmentIndex <= firstPlayer)
 			{
 				std::vector<float>& temps = _temperatureZones[i].temperatures;
-				for (unsigned int j = 0; j < temps.size(); j++)
+				for (unsigned int j = 0; j < temps.size(); ++j)
 				{
 					if (temps[j] > -0.99f)
 					{
-						temps[j] -= 0.003f;
+						temps[j] -= 0.1f * dt;
 					}
 				}
+
+				_track[_temperatureZones[i].segmentIndex]->setTemperatures(temps);
 			}
 			else
 			{
