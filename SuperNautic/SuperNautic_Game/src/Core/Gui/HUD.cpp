@@ -16,8 +16,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_offsetY(0),
 	_position(0),
 	_speedLine(sf::LineStrip, 150),
-	_heatOverlayTexture(SFMLTextureCache::get("heatoverlay.png")),
-	_overHeatTimer(0.f)
+	_overHeatTimer(0.f),
 	_heatOverlayTexture(SFMLTextureCache::get("heatoverlay.png")),
 	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 {
@@ -152,6 +151,8 @@ void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) cons
 {
 	if (_position == 0)
 	{
+		target.draw(_speedLine, getWorldTransform());;
+		target.draw(_speeder, getWorldTransform());
 		target.draw(_speedLine);
 		target.draw(_speeder);
 		target.draw(_heatOverlay);
@@ -160,10 +161,4 @@ void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) cons
 	{
 		target.draw(_tPosition);
 	}
-}
-	//target.draw(_tPosition);
-	target.draw(_speedLine, getWorldTransform());;
-	target.draw(_speeder, getWorldTransform());
-	target.draw(_speeder);
-	target.draw(_heatOverlay);
 }
