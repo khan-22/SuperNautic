@@ -127,9 +127,12 @@ private:
 
 	SpringSmoothedValue			_surfaceSlope;			// Determines the height of the camera
 	SpringSmoothedValue			_intensityOffset;		// Offset for engine light intensity
+	SpringSmoothedValue			_meshSpringValue;		// Spring value for mesh position
 	float						_timeUntilIntensityUpdate;
 
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
+
+	bool						_jumping;				// True if the ship is currently jumping
 
 	float _currentSurfaceTemperature{ 0.0f };
 
