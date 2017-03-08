@@ -9,6 +9,8 @@ out vec4 outColor;
 uniform sampler2D uOutsideBuffer;
 uniform sampler2D uOutsideDepthBuffer;
 
+uniform float uFactor;
+
 in VS_OUT
 {
 	vec2 uv;
@@ -18,7 +20,6 @@ in VS_OUT
 
 void main()
 {
-	vec4 bufferColor = texture(uOutsideDepthBuffer, fs_in.uv);
 
 	//float uvStepH = 0.0005208 * 2.0;
 	//float uvStepV = 0.0009259 * 2.0;
@@ -102,8 +103,17 @@ void main()
 	//outColor = vec4(bufferColor.b, 1.0 - bufferColor.g, bufferColor.r, 1.0);
 
 	const float CLIP_DISTANCE = 1000.0;
-	float fragDist = pow(texture(uOutsideDepthBuffer, fs_in.uv).r, 16.0) * 1.50 - 0.5;
+	float fragDist = pow(texture(uOutsideDepthBuffer, fs_in.uv).r, 16.0) * 1.49 - 0.5;
+
+	// Blueish fog
+	//outColor = mix(texture(uOutsideBuffer, fs_in.uv), vec4(0.4, 0.5, 1.0, 1.0), fragDist);// + average / 16.0;//273.0;
+
+	// Black fog for dark zone?
+	vec4 bufferColor = texture(uOutsideBuffer, fs_in.uv);
+	vec4 effectColor = mix(bufferColor, vec4(0.0, 0.0, 0.0, 1.0), fragDist);// + average / 16.0;//273.0;
+	
 
 
-	outColor = mix(texture(uOutsideBuffer, fs_in.uv), vec4(0.4, 0.5, 1.0, 1.0), fragDist);// + average / 16.0;//273.0;
+	
+	outColor = mix(bufferColor, effectColor, uFactor);// + average / 16.0;//273.0;
 }
