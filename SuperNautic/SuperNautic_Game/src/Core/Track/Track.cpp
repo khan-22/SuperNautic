@@ -27,14 +27,14 @@ Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	, _seed("1")
 	, _curviness(0.4f)
 	, _difficulty(0.6f)
-	, _targetLength(10000)
-	, _generatedLength(0)
+	, _targetLength(10000.f)
+	, _generatedLength(0.f)
 	, _totalProgress(0.f)
-	, _endMargin(600)
+	, _progressionLength(1500.f)
+	, _endMargin(600.f)
 	, _endMatrix(glm::mat4())
 {
-	//_octrees.push_back(Octree<SegmentInstance*>(glm::vec3(0, 0, 0), 10000));
-	_progressionLength = 1500;
+
 }
 
 // Destructor
@@ -60,12 +60,12 @@ int Track::getGeneratedLength() const
 
 unsigned int Track::getCurviness() const
 {
-    return static_cast<unsigned>(_MAX_CURVINESS * _curviness);
+    return static_cast<unsigned int>(_MAX_CURVINESS * _curviness);
 }
 
 unsigned int Track::getDifficulty() const
 {
-    return static_cast<unsigned>(_MAX_DIFFICULTY * _difficulty);
+    return static_cast<unsigned int>(_MAX_DIFFICULTY * _difficulty);
 }
 
 
@@ -82,14 +82,14 @@ void Track::setSeed(const std::string& seed)
 	_seed = seed;
 	if (seed.length() == 1 && seed[0] == '1')
 	{
-		srand(static_cast<unsigned>(time(NULL)));
+		srand(static_cast<unsigned int>(time(NULL)));
 	}
 	else
 	{
 		unsigned int intSeed = 0;
 		for (unsigned int i = 0; i < seed.length(); i++)
 		{
-			intSeed += (unsigned int)((seed[i] - 65) * static_cast<unsigned>(powf(10, static_cast<float>(i))));
+			intSeed += (unsigned int)((seed[i] - 65) * static_cast<unsigned int>(powf(10, static_cast<float>(i))));
 		}
 		srand(intSeed);
 	}
@@ -124,27 +124,28 @@ void Track::startNewTrack()
 	_endConnection = 'a';
 	_prevIndex = -1;
 	_lastSegment = nullptr;
-	_octrees.clear();
-	_lengthAfterLastCall = 0;
+	_lengthAfterLastCall = 0.f;
 	for (unsigned int i = 0; i < _track.size(); i++)
 	{
 		delete _track[i];
 	}
 	_track.clear();
+	_segmentWindows.clear();
+	_temperatureZones.clear();
 
-	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength + 2000, 2000.f, 5));
+	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength * 1.1 + 1000, 2000.f, 5));
 }
 
 // Generates the track
 bool Track::bGenerate()
 {
 	// Make the inital stretch straight
-	while (_generatedLength < 300)
+	while (_generatedLength < 400)
 	{
 		bInsertNormalSegment(0, false);
 	}
 
-	int failedRecently = 0;
+	float failedRecently = 0;
 	// Create random path
 	while (_generatedLength - _lengthAfterLastCall < _progressionLength)
 	{
@@ -157,7 +158,7 @@ bool Track::bGenerate()
 			// Randomize nr of same segment type in a row
 			inRow = getInRow(index);
 
-			for (int i = 0; i < inRow; i++)
+			for (unsigned int i = 0; i < inRow; i++)
 			{
 				if (!bInsertNormalSegment(index, true))
 				{
@@ -174,7 +175,7 @@ bool Track::bGenerate()
 				{
 					if (failedRecently > 0)
 					{
-						failedRecently -= static_cast<int>(_lastSegment->getLength());
+						failedRecently -= _lastSegment->getLength();
 						if (failedRecently < 0)
 						{
 							failedRecently = 0;
@@ -219,9 +220,8 @@ bool Track::bGenerate()
 		}
 	}
 
-	_lengthAfterLastCall = static_cast<int>(_generatedLength);
-	_totalProgress = (float)_generatedLength / _targetLength;
-//	LOG("Progression: ", _totalProgress * 100);
+	_lengthAfterLastCall = _generatedLength;
+	_totalProgress = _generatedLength / _targetLength;
 	return false;
 }
 
@@ -339,11 +339,11 @@ int Track::getInRow(int index) const
 }
 
 
-glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos, float& lengthInSegment, glm::vec3& directionDifference)
+glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned int& segmentIndex, glm::vec3& returnPos, float& lengthInSegment, glm::vec3& directionDifference)
 {
 	WaypointInfo closest;
 	closest.found = false;
-	unsigned closestIndex;
+	unsigned int closestIndex;
 
 	// Check previous, current and next segment
 	for (long i = static_cast<long>(segmentIndex) - 1; i <= static_cast<long>(segmentIndex) + 1; ++i)
@@ -419,7 +419,7 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIn
 	lengthInSegment = 0.0f;
 
 	// Add previous waypoint lengths
-	for (unsigned i = 0; i < closest.index; ++i)
+	for (unsigned int i = 0; i < closest.index; ++i)
 	{
 		lengthInSegment += glm::distance(_track[closestIndex]->getParent()->getWaypoints()[i], _track[closestIndex]->getParent()->getWaypoints()[i + 1]);
 	}
@@ -438,6 +438,7 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 {
 	const Segment * segment = _segmentHandler->loadSegment(index);
 	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+	// Check collision
 	if (testCollision)
 	{
 		if(!bInsertIntoOctree(tempInstance))
@@ -446,6 +447,8 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
             return false;
         }
 	}
+	addWindowsAndZonesToSegment(segment);
+	// Set up model matrix
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
@@ -456,11 +459,8 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	}
 	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
+
 	_generatedLength += segment->getLength();
-	if (segment->bHasWindow())
-	{
-		_segmentWindows.push_back({ segment->getWindowModel(), static_cast<unsigned int>(_track.size()), tempInstance->getModelMatrix() });
-	}
 	_track.push_back(tempInstance);
 	return true;
 }
@@ -533,6 +533,7 @@ void Track::insertStructure(const int index)
                 _endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
                 return;
             }
+			addWindowsAndZonesToSegment(segment);
 
 			glm::mat4 modelEndMat = segment->getEndMatrix();
 			int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
@@ -556,11 +557,40 @@ void Track::insertStructure(const int index)
 	}
 }
 
-// Deletes a certain length of the track (from the end)
-void Track::deleteSegments(const int lengthToDelete)
+// Adds windows and zones to the track based on the given segment type
+void Track::addWindowsAndZonesToSegment(const Segment* segment)
 {
-	int deletedLength = 0;
-	while (deletedLength <= lengthToDelete && _generatedLength > 500)
+	// Add windows
+	if (segment->bHasWindow())
+	{
+		_segmentWindows.push_back({ segment->getWindowModel(), _endMatrix, static_cast<unsigned int>(_track.size()) });
+	}
+	// Add temperature zones
+	if (segment->nrOfZones() > 0)
+	{
+		std::vector<float> temperatures;
+		temperatures.reserve(segment->nrOfZones());
+		for (unsigned int i = 0; i < segment->nrOfZones(); i++)
+		{
+			if (rand() % 3 == 0)
+			{
+				temperatures.push_back((double)rand() / RAND_MAX * 2.f - 1.f);
+			}
+			else
+			{
+				temperatures.push_back(-5.f);
+			}
+		}
+		_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures });
+
+	}
+}
+
+// Deletes a certain length of the track (from the end)
+void Track::deleteSegments(const float lengthToDelete)
+{
+	float deletedLength = 0.f;
+	while (deletedLength <= lengthToDelete && _generatedLength > 500.f)
 	{
 		int segmentLength = static_cast<int>(_track.back()->getLength());
 		deletedLength += segmentLength;
@@ -697,7 +727,7 @@ void Track::placeObstacles()
 }
 
 //
-void Track::placeBonusFields()
+void Track::placeVisibilityArea()
 {
 
 }
@@ -720,17 +750,44 @@ size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLen
 // Update obstacle rotations
 void Track::update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer)
 {
-	_track[firstPlayer]->decreaseObstacleSpeed();
-	for (size_t i = lastPlayer; i < _track.size() && i < firstPlayer + 6; i++)
+	// Obstacles
+	for (unsigned int i = lastPlayer; i < _track.size() && i < firstPlayer + 7; ++i)
 	{
 		_track[i]->update(dt);
+	}
+	for (unsigned int i = lastPlayer; i <= firstPlayer; ++i)
+	{
+		_track[i]->decreaseSpeed(dt);
+	}
+	// Temperature zones
+	for (unsigned int i = 0; i < _temperatureZones.size(); ++i)
+	{
+		if (i >= lastPlayer)
+		{
+			if (i <= firstPlayer)
+			{
+				std::vector<float>& temps = _temperatureZones[i].temperatures;
+				for (unsigned int j = 0; j < temps.size(); j++)
+				{
+					if (temps[j] > -0.99f)
+					{
+						temps[j] -= 0.1f * dt;
+					}
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
 	}
 }
 
 // Render the track
 void Track::render(GFX::ViewportPipeline& pipeline, const int shipIndex)
 {
-	for (int i = -2; i < 7; i++)
+	// Inside of segments
+	for (int i = -2; i < 7; ++i)
 	{
 		int index = shipIndex + i;
 		if (index >= 0 && index < _track.size())
@@ -744,9 +801,10 @@ void Track::render(GFX::ViewportPipeline& pipeline, const int shipIndex)
 		}
 	}
 
-	for (int i = 1; i < 100; i++)
+	// Outside of segments
+	for (unsigned int i = 1; i < 100; ++i)
 	{
-		int index = shipIndex + i;
+		size_t index = shipIndex + i;
 		if (index >= 0 && index < _track.size())
 		{
 			pipeline.windowForward.render(*_track[index]);
@@ -756,7 +814,7 @@ void Track::render(GFX::ViewportPipeline& pipeline, const int shipIndex)
 
 	int lowestIndex = shipIndex - 2;
 	int largestIndex = shipIndex + 7;
-
+	// Segment windows
 	for (auto& window : _segmentWindows)
 	{
 		int windowIndex = static_cast<int>(window.segmentIndex);
@@ -772,9 +830,25 @@ void Track::render(GFX::ViewportPipeline& pipeline, const int shipIndex)
 			}
 		}
 	}
+	// Temperature zones
+	for (auto& zone : _temperatureZones)
+	{
+		int zoneIndex = static_cast<int>(zone.segmentIndex);
+		if (zoneIndex >= lowestIndex)
+		{
+			if (zoneIndex < largestIndex)
+			{
+				pipeline.zoneForward.render(zone);
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
 }
 
-WaypointInfo Track::findNextWaypointInfo(const WaypointInfo& current, unsigned segmentIndex) const
+WaypointInfo Track::findNextWaypointInfo(const WaypointInfo& current, unsigned int segmentIndex) const
 {
 	WaypointInfo next;
 

@@ -319,6 +319,7 @@ void Ship::handleTemperature(float dt)
 	if (_engineTemperature > _overheatTemperature)
 	{
 		_engineCooldown = 10.0f;
+		_bEngineOverload = true;
 	}
 
 	if (_engineCooldown > 0.0f)
@@ -522,6 +523,11 @@ bool Ship::getOverload(float dt)
 
 bool Ship::isEngineOverload()
 {
+	if (_bEngineOverload) 
+	{
+		_bEngineOverload = false;
+		return true;
+	}
 	return false;
 }
 

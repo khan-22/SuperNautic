@@ -15,6 +15,8 @@
 #include "Core/Geometry/Octree.hpp"
 #include "Core/Track/ObstacleHandler.hpp"
 
+#include "GFX/Resources/TemperatureZone.hpp"
+
 class Track
 {
 public:
@@ -48,37 +50,38 @@ public:
 
 
 	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos and length from start of segment
-	glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned& segmentIndex, glm::vec3& returnPos, float& lengthInSegment, glm::vec3& directionDifference);
+	glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned int& segmentIndex, glm::vec3& returnPos, float& lengthInSegment, glm::vec3& directionDifference);
 
 private:
 	int getIndex() const;
 	int getInRow(const int index) const;
 
-	WaypointInfo findNextWaypointInfo(const WaypointInfo& current, unsigned segmentIndex) const;
+	WaypointInfo findNextWaypointInfo(const WaypointInfo& current, unsigned int segmentIndex) const;
 	bool bInsertNormalSegment(const int index, bool testCollision);
 	void insertStructure(const int index);
-	void deleteSegments(const int lengthToDelete);
+	void addWindowsAndZonesToSegment(const Segment* segment);
+	void deleteSegments(const float lengthToDelete);
 	bool bEndTrack();
 	void placeObstacles();
-	void placeBonusFields();
+	void placeVisibilityArea();
 	size_t findTrackIndex(const float totalLength, float & lastFullSegmentLength) const;
     bool bInsertIntoOctree(SegmentInstance* segment);
 
 
 	std::vector<GFX::Window>				_segmentWindows;
+	std::vector<GFX::TemperatureZone>		_temperatureZones;
 	SegmentHandler *						_segmentHandler;
 	ObstacleHandler *						_obstacleHandler;
 	std::vector<SegmentInstance*>			_track;
-	std::vector<Octree<SegmentInstance*>>	_octrees;
 	std::string								_seed;
 	float									_curviness;
 	float									_difficulty;
 	float									_targetLength;
 	float									_generatedLength;
 	float									_totalProgress;
-	int										_lengthAfterLastCall;
-	int										_progressionLength;
-	const int								_endMargin;
+	float									_lengthAfterLastCall;
+	const float								_progressionLength;
+	const float								_endMargin;
 	glm::mat4								_endMatrix;
 	char									_endConnection;
 	int										_prevIndex;

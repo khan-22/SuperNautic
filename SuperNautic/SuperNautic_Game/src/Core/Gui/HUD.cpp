@@ -89,6 +89,7 @@ void HUD::updateCurrent()
 	_speeder.setPosition(static_cast<float>(_offsetX) + _widthStep * 35.0f + _widthStep * 30.0f * (_speed - 50.0f) / 150.0f, _offsetY + _heightStep * 70.0f - _heightStep * 25.0f * sinf(_speed / 250.0f * 3.1415f));
 
 	float trans = 0.f;
+
 	if (_heat > .8f)
 	{
 		trans = (_heat - 0.8) * 5 * 255;

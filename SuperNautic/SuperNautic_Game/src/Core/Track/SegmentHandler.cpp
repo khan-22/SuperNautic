@@ -97,7 +97,7 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 	// Load all segments
 	for (size_t i = 0; i < _segmentInfos.size(); ++i)
 	{
-		loadSegment(static_cast<unsigned>(i));
+		loadSegment(static_cast<unsigned int>(i));
 	}
 }
 
@@ -119,7 +119,7 @@ SegmentHandler::~SegmentHandler()
 
 // Load segment from fbx file using info from _segments[i], returns reference to loaded segment
 // Just returns reference if already loaded
-const Segment* SegmentHandler::loadSegment(unsigned i)
+const Segment* SegmentHandler::loadSegment(unsigned int i)
 {
 	// If already loaded, just return reference
 	if (_segmentInfos[i].loadedIndex != -1)

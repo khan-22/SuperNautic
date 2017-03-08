@@ -23,9 +23,9 @@ public:
     const std::vector<BoundingBox>& getGlobalBoundingBoxes() const;
 	const int getIndex() const;
 	void addObstacle(ObstacleInstance newObstacle);
-	void decreaseObstacleSpeed();
 
 	void update(const float dt);
+	void decreaseSpeed(const float dt);
 	void render(GFX::RenderStates& states) override;
 	const RayIntersection rayIntersectionTest(const Ray& ray) const;
 	std::vector<ObstacleInstance>& getObstacles();
