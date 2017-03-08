@@ -371,6 +371,7 @@ void World::render()
 		_playerParticleRenderers[0].display(_debugCamera);*/
 
 		_viewportPipelines[0].display(_debugCamera);
+		_darkZonePass.perform();
 	}
 
 	GFX::SfmlRenderer sfml;
