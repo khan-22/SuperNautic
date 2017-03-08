@@ -17,7 +17,7 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 {
 	_resultFramebuffer = resultFramebuffer;
 
-	_geometryPassShader = ShaderCache::get("geometry_deferred");
+	_geometryPassShader = ShaderCache::get("geometry_forward");
 	_lightPassShader = ShaderCache::get("light_deferred");
 
 	_geometryPassShader.get()->bind();
@@ -79,7 +79,7 @@ void DeferredRenderer::display(Camera& camera)
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	geometryPass(camera, windowWidth, windowHeight);
-	lightPass(camera, windowWidth, windowHeight);
+//	lightPass(camera, windowWidth, windowHeight);
 
 	Framebuffer::DEFAULT.bindBoth();
 }
@@ -109,7 +109,7 @@ void DeferredRenderer::geometryPass(Camera& camera, GLsizei width, GLsizei heigh
 	//*************** GEOMETRY PASS *******************//
 	//*************************************************//
 
-	_frameBuffer.bindWrite();
+	_resultFramebuffer->bindWrite();
 
 	//glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
 	glViewport(0, 0, static_cast<GLsizei>(_width * width), static_cast<GLsizei>(_height * height));
@@ -121,6 +121,46 @@ void DeferredRenderer::geometryPass(Camera& camera, GLsizei width, GLsizei heigh
 
 	_geometryPassShader.get()->setUniform("uViewPos", camera.getPosition());
 
+
+	// Send all point light data as a uniform array struct
+	int lightCount = std::min((int)_pointLights.size(), NUMOFLIGHTS);
+
+	std::vector<glm::vec3> pointLightPos;
+	std::vector<glm::vec3> pointLightColor;
+	std::vector<float>	   pointLightIntensity;
+	std::vector<glm::vec3> pointLightProperties;
+
+	pointLightPos.reserve(NUMOFLIGHTS);
+	pointLightColor.reserve(NUMOFLIGHTS);
+	pointLightIntensity.reserve(NUMOFLIGHTS);
+	pointLightProperties.reserve(NUMOFLIGHTS);
+
+	for (int i = 0; i < lightCount; i++)
+	{
+		pointLightPos.push_back(_pointLights[i]->getPosition());
+		pointLightColor.push_back(_pointLights[i]->getLightProperties().diffuseColor);
+		pointLightIntensity.push_back(_pointLights[i]->getLightProperties().intensity);
+
+		glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
+		pointLightProperties.push_back(properties);
+
+	}
+	for (int i = lightCount; i < NUMOFLIGHTS; i++)
+	{
+		pointLightPos.push_back({ 0.f, 0.f, 0.f });
+		pointLightColor.push_back({ 0.f, 0.f, 0.f });
+		pointLightIntensity.push_back({ 1.f });
+		pointLightProperties.push_back({ 1.f, 0.f, 0.f });
+	}
+
+	_geometryPassShader.get()->setUniform("pointLights.pos", pointLightPos[0], NUMOFLIGHTS);
+	_geometryPassShader.get()->setUniform("pointLights.color", pointLightColor[0], NUMOFLIGHTS);
+	_geometryPassShader.get()->setUniform("pointLights.intensity", pointLightIntensity[0], NUMOFLIGHTS);
+	_geometryPassShader.get()->setUniform("pointLights.properties", pointLightProperties[0], NUMOFLIGHTS);
+
+
+
+
 	for (auto drawCall : _drawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _geometryPassShader.get() };
@@ -129,6 +169,7 @@ void DeferredRenderer::geometryPass(Camera& camera, GLsizei width, GLsizei heigh
 	}
 
 	_drawCalls.clear();
+	_pointLights.clear();
 }
 
 void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
