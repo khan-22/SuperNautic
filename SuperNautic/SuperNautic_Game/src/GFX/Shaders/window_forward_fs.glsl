@@ -24,16 +24,19 @@ in VS_OUT
 
 void main()
 {
-	vec3 dir = normalize(fs_in.direction);
-	float factor = max(dot(dir, -vec3(0.0, 1.0, 0.0)), 0.0);
+	//outColor = vec4(0.0, 0.03, 0.06, 0.5);
+	outColor = vec4(0.0, 0.6, 0.7, 0.5);
 
-	vec2 uv = gl_FragCoord.xy * uReciprocWindow;
+	//vec3 dir = normalize(fs_in.direction);
+	//float factor = max(dot(dir, -vec3(0.0, 1.0, 0.0)), 0.0);
 
-	vec4 bufferColor = texture(uOutsideBuffer, uv);
+	//vec2 uv = gl_FragCoord.xy * uReciprocWindow;
 
-	outColor = bufferColor.rgba;// + vec4(1.0, 1.0, 0.0, 0.0);
+	//vec4 bufferColor = texture(uOutsideBuffer, uv);
 
-	outColor += bufferColor.a * vec4(mix(vec3(0.0, 0.03, 0.06), vec3(0.0, 0.6, 0.7), factor), 1.0);
+	//outColor = bufferColor.rgba;// + vec4(1.0, 1.0, 0.0, 0.0);
+
+	//outColor += bufferColor.a * vec4(mix(vec3(0.0, 0.03, 0.06), vec3(0.0, 0.6, 0.7), factor), 1.0);
 	//outColor = vec4(fs_in.uv, 1.0, 1.0);
 
 }
