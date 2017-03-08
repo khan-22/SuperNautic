@@ -49,21 +49,21 @@ struct AABB
 	}
 
 	// Test if a ray intersects any geometry in this box
-	RayIntersection triangleRayIntersection(const Ray& ray, const std::vector<unsigned>& modelIndices, const std::vector<float>& temperatures, const RawMeshAsset& scene) const
+	RayIntersection triangleRayIntersection(const Ray& ray, const std::vector<GFX::RawVertexData*>& models, const std::vector<float>& temperatures) const
 	{
 		// Will hold final intersection
 		RayIntersection intersection{ false };
 
 		// For every model in segment
-		for (unsigned i = 0; i < modelIndices.size(); ++i)
+		for (unsigned i = 0; i < models.size(); ++i)
 		{
-			const unsigned currentModel = modelIndices[i];
+			GFX::RawVertexData& currentModel = *models[i];
 
-			std::vector<glm::uvec3>& faces{ scene.get()->meshes[currentModel].faces };
-			std::vector<glm::vec3>& vertices{ scene.get()->meshes[currentModel].vertices };
+			std::vector<glm::uvec3>& faces{ currentModel.faces };
+			std::vector<glm::vec3>& vertices{ currentModel.vertices };
 
 			// For every triangle in model
-			for (unsigned j = 0; j < scene.get()->meshes[currentModel].faces.size(); ++j)
+			for (unsigned j = 0; j < currentModel.faces.size(); ++j)
 			{
 				// Vertices of triangle
 				glm::vec3& v0 = vertices[faces[j].x];
@@ -114,15 +114,9 @@ struct AABB
 					intersection._hit = true;
 
 					// Return surface type using temperatures vector
-					if (i < modelIndices.size() - 1) // The last model is the base, others are temperature zones
+					if (i < models.size() - 1) // The last model is the base, others are temperature zones
 					{
-						if (temperatures.size() != modelIndices.size() - 1)
-						{
-							LOG_ERROR("Temperatures vector size does not correspond to number of temperature zone models!");
-							abort();
-						}
-
-						intersection._surface = temperatures[i];
+						intersection._surface = temperatures[static_cast<unsigned>(currentModel.texCoords[faces[j].x].z)];
 					}
 					else
 					{
@@ -130,9 +124,9 @@ struct AABB
 					}
 
 					intersection._position = v0 * (1.0f - u - v) + v1 * u + v2 * v;
-					intersection._normal = scene.get()->meshes[currentModel].normals[faces[j].x] * (1.0f - u - v) +
-										   scene.get()->meshes[currentModel].normals[faces[j].y] * u +
-										   scene.get()->meshes[currentModel].normals[faces[j].z] * v;
+					intersection._normal = currentModel.normals[faces[j].x] * (1.0f - u - v) +
+										   currentModel.normals[faces[j].y] * u +
+										   currentModel.normals[faces[j].z] * v;
 				}
 			}
 		}

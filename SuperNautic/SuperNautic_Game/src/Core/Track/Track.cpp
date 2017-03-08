@@ -578,7 +578,7 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 			}
 			else
 			{
-				temperatures.push_back(-5.f);
+				temperatures.push_back(0.f);
 			}
 		}
 		_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures });
@@ -762,9 +762,9 @@ void Track::update(const float dt, const unsigned int firstPlayer, const unsigne
 	// Temperature zones
 	for (unsigned int i = 0; i < _temperatureZones.size(); ++i)
 	{
-		if (i >= lastPlayer)
+		if (_temperatureZones[i].segmentIndex >= lastPlayer)
 		{
-			if (i <= firstPlayer)
+			if (_temperatureZones[i].segmentIndex <= firstPlayer)
 			{
 				std::vector<float>& temps = _temperatureZones[i].temperatures;
 				for (unsigned int j = 0; j < temps.size(); j++)
@@ -774,6 +774,8 @@ void Track::update(const float dt, const unsigned int firstPlayer, const unsigne
 						temps[j] -= 0.1f * dt;
 					}
 				}
+
+				_track[_temperatureZones[i].segmentIndex]->setTemperatures(temps);
 			}
 			else
 			{

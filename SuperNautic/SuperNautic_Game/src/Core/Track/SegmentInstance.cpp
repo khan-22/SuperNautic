@@ -19,7 +19,7 @@ SegmentInstance::SegmentInstance(const Segment * segment, glm::mat4 modelMatrix,
 	_bHasLighting = lighting;
 
 	// TEMPORARY
-	for (unsigned int i = 0; i < _parent->getNumZones(); ++i)
+	for (unsigned int i = 0; i < _parent->nrOfZones(); ++i)
 	{
 		if (i % 2 == 0)
 		{
@@ -194,4 +194,9 @@ void SegmentInstance::removeObstacle(size_t i)
 	assert(i < _obstacles.size());
 
 	_obstacles.erase(_obstacles.begin() + i);
+}
+
+void SegmentInstance::setTemperatures(std::vector<float>& temperatures)
+{
+	_temperatures = temperatures;
 }
