@@ -495,6 +495,7 @@ void Ship::handleLightsAndParticles(float dt)
 
 	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.3f, 1.0f }, -_meshForwardDirection() * (_velocity * 1.0f));
 
+	// Chemtrail particles
 	_leftChemtrailParticleSystem.setBirthColor(glm::vec3(0.05f));
 	_leftChemtrailParticleSystem.setDeathColor(glm::vec3(0.0f));
 	_leftChemtrailParticleSystem.setBirthSize(clamp(_velocity - 180.f, 0.f, 15.f) * 0.01f);
@@ -502,17 +503,8 @@ void Ship::handleLightsAndParticles(float dt)
 	_rightChemtrailParticleSystem.setDeathColor(glm::vec3(0.0f));
 	_rightChemtrailParticleSystem.setBirthSize(clamp(_velocity - 180.f, 0.f, 15.f) * 0.01f);
 
-
-	/*if (_velocity < 150.f)
-	{
-		_leftChemtrailParticleSystem.setBirthSize(0.0f);
-		_rightChemtrailParticleSystem.setBirthSize(0.0f);
-	}*/
-
 	_leftChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ -1.28f, -0.42f, -1.2f, 1.0f }, -_meshForwardDirection() * (_velocity * 0.5f));
 	_rightChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ 1.28f, -0.42f, -1.2f, 1.0f }, -_meshForwardDirection() * (_velocity * 0.5f));
-
-
 }
 
 bool Ship::getOverload(float dt)
