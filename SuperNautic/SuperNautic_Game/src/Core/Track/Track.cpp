@@ -195,6 +195,10 @@ bool Track::bGenerate()
 		{
 			_lengthWithCurrentConnectionType = 0.f;
 		}
+		else
+		{
+			_lengthWithCurrentConnectionType += _track.back()->getParent()->getLength();
+		}
 		_endConnection = newConnection;
 		_prevIndex = index;
 		_lastSegment = _track.back()->getParent();
@@ -223,6 +227,10 @@ bool Track::bGenerate()
 				if (newConnection != _endConnection)
 				{
 					_lengthWithCurrentConnectionType = 0.f;
+				}
+				else
+				{
+					_lengthWithCurrentConnectionType += _track.back()->getParent()->getLength();
 				}
 				_endConnection = newConnection;
 				_prevIndex = index;
@@ -309,6 +317,10 @@ int Track::getIndex() const
 			}
 		}
 		// Randomizing and finding the corresponding segment
+		if (totalProbability == 0)
+		{
+			totalProbability = 1;
+		}
 		int r = rand() % totalProbability;
 		int tested = 0;
 		for (unsigned int i = 0; i < validSegments.size(); i++)
@@ -477,7 +489,6 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
 
 	_generatedLength += segment->getLength();
-	_lengthWithCurrentConnectionType += segment->getLength();
 	_track.push_back(tempInstance);
 	return true;
 }
