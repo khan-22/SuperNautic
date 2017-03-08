@@ -30,8 +30,7 @@ Ship::Ship(glm::vec3 color)
 		_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 60.0f, 9.0f, true },
 		_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
 		_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
-		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, 5.0f },
-		_meshXZPosition{ glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 0, 0 }, 100.0f },
+		_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f },glm::vec3{0,1,0}, 100.0f, 5.0f },
 		_minAcceleration{ 0.0f },
 		_maxAcceleration{ 100.0f },
 		_maxTurningSpeed{ 20.0f },
@@ -51,7 +50,7 @@ Ship::Ship(glm::vec3 color)
 		_immunityTimer{ 0.0f },
 		_blinkFrequency{ 0.1f },
 		_surfaceSlope{ 0.0f, 0.0f, 0.5f },
-		_rayHeight{ 5.0f },
+		_rayHeight{ 1.0f },
 		_rayAheadDistance{ 5.0f },
 		_steeringCooldown{ 0.0f },
 		_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
@@ -364,7 +363,9 @@ void Ship::updateDirectionsAndPositions(float dt)
 
 	// Update mesh position
 	_meshPosition.setTarget(getPosition());
+	_meshPosition.setSlowAxis(_upDirection);
 	_meshPosition.update(dt);
+	_meshPosition.setVector(getPosition());
 
 	// Update mesh forward direction
 	_meshForwardDirection.setTarget(visualTurningDirection);
@@ -385,13 +386,6 @@ void Ship::updateDirectionsAndPositions(float dt)
 	_cameraForwardDirection.setTarget(_shipForward);
 	_cameraForwardDirection.setBackupAxis(_upDirection);
 	_cameraForwardDirection.update(dt);
-
-	// Update forward/right position
-	_meshXZPosition.setTarget(getPosition());
-	_meshXZPosition.update(dt);
-
-	// Move ship mesh to correct forward/right position, keep up position
-	_meshPosition.setVector(_meshPosition() + (_meshXZPosition() - _meshPosition()) - glm::dot(_upDirection, (_meshXZPosition() - _meshPosition())) * _upDirection);
 }
 
 void Ship::trackSurface(float dt)
@@ -525,11 +519,6 @@ void Ship::setSegments(const std::vector<SegmentInstance*> segments)
 	_segmentsToTest = segments;
 }
 
-glm::vec3 Ship::getCameraUp()
-{
-	return _cameraUpDirection();
-}
-
 void Ship::start()
 {
 	_stopped = false;
@@ -575,6 +564,11 @@ const glm::vec3& Ship::getMeshUp() const
 const glm::vec3 Ship::getVelocity() const
 {
 	return _velocity * _meshForwardDirection();
+}
+
+glm::vec3 Ship::getCameraUp()
+{
+	return _cameraUpDirection();
 }
 
 const glm::vec3 Ship::getCameraForward() const

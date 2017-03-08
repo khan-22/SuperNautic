@@ -130,7 +130,6 @@ private:
 	float						_timeUntilIntensityUpdate;
 
 	SpringTranslatedVector		_meshPosition;			// Position of ship mesh in up direction
-	SpringTranslatedVector		_meshXZPosition;		// Position of ship mesh in forward/right directions
 
 	float _currentSurfaceTemperature{ 0.0f };
 
