@@ -22,7 +22,8 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_heightStep = windowHeight / 100.f;
 
 	_speeder.setFillColor(sf::Color::Transparent);
-	_speeder.setOutlineColor(sf::Color::Black);
+//	_speeder.setOutlineColor(sf::Color::Black);
+	_speeder.setOutlineColor(sf::Color(125, 125, 125, 255));
 
 	for (size_t i = 0; i < _speedLine.getVertexCount(); i++)
 	{
@@ -76,9 +77,11 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	//_tSpeed.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
 	//_tSpeed.setPosition(_widthStep * 75 + _offsetX, _heightStep + _offsetY);
 
-	_speeder.setRadius(_widthStep * 6.f / 4.f);
-	_speeder.setOutlineThickness(_widthStep * 3.f / 8.f);
-	_speeder.setOrigin(_widthStep * 6.f / (_speeder.getRadius() + _speeder.getOutlineThickness()), _widthStep * 6.f / (_speeder.getRadius() + _speeder.getOutlineThickness()));
+	float speederRadius = ((1920.f / 2.f) / 300.f) * (6.f / 4.f);
+	_speeder.setRadius(speederRadius);
+	_speeder.setOutlineThickness(speederRadius / 4.f);
+//	_speeder.setOrigin(_widthStep * 6.f / (_speeder.getRadius() + _speeder.getOutlineThickness()), _widthStep * 6.f / (_speeder.getRadius() + _speeder.getOutlineThickness()));
+    _speeder.setOrigin(_speeder.getGlobalBounds().width / 2.f, _speeder.getGlobalBounds().height / 2.f);
 
 	for (size_t i = 0; i < _speedLine.getVertexCount(); i++)
 	{
@@ -109,7 +112,9 @@ void HUD::updateCurrent(float dtSeconds)
 
     float colorModifier = std::pow(_heat, 6.f);
 	glm::vec4 speederColor = _MIN_SPEEDER_COLOR * (1.f - colorModifier) + _MAX_SPEEDER_COLOR * colorModifier;
-	_speeder.setFillColor(sf::Color(speederColor.r, speederColor.g, speederColor.b, speederColor.a));
+//	_speeder.setFillColor(sf::Color(speederColor.r, speederColor.g, speederColor.b, speederColor.a));
+//	_speeder.setFillColor(sf::Color(speederColor.r, speederColor.g, speederColor.b, _heat * 255.f));
+	_speeder.setFillColor(sf::Color(_MAX_SPEEDER_COLOR.r, _MAX_SPEEDER_COLOR.g, _MAX_SPEEDER_COLOR.b, colorModifier * 255.f));
 
 	if(_heat > 0.9f)
     {
