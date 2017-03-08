@@ -8,8 +8,12 @@
 WorldAudio::WorldAudio() :
 	_sbCountdown(AssetCache<sf::SoundBuffer, std::string>::get("counter"))
 {
-	loadSound("Stranger Danger - Mellow Business");
-	_music.setBuffer(_musicbuffer);
+	_playlist.push_back("Stranger Danger - Mellow Business");
+	_playlist.push_back("Stranger Danger - Haste");
+
+	loadBuffers();
+
+	_music.setBuffer(_musicbuffers.at(0));
 
 	AudioOptions options;
 	setVolume(options.getMusicVolume());
@@ -34,10 +38,14 @@ void WorldAudio::stopMusic() {
 	_music.stop();
 }
 
-void WorldAudio::loadSound(std::string filename)
+void WorldAudio::loadBuffers()
 {
 	std::string folder = "./res/audio/music/";
-	_musicbuffer.loadFromFile(folder + filename + ".ogg");
+	for(int i = 0; i < _playlist.size(); i++)
+	{
+		_musicbuffers.push_back(sf::SoundBuffer());
+		_musicbuffers[i].loadFromFile(folder + _playlist[i] + ".ogg");
+	}
 }
 
 std::vector<std::string> WorldAudio::getPlaylist() 
@@ -47,9 +55,19 @@ std::vector<std::string> WorldAudio::getPlaylist()
 
 void WorldAudio::changeSong(std::string name)
 {
-	loadSound(name);
+	int place = 0;
+
+	for (int i = 0; i < _playlist.size(); i++)
+	{
+		if (_playlist[i] == name) 
+		{
+			place = i;
+			break;
+		}
+	}
+
 	stopMusic();
-	_music.setBuffer(_musicbuffer);
+	_music.setBuffer(_musicbuffers[place]);
 	playMusic();
 }
 
