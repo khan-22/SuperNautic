@@ -62,7 +62,7 @@ World::World(ApplicationContext& context)
 
 	GLuint resultColorChannels[] = { 3 };
 	_resultFramebuffer.initialize(_context.window.getSize().x, _context.window.getSize().y, resultColorChannels, sizeof(resultColorChannels) / sizeof(resultColorChannels[0]));
-	
+
 	//_darkZonePass.initialize(0.f, 0.f, 1.f, 1.f, &_resultFramebuffer, "darkpass_forward");
 
 
@@ -331,6 +331,7 @@ void World::render()
 			_viewportPipelines[i].particleForward.render(_players[j].getShip().getRightParticleSystem());
 		}
 	}
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (!_bDebugging)
 	{
