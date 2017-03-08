@@ -109,13 +109,11 @@ void DeferredRenderer::geometryPass(Camera& camera, GLsizei width, GLsizei heigh
 	//*************** GEOMETRY PASS *******************//
 	//*************************************************//
 
-	_resultFramebuffer->bindWrite();
+	Framebuffer::DEFAULT.bindWrite();
 
-	//glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
-	glViewport(0, 0, static_cast<GLsizei>(_width * width), static_cast<GLsizei>(_height * height));
+	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
 	glDisable(GL_BLEND);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	_geometryPassShader.get()->bind();
 

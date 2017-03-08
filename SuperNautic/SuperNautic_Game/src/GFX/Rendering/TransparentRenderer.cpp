@@ -50,7 +50,7 @@ void TransparentRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
 
-	_resultFramebuffer->bindWrite();
+    Framebuffer::DEFAULT.bindWrite();
 
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;

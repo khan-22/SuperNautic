@@ -70,16 +70,19 @@ void WindowRenderer::display(Camera& camera)
 
 	outsidePass(camera);
 	windowPass(camera);
-	
+
 	//glViewport(0, 0, windowWidth, windowHeight);
 	Framebuffer::DEFAULT.bindBoth();
 }
 
 void GFX::WindowRenderer::outsidePass(Camera & camera)
 {
-	_outsideFrameBuffer.bindWrite();
-	glViewport(0, 0, _actualWidth, _actualHeight);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	Framebuffer::DEFAULT.bindWrite();
+//	glViewport(0, 0, _actualWidth, _actualHeight);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
+
 
 	Shader* shader = _outsideShader.get();
 	shader->bind();
@@ -94,7 +97,7 @@ void GFX::WindowRenderer::outsidePass(Camera & camera)
 
 		drawCall->render(states);
 	}
-	
+
 	glDisable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
 
@@ -106,10 +109,13 @@ void GFX::WindowRenderer::windowPass(Camera & camera)
 {
 	assert(_window != nullptr);
 
-	_resultFramebuffer->bindWrite();
-	_outsideFrameBuffer.bindRead();
-	_outsideFrameBuffer.bindColorTextures();
+	Framebuffer::DEFAULT.bindWrite();
+
+//	_outsideFrameBuffer.bindColorTextures();
 	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	Shader* shader = _windowShader.get();
 	shader->bind();
@@ -125,6 +131,9 @@ void GFX::WindowRenderer::windowPass(Camera & camera)
 		windowDrawCall->windowModel.get()->setModelMatrix(windowDrawCall->modelTransform);
 		windowDrawCall->windowModel.get()->render(states);
 	}
+
+	glDisable(GL_BLEND);
+
 
 	_windowDrawCalls.clear();
 
