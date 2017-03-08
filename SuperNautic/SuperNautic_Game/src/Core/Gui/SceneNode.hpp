@@ -25,7 +25,7 @@ public:
     void attachChild(std::unique_ptr<SceneNode>& child);
     std::unique_ptr<SceneNode> detachChild(const SceneNode& node);
 
-    void update();
+    void update(float dtSeconds);
 
     virtual sf::Vector2f getWorldPosition() const;
     sf::Transform getWorldTransform() const;
@@ -42,8 +42,8 @@ private:
 
     virtual void handleEventCurrent(const sf::Event& event);
     void handleEventChildren(const sf::Event& event);
-    virtual void updateCurrent();
-    void updateChildren();
+    virtual void updateCurrent(float dtSeconds);
+    void updateChildren(float dtSeconds);
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
     virtual void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
     void renderChildren(sf::RenderTarget& target, sf::RenderStates states) const;

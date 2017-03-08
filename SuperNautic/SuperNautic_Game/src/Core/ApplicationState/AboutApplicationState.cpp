@@ -83,34 +83,50 @@ void AboutApplicationState::render()
 bool AboutApplicationState::bUpdate(float dtSeconds)
 {
     _context.menuBackground->update(dtSeconds);
+
+	if (_input.checkActive())
+	{
+		_input.update();
+		for (const sf::Event& e : _input.getEvents())
+		{
+			if (e.type == sf::Event::KeyPressed)
+			{
+				switch (e.key.code)
+				{
+				case sf::Keyboard::Escape:
+				case sf::Keyboard::B:
+					_stack.clear();
+					_stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
+					return true;
+
+				default:
+					break;
+				}
+			}
+
+			_guiGraph.handleEvent(e);
+		}
+	}
     return true;
 }
 
 bool AboutApplicationState::bHandleEvent(const sf::Event& event)
 {
-    if(event.type == sf::Event::KeyPressed)
-    {
-        switch(event.key.code)
-        {
-            case sf::Keyboard::Escape:
-            case sf::Keyboard::B:
-                _stack.clear();
-                _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
-                return true;
+	if (event.type == sf::Event::KeyPressed)
+	{
+		switch (event.key.code)
+		{
+		case sf::Keyboard::Escape:
+		case sf::Keyboard::B:
+			_stack.clear();
+			_stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
+			return true;
 
-            default:
-                break;
-        }
-    }
+		default:
+			break;
+		}
+	}
 
-    _guiGraph.handleEvent(event);
-    if(_input.checkActive())
-    {
-        _input.update();
-        for(const sf::Event& e : _input.getEvents())
-        {
-            _guiGraph.handleEvent(e);
-        }
-    }
+	_guiGraph.handleEvent(event);
     return true;
 }

@@ -14,7 +14,7 @@
 #include "Core/Utility/CollisionUtility.hpp"
 
 Ship::Ship(glm::vec3 color)
-	: 
+	:
 	_destroyed{ false },
 	_stopped{ false },
 	_turningFactor{ 0.0f },
@@ -35,9 +35,9 @@ Ship::Ship(glm::vec3 color)
 	_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0, 1, 0 }, 5.0f, 100.0f },
 	_minAcceleration{ 0.0f },
 	_maxAcceleration{ 100.0f },
-	_maxTurningSpeed{ 20.0f },
+	_maxTurningSpeed{ 35.0f },
 	_straighteningForce{ 3.0f },
-	_steerStraighteningForce{ 10.0f },
+	_steerStraighteningForce{ 20.0f },
 	_speedResistance{ 0.001f },
 	_preferredHeight{ 1.5f },
 	_engineCooldown{ 0 },
@@ -244,7 +244,7 @@ void Ship::handleInputs(float dt)
 			_accelerationFactor = -1.0f;
 		}
 		// abs to preserve sign of _currentTurningAngle
-		_currentTurningAngle -= _steerStraighteningForce * _currentTurningAngle * abs(_currentTurningAngle) * dt;
+		_currentTurningAngle -= _steerStraighteningForce * _currentTurningAngle * dt;
 
 		// Update velocity
 		_velocity += (_minAcceleration + _accelerationFactor * (_maxAcceleration - _minAcceleration)) * dt;
@@ -312,7 +312,7 @@ void Ship::handleTemperature(float dt)
 
 	difference += _currentSurfaceTemperature * 5.5f;
 
-	_engineTemperature += (difference == 0.0f ? 1.0f : (abs(difference) / difference)) *  powf(abs(difference), 1.2f) * 0.2f * dt;
+	_engineTemperature += (difference == 0.0f ? 1.0f : (std::fabs(difference) / difference)) *  powf(std::fabs(difference), 1.2f) * 0.2f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 
 	if (_engineTemperature > _overheatTemperature)
@@ -514,7 +514,7 @@ bool Ship::getOverload(float dt)
 
 bool Ship::isEngineOverload()
 {
-	if (_bEngineOverload) 
+	if (_bEngineOverload)
 	{
 		_bEngineOverload = false;
 		return true;

@@ -82,6 +82,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     _toolTip.centerAt(static_cast<size_t>(windowSize.x / 2.f), static_cast<size_t>(windowSize.y * 0.95f));
     _toolTip.registerTip(startButton, "Start the game.");
     _toolTip.registerTip(backButton, "Go back to main menu.");
+	_toolTip.registerTip(songList, "Select background music track.");
     _toolTip.setCharacterSize(18);
 
 
@@ -114,7 +115,7 @@ void PreGameApplicationState::render()
 bool PreGameApplicationState::bUpdate(float dtSeconds)
 {
     _context.menuBackground->update(dtSeconds);
-    _guiContainer.update();
+    _guiContainer.update(dtSeconds);
     _trackGenerator.update(dtSeconds);
 
     if(_input.checkActive())
