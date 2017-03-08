@@ -225,13 +225,14 @@ void OptionsApplicationState::applyOptions()
 	_context.segmentHandler.reset();
 	_context.obstacleHandler.reset();
 
-    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos1.txt", "Segments/ConnectionTypes.txt"));
+    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos3.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
 
     sf::Vector2u size = _context.window.getSize();
 
     _context.menuBackground.reset(new MenuBackground(size.x, size.y));
     _guiContainer.setPosition(size.x / 2.f, size.y / 2.f);
+    _title.setPosition(size.x / 2.f, _guiContainer.getBoundingRect().top / 2.f);
     _toolTip.centerAt(static_cast<size_t>(size.x / 2.f), static_cast<size_t>(size.y * 0.95f));
 }
 

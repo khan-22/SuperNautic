@@ -21,6 +21,7 @@ public:
 	~HUD();
 
 	void setSpeed(float speed);
+	void setHeat(float heat);
 	void setPosition(int position);
 	void setScreenSize(int width, int height, int offsetX, int offsetY);
 
@@ -33,6 +34,7 @@ private:
 	int					_offsetX;
 	int					_offsetY;
 	float				_speed;
+	float				_heat;
 	//int					_position;
 
 	//Asset<sf::Font>		_font;
@@ -41,6 +43,9 @@ private:
 	sf::CircleShape		_speeder;
 
 	sf::VertexArray		_speedLine;
+
+	sf::RectangleShape	_heatOverlay;
+	Asset<sf::Texture>	_heatOverlayTexture;
 
 	//sf::Text			_tSpeed;
 	//sf::Text			_tPosition;

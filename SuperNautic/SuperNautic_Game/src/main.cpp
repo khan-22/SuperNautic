@@ -12,15 +12,6 @@
 #include "Core/Io/Log.hpp"
 #include "Core/Game.hpp"
 
-// For ray intersection testing
-#include "Core/Geometry/RayIntersection.hpp"
-#include "Core/Geometry/Ray.hpp"
-#include "Core/Track/SegmentHandler.hpp"
-#include "Core/Track/Segment.hpp"
-
-#include "GFX/Rendering/Transformable3D.hpp"
-
-
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -37,7 +28,6 @@ int main()
 		game.bInitialize();
 		game.run();
 	}
-
 
 	return 0;
 }

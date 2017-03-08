@@ -15,8 +15,8 @@ const std::string Segment::boundingBoxName					{ "BB" };
 const std::string Segment::waypointsName					{ "WP" };
 
 // Static maps declared in Segment.hpp
-std::unordered_map<std::string, unsigned Segment::*> Segment::nameToIndex;
-std::unordered_map<std::string, std::vector<unsigned> Segment::*> Segment::nameToVecIndex;
+std::unordered_map<std::string, unsigned int Segment::*> Segment::nameToIndex;
+std::unordered_map<std::string, std::vector<unsigned int> Segment::*> Segment::nameToVecIndex;
 
 // Mappings are by default not created
 bool Segment::mappingsCreated { false };
@@ -29,6 +29,7 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 
 	// Get the scene data asset
 	_scene = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_dataFileName);
+
 
 	// Get visual model asset
 	_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get(_segmentInfo->_materialFileName));
@@ -44,15 +45,16 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 		_bHasWindow = false;
 	}
 
-	//Zones
+	// Zones
 	if (_segmentInfo->_zoneFileName != "E")
 	{
 		_zonesModel = ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_zoneFileName);
-		_bHasZones = true;
+		_zonesCollision = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_zoneFileName);
+		_nrOfZones = 4;
 	}
 	else
 	{
-		_bHasZones = false;
+		_nrOfZones = 0;
 	}
 
 	if (_scene.get()->cameras.size() < 1)
@@ -114,7 +116,7 @@ const RayIntersection Segment::rayIntersectionTest(const Ray& ray, const std::ve
 			if (boxesToTest.begin()->second->_children.size() > 0)
 			{
 				// For every child
-				for (unsigned i = 0; i < boxesToTest.begin()->second->_children.size(); ++i)
+				for (unsigned int i = 0; i < boxesToTest.begin()->second->_children.size(); ++i)
 				{
 					// Check if child intersects ray
 					float hitValue = boxesToTest.begin()->second->_children[i].rayIntersection(ray);
@@ -130,11 +132,17 @@ const RayIntersection Segment::rayIntersectionTest(const Ray& ray, const std::ve
 			else
 			{
 				// Construct vector of indices of models
-				std::vector<unsigned> modelIndices{ _temperatureZoneCollisions };
-				modelIndices.push_back(_baseCollision);
+				std::vector<GFX::RawVertexData*> models;
+
+				if (_zonesCollision.get())
+				{
+					models.push_back(&_zonesCollision.get()->meshes[0]);
+				}
+
+				models.push_back(&_scene.get()->meshes[_baseCollision]);
 
 				// Test intersection with geometry
-				RayIntersection intersection = boxesToTest.begin()->second->triangleRayIntersection(ray, modelIndices, temperatures, _scene);
+				RayIntersection intersection = boxesToTest.begin()->second->triangleRayIntersection(ray, models, temperatures);
 
 				if (intersection)
 				{
@@ -161,7 +169,7 @@ WaypointInfo Segment::findClosestWaypoint(const glm::vec3& position) const
 	closest.found = false;
 
 	// Find the closest waypoint
-	for (unsigned i = 0; i < _waypoints.size(); ++i)
+	for (unsigned int i = 0; i < _waypoints.size(); ++i)
 	{
 		// Find direction of the waypoint that will be checked
 		glm::vec3 currentDirection;
@@ -214,7 +222,7 @@ void Segment::assignMeshPointers()
 {
 	// Data file
 	std::string currentName;
-	for (unsigned i = 0; i < _scene.get()->meshes.size(); ++i)
+	for (unsigned int i = 0; i < _scene.get()->meshes.size(); ++i)
 	{
 		// currentName contains name of current mesh
 		// readName will not have trailing digits removed, used for error logging
@@ -253,7 +261,7 @@ void Segment::assignMeshPointers()
 				if ((this->*nameToVecIndex[currentName]).size() < (trailingNumber + 1))
 				{
 																					// Max value represents unassigned
-					(this->*nameToVecIndex[currentName]).resize(trailingNumber + 1, std::numeric_limits<unsigned>::max());
+					(this->*nameToVecIndex[currentName]).resize(trailingNumber + 1, std::numeric_limits<unsigned int>::max());
 				}
 				(this->*nameToVecIndex[currentName])[trailingNumber] = i;
 			}
@@ -280,10 +288,10 @@ void Segment::assignMeshPointers()
 void Segment::createBoundingBoxes()
 {
 	// Create a bounding box for every mesh in _boundingBoxMeshes
-	for (unsigned i = 0; i < _boundingBoxMeshes.size(); ++i)
+	for (unsigned int i = 0; i < _boundingBoxMeshes.size(); ++i)
 	{
 		// Max value represents unassigned
-		if (_boundingBoxMeshes[i] == std::numeric_limits<unsigned>::max())
+		if (_boundingBoxMeshes[i] == std::numeric_limits<unsigned int>::max())
 		{
 			LOG_ERROR("_boundingBoxMeshes[", i, "] was not assigned (not zero-based indexing?)");
 			continue;
@@ -312,15 +320,15 @@ void Segment::createWaypoints()
 
 	// Set middle[i] to the waypoint closest to middle[i - 1]
 	// middle[0] is always (0, 0, 0)
-	for (unsigned i = 1; i < _waypoints.size(); ++i)
+	for (unsigned int i = 1; i < _waypoints.size(); ++i)
 	{
 		// Index of closest, initialize to first position tested
-		unsigned closest = i;
+		unsigned int closest = i;
 
 		// Squared distance from middles[i] to middles[i - 1], will hold distance from closest waypoint to middles[i - 1]
 		float lowestDistance = glm::distance(_waypoints[i], _waypoints[i - 1]);
 
-		for (unsigned j = i + 1; j < _waypoints.size(); ++j)
+		for (unsigned int j = i + 1; j < _waypoints.size(); ++j)
 		{
 			float testDistance = glm::distance(_waypoints[j], _waypoints[i]);
 
@@ -347,15 +355,15 @@ void Segment::createWaypoints()
 }
 
 // Create a vector with average positions of a vector of mesh indices, insert (0, 0, 0) at index 0
-void Segment::createAverageWaypoints(std::vector<unsigned>& meshIndices)
+void Segment::createAverageWaypoints(std::vector<unsigned int>& meshIndices)
 {
 	// Create a vector containing the average position of all vertices in corresponding mesh in meshes
 	// First waypoint is always (0, 0, 0)
 	_waypoints.push_back( glm::vec3{0, 0, 0} );
 
-	for (unsigned i = 0; i < meshIndices.size(); ++i)
+	for (unsigned int i = 0; i < meshIndices.size(); ++i)
 	{
-		if (meshIndices[i] == std::numeric_limits<unsigned>::max())
+		if (meshIndices[i] == std::numeric_limits<unsigned int>::max())
 		{
 			LOG_ERROR("_waypointMeshes[", i, "] was not assigned (not zero-based indexing?)");
 			continue;
@@ -366,7 +374,7 @@ void Segment::createAverageWaypoints(std::vector<unsigned>& meshIndices)
 		const size_t index = _waypoints.size() - 1;
 
 		// Add the position of every vertex in the model
-		for (unsigned j = 0; j < _scene.get()->meshes[meshIndices[i]].vertices.size(); ++j)
+		for (unsigned int j = 0; j < _scene.get()->meshes[meshIndices[i]].vertices.size(); ++j)
 		{
 			_waypoints[index].x += _scene.get()->meshes[meshIndices[i]].vertices[j].x;
 			_waypoints[index].y += _scene.get()->meshes[meshIndices[i]].vertices[j].y;
@@ -379,7 +387,7 @@ void Segment::createAverageWaypoints(std::vector<unsigned>& meshIndices)
 }
 
 // Divides the collision geometry of this segment into an oct-tree
-void Segment::createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions)
+void Segment::createOctTree(unsigned int maxFacesPerBox, unsigned int maxSubdivisions)
 {
 	// Find the largest and smallest vertex position in each axis
 	// and use as starting values for box
@@ -392,7 +400,7 @@ void Segment::createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions)
 	findMinMaxValues(min, max, _baseCollision);
 
 	// Look through zones
-	for (unsigned i = 0; i < _temperatureZoneCollisions.size(); ++i)
+	for (unsigned int i = 0; i < _temperatureZoneCollisions.size(); ++i)
 	{
 		findMinMaxValues(min, max, _temperatureZoneCollisions[i]);
 	}
@@ -403,8 +411,8 @@ void Segment::createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions)
 
 	// Will contain indices into vertices/faces vectors of models
 	// [0]..[_temperatureZoneCollisions.size()] is zone collisions, [_temperatureZoneCollisions.size()] is base collision
-	std::vector<std::vector<unsigned>> vertexIndices;
-	std::vector<std::vector<unsigned>> faceIndices;
+	std::vector<std::vector<unsigned int>> vertexIndices;
+	std::vector<std::vector<unsigned int>> faceIndices;
 
 	// Fill indices
 	for (size_t i = 0; i <= _temperatureZoneCollisions.size(); ++i)
@@ -433,13 +441,13 @@ void Segment::createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions)
 		}
 
 		// Fill vertex indices
-		for (unsigned j = 0; j < vertsToFill; ++j)
+		for (unsigned int j = 0; j < vertsToFill; ++j)
 		{
 			vertexIndices[i].push_back(j);
 		}
 
 		// Fill face indices
-		for (unsigned j = 0; j < facesToFill; ++j)
+		for (unsigned int j = 0; j < facesToFill; ++j)
 		{
 			faceIndices[i].push_back(j);
 		}
@@ -450,7 +458,7 @@ void Segment::createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions)
 }
 
 // Find smallest and largest vertex position in each axis for a model, using min and max for comparison
-void Segment::findMinMaxValues(glm::vec3& min, glm::vec3& max, unsigned modelIndex)
+void Segment::findMinMaxValues(glm::vec3& min, glm::vec3& max, unsigned int modelIndex)
 {
 	size_t numVerts = _scene.get()->meshes[modelIndex].vertices.size();
 	for (size_t i = 0; i < numVerts; ++i)
@@ -489,7 +497,7 @@ void Segment::findMinMaxValues(glm::vec3& min, glm::vec3& max, unsigned modelInd
 }
 
 // Recursively subdivides an AABB until every box touches <= maxFacesPerBox or maxSubdivisions == 0
-void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxSubdivisions, std::vector<std::vector<unsigned>>&& vertexIndices, std::vector<std::vector<unsigned>>&& faceIndices)
+void Segment::subdivideOctTree(AABB& box, unsigned int maxFacesPerBox, unsigned int maxSubdivisions, std::vector<std::vector<unsigned int>>&& vertexIndices, std::vector<std::vector<unsigned int>>&& faceIndices)
 {
 	bool stopSubdividing = false;
 
@@ -527,13 +535,13 @@ void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxS
 	std::vector<AABB> possibleChildren = createChildren(box._minCorner, box._maxCorner);
 
 	// Vectors corresponding to vertexIndices and faceIndices for every child
-	std::vector<std::vector<std::vector<unsigned>>> childrenVertexIndices(8);
-	std::vector<std::vector<std::vector<unsigned>>> childrenFaceIndices(8);
+	std::vector<std::vector<std::vector<unsigned int>>> childrenVertexIndices(8);
+	std::vector<std::vector<std::vector<unsigned int>>> childrenFaceIndices(8);
 
 	// Initialize subvectors
-	for (unsigned i = 0; i < 8; ++i)
+	for (unsigned int i = 0; i < 8; ++i)
 	{
-		for (unsigned j = 0; j < _temperatureZoneCollisions.size() + 1; ++j)  // +1 to include _baseCollison
+		for (unsigned int j = 0; j < _temperatureZoneCollisions.size() + 1; ++j)  // +1 to include _baseCollison
 		{
 			childrenVertexIndices[i].emplace_back();
 			childrenFaceIndices[i].emplace_back();
@@ -541,7 +549,7 @@ void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxS
 	}
 
 	// For every vertex, this vector contains an index representing which child the index occupies
-	std::vector<std::vector<unsigned>> vertexMovement(vertexIndices.size());
+	std::vector<std::vector<unsigned int>> vertexMovement(vertexIndices.size());
 
 
 	// For every vertex, check which child it belongs to, copy to corresponding vertex index, indicate move in vertex index movement vector
@@ -567,7 +575,7 @@ void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxS
 		for (size_t j = 0; j < vertexIndices[i].size(); ++j)
 		{
 			// Index into possibleChildren
-			unsigned targetChild = findChildIndex(currentModel, vertexIndices[i][j], boxMiddle);
+			unsigned int targetChild = findChildIndex(currentModel, vertexIndices[i][j], boxMiddle);
 
 			// Pass index to correct child
 			childrenVertexIndices[targetChild][i].push_back(vertexIndices[i][j]);
@@ -584,7 +592,7 @@ void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxS
 			int placedIn2 = -1;
 
 			// For every vertex in face
-			for (unsigned k = 0; k < 3; ++k)
+			for (unsigned int k = 0; k < 3; ++k)
 			{
 				// The index of the vertex that needs to be found
 				size_t indexToFind = _scene.get()->meshes[currentModel].faces[j][k];
@@ -593,7 +601,7 @@ void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxS
 				auto foundAt = std::lower_bound(vertexIndices[i].begin(), vertexIndices[i].end(), indexToFind);
 				ptrdiff_t indexInMovementVector = foundAt - vertexIndices[i].begin();
 
-				unsigned targetChild = vertexMovement[i][indexInMovementVector];
+				unsigned int targetChild = vertexMovement[i][indexInMovementVector];
 
 				// Copy face to child if not already copied
 				if (placedIn1 < 0)
@@ -614,13 +622,13 @@ void Segment::subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxS
 	}
 
 	// For every child with nonempty index vectors, copy into AABB children vector and call this function with corresponding vertexIndices and faceIndices
-	for (unsigned i = 0; i < possibleChildren.size(); ++i)
+	for (unsigned int i = 0; i < possibleChildren.size(); ++i)
 	{
 		// A child will only be kept if it contains geometry
 		bool childContainsData = false;
 
 		// Check for geometry from every mesh
-		for (unsigned j = 0; j < childrenFaceIndices[i].size(); ++j)
+		for (unsigned int j = 0; j < childrenFaceIndices[i].size(); ++j)
 		{
 			if (childrenFaceIndices[i][j].size() > 0)
 			{
@@ -658,9 +666,9 @@ std::vector<AABB> Segment::createChildren(glm::vec3 min, glm::vec3 max)
 }
 
 // Helper for subdivideOctTree, finds index of child to copy a vertex to
-unsigned Segment::findChildIndex(size_t currentModel, unsigned index, glm::vec3 boxMiddle)
+unsigned int Segment::findChildIndex(size_t currentModel, unsigned int index, glm::vec3 boxMiddle)
 {
-	unsigned targetChild = 0;
+	unsigned int targetChild = 0;
 
 	// Find correct index
 	if (_scene.get()->meshes[currentModel].vertices[index].x > boxMiddle.x)
@@ -679,11 +687,6 @@ unsigned Segment::findChildIndex(size_t currentModel, unsigned index, glm::vec3 
 	}
 
 	return targetChild;
-}
-
-unsigned Segment::getNumZones() const
-{
-	return static_cast<unsigned>(_temperatureZoneCollisions.size());
 }
 
 // Returns bounding boxes
@@ -743,7 +746,7 @@ ModelAsset Segment::getZonesModel() const
 	return _zonesModel;
 }
 
-bool Segment::bHasZones() const
+unsigned int Segment::nrOfZones() const
 {
-	return _bHasZones;
+	return _nrOfZones;
 }

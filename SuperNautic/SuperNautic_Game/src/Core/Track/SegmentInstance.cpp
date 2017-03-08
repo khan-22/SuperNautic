@@ -19,7 +19,7 @@ SegmentInstance::SegmentInstance(const Segment * segment, glm::mat4 modelMatrix,
 	_bHasLighting = lighting;
 
 	// TEMPORARY
-	for (unsigned i = 0; i < _parent->getNumZones(); ++i)
+	for (unsigned int i = 0; i < _parent->nrOfZones(); ++i)
 	{
 		if (i % 2 == 0)
 		{
@@ -62,14 +62,6 @@ const int SegmentInstance::getIndex() const
 void SegmentInstance::addObstacle(ObstacleInstance newObstacle)
 {
 	_obstacles.push_back(newObstacle);
-}
-
-void SegmentInstance::decreaseObstacleSpeed()
-{
-	for (size_t i = 0; i < _obstacles.size(); i++)
-	{
-		_obstacles[i].decreaseSpeed();
-	}
 }
 
 bool SegmentInstance::bTestCollisionSphere(const SegmentInstance& other) const
@@ -152,9 +144,17 @@ void SegmentInstance::updateGlobalBounds()
 
 void SegmentInstance::update(const float dt)
 {
-	for (size_t i = 0; i < _obstacles.size(); i++)
+	for (size_t i = 0; i < _obstacles.size(); ++i)
 	{
 		_obstacles[i].update(dt);
+	}
+}
+
+void SegmentInstance::decreaseSpeed(const float dt)
+{
+	for (unsigned int i = 0; i < _obstacles.size(); ++i)
+	{
+		_obstacles[i].decreaseSpeed(dt);
 	}
 }
 
@@ -194,4 +194,9 @@ void SegmentInstance::removeObstacle(size_t i)
 	assert(i < _obstacles.size());
 
 	_obstacles.erase(_obstacles.begin() + i);
+}
+
+void SegmentInstance::setTemperatures(std::vector<float>& temperatures)
+{
+	_temperatures = temperatures;
 }

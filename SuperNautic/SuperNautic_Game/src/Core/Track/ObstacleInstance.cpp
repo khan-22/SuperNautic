@@ -6,7 +6,6 @@
 ObstacleInstance::ObstacleInstance(const glm::mat4& m, ObstacleHandler::Obstacle* parent, float diff)
 	: _modelMat(m)
 	, _parent(parent)
-	, _bDecreaseSpeed(false)
 {
 	_rotSpeed = _parent->getRandomRotSpeed(diff);
 	_rotDir = 1;
@@ -23,11 +22,15 @@ ObstacleInstance::~ObstacleInstance()
 
 void ObstacleInstance::update(const float dt)
 {
-	if (_bDecreaseSpeed && _rotSpeed > 0)
-	{
-		_rotSpeed -= 0.02f;
-	}
 	_modelMat = _modelMat * glm::rotate(glm::radians(_rotSpeed * _rotDir * dt), glm::vec3(0, 0, 1));
+}
+
+void ObstacleInstance::decreaseSpeed(const float dt)
+{
+	if (_rotSpeed > 0.f)
+	{
+		_rotSpeed -= 5.0f * dt;
+	}
 }
 
 void ObstacleInstance::render(GFX::RenderStates & states)
@@ -44,9 +47,4 @@ std::vector<BoundingBox>& ObstacleInstance::getBoundingBoxes() const
 const glm::mat4 & ObstacleInstance::getModelMatrix() const
 {
 	return _modelMat;
-}
-
-void ObstacleInstance::decreaseSpeed()
-{
-	_bDecreaseSpeed = true;
 }

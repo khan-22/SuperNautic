@@ -25,7 +25,7 @@ struct WaypointInfo
 	glm::vec3 position;
 	glm::vec3 direction;
 	float distance;
-	unsigned index;	// index in _waypoints
+	unsigned int index;	// index in _waypoints
 };
 
 // Uninstantiated version of a track segment
@@ -46,7 +46,7 @@ public:
 	char getStart() const;
 	char getEnd() const;
 
-	const SegmentInfo * getInfo() const;
+	const SegmentInfo* getInfo() const;
 
 	// Returns approximate segment length
 	float getLength() const;
@@ -54,8 +54,6 @@ public:
 	const glm::mat4x4& getEndMatrix() const;
 
 	const std::vector<glm::vec3>& getWaypoints() const;
-
-	unsigned getNumZones() const;
 
 	// Finds position of and distance to the waypoint closest to a position (position is relative to segment's local origin)
 	WaypointInfo findClosestWaypoint(const glm::vec3& position) const;
@@ -68,7 +66,7 @@ public:
 
 	ModelAsset getZonesModel() const;
 
-	bool bHasZones() const;
+	unsigned int nrOfZones() const;
 
 private:
 	const SegmentInfo*	_segmentInfo;
@@ -76,20 +74,23 @@ private:
 	// The loaded scene data
 	RawMeshAsset _scene;
 
+	// The temperature zone models
+	RawMeshAsset _zonesCollision;
+
 	// The visual geometry for this segment
 	GFX::TexturedModel	_visual;
 	ModelAsset			_windowModel;
 	bool				_bHasWindow;
 	ModelAsset			_zonesModel;
-	bool				_bHasZones;
+	unsigned int		_nrOfZones;
 
 	// Indices in _scene.get()->meshes to the required meshes
-	unsigned				_baseVisual;
-	unsigned				_baseCollision;
-	std::vector<unsigned>	_temperatureZoneVisuals;
-	std::vector<unsigned>	_temperatureZoneCollisions;
-	std::vector<unsigned>	_boundingBoxMeshes;
-	std::vector<unsigned>	_waypointMeshes;
+	unsigned int			_baseVisual;
+	unsigned int			_baseCollision;
+	std::vector<unsigned int>	_temperatureZoneVisuals;
+	std::vector<unsigned int>	_temperatureZoneCollisions;
+	std::vector<unsigned int>	_boundingBoxMeshes;
+	std::vector<unsigned int>	_waypointMeshes;
 
 	// Bounding boxes read from mesh
 	std::vector<BoundingBox> _boundingBoxes;
@@ -113,8 +114,8 @@ private:
 	static const std::string endName;
 
 	// Mappings from mesh name to aiMesh* or vector<aiMesh*>
-	static std::unordered_map<std::string, unsigned Segment::*> nameToIndex;
-	static std::unordered_map<std::string, std::vector<unsigned> Segment::*> nameToVecIndex;
+	static std::unordered_map<std::string, unsigned int Segment::*> nameToIndex;
+	static std::unordered_map<std::string, std::vector<unsigned int> Segment::*> nameToVecIndex;
 
 	// True if nameToIndex and nameToVecIndex are initialized
 	static bool mappingsCreated;
@@ -132,22 +133,22 @@ private:
 	void createWaypoints();
 
 	// Create a vector with average positions of a vector of mesh indices, insert (0, 0, 0) at index 0
-	void createAverageWaypoints(std::vector<unsigned>& meshIndices);
+	void createAverageWaypoints(std::vector<unsigned int>& meshIndices);
 
 	// Divides the collision geometry of this segment into an oct-tree
-	void createOctTree(unsigned maxFacesPerBox, unsigned maxSubdivisions);
+	void createOctTree(unsigned int maxFacesPerBox, unsigned int maxSubdivisions);
 
 	// Find smallest and largest vertex position in each axis for a model, using min and max for comparison
-	void findMinMaxValues(glm::vec3& min, glm::vec3& max, unsigned modelIndex);
+	void findMinMaxValues(glm::vec3& min, glm::vec3& max, unsigned int modelIndex);
 
 	// Recursively subdivides an AABB until every box touches <= maxFacesPerBox or maxSubdivisions == 0
-	void subdivideOctTree(AABB& box, unsigned maxFacesPerBox, unsigned maxSubdivisions, std::vector<std::vector<unsigned>>&& vertexIndices, std::vector<std::vector<unsigned>>&& faceIndices);
+	void subdivideOctTree(AABB& box, unsigned int maxFacesPerBox, unsigned int maxSubdivisions, std::vector<std::vector<unsigned int>>&& vertexIndices, std::vector<std::vector<unsigned int>>&& faceIndices);
 
 	// Helper for subdivideOctTree, creates child boxes from a parent
 	std::vector<AABB> createChildren(glm::vec3 min, glm::vec3 max);
 
 	// Helper for subdivideOctTree, finds index of child to copy a vertex to
-	unsigned findChildIndex(size_t currentModel, unsigned index, glm::vec3 boxMiddle);
+	unsigned int findChildIndex(size_t currentModel, unsigned int index, glm::vec3 boxMiddle);
 };
 
 #endif // SEGMENT_H

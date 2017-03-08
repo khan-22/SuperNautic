@@ -131,17 +131,51 @@ void World::handleEvent(const sf::Event& e)
 
 }
 
+void World::pause()
+{
+    _countdown.pause();
+    for(Player& p : _players)
+    {
+        p.pause();
+    }
+}
+
+void World::resume()
+{
+    _countdown.resume();
+    for(Player& p : _players)
+    {
+        p.resume();
+    }
+}
+
 void World::update(float dt, sf::Window& window)
 {
+	if (!_countdown.isPlaying())
+	{
+		_timer.updateTime(dt);
+		for(Player& p : _players)
+        {
+            p.getShip().setInactiveTime(0.f);
+        }
+	}
+	else
+    {
+		for(Player& p : _players)
+        {
+            p.getShip().setInactiveTime(_countdown.getTimeLeft());
+        }
+    }
+
 	if (!_bDebugging)
 	{
 		// Update players
-		for (unsigned i = 0; i < _players.size(); ++i)
+		for (unsigned int i = 0; i < _players.size(); ++i)
 		{
 			// Finds forward vector of ship and updates segment index
 			glm::vec3 returnPos;
 			glm::vec3 directionDifference;
-			unsigned segmentIndex = _playerProgression[i].getCurrentSegment();
+			unsigned int segmentIndex = _playerProgression[i].getCurrentSegment();
 			float lengthInSegment = 0.0f;
 			glm::vec3 forward = _track->findForward(_players[i].getShip().getPosition(), segmentIndex, returnPos, lengthInSegment, directionDifference);
 
@@ -178,11 +212,11 @@ void World::update(float dt, sf::Window& window)
 			{
 				_players[i].getShip().setSegments(instances);
 			}
-			
+
 			_players[i].update(dt);
 
 			// Check for ship-ship collisions
-			for (unsigned j = i + 1; j < _players.size(); ++j)
+			for (unsigned int j = i + 1; j < _players.size(); ++j)
 			{
 				if (bTestCollision(_players[i].getShip().getBoundingBox(), _players[j].getShip().getBoundingBox()))
 				{
@@ -199,10 +233,10 @@ void World::update(float dt, sf::Window& window)
 
 		std::vector<float> progression;
 
-		for (unsigned i = 0; i < _players.size(); ++i)
+		for (unsigned int i = 0; i < _players.size(); ++i)
 		{
 			int k = 1;
-			for (unsigned j = 0; j < _players.size(); ++j)
+			for (unsigned int j = 0; j < _players.size(); ++j)
 			{
 				if (_playerProgression[i].getProgression() < _playerProgression[j].getProgression())
 				{
@@ -242,21 +276,18 @@ void World::update(float dt, sf::Window& window)
 	for (size_t i = 0; i < _playerProgression.size(); i++)
 	{
 		size_t segment = _playerProgression[i].getCurrentSegment();
-		if (segment > max)
+		if (segment >= max)
 		{
 			max = segment;
 		}
-		if (segment < min)
+		if (segment <= min)
 		{
 			min = segment;
 		}
 	}
-	_track->update(dt, static_cast<unsigned>(max), static_cast<unsigned>(min));
+	_track->update(dt, static_cast<unsigned int>(max), static_cast<unsigned int>(min));
 
-	if (!_countdown.isPlaying())
-	{
-		_timer.updateTime(dt);
-	}
+
 	_timer.updateCurrent();
 
 	_progression.updateCurrent();
@@ -339,9 +370,9 @@ void World::render()
 		_playerRTs[0].blitDepthOnto(GFX::Framebuffer::DEFAULT);
 
 		_playerZoneRenderers[0].display(_debugCamera);
-		
+
 		_playerWindowRenderers[0].display(_debugCamera);
-		
+
 		_playerParticleRenderers[0].display(_debugCamera);*/
 
 		_viewportPipelines[0].display(_debugCamera);

@@ -15,6 +15,7 @@
 #include "GFX/Rendering/SfmlRenderer.hpp"
 
 #include "Core/Gui/GuiPlayerJoinContainer.hpp"
+#include "Core/Gui/GuiHorizontalList.hpp"
 
 PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
@@ -36,6 +37,19 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     });
     guiElements.emplace_back(startButton);
 
+    GuiHorizontalList* songList = new GuiHorizontalList();
+    for(std::string song : _context.audio.getPlaylist())
+    {
+        GuiText* songText = new GuiText(song, _font);
+        songText->registerOnSelect([&context, song]()
+        {
+            context.audio.changeSong(song);
+        });
+        auto songTextPtr = std::unique_ptr<GuiElement>(songText);
+        songList->insert(songTextPtr);
+    }
+    guiElements.emplace_back(songList);
+
 
     GuiButton* backButton = new GuiButton(sf::Text("Back", *_font.get()), [&]()
     {
@@ -51,7 +65,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     sf::Vector2f pos(0.f, _guiContainer.getBoundingRect().top + _guiContainer.getBoundingRect().height);
     for(const std::unique_ptr<GuiElement>& e : guiElements)
     {
-        pos.y += e->getBoundingRect().height * 1.5f;
+        pos.y += e->getBoundingRect().height * 1.75f;
         e->setPosition(pos);
     }
 
