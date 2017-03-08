@@ -19,13 +19,18 @@ namespace GFX
 
 		void initialize(GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer, std::string shaderName);
 
+		void setEffectFactor(GLfloat factor);
+
 		void perform();
+
 
 	private:
 		Framebuffer*	_resultFramebuffer;
 
 		ShaderAsset		_shader;
 		ScreenQuad		_screenQuad;
+
+		GLfloat			_effectFactor;
 
 		float _time;
 	};

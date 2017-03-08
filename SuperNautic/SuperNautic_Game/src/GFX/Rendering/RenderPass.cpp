@@ -1,6 +1,7 @@
 #include "RenderPass.hpp"
 
 GFX::RenderPass::RenderPass()
+	: _effectFactor(0.f)
 {
 	_time = 0.f;
 }
@@ -22,6 +23,11 @@ void GFX::RenderPass::initialize(GLfloat x, GLfloat y, GLfloat width, GLfloat he
 	_screenQuad.initialize(x, y, width, height);
 }
 
+void GFX::RenderPass::setEffectFactor(GLfloat factor)
+{
+	_effectFactor = factor;
+}
+
 void GFX::RenderPass::perform()
 {
 	_resultFramebuffer->bindRead();
@@ -31,6 +37,7 @@ void GFX::RenderPass::perform()
 	Framebuffer::DEFAULT.bindWrite();
 
 	_shader.get()->bind();
+	_shader.get()->setUniform("uFactor", _effectFactor);
 	_screenQuad.render();
 
 	glActiveTexture(GL_TEXTURE1);
