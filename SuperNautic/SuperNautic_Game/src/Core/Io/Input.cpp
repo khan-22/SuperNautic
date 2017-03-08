@@ -239,17 +239,17 @@ bool Input::bGetAValue()
 
 float Input::getLeftStickXValue()
 {
-	return _leftStickX / 100;
+	return _leftStickX / 100.f;
 }
 
 float Input::getLeftStickYValue()
 {
-	return _leftStickX / 100;
+	return _leftStickX / 100.f;
 }
 
 float Input::getTriggersValue()
 {
-	return -_triggers / 100;
+	return -_triggers / 100.f;
 }
 
 std::list<sf::Event> Input::getEvents()
