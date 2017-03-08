@@ -18,7 +18,7 @@ class GuiText : public GuiElement
         GuiText(const std::string& str, FontAsset font);
 
         void setText(const std::string& str);
-        const std::string getText() const;
+        const std::string& getText() const;
 
         virtual sf::FloatRect getBoundingRect() const override;
 
