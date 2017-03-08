@@ -68,7 +68,7 @@ private:
 
 	std::vector<GFX::ViewportPipeline>		_viewportPipelines;
 	GFX::Framebuffer						_resultFramebuffer;
-	GFX::RenderPass							_invertPass;
+	GFX::RenderPass							_darkZonePass;
 
 	/*std::vector<GFX::DeferredRenderer>	_playerRTs;
 	std::vector<GFX::ZoneRenderer>		_playerZoneRenderers;

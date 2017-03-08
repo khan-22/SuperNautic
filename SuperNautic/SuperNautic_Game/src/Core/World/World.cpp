@@ -63,7 +63,7 @@ World::World(ApplicationContext& context)
 	GLuint resultColorChannels[] = { 3 };
 	_resultFramebuffer.initialize(_context.window.getSize().x, _context.window.getSize().y, resultColorChannels, sizeof(resultColorChannels) / sizeof(resultColorChannels[0]));
 	
-	_invertPass.initialize(0.f, 0.f, 1.f, 1.f, &_resultFramebuffer, "invertpass_forward");
+	_darkZonePass.initialize(0.f, 0.f, 1.f, 1.f, &_resultFramebuffer, "darkpass_forward");
 
 
 	if (_players.size() == 1)
@@ -293,6 +293,9 @@ void World::update(float dt, sf::Window& window)
 	_progression.updateCurrent(dt);
 
 	_playTime += dt;
+
+
+	//_invertPass.setEffectFactor(_players[0].getShip().getSpeed() / 200.f);
 }
 
 void World::render()
@@ -362,7 +365,7 @@ void World::render()
 			_viewportPipelines[i].display(*_players[i].getCamera());
 		}
 
-		_invertPass.perform();
+		_darkZonePass.perform();
 	}
 	else
 	{
