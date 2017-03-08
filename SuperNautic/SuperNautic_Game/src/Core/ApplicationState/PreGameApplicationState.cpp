@@ -41,6 +41,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     for(const std::string& song : _context.audio.getPlaylist())
     {
         GuiText* songText = new GuiText(song, _font);
+        songText->registerOnSelect([&context, songText]()
         {
             context.audio.changeSong(songText->getText());
         });
