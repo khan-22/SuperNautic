@@ -578,7 +578,7 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 			}
 			else
 			{
-				temperatures.push_back(0.f);
+				temperatures.push_back(-5.f);
 			}
 		}
 		_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures });

@@ -116,7 +116,15 @@ struct AABB
 					// Return surface type using temperatures vector
 					if (i < models.size() - 1) // The last model is the base, others are temperature zones
 					{
-						intersection._surface = temperatures[static_cast<unsigned>(currentModel.texCoords[faces[j].x].z)];
+						float temp = temperatures[static_cast<unsigned>(currentModel.texCoords[faces[j].x].z)];
+						if (temp >= -1.0f && temp <= 1.0f)
+						{
+							intersection._surface = temp;
+						}
+						else
+						{
+							intersection._surface = 0.0f;
+						}
 					}
 					else
 					{
