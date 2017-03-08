@@ -21,7 +21,7 @@ void main()
 	//vs_out.uv	  = vec2(uv.x, 1.0 - uv.y); 
 	//vs_out.normal = normal;
 
-	vs_out.uv = uv;
+	vs_out.uv = pos.xy / 2.0 + vec2(0.5);
 	gl_Position = vec4(pos, 1.0);
 
 
