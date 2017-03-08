@@ -17,6 +17,7 @@ CollisionMesh::CollisionMesh(const std::vector<BoundingBox>& obbs)
 : _obbs(obbs)
 , _type(Type::OBB_COLLECTION)
 {
+    assert(!obbs.empty());
     for(const BoundingBox& obb : obbs)
     {
         _spheres.push_back(generateBoundingSphere(obb));
