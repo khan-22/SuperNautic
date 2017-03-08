@@ -163,12 +163,12 @@ void World::update(float dt, sf::Window& window)
 	if (!_bDebugging)
 	{
 		// Update players
-		for (unsigned i = 0; i < _players.size(); ++i)
+		for (unsigned int i = 0; i < _players.size(); ++i)
 		{
 			// Finds forward vector of ship and updates segment index
 			glm::vec3 returnPos;
 			glm::vec3 directionDifference;
-			unsigned segmentIndex = _playerProgression[i].getCurrentSegment();
+			unsigned int segmentIndex = _playerProgression[i].getCurrentSegment();
 			float lengthInSegment = 0.0f;
 			glm::vec3 forward = _track->findForward(_players[i].getShip().getPosition(), segmentIndex, returnPos, lengthInSegment, directionDifference);
 
@@ -209,7 +209,7 @@ void World::update(float dt, sf::Window& window)
 			_players[i].update(dt);
 
 			// Check for ship-ship collisions
-			for (unsigned j = i + 1; j < _players.size(); ++j)
+			for (unsigned int j = i + 1; j < _players.size(); ++j)
 			{
 				if (bTestCollision(_players[i].getShip().getBoundingBox(), _players[j].getShip().getBoundingBox()))
 				{
@@ -226,10 +226,10 @@ void World::update(float dt, sf::Window& window)
 
 		std::vector<float> progression;
 
-		for (unsigned i = 0; i < _players.size(); ++i)
+		for (unsigned int i = 0; i < _players.size(); ++i)
 		{
 			int k = 1;
-			for (unsigned j = 0; j < _players.size(); ++j)
+			for (unsigned int j = 0; j < _players.size(); ++j)
 			{
 				if (_playerProgression[i].getProgression() < _playerProgression[j].getProgression())
 				{
@@ -278,7 +278,7 @@ void World::update(float dt, sf::Window& window)
 			min = segment;
 		}
 	}
-	_track->update(dt, static_cast<unsigned>(max), static_cast<unsigned>(min));
+	_track->update(dt, static_cast<unsigned int>(max), static_cast<unsigned int>(min));
 
 
 	_timer.updateCurrent();

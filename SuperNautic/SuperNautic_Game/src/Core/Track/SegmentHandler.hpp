@@ -68,7 +68,7 @@ public:
 
 	// Load segment from fbx file using info from _segments[i], returns reference to loaded segment
 	// Just returns reference if already loaded
-	const Segment* loadSegment(unsigned i);
+	const Segment* loadSegment(unsigned int i);
 
 	const SegmentHandler::Structure * getStructure(const unsigned int index) const;
 
