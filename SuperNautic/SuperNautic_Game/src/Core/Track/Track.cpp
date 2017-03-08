@@ -448,31 +448,7 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
             return false;
         }
 	}
-	// Add windows
-	if (segment->bHasWindow())
-	{
-		_segmentWindows.push_back({ segment->getWindowModel(), _endMatrix, static_cast<unsigned int>(_track.size()) });
-	}
-	// Add temperature zones
-	if (segment->nrOfZones() > 0)
-	{
-		std::vector<float> temperatures;
-		temperatures.reserve(segment->nrOfZones());
-		for (unsigned int i = 0; i < segment->nrOfZones(); i++)
-		{
-			if (rand() % 3 == 0)
-			{
-				temperatures.push_back((double)rand() / RAND_MAX * 2.f - 1.f);
-			}
-			else
-			{
-				temperatures.push_back(-5.f);
-			}
-			//temperatures.push_back((double)rand() / RAND_MAX* 2.f - 1.f);
-		}
-		_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures});
-		
-	}
+	addWindowsAndZonesToSegment(segment);
 	// Set up model matrix
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
@@ -558,6 +534,7 @@ void Track::insertStructure(const int index)
                 _endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
                 return;
             }
+			addWindowsAndZonesToSegment(segment);
 
 			glm::mat4 modelEndMat = segment->getEndMatrix();
 			int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
@@ -578,6 +555,35 @@ void Track::insertStructure(const int index)
 				return;
 			}
 		}
+	}
+}
+
+// Adds windows and zones to the track based on the given segment type
+void Track::addWindowsAndZonesToSegment(const Segment* segment)
+{
+	// Add windows
+	if (segment->bHasWindow())
+	{
+		_segmentWindows.push_back({ segment->getWindowModel(), _endMatrix, static_cast<unsigned int>(_track.size()) });
+	}
+	// Add temperature zones
+	if (segment->nrOfZones() > 0)
+	{
+		std::vector<float> temperatures;
+		temperatures.reserve(segment->nrOfZones());
+		for (unsigned int i = 0; i < segment->nrOfZones(); i++)
+		{
+			if (rand() % 3 == 0)
+			{
+				temperatures.push_back((double)rand() / RAND_MAX * 2.f - 1.f);
+			}
+			else
+			{
+				temperatures.push_back(-5.f);
+			}
+		}
+		_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures });
+
 	}
 }
 

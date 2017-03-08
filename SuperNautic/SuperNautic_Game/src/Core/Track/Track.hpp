@@ -59,6 +59,7 @@ private:
 	WaypointInfo findNextWaypointInfo(const WaypointInfo& current, unsigned int segmentIndex) const;
 	bool bInsertNormalSegment(const int index, bool testCollision);
 	void insertStructure(const int index);
+	void addWindowsAndZonesToSegment(const Segment* segment);
 	void deleteSegments(const int lengthToDelete);
 	bool bEndTrack();
 	void placeObstacles();
