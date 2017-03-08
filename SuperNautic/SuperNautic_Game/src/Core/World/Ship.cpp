@@ -35,7 +35,7 @@ Ship::Ship(glm::vec3 color)
 	_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0, 1, 0 }, 5.0f, 100.0f },
 	_minAcceleration{ 0.0f },
 	_maxAcceleration{ 100.0f },
-	_maxTurningSpeed{ 40.0f },
+	_maxTurningSpeed{ 35.0f },
 	_straighteningForce{ 3.0f },
 	_steerStraighteningForce{ 20.0f },
 	_speedResistance{ 0.001f },
