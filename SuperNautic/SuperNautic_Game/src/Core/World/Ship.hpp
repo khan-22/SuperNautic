@@ -151,8 +151,7 @@ private:
 	const float _speedResistance;			// 'Air resistance'
 	const float _preferredHeight;			// Desired ship height above track
 
-	const float _rayHeight;			// Height above ship of the origin of the rays used for intersection
-	const float _rayAheadDistance;	// Distance ahead of ship the second ray starts
+	const float _rayHeight;			// Height above ship of the origin of the ray used for intersection
 
 	const float _cooldownOnObstacleCollision;
 	const float _immunityoOnObstacleCollision;

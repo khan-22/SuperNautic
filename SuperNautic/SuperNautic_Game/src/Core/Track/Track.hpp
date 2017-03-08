@@ -86,6 +86,7 @@ private:
 	char									_endConnection;
 	int										_prevIndex;
 	const Segment *							_lastSegment;
+	float									_lengthWithCurrentConnectionType;
 	std::unique_ptr<Octree<SegmentInstance*>> _octree;
 };
 

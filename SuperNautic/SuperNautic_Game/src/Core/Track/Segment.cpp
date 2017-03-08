@@ -30,6 +30,7 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 	// Get the scene data asset
 	_scene = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_dataFileName);
 
+
 	// Get visual model asset
 	_visual = GFX::TexturedModel(ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_visualFileName), MaterialCache::get(_segmentInfo->_materialFileName));
 
@@ -44,10 +45,11 @@ Segment::Segment(const SegmentInfo* segmentInfo)
 		_bHasWindow = false;
 	}
 
-	//Zones
+	// Zones
 	if (_segmentInfo->_zoneFileName != "E")
 	{
 		_zonesModel = ModelCache::get(std::string{ "Segments/" } +_segmentInfo->_zoneFileName);
+		_zonesCollision = RawMeshCache::get(std::string{ "Segments/" } + _segmentInfo->_zoneFileName);
 		_nrOfZones = 4;
 	}
 	else
@@ -130,11 +132,17 @@ const RayIntersection Segment::rayIntersectionTest(const Ray& ray, const std::ve
 			else
 			{
 				// Construct vector of indices of models
-				std::vector<unsigned int> modelIndices{ _temperatureZoneCollisions };
-				modelIndices.push_back(_baseCollision);
+				std::vector<GFX::RawVertexData*> models;
+
+				if (_zonesCollision.get())
+				{
+					models.push_back(&_zonesCollision.get()->meshes[0]);
+				}
+
+				models.push_back(&_scene.get()->meshes[_baseCollision]);
 
 				// Test intersection with geometry
-				RayIntersection intersection = boxesToTest.begin()->second->triangleRayIntersection(ray, modelIndices, temperatures, _scene);
+				RayIntersection intersection = boxesToTest.begin()->second->triangleRayIntersection(ray, models, temperatures);
 
 				if (intersection)
 				{
@@ -679,11 +687,6 @@ unsigned int Segment::findChildIndex(size_t currentModel, unsigned int index, gl
 	}
 
 	return targetChild;
-}
-
-unsigned int Segment::getNumZones() const
-{
-	return static_cast<unsigned int>(_temperatureZoneCollisions.size());
 }
 
 // Returns bounding boxes

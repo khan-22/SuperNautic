@@ -53,8 +53,7 @@ Ship::Ship(glm::vec3 color)
 	_blinkFrequency{ 0.1f },
 	_surfaceSlope{ 0.0f, 0.0f, 0.5f },
 	_meshSpringValue{ 100.0f, 100.0f, 2.0f },
-	_rayHeight{ 1.0f },
-	_rayAheadDistance{ 5.0f },
+	_rayHeight{ 5.0f },
 	_steeringCooldown{ 0.0f },
 	_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
 	_shipColor{ color },
@@ -311,14 +310,14 @@ void Ship::handleTemperature(float dt)
 	// Get difference between acceleration [0..1] and temperature [0..1]
 	float difference = (_accelerationFactor + 1.0f) / 2.0f - _engineTemperature;
 
-	difference += _currentSurfaceTemperature * 0.5f;
+	difference += _currentSurfaceTemperature * 5.5f;
 
 	_engineTemperature += (difference == 0.0f ? 1.0f : (abs(difference) / difference)) *  powf(abs(difference), 1.2f) * 0.2f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 
 	if (_engineTemperature > _overheatTemperature)
 	{
-		_engineCooldown = 10.0f;
+		_engineCooldown = 4.0f;
 		_bEngineOverload = true;
 	}
 
@@ -496,24 +495,16 @@ void Ship::handleLightsAndParticles(float dt)
 
 	_particleSystem.update(dt, _transformMatrix * glm::vec4{ 0.0f, 0.0f, -1.3f, 1.0f }, -_meshForwardDirection() * (_velocity * 1.0f));
 
-	_leftChemtrailParticleSystem.setBirthColor(glm::vec3(0.6f));
+	// Chemtrail particles
+	_leftChemtrailParticleSystem.setBirthColor(glm::vec3(0.05f));
 	_leftChemtrailParticleSystem.setDeathColor(glm::vec3(0.0f));
 	_leftChemtrailParticleSystem.setBirthSize(clamp(_velocity - 180.f, 0.f, 15.f) * 0.01f);
-	_rightChemtrailParticleSystem.setBirthColor(glm::vec3(0.6f));
+	_rightChemtrailParticleSystem.setBirthColor(glm::vec3(0.05f));
 	_rightChemtrailParticleSystem.setDeathColor(glm::vec3(0.0f));
 	_rightChemtrailParticleSystem.setBirthSize(clamp(_velocity - 180.f, 0.f, 15.f) * 0.01f);
 
-
-	/*if (_velocity < 150.f)
-	{
-		_leftChemtrailParticleSystem.setBirthSize(0.0f);
-		_rightChemtrailParticleSystem.setBirthSize(0.0f);
-	}*/
-
-	_leftChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ -1.28f, -0.42f, -1.2f, 1.0f },	glm::vec3(0.f));//-_meshForwardDirection() * (_velocity * 2.f));
-	_rightChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ 1.28f, -0.42f, -1.2f, 1.0f },	glm::vec3(0.f));//-_meshForwardDirection() * (_velocity * 2.f));
-
-
+	_leftChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ -1.28f, -0.42f, -1.2f, 1.0f }, -_meshForwardDirection() * (_velocity * 0.5f));
+	_rightChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ 1.28f, -0.42f, -1.2f, 1.0f }, -_meshForwardDirection() * (_velocity * 0.5f));
 }
 
 bool Ship::getOverload(float dt)

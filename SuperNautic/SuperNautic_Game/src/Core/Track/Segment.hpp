@@ -46,7 +46,7 @@ public:
 	char getStart() const;
 	char getEnd() const;
 
-	const SegmentInfo * getInfo() const;
+	const SegmentInfo* getInfo() const;
 
 	// Returns approximate segment length
 	float getLength() const;
@@ -54,8 +54,6 @@ public:
 	const glm::mat4x4& getEndMatrix() const;
 
 	const std::vector<glm::vec3>& getWaypoints() const;
-
-	unsigned int getNumZones() const;
 
 	// Finds position of and distance to the waypoint closest to a position (position is relative to segment's local origin)
 	WaypointInfo findClosestWaypoint(const glm::vec3& position) const;
@@ -75,6 +73,9 @@ private:
 
 	// The loaded scene data
 	RawMeshAsset _scene;
+
+	// The temperature zone models
+	RawMeshAsset _zonesCollision;
 
 	// The visual geometry for this segment
 	GFX::TexturedModel	_visual;

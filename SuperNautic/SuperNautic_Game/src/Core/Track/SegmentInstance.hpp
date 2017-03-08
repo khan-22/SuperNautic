@@ -32,6 +32,9 @@ public:
 	// Remove obstacle at index i
 	void removeObstacle(size_t i);
 
+	// Set temperature vector
+	void setTemperatures(std::vector<float>& temperatures);
+
 	const Segment* getParent()
 	{
 		return _parent;

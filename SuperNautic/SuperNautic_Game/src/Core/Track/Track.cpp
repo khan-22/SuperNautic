@@ -125,6 +125,7 @@ void Track::startNewTrack()
 	_prevIndex = -1;
 	_lastSegment = nullptr;
 	_lengthAfterLastCall = 0.f;
+	_lengthWithCurrentConnectionType = 0.f;
 	for (unsigned int i = 0; i < _track.size(); i++)
 	{
 		delete _track[i];
@@ -173,7 +174,7 @@ bool Track::bGenerate()
 				}
 				else
 				{
-					if (failedRecently > 0.f)
+					if (failedRecently > 0.1f)
 					{
 						failedRecently -= _lastSegment->getLength();
 						if (failedRecently < 0.f)
@@ -189,7 +190,16 @@ bool Track::bGenerate()
 		{
 			insertStructure(index - static_cast<int>(_segmentHandler->infos().size()));
 		}
-		_endConnection = _track.back()->getParent()->getEnd();
+		char newConnection = _track.back()->getParent()->getEnd();
+		if (newConnection != _endConnection)
+		{
+			_lengthWithCurrentConnectionType = 0.f;
+		}
+		else
+		{
+			_lengthWithCurrentConnectionType += _track.back()->getParent()->getLength();
+		}
+		_endConnection = newConnection;
 		_prevIndex = index;
 		_lastSegment = _track.back()->getParent();
 
@@ -213,7 +223,16 @@ bool Track::bGenerate()
 			{
 				failedRecently += 400.f;
 				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
-				_endConnection = _track.back()->getParent()->getEnd();
+				char newConnection = _track.back()->getParent()->getEnd();
+				if (newConnection != _endConnection)
+				{
+					_lengthWithCurrentConnectionType = 0.f;
+				}
+				else
+				{
+					_lengthWithCurrentConnectionType += _track.back()->getParent()->getLength();
+				}
+				_endConnection = newConnection;
 				_prevIndex = index;
 				_lastSegment = _track.back()->getParent();
 			}
@@ -247,25 +266,30 @@ float Track::getProgression() const
 int Track::getIndex() const
 {
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
-	int nonZeroProbSegments = 0;
-	for (unsigned int i = 0; i < infos.size(); i++)
-	{
-		if (infos[i].getProbaility(_curviness) != 0)
-		{
-			nonZeroProbSegments++;
-		}
-	}
-	if (nonZeroProbSegments >= 2)
-	{
+	//int nonZeroProbSegments = 0;
+	//for (unsigned int i = 0; i < infos.size(); i++)
+	//{
+	//	if (infos[i].getProbaility(_curviness) != 0)
+	//	{
+	//		nonZeroProbSegments++;
+	//	}
+	//}
+	//if (nonZeroProbSegments >= 2)
+	//{
 		// Finding valid segments based on connection type
 		std::vector<int> validSegments = std::vector<int>();
 		// Normal segments
 		for (unsigned int i = 0; i < infos.size(); i++)
 		{
-			if (infos[i]._startConnection == _endConnection && infos[i].getProbaility(_curviness) != 0
+			if (infos[i]._startConnection == _endConnection
+				&& infos[i].getProbaility(_curviness) != 0
 				&& _segmentHandler->loadSegment(i) != _lastSegment)
 			{
-				validSegments.push_back(i);
+				if ((infos[i]._endConnection != _endConnection && _lengthWithCurrentConnectionType >= 500.f)
+					|| infos[i]._endConnection == _endConnection)
+				{
+					validSegments.push_back(i);
+				}
 			}
 		}
 		// Structures
@@ -293,6 +317,10 @@ int Track::getIndex() const
 			}
 		}
 		// Randomizing and finding the corresponding segment
+		if (totalProbability == 0)
+		{
+			totalProbability = 1;
+		}
 		int r = rand() % totalProbability;
 		int tested = 0;
 		for (unsigned int i = 0; i < validSegments.size(); i++)
@@ -311,16 +339,16 @@ int Track::getIndex() const
 				int test = _segmentHandler->getStructure(validSegments[i] - static_cast<int>(infos.size()))->getProbability(_curviness);
 				if (r - tested < test)
 				{
-					return validSegments[i];;
+					return validSegments[i];
 				}
 				tested += test;
 			}
 		}
-	}
-	else
-	{
-		return 0;
-	}
+	//}
+	//else
+	//{
+	//	return 0;
+	//}
 
 	//This should never ever run!
 	assert(true);
@@ -452,12 +480,12 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	glm::mat4 modelEndMat = segment->getEndMatrix();
 	int angle = static_cast<int>(360.f / _segmentHandler->getConnectionRotation(segment->getStart()));
 	int maxRotOffset = segment->getInfo()->getRotationOffset(_curviness) / angle;
-	int rotVal = 0;
+	float rotVal = 0.f;
 	if (maxRotOffset != 0)
 	{
 		rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
 	}
-	glm::mat4 rotMat = glm::rotate(glm::radians(static_cast<float>(rotVal)), glm::vec3(0, 0, 1));
+	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
 
 	_generatedLength += segment->getLength();
@@ -767,9 +795,9 @@ void Track::update(const float dt, const unsigned int firstPlayer, const unsigne
 	// Temperature zones
 	for (unsigned int i = 0; i < _temperatureZones.size(); ++i)
 	{
-		if (i >= lastPlayer)
+		if (_temperatureZones[i].segmentIndex >= lastPlayer)
 		{
-			if (i <= firstPlayer)
+			if (_temperatureZones[i].segmentIndex <= firstPlayer)
 			{
 				std::vector<float>& temps = _temperatureZones[i].temperatures;
 				for (unsigned int j = 0; j < temps.size(); ++j)
@@ -779,6 +807,8 @@ void Track::update(const float dt, const unsigned int firstPlayer, const unsigne
 						temps[j] -= 0.1f * dt;
 					}
 				}
+
+				_track[_temperatureZones[i].segmentIndex]->setTemperatures(temps);
 			}
 			else
 			{
