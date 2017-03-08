@@ -144,9 +144,17 @@ void SegmentInstance::updateGlobalBounds()
 
 void SegmentInstance::update(const float dt)
 {
-	for (size_t i = 0; i < _obstacles.size(); i++)
+	for (size_t i = 0; i < _obstacles.size(); ++i)
 	{
 		_obstacles[i].update(dt);
+	}
+}
+
+void SegmentInstance::decreaseSpeed(const float dt)
+{
+	for (unsigned int i = 0; i < _obstacles.size(); ++i)
+	{
+		_obstacles[i].decreaseSpeed(dt);
 	}
 }
 

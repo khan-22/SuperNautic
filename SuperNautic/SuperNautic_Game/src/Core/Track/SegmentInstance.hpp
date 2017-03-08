@@ -25,6 +25,7 @@ public:
 	void addObstacle(ObstacleInstance newObstacle);
 
 	void update(const float dt);
+	void decreaseSpeed(const float dt);
 	void render(GFX::RenderStates& states) override;
 	const RayIntersection rayIntersectionTest(const Ray& ray) const;
 	std::vector<ObstacleInstance>& getObstacles();

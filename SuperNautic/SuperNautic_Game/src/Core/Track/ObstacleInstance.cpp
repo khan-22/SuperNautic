@@ -22,10 +22,14 @@ ObstacleInstance::~ObstacleInstance()
 
 void ObstacleInstance::update(const float dt)
 {
-	if (_rotSpeed > 0)
+	_modelMat = _modelMat * glm::rotate(glm::radians(_rotSpeed * _rotDir * dt), glm::vec3(0, 0, 1));
+}
+
+void ObstacleInstance::decreaseSpeed(const float dt)
+{
+	if (_rotSpeed > 0.f)
 	{
-		_rotSpeed -= 0.04f;
-		_modelMat = _modelMat * glm::rotate(glm::radians(_rotSpeed * _rotDir * dt), glm::vec3(0, 0, 1));
+		_rotSpeed -= 5.0f * dt;
 	}
 }
 

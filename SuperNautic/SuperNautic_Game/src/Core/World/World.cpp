@@ -269,11 +269,11 @@ void World::update(float dt, sf::Window& window)
 	for (size_t i = 0; i < _playerProgression.size(); i++)
 	{
 		size_t segment = _playerProgression[i].getCurrentSegment();
-		if (segment > max)
+		if (segment >= max)
 		{
 			max = segment;
 		}
-		if (segment < min)
+		if (segment <= min)
 		{
 			min = segment;
 		}

@@ -140,12 +140,12 @@ void Track::startNewTrack()
 bool Track::bGenerate()
 {
 	// Make the inital stretch straight
-	while (_generatedLength < 300)
+	while (_generatedLength < 400)
 	{
 		bInsertNormalSegment(0, false);
 	}
 
-	int failedRecently = 0;
+	float failedRecently = 0;
 	// Create random path
 	while (_generatedLength - _lengthAfterLastCall < _progressionLength)
 	{
@@ -158,7 +158,7 @@ bool Track::bGenerate()
 			// Randomize nr of same segment type in a row
 			inRow = getInRow(index);
 
-			for (int i = 0; i < inRow; i++)
+			for (unsigned int i = 0; i < inRow; i++)
 			{
 				if (!bInsertNormalSegment(index, true))
 				{
@@ -175,7 +175,7 @@ bool Track::bGenerate()
 				{
 					if (failedRecently > 0)
 					{
-						failedRecently -= static_cast<int>(_lastSegment->getLength());
+						failedRecently -= _lastSegment->getLength();
 						if (failedRecently < 0)
 						{
 							failedRecently = 0;
@@ -220,9 +220,8 @@ bool Track::bGenerate()
 		}
 	}
 
-	_lengthAfterLastCall = static_cast<int>(_generatedLength);
-	_totalProgress = (float)_generatedLength / _targetLength;
-//	LOG("Progression: ", _totalProgress * 100);
+	_lengthAfterLastCall = _generatedLength;
+	_totalProgress = _generatedLength / _targetLength;
 	return false;
 }
 
@@ -588,10 +587,10 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 }
 
 // Deletes a certain length of the track (from the end)
-void Track::deleteSegments(const int lengthToDelete)
+void Track::deleteSegments(const float lengthToDelete)
 {
-	int deletedLength = 0;
-	while (deletedLength <= lengthToDelete && _generatedLength > 500)
+	float deletedLength = 0.f;
+	while (deletedLength <= lengthToDelete && _generatedLength > 500.f)
 	{
 		int segmentLength = static_cast<int>(_track.back()->getLength());
 		deletedLength += segmentLength;
@@ -752,9 +751,13 @@ size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLen
 void Track::update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer)
 {
 	// Obstacles
-	for (unsigned int i = lastPlayer; i < _track.size() && i < firstPlayer + 6; ++i)
+	for (unsigned int i = lastPlayer; i < _track.size() && i < firstPlayer + 7; ++i)
 	{
 		_track[i]->update(dt);
+	}
+	for (unsigned int i = lastPlayer; i <= firstPlayer; ++i)
+	{
+		_track[i]->decreaseSpeed(dt);
 	}
 	// Temperature zones
 	for (unsigned int i = 0; i < _temperatureZones.size(); ++i)
@@ -768,7 +771,7 @@ void Track::update(const float dt, const unsigned int firstPlayer, const unsigne
 				{
 					if (temps[j] > -0.99f)
 					{
-						temps[j] -= 0.003f;
+						temps[j] -= 0.1f * dt;
 					}
 				}
 			}
