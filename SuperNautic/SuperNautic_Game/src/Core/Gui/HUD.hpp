@@ -35,9 +35,9 @@ private:
 	int					_offsetY;
 	float				_speed;
 	float				_heat;
-	//int					_position;
+	int					_position;
 
-	//Asset<sf::Font>		_font;
+	Asset<sf::Font>		_font;
 
 	//sf::RectangleShape	_speedMeter;
 	sf::CircleShape		_speeder;
@@ -48,7 +48,7 @@ private:
 	Asset<sf::Texture>	_heatOverlayTexture;
 
 	//sf::Text			_tSpeed;
-	//sf::Text			_tPosition;
+	sf::Text			_tPosition;
 
 };
 
