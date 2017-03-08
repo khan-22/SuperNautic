@@ -111,7 +111,7 @@ void Ship::update(float dt)
 	{
 		_bounceVector = glm::normalize(bounceDirection) * glm::length(_bounceVector);
 		move(_bounceVector);
-		
+
 	}
 	_bounceVector -= _bounceVector * _bounceDecay * dt;
 
@@ -293,10 +293,10 @@ void Ship::handleCooldowns(float dt)
 		_immunityTimer -= dt;
 	}
 
-	if (_inactiveTimer > 0.0f)
-	{
-		_inactiveTimer -= dt;
-	}
+//	if (_inactiveTimer > 0.0f)
+//	{
+//		_inactiveTimer -= dt;
+//	}
 }
 
 void Ship::handleTemperature(float dt)
@@ -495,7 +495,7 @@ void Ship::handleLightsAndParticles(float dt)
 
 	_leftChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ -1.28f, -0.42f, -1.2f, 1.0f },	glm::vec3(0.f));//-_meshForwardDirection() * (_velocity * 2.f));
 	_rightChemtrailParticleSystem.update(dt, _transformMatrix * glm::vec4{ 1.28f, -0.42f, -1.2f, 1.0f },	glm::vec3(0.f));//-_meshForwardDirection() * (_velocity * 2.f));
-	
+
 
 }
 
@@ -573,14 +573,14 @@ glm::vec3 Ship::getCameraUp()
 
 const glm::vec3 Ship::getCameraForward() const
 {
-	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope() - 
+	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope() -
 		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * glm::cross(_cameraUpDirection(), _cameraForwardDirection()) * 6.0f);
 }
 
 const glm::vec3 Ship::getCameraPosition() const
 {
-	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) + 
-		_cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f) + 
+	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) +
+		_cameraUpDirection() * (3.0f + _surfaceSlope() * 5.0f) +
 		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f));
 }
 

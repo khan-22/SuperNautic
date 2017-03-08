@@ -84,7 +84,7 @@ bool VictoryApplicationState::bUpdate(float dtSeconds)
 	{
 		_playersActive = 1;
 	}
-    return false;
+    return true;
 }
 
 bool VictoryApplicationState::bHandleEvent(const sf::Event& event)

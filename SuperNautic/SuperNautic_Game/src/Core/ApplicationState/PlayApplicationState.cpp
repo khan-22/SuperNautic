@@ -14,6 +14,7 @@
 PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 	: ApplicationState(stack, context)
 	, _world(context)
+	, _bHasRaceEnded(false)
 {
     std::cout << "Welcome to Play state. Press ESC to go back to main menu." << std::endl;
 }
@@ -28,9 +29,10 @@ bool PlayApplicationState::bUpdate(float dtSeconds)
 {
     _world.update(dtSeconds, _context.window);
 
-	if (_world.bHasWon())
+	if (_world.bHasWon() && !_bHasRaceEnded)
 	{
 		_stack.push(std::unique_ptr<ApplicationState>(new VictoryApplicationState(_stack, _context)));
+		_bHasRaceEnded = true;
 	}
 
     if(_input.checkActive())
@@ -43,7 +45,7 @@ bool PlayApplicationState::bUpdate(float dtSeconds)
                 switch(e.key.code)
                 {
                 case sf::Keyboard::Escape:
-                    _stack.push(std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context)));
+                    _stack.push(std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context, _world)));
                     return true;
                     break;
 
@@ -65,7 +67,7 @@ bool PlayApplicationState::bHandleEvent(const sf::Event& event)
         {
         case sf::Keyboard::Escape:
         {
-            _stack.push(std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context)));
+            _stack.push(std::unique_ptr<ApplicationState>(new PauseMenuApplicationState(_stack, _context, _world)));
             return true;
             break;
 
