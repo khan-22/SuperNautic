@@ -35,7 +35,7 @@ namespace GFX
 		void setViewport() const;
 
 		void bindColorTextures() const;
-
+		void bindDepthTexture(GLuint unit) const;
 	protected:
 
 

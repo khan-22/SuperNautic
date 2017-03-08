@@ -145,3 +145,9 @@ void Framebuffer::bindColorTextures() const
 	}
 }
 
+void Framebuffer::bindDepthTexture(GLuint unit) const
+{
+	glActiveTexture(GL_TEXTURE0 + unit);
+	glBindTexture(GL_TEXTURE_2D, _depthTexture);
+}
+
