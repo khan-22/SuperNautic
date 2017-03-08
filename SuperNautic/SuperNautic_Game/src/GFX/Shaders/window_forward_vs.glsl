@@ -33,7 +33,7 @@ void main()
 	//vs_out.uv	  = vec2(uv.x, 1.0 - uv.y); 
 	//vs_out.normal = normal;
 
-	vs_out.direction = vec3(uCameraPos - uModel * vec4(pos, 1.0));
+	vs_out.direction = vec3(uCameraPos - (uModel * vec4(pos, 1.0)).xyz);
 	gl_Position = uMVP * vec4(pos, 1.0);
 
 
