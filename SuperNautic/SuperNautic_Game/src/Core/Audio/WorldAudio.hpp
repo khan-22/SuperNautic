@@ -6,6 +6,7 @@
 #include <SFML/Audio.hpp>
 
 #include <Core/Asset/Asset.hpp>
+#include <string>
 
 class WorldAudio
 {
@@ -17,6 +18,8 @@ public:
 	void stopMusic();
 	void loadSound(std::string filename);
 
+	std::vector<std::string> getPlaylist();
+	void changeSong(std::string name);
 
 	void playCountdown();
 
@@ -30,6 +33,8 @@ private:
 
 	sf::Sound _sCountdown;
 	Asset<sf::SoundBuffer> _sbCountdown;
+
+	std::vector<std::string> _playlist;
 };
 
 #endif // !WORLDAUDIO_H

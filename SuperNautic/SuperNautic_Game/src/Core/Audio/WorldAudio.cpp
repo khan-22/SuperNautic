@@ -8,7 +8,7 @@
 WorldAudio::WorldAudio() :
 	_sbCountdown(AssetCache<sf::SoundBuffer, std::string>::get("counter"))
 {
-	loadSound("Stranger Danger - Mellow Business.ogg");
+	loadSound("Stranger Danger - Mellow Business");
 	_music.setBuffer(_musicbuffer);
 
 
@@ -38,7 +38,20 @@ void WorldAudio::stopMusic() {
 void WorldAudio::loadSound(std::string filename)
 {
 	std::string folder = "./res/audio/music/";
-	_musicbuffer.loadFromFile(folder + filename);
+	_musicbuffer.loadFromFile(folder + filename + ".ogg");
+}
+
+std::vector<std::string> WorldAudio::getPlaylist() 
+{
+	return _playlist;
+}
+
+void WorldAudio::changeSong(std::string name)
+{
+	loadSound(name);
+	stopMusic();
+	_music.setBuffer(_musicbuffer);
+	playMusic();
 }
 
 void WorldAudio::playCountdown()
