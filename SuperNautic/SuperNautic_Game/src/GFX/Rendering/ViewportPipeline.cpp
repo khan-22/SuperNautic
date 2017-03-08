@@ -12,12 +12,20 @@ void GFX::ViewportPipeline::initialize(sf::RenderWindow * window, GLfloat x, GLf
 {
 	_window = window;
 	_resultFramebuffer = resultFramebuffer;
+	_darkZonePass.initialize(x, y, width, height, resultFramebuffer, "darkpass_forward");
+	
+	_darkZonePass.setEffectFactor(0.0f);
 
 	generalDeferred.initialize(window, x, y, width, height, resultFramebuffer);
 	zoneForward.initialize(window, x, y, width, height, resultFramebuffer);
 	windowForward.initialize(window, x, y, width, height, resultFramebuffer);
 	transparentForward.initialize(window, x, y, width, height, resultFramebuffer);
 	particleForward.initialize(window, x, y, width, height, resultFramebuffer);
+}
+
+void GFX::ViewportPipeline::setDarkFactor(float factor)
+{
+	_darkZonePass.setEffectFactor(factor);
 }
 
 void GFX::ViewportPipeline::display(Camera& camera)
@@ -30,6 +38,6 @@ void GFX::ViewportPipeline::display(Camera& camera)
 	transparentForward.display(camera);
 	particleForward.display(camera);
 
-
+	_darkZonePass.perform();
 
 }
