@@ -34,7 +34,7 @@ private:
 	sf::Sound _sCountdown;
 	Asset<sf::SoundBuffer> _sbCountdown;
 
-	std::vector<std::string> _playlist;
+	std::vector<std::string> _playlist = { "Stranger Danger - Mellow Business", "Stranger Danger - Haste" };
 };
 
 #endif // !WORLDAUDIO_H

@@ -11,7 +11,6 @@ WorldAudio::WorldAudio() :
 	loadSound("Stranger Danger - Mellow Business");
 	_music.setBuffer(_musicbuffer);
 
-
 	AudioOptions options;
 	setVolume(options.getMusicVolume());
 
