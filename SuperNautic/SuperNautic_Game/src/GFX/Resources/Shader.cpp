@@ -121,7 +121,7 @@ GLuint GFX::Shader::getUniform(const std::string& name)
 
 	if (location == -1)
 	{
-		LOG_ERROR("Failed to get the uniform location for: ", name);
+		//LOG_ERROR("Failed to get the uniform location for: ", name);
 	}
 	else
 	{
