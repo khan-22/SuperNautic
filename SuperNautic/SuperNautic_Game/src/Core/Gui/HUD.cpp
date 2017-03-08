@@ -14,15 +14,18 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_speed(0),
 	_offsetX(0),
 	_offsetY(0),
+	_position(0),
 	_speedLine(sf::LineStrip, 150),
+	_overHeatTimer(0.f),
 	_heatOverlayTexture(SFMLTextureCache::get("heatoverlay.png")),
-	_overHeatTimer(0.f)
+	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 {
 	_widthStep = windowWidth / 100.f;
 	_heightStep = windowHeight / 100.f;
 
 	_speeder.setFillColor(sf::Color::Transparent);
-	_speeder.setOutlineColor(sf::Color::Black);
+//	_speeder.setOutlineColor(sf::Color::Black);
+	_speeder.setOutlineColor(sf::Color(125, 125, 125, 255));
 
 	for (size_t i = 0; i < _speedLine.getVertexCount(); i++)
 	{
@@ -34,9 +37,9 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	//_tSpeed.setFont(*_font.get());
 	//_tSpeed.setFillColor(sf::Color::Red);
 
-	//_tPosition.setFont(*_font.get());
-	//_tPosition.setFillColor(sf::Color::Cyan);
-	//_tPosition.setString("0");
+	_tPosition.setFont(*_font.get());
+	_tPosition.setFillColor(sf::Color::Cyan);
+	_tPosition.setString("0");
 }
 
 HUD::~HUD()
@@ -55,7 +58,8 @@ void HUD::setHeat(float heat)
 
 void HUD::setPosition(int position)
 {
-	//_position = position;
+	_position = position;
+	_tPosition.setString(std::to_string(_position));
 }
 
 void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
@@ -76,9 +80,11 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	//_tSpeed.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
 	//_tSpeed.setPosition(_widthStep * 75 + _offsetX, _heightStep + _offsetY);
 
-	_speeder.setRadius(_widthStep * 6.f / 4.f);
-	_speeder.setOutlineThickness(_widthStep * 3.f / 8.f);
-	_speeder.setOrigin(_widthStep * 6.f / (_speeder.getRadius() + _speeder.getOutlineThickness()), _widthStep * 6.f / (_speeder.getRadius() + _speeder.getOutlineThickness()));
+	float speederRadius = ((1920.f / 2.f) / 300.f) * (6.f / 4.f);
+	_speeder.setRadius(speederRadius);
+	_speeder.setOutlineThickness(speederRadius / 4.f);
+//	_speeder.setOrigin(_widthStep * 6.f / (_speeder.getRadius() + _speeder.getOutlineThickness()), _widthStep * 6.f / (_speeder.getRadius() + _speeder.getOutlineThickness()));
+    _speeder.setOrigin(_speeder.getGlobalBounds().width / 2.f, _speeder.getGlobalBounds().height / 2.f);
 
 	for (size_t i = 0; i < _speedLine.getVertexCount(); i++)
 	{
@@ -95,9 +101,9 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_heatOverlay.setSize(sf::Vector2f(width, height));
 	_heatOverlay.setPosition(sf::Vector2f(offsetX, offsetY));
 
-	//_tPosition.setOrigin(_tPosition.getGlobalBounds().width / 2, 0);
-	//_tPosition.setCharacterSize(static_cast<unsigned>(_widthStep * 5));
-	//_tPosition.setPosition(static_cast<float>(_widthStep * 50 + _offsetX), static_cast<float>(0 + _offsetY));
+	_tPosition.setCharacterSize(static_cast<unsigned>(_widthStep * 10));
+	_tPosition.setOrigin(_tPosition.getGlobalBounds().width / 2, _tPosition.getGlobalBounds().height / 2);
+	_tPosition.setPosition(static_cast<float>(_widthStep * 50 + _offsetX), static_cast<float>(_heightStep * 50 + _offsetY));
 }
 
 void HUD::updateCurrent(float dtSeconds)
@@ -109,7 +115,9 @@ void HUD::updateCurrent(float dtSeconds)
 
     float colorModifier = std::pow(_heat, 6.f);
 	glm::vec4 speederColor = _MIN_SPEEDER_COLOR * (1.f - colorModifier) + _MAX_SPEEDER_COLOR * colorModifier;
-	_speeder.setFillColor(sf::Color(speederColor.r, speederColor.g, speederColor.b, speederColor.a));
+//	_speeder.setFillColor(sf::Color(speederColor.r, speederColor.g, speederColor.b, speederColor.a));
+//	_speeder.setFillColor(sf::Color(speederColor.r, speederColor.g, speederColor.b, _heat * 255.f));
+	_speeder.setFillColor(sf::Color(_MAX_SPEEDER_COLOR.r, _MAX_SPEEDER_COLOR.g, _MAX_SPEEDER_COLOR.b, colorModifier * 255.f));
 
 	if(_heat > 0.9f)
     {
@@ -136,15 +144,21 @@ void HUD::updateCurrent(float dtSeconds)
 
 	_heatOverlay.setFillColor(sf::Color(255, 255, 255, trans));
 
-	//_tPosition.setString(std::to_string(_position));
 	//_tSpeed.setString("Speed: " + std::to_string(_speed));
 }
 
 void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) const
 {
-	//target.draw(_tPosition);
-	target.draw(_speedLine, getWorldTransform());;
-	target.draw(_speeder, getWorldTransform());
-	target.draw(_speeder);
-	target.draw(_heatOverlay);
+	if (_position == 0)
+	{
+		target.draw(_speedLine, getWorldTransform());;
+		target.draw(_speeder, getWorldTransform());
+		target.draw(_speedLine);
+		target.draw(_speeder);
+		target.draw(_heatOverlay);
+	}
+	else
+	{
+		target.draw(_tPosition);
+	}
 }

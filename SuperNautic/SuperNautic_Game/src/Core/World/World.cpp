@@ -203,6 +203,7 @@ void World::update(float dt, sf::Window& window)
 				if (!_players[i].getShip().getStopped())
 				{
 					++_playersAtFinishLine;
+					_players[i].setPosition(_playersAtFinishLine);
 				}
 				_players[i].getShip().stop();
 			}
@@ -235,15 +236,6 @@ void World::update(float dt, sf::Window& window)
 
 		for (unsigned int i = 0; i < _players.size(); ++i)
 		{
-			int k = 1;
-			for (unsigned int j = 0; j < _players.size(); ++j)
-			{
-				if (_playerProgression[i].getProgression() < _playerProgression[j].getProgression())
-				{
-					k++;
-				}
-			}
-			_players[i].setPosition(k);
 			progression.push_back(_playerProgression[i].getProgression());
 		}
 

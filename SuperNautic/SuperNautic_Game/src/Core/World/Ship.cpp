@@ -310,7 +310,7 @@ void Ship::handleTemperature(float dt)
 	// Get difference between acceleration [0..1] and temperature [0..1]
 	float difference = (_accelerationFactor + 1.0f) / 2.0f - _engineTemperature;
 
-	difference += _currentSurfaceTemperature * 5.5f;
+	difference += _currentSurfaceTemperature * 3.5f;
 
 	_engineTemperature += (difference == 0.0f ? 1.0f : (std::fabs(difference) / difference)) *  powf(std::fabs(difference), 1.2f) * 0.2f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
