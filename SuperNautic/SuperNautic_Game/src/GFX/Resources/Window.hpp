@@ -10,8 +10,8 @@ namespace GFX
 	struct Window
 	{
 		ModelAsset		windowModel;
-		unsigned int	segmentIndex;
 		glm::mat4		modelTransform;
+		unsigned int 	segmentIndex;
 	};
 }
 

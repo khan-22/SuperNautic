@@ -53,7 +53,7 @@ private:
 	std::vector<Player>						_players;
 	std::vector<std::vector<PointLight>>	_playerPointLights;
 
-	unsigned								_playersAtFinishLine;
+	unsigned int								_playersAtFinishLine;
 
 	Timer									_timer;
 	Progression								_progression;
