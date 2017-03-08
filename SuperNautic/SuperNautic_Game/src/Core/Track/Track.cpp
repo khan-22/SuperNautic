@@ -311,7 +311,7 @@ int Track::getIndex() const
 				int test = _segmentHandler->getStructure(validSegments[i] - static_cast<int>(infos.size()))->getProbability(_curviness);
 				if (r - tested < test)
 				{
-					return i;
+					return validSegments[i];;
 				}
 				tested += test;
 			}
@@ -626,7 +626,7 @@ bool Track::bEndTrack()
 			{
 				if (!bInsertNormalSegment(i, true))
 				{
-					deleteSegments(_endMargin + 400);
+					deleteSegments(_endMargin + 500);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					return false;
 				}
@@ -638,7 +638,7 @@ bool Track::bEndTrack()
 	{
 		if (!bInsertNormalSegment(0, true))
 		{
-			deleteSegments(_endMargin + 400);
+			deleteSegments(_endMargin + 500);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 			return false;
 		}
