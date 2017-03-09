@@ -16,10 +16,6 @@ in VS_OUT
 } fs_in;
 
 vec3 lightDir = vec3(0.0, -1.0, 0.0);
-uniform vec3 uCameraPos;
-const float FOG_DISTANCE = 100.0;
-const vec4 FOG_COLOR = vec4(0.3, 0.3, 0.3, 1.0);
-const float uFactor = 1.0;
 
 void main()
 {
@@ -38,10 +34,4 @@ void main()
 	vec4 illuminatedColor = mix(shadedColor, diffuse, illumination);
 
 	outColor = mix(illuminatedColor, vec4(0.0, 0.0, 0.0, 1.0), fs_in.dist);
-	/*
-	float distanceToFragment = clamp(length(fs_in.position - uCameraPos) / FOG_DISTANCE, 0.0, 1.0);
-	float fragDist = distanceToFragment;
-	vec4 effectColor = mix(outColor, vec4(0.0, 0.0, 0.0, 1.0), fragDist);// + average / 16.0;//273.0;
-	outColor = mix(outColor, effectColor, uFactor);// + average / 16.0;//273.0;
-	*/
 }

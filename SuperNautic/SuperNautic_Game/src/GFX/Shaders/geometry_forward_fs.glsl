@@ -15,7 +15,7 @@ in GS_OUT
 
 uniform vec3 uViewPos;
 
-const float FOG_DISTANCE = 100.0;
+uniform float uFogDistance;
 
 const int NUM_LIGHTS = 8;
 struct PointLightData
@@ -53,7 +53,7 @@ void main()
 	}
 
 	outColor = mix(lightingResult, vec4(diffuse, 1.0), illumination);
-	outColor = fogify(outColor, fs_in.camToFragDistance, FOG_DISTANCE);
+	outColor = fogify(outColor, fs_in.camToFragDistance, uFogDistance);
 }
 
 
