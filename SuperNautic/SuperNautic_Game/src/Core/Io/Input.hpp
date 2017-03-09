@@ -36,6 +36,7 @@ private:
 
 	bool _bButtonA;
 	bool _bButtonB;
+	bool _bButtonX;
 	bool _bButtonY;
 	bool _bButtonL;
 	bool _bButtonR;
@@ -46,6 +47,7 @@ private:
 	bool _bDPadYDormant;
 	bool _bAWasDormant;
 	bool _bBWasDormant;
+	bool _bXWasDormant;
 	bool _bYWasDormant;
 	bool _bLWasDormant;
 	bool _bRWasDormant;

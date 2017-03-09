@@ -38,6 +38,7 @@ void Input::update()
 	{
 		_bButtonA = sf::Joystick::isButtonPressed(_controllerId, 0);
 		_bButtonB = sf::Joystick::isButtonPressed(_controllerId, 1);
+		_bButtonX = sf::Joystick::isButtonPressed(_controllerId, 2);
 		_bButtonY = sf::Joystick::isButtonPressed(_controllerId, 3);
 		_bButtonL = sf::Joystick::isButtonPressed(_controllerId, 4);
 		_bButtonR = sf::Joystick::isButtonPressed(_controllerId, 5);
@@ -85,19 +86,6 @@ void Input::update()
 			_bAWasDormant = true;
 		}
 
-		if (_bButtonY && _bYWasDormant)
-		{
-			event.type = sf::Event::KeyPressed;
-			event.key.code = sf::Keyboard::Y;
-			_events.push_back(event);
-			_bButtonY = true;
-			_bYWasDormant = false;
-		}
-		if (!_bButtonY)
-		{
-			_bYWasDormant = true;
-		}
-
 		if (_bButtonB && _bBWasDormant)
 		{
 			event.type = sf::Event::KeyPressed;
@@ -109,6 +97,32 @@ void Input::update()
 		if (!_bButtonB)
 		{
 			_bBWasDormant = true;
+		}
+
+		if (_bButtonX && _bXWasDormant)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::X;
+			_events.push_back(event);
+			_bButtonX = true;
+			_bXWasDormant = false;
+		}
+		if (!_bButtonX)
+		{
+			_bXWasDormant = true;
+		}
+
+		if (_bButtonY && _bYWasDormant)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::Y;
+			_events.push_back(event);
+			_bButtonY = true;
+			_bYWasDormant = false;
+		}
+		if (!_bButtonY)
+		{
+			_bYWasDormant = true;
 		}
 
 		if (_bButtonL && _bLWasDormant)

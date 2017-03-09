@@ -20,7 +20,7 @@ ControlsApplicationState::ControlsApplicationState(ApplicationStateStack& stack,
 	GuiText* title = new GuiText("Controls", _font);
 	title->setCharacterSize(50);
 	title->setOrigin(title->getBoundingRect().width / 2.f, title->getBoundingRect().height / 2.f);
-	title->setPosition(windowSize.x / 2.f, windowSize.y / 4.f);
+	title->setPosition(windowSize.x / 2.f, windowSize.y / 5.f);
 	auto titlePtr = std::unique_ptr<SceneNode>(title);
 	_guiGraph.attachChild(titlePtr);
 
