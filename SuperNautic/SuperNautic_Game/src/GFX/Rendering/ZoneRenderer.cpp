@@ -50,12 +50,8 @@ void ZoneRenderer::display(Camera& camera)
 
 	Framebuffer::DEFAULT.bindWrite();
 
-	GLsizei windowWidth = _window->getSize().x;
-	GLsizei windowHeight = _window->getSize().y;
 
 	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
-
-	float uTemperatures[4] = { 1.0, 0.25, -0.25, -1.0 };
 
 	_shader.get()->bind();
 	_shader.get()->setUniform("uViewPos", camera.getPosition());
@@ -70,5 +66,4 @@ void ZoneRenderer::display(Camera& camera)
 	}
 
 	_drawCalls.clear();
-	glViewport(0, 0, windowWidth, windowHeight);
 }

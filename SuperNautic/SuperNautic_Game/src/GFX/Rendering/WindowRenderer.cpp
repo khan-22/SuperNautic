@@ -62,24 +62,15 @@ void WindowRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
 
-	GLsizei windowWidth = _window->getSize().x;
-	GLsizei windowHeight = _window->getSize().y;
-
-
-	//glm::mat4 VP = camera.getVP();
-
 	outsidePass(camera);
 	windowPass(camera);
 
-	//glViewport(0, 0, windowWidth, windowHeight);
 	Framebuffer::DEFAULT.bindBoth();
 }
 
 void GFX::WindowRenderer::outsidePass(Camera & camera)
 {
 	Framebuffer::DEFAULT.bindWrite();
-//	glViewport(0, 0, _actualWidth, _actualHeight);
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
@@ -111,7 +102,6 @@ void GFX::WindowRenderer::windowPass(Camera & camera)
 
 	Framebuffer::DEFAULT.bindWrite();
 
-//	_outsideFrameBuffer.bindColorTextures();
 	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
 	glEnable(GL_BLEND);
@@ -120,10 +110,6 @@ void GFX::WindowRenderer::windowPass(Camera & camera)
 	Shader* shader = _windowShader.get();
 	shader->bind();
 	shader->setUniform("uCameraPos", camera.getPosition());
-	shader->setUniform("uReciprocWindow", glm::vec2(1.f / _actualWidth, 1.f / _actualHeight));
-
-	//shader->setUniform("uVP", camera.getVP());
-
 	for (auto windowDrawCall : _windowDrawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _windowShader.get() };
