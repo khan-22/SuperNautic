@@ -66,7 +66,7 @@ void ForwardRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
 
-Framebuffer::DEFAULT.bindWrite();
+    _resultFramebuffer->bindWrite();
 
 	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 

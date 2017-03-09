@@ -70,7 +70,7 @@ void WindowRenderer::display(Camera& camera)
 
 void GFX::WindowRenderer::outsidePass(Camera & camera)
 {
-	Framebuffer::DEFAULT.bindWrite();
+    _resultFramebuffer->bindWrite();
 
 	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
