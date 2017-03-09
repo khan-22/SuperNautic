@@ -68,19 +68,19 @@ World::World(ApplicationContext& context)
 	//_darkZonePass.initialize(0.f, 0.f, 1.f, 1.f, &_resultFramebuffer, "darkpass_forward");
 
 	// Randomize seaweed positions
-	glm::vec3 center{ _track->getOctreeCenter() };
-	float size{ _track->getOctreeSize() };
-
 	RawMeshAsset loadedBox{ RawMeshCache::get("seaweed_boundingbox.kmf") };
 	BoundingBox seaweedBox{ loadedBox.get()->meshes[0] };
 
-	for (unsigned i = 0; i < 1000; ++i)
+	constexpr float seaweedHeight = 10000.0f;
+	for (unsigned i = 0; i < _track->getNrOfSegments(); i += 2)
 	{
-		glm::vec3 position{ center.x + (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * 2000.0f,
-			center.y - 10000,
-			center.z + (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * 2000.0f };
+		glm::vec3 segmentPos = _track->getInstance(i)->getModelMatrix() * glm::vec4{ 0, 0, 0, 1 };
 
-		seaweedBox.center = position + glm::vec3{ 0.0f, 10000.0f, 0.0f };
+		glm::vec3 position{ segmentPos.x + (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * 500.0f,
+			-seaweedHeight,
+			segmentPos.z + (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * 500.0f };
+
+		seaweedBox.center = position + glm::vec3{ 0.0f, seaweedHeight, 0.0f };
 		CollisionMesh seaweedBoundingBox{ seaweedBox };
 
 		if (!_track->bTestCollision(seaweedBoundingBox))
@@ -345,7 +345,7 @@ void World::render()
 			glm::vec3 difference{ _players[i].getShip().getPosition() - _seaweeds[j].getPosition() };
 			difference -= glm::dot(difference, glm::vec3{ 0,1,0 }) * glm::vec3{ 0,1,0 };
 
-			if (glm::length(difference) < 600.0f)
+			if (glm::length(difference) < 1000.0f)
 			{
 				_viewportPipelines[i].windowForward.render(_seaweeds[j]);
 			}

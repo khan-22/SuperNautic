@@ -48,12 +48,6 @@ public:
 	void render(GFX::ViewportPipeline& pipeline, const int shipIndex);
 	void update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer);
 
-	// Returns octree center
-	glm::vec3 getOctreeCenter() const;
-
-	// Returns octree size
-	float getOctreeSize() const;
-
 	// Test collision against octree
 	bool bTestCollision(const CollisionMesh& mesh) const;
 

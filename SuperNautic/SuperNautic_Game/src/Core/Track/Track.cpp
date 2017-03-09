@@ -832,16 +832,6 @@ void Track::update(const float dt, const unsigned int firstPlayer, const unsigne
 	}
 }
 
-glm::vec3 Track::getOctreeCenter() const
-{
-	return _octree.get() ? _octree.get()->getCenter() : glm::vec3{ 0.0f };
-}
-
-float Track::getOctreeSize() const
-{
-	return _octree.get() ? _octree.get()->getSize() : 0.0f;
-}
-
 // Render the track
 void Track::render(GFX::ViewportPipeline& pipeline, const int shipIndex)
 {
