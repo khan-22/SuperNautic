@@ -60,23 +60,25 @@ World::World(ApplicationContext& context)
 		abort();
 	}
 
-	GLuint resultColorChannels[] = { 3 };
+	GLuint resultColorChannels[] = { 4 };
 	_resultFramebuffer.initialize(_context.window.getSize().x, _context.window.getSize().y, resultColorChannels, sizeof(resultColorChannels) / sizeof(resultColorChannels[0]));
+
+	GFX::Framebuffer* targetFramebuffer = &GFX::Framebuffer::DEFAULT;
 
 	//_darkZonePass.initialize(0.f, 0.f, 1.f, 1.f, &_resultFramebuffer, "darkpass_forward");
 
 
 	if (_players.size() == 1)
 	{
-		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f, &_resultFramebuffer);
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f, targetFramebuffer);
 		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y, 0, 0);
 	}
 	else if (_players.size() == 2)
 	{
-		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f, targetFramebuffer);
 		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, 0);
 
-		_viewportPipelines[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f, targetFramebuffer);
 		_players[1].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 
 		//_viewportPipelines[0].initialize(&context.window, 0.0f, 0.0f, 0.5f, 1.0f);
@@ -87,27 +89,27 @@ World::World(ApplicationContext& context)
 	}
 	else if (_players.size() == 3)
 	{
-		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f, targetFramebuffer);
 		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, 0);
 
-		_viewportPipelines[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f, targetFramebuffer);
 		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 
-		_viewportPipelines[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f, targetFramebuffer);
 		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
 	else if (_players.size() == 4)
 	{
-		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f, targetFramebuffer);
 		_players[0].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, 0);
 
-		_viewportPipelines[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f, targetFramebuffer);
 		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, 0);
 
-		_viewportPipelines[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f, targetFramebuffer);
 		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 
-		_viewportPipelines[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f, targetFramebuffer);
 		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
 
@@ -331,7 +333,9 @@ void World::render()
 			_viewportPipelines[i].particleForward.render(_players[j].getShip().getRightParticleSystem());
 		}
 	}
+	_resultFramebuffer.bindBoth();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	GFX::Framebuffer::DEFAULT.bindBoth();
 
 	if (!_bDebugging)
 	{
@@ -389,6 +393,7 @@ void World::render()
 	sfml.render(_progression);
 
 	sfml.display(_context.window);
+
 
 	_frameCount++;
 }
