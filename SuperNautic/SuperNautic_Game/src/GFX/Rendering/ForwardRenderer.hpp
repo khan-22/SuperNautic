@@ -7,7 +7,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "Core/Asset/LoadAssetFunctions.hpp"
-
+#include "GFX/Lighting/PointLight.hpp"
 #include "GFX/Rendering/Framebuffer.hpp"
 
 class Camera;		// Forward-decl
@@ -24,15 +24,19 @@ namespace GFX
 
 		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer);
 
+		void pushPointLight(PointLight& pointLight);
 		void render(Renderable3D& renderable);
+
 		void display(Camera& camera);
 
 	protected:
 
 	private:
-		std::vector<Renderable3D*> _drawCalls;
+        std::vector<Renderable3D*> _drawCalls;
+		std::vector<PointLight*> _pointLights;
 		ShaderAsset	_shader;
 
+		Framebuffer _frameBuffer;
 		Framebuffer* _resultFramebuffer;
 
 		sf::RenderWindow* _window;
@@ -40,6 +44,11 @@ namespace GFX
 		GLfloat _y;
 		GLfloat _width;
 		GLfloat _height;
+
+		GLsizei _actualX;
+		GLsizei _actualY;
+		GLsizei _actualWidth;
+		GLsizei _actualHeight;
 	};
 }
 
