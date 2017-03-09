@@ -14,11 +14,11 @@ class SegmentHandler
 public:
 	struct StructurePiece
 	{
-		int index;
-		int minRotation;
-		int maxRotation;
+		unsigned int index;
+		unsigned int minRotation;
+		unsigned int maxRotation;
 
-		StructurePiece(int i, int minR, int maxR)
+		StructurePiece(unsigned int i, unsigned int minR, unsigned int maxR)
 		{
 			index = i;
 			minRotation = minR;
@@ -72,10 +72,13 @@ public:
 
 	const SegmentHandler::Structure * getStructure(const unsigned int index) const;
 
-	const int getNrOfStructures() const;
+	const unsigned int getNrOfStructures() const;
 
 	// Returns rotation info about connection type 'type'
 	int getConnectionRotation(const char type);
+
+	std::vector<char> getConnectionTypes() const;
+	unsigned int getNrOfSegmentsOfType(const char connectionType, const float difficulty) const;
 
 private:
 	// Segments that have been loaded from an fbx file

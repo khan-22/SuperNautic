@@ -56,7 +56,6 @@ private:
 
 	float               _overHeatTimer;
 
-	//sf::Text			_tSpeed;
 	sf::Text			_tPosition;
 
 };
