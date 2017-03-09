@@ -14,8 +14,10 @@ ForwardRenderer::~ForwardRenderer()
 {
 }
 
-void ForwardRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
+void ForwardRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer)
 {
+	_resultFramebuffer = resultFramebuffer;
+
 	_shader = ShaderCache::get("forward");
 	_shader.get()->bind();
     _shader.get()->setSampler("uDiffuse", 0);
@@ -37,6 +39,8 @@ void ForwardRenderer::render(Renderable3D& renderable)
 void ForwardRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
+
+	_resultFramebuffer->bindWrite();
 
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;

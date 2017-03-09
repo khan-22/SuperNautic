@@ -92,7 +92,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     _guiContainer.select(startButton);
 
-    _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f);
+    _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f, &GFX::Framebuffer::DEFAULT);
 
 
 }

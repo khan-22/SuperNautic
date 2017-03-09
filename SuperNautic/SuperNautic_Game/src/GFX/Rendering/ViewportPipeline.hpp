@@ -12,6 +12,7 @@
 #include "GFX/Rendering/WindowRenderer.hpp"
 #include "GFX/Rendering/TransparentRenderer.hpp"
 #include "GFX/Rendering/ParticleRenderer.hpp"
+#include "GFX/Rendering/RenderPass.hpp"
 
 #include "Core/Utility/Camera.h"
 
@@ -23,7 +24,9 @@ namespace GFX
 		ViewportPipeline();
 		~ViewportPipeline();
 
-		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
+		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer);
+
+		void setDarkFactor(float factor);
 
 		GFX::DeferredRenderer		generalDeferred;
 		GFX::ZoneRenderer			zoneForward;
@@ -33,11 +36,13 @@ namespace GFX
 
 		void display(Camera& camera);
 
+
 	private:
 		sf::RenderWindow*	_window;
 
+		Framebuffer*		_resultFramebuffer;
 
-
+		RenderPass			_darkZonePass;
 	};
 }
 

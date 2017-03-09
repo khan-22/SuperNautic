@@ -10,6 +10,7 @@
 #include "GFX/Lighting/PointLight.hpp"
 #include "GFX/Rendering/Framebuffer.hpp"
 
+#include "GFX/Rendering/ScreenQuad.hpp"
 
 namespace GFX
 {
@@ -21,7 +22,7 @@ namespace GFX
 		DeferredRenderer();
 		~DeferredRenderer();
 
-		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
+		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer);
 		void pushPointLight(PointLight& pointLight);
 
 		void render(Renderable3D& renderable);
@@ -37,6 +38,7 @@ namespace GFX
 		ShaderAsset	_lightPassShader;
 
 		Framebuffer _frameBuffer;
+		Framebuffer* _resultFramebuffer;
 
 		sf::RenderWindow* _window;
 		GLfloat _x;
@@ -49,7 +51,8 @@ namespace GFX
 		GLsizei _actualWidth;
 		GLsizei _actualHeight;
 
-		std::unique_ptr<VertexArrayObject> _screenQuad;
+		//std::unique_ptr<VertexArrayObject> _screenQuad;
+		ScreenQuad _screenQuad;
 
 		void geometryPass(Camera& camera, GLsizei width, GLsizei height);
 		void lightPass(Camera& camera, GLsizei width, GLsizei height);

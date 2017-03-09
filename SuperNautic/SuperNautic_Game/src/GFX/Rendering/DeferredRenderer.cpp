@@ -5,7 +5,6 @@
 using namespace GFX;
 
 DeferredRenderer::DeferredRenderer()
-	: _screenQuad(nullptr)
 {
 }
 
@@ -14,8 +13,10 @@ DeferredRenderer::~DeferredRenderer()
 {
 }
 
-void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
+void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer)
 {
+	_resultFramebuffer = resultFramebuffer;
+
 	_geometryPassShader = ShaderCache::get("geometry_deferred");
 	_lightPassShader = ShaderCache::get("light_deferred");
 
@@ -47,49 +48,7 @@ void DeferredRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	GLuint colorChannels[] = { 3, 4, 3 };
 	_frameBuffer.initialize(static_cast<GLuint>(_width * windowWidth), static_cast<GLuint>(_height * windowHeight), colorChannels, static_cast<GLuint>(sizeof(colorChannels) / sizeof(colorChannels[0])));
 
-	GLfloat screenX1 = _x * 2.f - 1.f;
-	GLfloat screenY1 = _y * 2.f - 1.f;
-	GLfloat screenX2 = (_x + _width)  * 2.f - 1.f;
-	GLfloat screenY2 = (_y + _height) * 2.f - 1.f;
-
-	glm::vec3 positions[] =
-	{
-		{ screenX1, screenY1, 0.0 },
-		{ screenX1, screenY2, 0.0 },
-		{ screenX2, screenY1, 0.0 },
-		{ screenX2, screenY2, 0.0 },
-	};
-
-	glm::vec2 texCoords[] =
-	{
-		{ 0.0, 0.0 },
-		{ 0.0, 1.0 },
-		{ 1.0, 0.0 },
-		{ 1.0, 1.0 },
-	};
-
-	GLuint indices[] =
-	{
-		0, 1, 2,
-		1, 3, 2,
-	};
-
-	_screenQuad.reset(new VertexArrayObject());
-
-	GLsizei sizePositionsInBytes = sizeof(positions[0]) * 4;
-	GLsizei sizeTexCoordsInBytes = sizeof(texCoords[0]) * 4;
-	_screenQuad->addVertexBuffer(sizePositionsInBytes + sizeTexCoordsInBytes, GL_STATIC_DRAW);
-
-	_screenQuad->sendDataToBuffer(0, 0, 0,
-		sizePositionsInBytes, &positions[0], 3, GL_FLOAT);
-	_screenQuad->sendDataToBuffer(0, 1, sizePositionsInBytes,
-		sizeTexCoordsInBytes, &texCoords[0], 2, GL_FLOAT);
-
-	GLsizei sizeIndicesInBytes = sizeof(indices[0]) * 6;
-	_screenQuad->addIndexBuffer(sizeIndicesInBytes, GL_STATIC_DRAW);
-	_screenQuad->sendDataToIndexBuffer(0, sizeIndicesInBytes, &indices[0]);
-
-	_screenQuad->setDrawCount(6);
+	_screenQuad.initialize(x, y, width, height);
 }
 
 void DeferredRenderer::pushPointLight(PointLight & pointLight)
@@ -178,7 +137,7 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	//*************** LIGHT PASS *******************//
 	//**********************************************//
 
-	Framebuffer::DEFAULT.bindWrite();
+	_resultFramebuffer->bindWrite();
 	_frameBuffer.bindRead();
 	_frameBuffer.bindColorTextures();
 
@@ -245,7 +204,7 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	//glDisable(GL_CULL_FACE);
 
 	glViewport(0, 0, width, height);
-	_screenQuad->render();
+	_screenQuad.render();
 
 	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
