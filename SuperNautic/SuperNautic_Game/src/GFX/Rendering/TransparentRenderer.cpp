@@ -52,10 +52,8 @@ void TransparentRenderer::display(Camera& camera)
 
     Framebuffer::DEFAULT.bindWrite();
 
-	GLsizei windowWidth = _window->getSize().x;
-	GLsizei windowHeight = _window->getSize().y;
 
-	glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
+	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
 	float uTemperatures[4] = { 1.0, 0.25, -0.25, -1.0 };
 
@@ -74,6 +72,4 @@ void TransparentRenderer::display(Camera& camera)
 	_drawCalls.clear();
 
 	glDisable(GL_BLEND);
-
-	glViewport(0, 0, windowWidth, windowHeight);
 }
