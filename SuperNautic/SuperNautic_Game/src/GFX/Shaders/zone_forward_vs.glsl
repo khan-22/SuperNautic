@@ -8,41 +8,15 @@ layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 uv; //Supports 3D textures
 layout (location = 2) in vec3 normal;
 
-//uniform mat4 uModel;
-
-//uniform mat4 uMVP;
-
-//out VS_OUT
-//{
-//	vec3	position;
-//	vec3	uv;
-//	vec3	normal;
-//	vec3	color;
-//	float	temperature;
-//} vs_out;
-
-
-//uniform float uTemperatures[4];
 
 out VS_OUT
 {
 	vec3 uv;
-	//vec3 color;
-	//float temperature;
 } vs_out;
 
 
 void main()
 {
-	//vs_out.temperature = uTemperatures[int(uv.z)];
-	
-
-	//float temperature	= uTemperatures[int(uv.z)];
-	//vs_out.temperature  = temperature;
-	//vs_out.color		= mix(vec3(0.0, 0.0, 1.0), vec3(1.0, 0.0, 0.0), temperature / 2.0 + 0.5);
-	//gl_Position			= uMVP * vec4(pos, 1.0f);
-	
 	vs_out.uv = uv;
 	gl_Position = vec4(pos, 1.0);
-
 }

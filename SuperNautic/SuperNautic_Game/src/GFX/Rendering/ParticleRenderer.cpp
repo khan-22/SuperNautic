@@ -26,6 +26,14 @@ void ParticleRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y
 	_y		= y;
 	_width	= width;
 	_height = height;
+
+	GLsizei windowWidth = _window->getSize().x;
+	GLsizei windowHeight = _window->getSize().y;
+
+	_actualX = static_cast<GLsizei>(_x * windowWidth);
+	_actualY = static_cast<GLsizei>(_y * windowHeight);
+	_actualWidth = static_cast<GLsizei>(_width * windowWidth);
+	_actualHeight = static_cast<GLsizei>(_height * windowHeight);
 }
 
 void ParticleRenderer::render(Renderable3D& renderable)
@@ -37,12 +45,9 @@ void ParticleRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
 
-	_resultFramebuffer->bindWrite();
+    _resultFramebuffer->bindWrite();
 
-	GLsizei windowWidth = _window->getSize().x;
-	GLsizei windowHeight = _window->getSize().y;
-
-	glViewport(static_cast<GLint>(_x * windowWidth), static_cast<GLint>(_y * windowHeight), static_cast<GLsizei>(_width * windowWidth), static_cast<GLsizei>(_height * windowHeight));
+	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
 	glEnable(GL_BLEND);
 	glDepthMask(GL_FALSE);
@@ -58,10 +63,9 @@ void ParticleRenderer::display(Camera& camera)
 
 		drawCall->render(states);
 	}
-	
+
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
 
 	_drawCalls.clear();
-	glViewport(0, 0, windowWidth, windowHeight);
 }

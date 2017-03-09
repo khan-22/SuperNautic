@@ -40,6 +40,11 @@ namespace GFX
 		GLfloat _y;
 		GLfloat _width;
 		GLfloat _height;
+
+		GLsizei _actualX;
+		GLsizei _actualY;
+		GLsizei _actualWidth;
+		GLsizei _actualHeight;
 	};
 }
 

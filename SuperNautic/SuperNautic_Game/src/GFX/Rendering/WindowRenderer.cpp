@@ -47,7 +47,10 @@ void WindowRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, 
 	GLuint colorChannels[] = { 3 };
 	_outsideFrameBuffer.initialize(_actualWidth, _actualHeight, colorChannels, sizeof(colorChannels) / sizeof(colorChannels[0]));
 }
-
+void WindowRenderer::setFogDistance(float distance)
+{
+    _fogDistance = distance;
+}
 void WindowRenderer::render(GFX::Window& segmentWindow)
 {
 	_windowDrawCalls.push_back(&segmentWindow);
@@ -62,28 +65,23 @@ void WindowRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
 
-	GLsizei windowWidth = _window->getSize().x;
-	GLsizei windowHeight = _window->getSize().y;
-
-
-	//glm::mat4 VP = camera.getVP();
-
 	outsidePass(camera);
 	windowPass(camera);
-	
-	//glViewport(0, 0, windowWidth, windowHeight);
+
 	Framebuffer::DEFAULT.bindBoth();
 }
 
 void GFX::WindowRenderer::outsidePass(Camera & camera)
 {
-	_outsideFrameBuffer.bindWrite();
-	glViewport(0, 0, _actualWidth, _actualHeight);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _resultFramebuffer->bindWrite();
+
+	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
+
 
 	Shader* shader = _outsideShader.get();
 	shader->bind();
 	shader->setUniform("uCameraPos", camera.getPosition());
+	shader->setUniform("uFogDistance", _fogDistance);
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
@@ -94,7 +92,7 @@ void GFX::WindowRenderer::outsidePass(Camera & camera)
 
 		drawCall->render(states);
 	}
-	
+
 	glDisable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
 
@@ -106,18 +104,17 @@ void GFX::WindowRenderer::windowPass(Camera & camera)
 {
 	assert(_window != nullptr);
 
-	_resultFramebuffer->bindWrite();
-	_outsideFrameBuffer.bindRead();
-	_outsideFrameBuffer.bindColorTextures();
+	Framebuffer::DEFAULT.bindWrite();
+
 	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	Shader* shader = _windowShader.get();
 	shader->bind();
 	shader->setUniform("uCameraPos", camera.getPosition());
-	shader->setUniform("uReciprocWindow", glm::vec2(1.f / _actualWidth, 1.f / _actualHeight));
-
-	//shader->setUniform("uVP", camera.getVP());
-
+	shader->setUniform("uFogDistance", _fogDistance);
 	for (auto windowDrawCall : _windowDrawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _windowShader.get() };
@@ -125,6 +122,9 @@ void GFX::WindowRenderer::windowPass(Camera & camera)
 		windowDrawCall->windowModel.get()->setModelMatrix(windowDrawCall->modelTransform);
 		windowDrawCall->windowModel.get()->render(states);
 	}
+
+	glDisable(GL_BLEND);
+
 
 	_windowDrawCalls.clear();
 
