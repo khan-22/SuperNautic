@@ -185,6 +185,8 @@ Camera* Player::getCamera()
 void Player::setPosition(int position)
 {
 	_hud.setPosition(position);
+	_audio.setRandomGoalBuffer(position);
+	_audio.playAudio(_audio.goal);
 }
 
 void Player::swapPerspective()
@@ -194,5 +196,5 @@ void Player::swapPerspective()
 
 void Player::shipCollision()
 {
-	_audio.playAudio(PlayerAudio::Sounds::shipCollision);
+	_audio.playAudio(_audio.shipCollision);
 }
