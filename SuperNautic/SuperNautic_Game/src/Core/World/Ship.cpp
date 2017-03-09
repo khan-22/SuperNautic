@@ -239,21 +239,24 @@ void Ship::handleInputs(float dt)
 {
 	if (!_stopped)
 	{
+		float addToAngle = 0.0f;
+
 		if (_steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 		{
 			// Update turning angle										reduce maneuverability at high acceleration
-			_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.0f) * dt;
+			addToAngle = -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.0f) * dt;
 		}
 		else
 		{
 			_accelerationFactor = -1.0f;
 		}
 		// abs to preserve sign of _currentTurningAngle
-		_currentTurningAngle -= _steerStraighteningForce * _currentTurningAngle * dt;
+		float removeFromAngle = _steerStraighteningForce * _currentTurningAngle * dt;
+
+		_currentTurningAngle += addToAngle - removeFromAngle;
 
 		// Update velocity
-		_velocity += (_minAcceleration + _accelerationFactor * (_maxAcceleration - _minAcceleration)) * dt;
-		_velocity -= (_velocity * _velocity * _speedResistance) * dt;
+		_velocity += (_minAcceleration + _accelerationFactor * (_maxAcceleration - _minAcceleration)) * dt - (_velocity * _velocity * _speedResistance) * dt;
 	}
 	else
 	{
