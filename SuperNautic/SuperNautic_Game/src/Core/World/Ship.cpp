@@ -101,6 +101,11 @@ void Ship::update(float dt)
 {
 	dt = clamp(dt, 0.0f, 1.0f / 30.0f);
 
+	if (_engineCooldown > 0.0f)
+	{
+		_accelerationFactor = 0.0f;
+	}
+
 	handleInputs(dt);
 	handleCooldowns(dt);
 	handleTemperature(dt);
