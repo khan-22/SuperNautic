@@ -48,16 +48,17 @@ void ZoneRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
 
-	_resultFramebuffer->bindWrite();
+	Framebuffer::DEFAULT.bindWrite();
 
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
 
-	glViewport(static_cast<GLint>(_x * windowWidth), static_cast<GLint>(_y * windowHeight), static_cast<GLsizei>(_width * windowWidth), static_cast<GLsizei>(_height * windowHeight));
+	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
 	float uTemperatures[4] = { 1.0, 0.25, -0.25, -1.0 };
 
 	_shader.get()->bind();
+	_shader.get()->setUniform("uViewPos", camera.getPosition());
 	for (auto drawCall : _drawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _shader.get()};

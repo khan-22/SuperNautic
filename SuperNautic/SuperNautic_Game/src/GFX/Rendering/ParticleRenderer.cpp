@@ -37,7 +37,7 @@ void ParticleRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
 
-	_resultFramebuffer->bindWrite();
+    Framebuffer::DEFAULT.bindWrite();
 
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;
@@ -58,7 +58,7 @@ void ParticleRenderer::display(Camera& camera)
 
 		drawCall->render(states);
 	}
-	
+
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
 
