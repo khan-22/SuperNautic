@@ -114,7 +114,6 @@ bool Game::bInitialize()
 
 
 	_shader = ShaderCache::get("forward");
-	_texture = TextureCache::get("heatchart.png");
 
 	_texturedModel.setModelAndMaterial(ModelCache::get("gizmo.kmf"), materialTest);
 
