@@ -46,7 +46,7 @@ bool ControlsApplicationState::bUpdate(float dtSeconds)
 
 	if (_input.checkActive())
 	{
-		_input.update();
+		_input.update(dtSeconds);
 		for (const sf::Event& e : _input.getEvents())
 		{
 			if (e.type == sf::Event::KeyPressed)

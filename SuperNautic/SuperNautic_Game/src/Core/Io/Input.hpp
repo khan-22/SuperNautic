@@ -12,7 +12,7 @@ public:
 	Input(int id);
 	~Input();
 
-	void update();
+	void update(float dt);
 	bool checkActive();
 
 	bool bGetAValue();
@@ -41,6 +41,8 @@ private:
 	bool _bButtonL;
 	bool _bButtonR;
 	bool _bButtonStart;
+
+	float _leftStickTimer;
 
 	bool _bLeftStickDormant;
 	bool _bDPadXDormant;
