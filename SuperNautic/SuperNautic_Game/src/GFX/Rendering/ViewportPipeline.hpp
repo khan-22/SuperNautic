@@ -28,7 +28,7 @@ namespace GFX
 
 		void setDarkFactor(float factor);
 
-		GFX::DeferredRenderer		generalDeferred;
+		GFX::ForwardRenderer		generalForward;
 		GFX::ZoneRenderer			zoneForward;
 		GFX::WindowRenderer			windowForward;
 		GFX::TransparentRenderer	transparentForward;

@@ -303,7 +303,7 @@ void World::render()
 		{
 			if (!(i == j && _players[j]._bIsFirstPerson))
 			{
-				_viewportPipelines[i].generalDeferred.render(_players[j].getShip());
+				_viewportPipelines[i].generalForward.render(_players[j].getShip());
 			}
 		}
 	}
@@ -311,9 +311,9 @@ void World::render()
 	{
 		for (int j = 0; j < _players.size(); j++)
 		{
-			_viewportPipelines[i].generalDeferred.pushPointLight(_players[j].getShip().getPointLight());
+			_viewportPipelines[i].generalForward.pushPointLight(_players[j].getShip().getPointLight());
 
-			_viewportPipelines[i].generalDeferred.pushPointLight(_players[j].getShip().getWarningLight());
+			_viewportPipelines[i].generalForward.pushPointLight(_players[j].getShip().getWarningLight());
 		}
 	}
 
