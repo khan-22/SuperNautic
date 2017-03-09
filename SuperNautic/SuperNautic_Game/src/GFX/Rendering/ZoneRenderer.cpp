@@ -58,6 +58,7 @@ void ZoneRenderer::display(Camera& camera)
 	float uTemperatures[4] = { 1.0, 0.25, -0.25, -1.0 };
 
 	_shader.get()->bind();
+	_shader.get()->setUniform("uViewPos", camera.getPosition());
 	for (auto drawCall : _drawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _shader.get()};
