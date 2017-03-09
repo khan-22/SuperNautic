@@ -23,7 +23,7 @@ vec4 fogify(vec4 inColor, float camToFragDistance, float fogDistance)
 
 void main()
 {
-	vec3 dir = normalize(fs_in.camToFragVector);
+	vec3 dir = normalize(-fs_in.camToFragVector);
 	float factor = max(dot(dir, -vec3(0.0, 1.0, 0.0)), 0.0);
 
 	outColor = vec4(mix(vec3(0.0, 0.03, 0.06), vec3(0.0, 0.6, 0.7), factor), 0.5);
