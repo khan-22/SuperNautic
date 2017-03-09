@@ -60,7 +60,10 @@ void ForwardRenderer::render(Renderable3D& renderable)
 {
 	_drawCalls.push_back(&renderable);
 }
-
+void ForwardRenderer::setFogDistance(float distance)
+{
+    _fogDistance = distance;
+}
 
 void ForwardRenderer::display(Camera& camera)
 {
@@ -75,6 +78,7 @@ void ForwardRenderer::display(Camera& camera)
 	_shader.get()->bind();
 
 	_shader.get()->setUniform("uViewPos", camera.getPosition());
+	_shader.get()->setUniform("uFogDistance", _fogDistance);
 
 
 	// Send all point light data as a uniform array struct

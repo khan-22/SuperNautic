@@ -26,6 +26,7 @@ namespace GFX
 
 		void pushPointLight(PointLight& pointLight);
 		void render(Renderable3D& renderable);
+		void setFogDistance(float distance);
 
 		void display(Camera& camera);
 
@@ -49,6 +50,9 @@ namespace GFX
 		GLsizei _actualY;
 		GLsizei _actualWidth;
 		GLsizei _actualHeight;
+
+		float _fogDistance;
+
 	};
 }
 

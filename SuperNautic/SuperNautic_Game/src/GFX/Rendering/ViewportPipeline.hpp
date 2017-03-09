@@ -39,10 +39,9 @@ namespace GFX
 
 	private:
 		sf::RenderWindow*	_window;
-
 		Framebuffer*		_resultFramebuffer;
 
-		RenderPass			_darkZonePass;
+		float _fogDistance;
 	};
 }
 

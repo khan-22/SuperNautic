@@ -43,7 +43,10 @@ void ZoneRenderer::render(TemperatureZone& temperatureZone)
 {
 	_drawCalls.push_back(&temperatureZone);
 }
-
+void ZoneRenderer::setFogDistance(float distance)
+{
+    _fogDistance = distance;
+}
 void ZoneRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
@@ -55,6 +58,7 @@ void ZoneRenderer::display(Camera& camera)
 
 	_shader.get()->bind();
 	_shader.get()->setUniform("uViewPos", camera.getPosition());
+	_shader.get()->setUniform("uFogDistance", _fogDistance);
 	for (auto drawCall : _drawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _shader.get()};

@@ -46,6 +46,11 @@ void TransparentRenderer::render(Renderable3D& renderable)
 	_drawCalls.push_back(&renderable);
 }
 
+void TransparentRenderer::setFogDistance(float distance)
+{
+    _fogDistance = distance;
+}
+
 void TransparentRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
@@ -62,6 +67,7 @@ void TransparentRenderer::display(Camera& camera)
 
 	_shader.get()->bind();
 	_shader.get()->setUniform("uCameraPos", camera.getPosition());
+	_shader.get()->setUniform("uFogDistance", _fogDistance);
 	for (int i = _drawCalls.size() - 1; i >= 0; --i)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _shader.get()};

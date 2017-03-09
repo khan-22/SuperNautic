@@ -47,7 +47,10 @@ void WindowRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, 
 	GLuint colorChannels[] = { 3 };
 	_outsideFrameBuffer.initialize(_actualWidth, _actualHeight, colorChannels, sizeof(colorChannels) / sizeof(colorChannels[0]));
 }
-
+void WindowRenderer::setFogDistance(float distance)
+{
+    _fogDistance = distance;
+}
 void WindowRenderer::render(GFX::Window& segmentWindow)
 {
 	_windowDrawCalls.push_back(&segmentWindow);
@@ -78,6 +81,7 @@ void GFX::WindowRenderer::outsidePass(Camera & camera)
 	Shader* shader = _outsideShader.get();
 	shader->bind();
 	shader->setUniform("uCameraPos", camera.getPosition());
+	shader->setUniform("uFogDistance", _fogDistance);
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
@@ -110,6 +114,7 @@ void GFX::WindowRenderer::windowPass(Camera & camera)
 	Shader* shader = _windowShader.get();
 	shader->bind();
 	shader->setUniform("uCameraPos", camera.getPosition());
+	shader->setUniform("uFogDistance", _fogDistance);
 	for (auto windowDrawCall : _windowDrawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _windowShader.get() };
