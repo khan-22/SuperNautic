@@ -27,6 +27,7 @@ public:
 	GFX::TexturedModel _shipModel;
 
 	Ship(glm::vec3 color);
+	Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float cooldownOnObstacleCollision, float overheatTemperature, float overhearCooldown);
 
 	void render(GFX::RenderStates& states) override;
 	void update(float dt);
@@ -92,6 +93,7 @@ private:
 	float		_currentJumpCooldown;	// Current cooldown
 	float		_engineTemperature;
 	float		_engineCooldown;
+	float		_overheatCooldown;
 	float		_engineOverload;
 	float		_engineFlashTime;
 	bool		_bEngineFlash;
