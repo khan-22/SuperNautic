@@ -6,6 +6,7 @@
 
 #include "Core/ApplicationState/MainMenuApplicationState.hpp"
 #include "Core/ApplicationState/OptionsApplicationState.hpp"
+#include "Core/ApplicationState/ControlsApplicationState.hpp"
 #include "Core/ApplicationState/AboutApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
@@ -43,6 +44,13 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
         _stack.push(std::unique_ptr<ApplicationState>(new OptionsApplicationState(_stack, _context)));
     }));
 
+	text.setString("Controls");
+	auto controls = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
+	{
+		_stack.clear();
+		_stack.push(std::unique_ptr<ApplicationState>(new ControlsApplicationState(_stack, _context)));
+	}));
+
     text.setString("About");
     auto about = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
     {
@@ -57,12 +65,15 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     }));
 
     options->move(0.f, play->getBoundingRect().height * 1.5f);
-    about->setPosition(options->getPosition());
-    about->move(0.f, options->getBoundingRect().height * 1.5f);
+	controls->setPosition(options->getPosition());
+	controls->move(0.f, options->getBoundingRect().height * 1.5f);
+	about->setPosition(controls->getPosition());
+	about->move(0.f, controls->getBoundingRect().height * 1.5f);
     quit->setPosition(about->getPosition());
     quit->move(0.f, about->getBoundingRect().height * 1.5f);
     _guiContainer.insert(play);
     _guiContainer.insert(options);
+	_guiContainer.insert(controls);
     _guiContainer.insert(about);
     _guiContainer.insert(quit);
 
@@ -114,7 +125,7 @@ bool MainMenuApplicationState::bHandleEvent(const sf::Event& event)
     _guiContainer.handleEvent(event);
     if(_input.checkActive())
     {
-        _input.update();
+        _input.update(0);
         for(const sf::Event& e : _input.getEvents())
         {
             _guiContainer.handleEvent(e);

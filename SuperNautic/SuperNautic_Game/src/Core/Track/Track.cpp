@@ -188,7 +188,7 @@ bool Track::bGenerate()
 		// Structures
 		else
 		{
-			insertStructure(index - static_cast<int>(_segmentHandler->infos().size()));
+			insertStructure(index - 100);
 		}
 		char newConnection = _track.back()->getParent()->getEnd();
 		if (newConnection != _endConnection)
@@ -266,89 +266,79 @@ float Track::getProgression() const
 int Track::getIndex() const
 {
 	std::vector<SegmentInfo> infos = _segmentHandler->infos();
-	//int nonZeroProbSegments = 0;
-	//for (unsigned int i = 0; i < infos.size(); i++)
-	//{
-	//	if (infos[i].getProbaility(_curviness) != 0)
-	//	{
-	//		nonZeroProbSegments++;
-	//	}
-	//}
-	//if (nonZeroProbSegments >= 2)
-	//{
-		// Finding valid segments based on connection type
-		std::vector<int> validSegments = std::vector<int>();
-		// Normal segments
-		for (unsigned int i = 0; i < infos.size(); i++)
+	// Finding valid segments based on connection type
+	std::vector<unsigned int> validSegments = std::vector<unsigned int>();
+	// Normal segments
+	for (unsigned int i = 0; i < infos.size(); i++)
+	{
+		if (infos[i]._startConnection == _endConnection
+			&& infos[i].getProbability(_curviness) != 0)
 		{
-			if (infos[i]._startConnection == _endConnection
-				&& infos[i].getProbaility(_curviness) != 0
-				&& _segmentHandler->loadSegment(i) != _lastSegment)
+			if (_segmentHandler->getNrOfSegmentsOfType(_endConnection, _difficulty) > 2)
 			{
-				if ((infos[i]._endConnection != _endConnection && _lengthWithCurrentConnectionType >= 500.f)
-					|| infos[i]._endConnection == _endConnection)
+				if ((infos[i]._endConnection != _endConnection && _lengthWithCurrentConnectionType >= 600.f)
+					|| infos[i]._endConnection == _endConnection
+					&& _segmentHandler->loadSegment(i) != _lastSegment)
 				{
 					validSegments.push_back(i);
 				}
 			}
-		}
-		// Structures
-		for (int i = 0; i < _segmentHandler->getNrOfStructures(); i++)
-		{
-			if (infos[_segmentHandler->getStructure(i)->pieces[0]->index]._startConnection == _endConnection
-				&& i != _prevIndex && _segmentHandler->getStructure(i)->curviness <= _curviness)
-			{
-				validSegments.push_back(static_cast<int>(infos.size()) + i);
-			}
-		}
-		// Calculating total probability
-		unsigned int totalProbability = 0;
-		for (unsigned int i = 0; i < validSegments.size(); i++)
-		{
-			if (validSegments[i] < infos.size())
-			{
-				totalProbability += infos[validSegments[i]].getProbaility(_curviness);
-			}
 			else
 			{
-				int index = validSegments[i] - static_cast<int>(infos.size());
-				int prob = _segmentHandler->getStructure(index)->getProbability(_curviness);
-				totalProbability += prob;
+				validSegments.push_back(i);
 			}
 		}
-		// Randomizing and finding the corresponding segment
-		if (totalProbability == 0)
+	}
+	// Structures
+	unsigned int amount = _segmentHandler->getNrOfStructures();
+	for (unsigned int i = 0; i < amount; i++)
+	{
+		unsigned int index = _segmentHandler->getStructure(i)->pieces[0]->index;
+		if (infos[index]._startConnection == _endConnection
+			&& index != _prevIndex && _segmentHandler->getStructure(i)->curviness <= _curviness)
 		{
-			totalProbability = 1;
+			validSegments.push_back(static_cast<unsigned int>(100) + i);
 		}
-		int r = rand() % totalProbability;
-		int tested = 0;
-		for (unsigned int i = 0; i < validSegments.size(); i++)
+	}
+	// Calculating total probability
+	unsigned int totalProbability = 0;
+	for (unsigned int i = 0; i < validSegments.size(); i++)
+	{
+		if (validSegments[i] < infos.size())
 		{
-			if (validSegments[i] < infos.size())
-			{
-				int test = infos[validSegments[i]].getProbaility(_curviness);
-				if (r - tested < test)
-				{
-					return validSegments[i];
-				}
-				tested += test;
-			}
-			else
-			{
-				int test = _segmentHandler->getStructure(validSegments[i] - static_cast<int>(infos.size()))->getProbability(_curviness);
-				if (r - tested < test)
-				{
-					return validSegments[i];
-				}
-				tested += test;
-			}
+			totalProbability += infos[validSegments[i]].getProbability(_curviness);
 		}
-	//}
-	//else
-	//{
-	//	return 0;
-	//}
+		else
+		{
+			unsigned int index = validSegments[i] - 100;
+			int prob = _segmentHandler->getStructure(index)->getProbability(_curviness);
+			totalProbability += prob;
+		}
+	}
+	// Randomizing and finding the corresponding segment
+	int r = rand() % totalProbability;
+	int tested = 0;
+	for (unsigned int i = 0; i < validSegments.size(); i++)
+	{
+		if (validSegments[i] < infos.size())
+		{
+			int test = infos[validSegments[i]].getProbability(_curviness);
+			if (r - tested < test)
+			{
+				return validSegments[i];
+			}
+			tested += test;
+		}
+		else
+		{
+			int test = _segmentHandler->getStructure(validSegments[i] - 100)->getProbability(_curviness);
+			if (r - tested < test)
+			{
+				return validSegments[i];
+			}
+			tested += test;
+		}
+	}
 
 	//This should never ever run!
 	assert(true);
@@ -545,10 +535,10 @@ bool Track::bTestCollision(const CollisionMesh& mesh) const
 void Track::insertStructure(const int index)
 {
 	float startLength = _generatedLength;
-	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
+	const SegmentHandler::Structure * sugMig = _segmentHandler->getStructure(index);
 	// Randomize how many times the structure should be looped
-	int min = s->minInRow;
-	int max = s->maxInRow;
+	int min = sugMig->minInRow;
+	int max = sugMig->maxInRow;
 	double scaled = (double)rand() / RAND_MAX;
 	int amount = static_cast<int>((max - min + 1) * scaled) + min;
 	// Randomize if there should be "negative" rotation
@@ -561,9 +551,9 @@ void Track::insertStructure(const int index)
 	for (int i = 0; i < amount; i++)
 	{
 		// Amount of pieces in each "loop"
-		for (unsigned int j = 0; j < s->pieces.size(); j++)
+		for (unsigned int j = 0; j < sugMig->pieces.size(); j++)
 		{
-			const SegmentHandler::StructurePiece * p = s->pieces[j];
+			const SegmentHandler::StructurePiece * p = sugMig->pieces[j];
 			const Segment * segment = _segmentHandler->loadSegment(p->index);
 			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
 
@@ -610,10 +600,10 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 	if (segment->nrOfZones() > 0)
 	{
 		std::vector<float> temperatures;
-		temperatures.reserve(segment->nrOfZones());
-		for (unsigned int i = 0; i < segment->nrOfZones(); i++)
+		temperatures.reserve(4);
+		for (unsigned int i = 0; i < 4; i++)
 		{
-			if (rand() % 3 == 0)
+			if (rand() % 4 == 0)
 			{
 				temperatures.push_back((double)rand() / RAND_MAX * 2.f - 1.f);
 			}
@@ -622,8 +612,19 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 				temperatures.push_back(-5.f);
 			}
 		}
-		_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures });
-
+		// Makes sure to only add something to render if at least one part of the zone is active
+		unsigned int count = 0;
+		for (unsigned int i = 0; i < 4; i++)
+		{
+			if (temperatures[i] > -2.f)
+			{
+				++count;
+			}
+		}
+		if (count != 0)
+		{
+			_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures });
+		}
 	}
 }
 
@@ -660,10 +661,10 @@ bool Track::bEndTrack()
 	// Make sur the currently last segment is of end type a
 	if (_endConnection != 'a')
 	{
-		for (size_t i = 1; i < _segmentHandler->infos().size(); i++)
+		for (unsigned int i = 1; i < _segmentHandler->infos().size(); i++)
 		{
-			const Segment * s = _segmentHandler->loadSegment(i);
-			if (s->getStart() == _endConnection && s->getEnd() == 'a')
+			const Segment * test = _segmentHandler->loadSegment(i);
+			if (test->getStart() == _endConnection && test->getEnd() == 'a')
 			{
 				if (!bInsertNormalSegment(i, true))
 				{

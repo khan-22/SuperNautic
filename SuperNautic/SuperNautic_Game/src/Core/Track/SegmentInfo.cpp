@@ -31,7 +31,7 @@ SegmentInfo::~SegmentInfo()
 	//Nothing
 }
 
-int SegmentInfo::getProbaility(const float p) const
+int SegmentInfo::getProbability(const float p) const
 {
 	return int((1 - p) * _probability1 + p * _probability2);
 }

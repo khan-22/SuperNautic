@@ -14,11 +14,6 @@ in VS_OUT
 	vec2 uv;
 } fs_in;
 
-//Should be exposed as uniforms
-const float FOG_DISTANCE = 1500.0;
-const vec4 FOG_COLOR = vec4(0.3, 0.3, 0.3, 1.0);
-//const vec3 lightDir = vec3(0.0, 1.0, 0.0);
-
 const int NUM_LIGHTS = 8;
 struct PointLightData
 {
@@ -59,17 +54,6 @@ vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3
 	return result;
 }
 
-//vec3 calculateDirLight(vec3 normal)
-//{
-//	vec3 color = vec3(0.2, 0.5, 0.6);
-//	vec3 norm = normalize(normal);
-//	float factor = max(dot(norm, lightDir), 0.0);
-	
-//	vec3 result = color * factor;
-
-//	return result;
-//}
-
 void main()
 {
 	vec3 fragPos		= texture(uPosition, fs_in.uv).rgb;
@@ -80,18 +64,13 @@ void main()
 
 	vec4 lightingResult = vec4(0, 0, 0, 1);
 
-	//lightingResult.rgb += calculateDirLight(normal);
 
 	for(int i = 0; i < NUM_LIGHTS; i++)
 	{
 		lightingResult.rgb += calculatePointLight(i, fragPos, diffuseTex, normal, viewDir);
 	}
 	
-	float distanceToFragment = clamp(length(fragPos - uViewPos) / FOG_DISTANCE, 0.0, 1.0);
-
-	
 	//outColor = vec4(diffuseTex, 1.0);
 	//lightingResult.rgb += vec3(0.1, 0.9, 1.0) * 0.1; //Add slight shade of blue as ambient
-	outColor = mix(mix(lightingResult, vec4(diffuseTex, 1.0), illumination), FOG_COLOR, distanceToFragment);
-	//outColor = mix(lightingResult, vec4(diffuseTex, 1.0), illumination);
+	outColor = mix(lightingResult, vec4(diffuseTex, 1.0), illumination);
 }

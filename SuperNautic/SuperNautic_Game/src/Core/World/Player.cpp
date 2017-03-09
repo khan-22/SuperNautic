@@ -59,7 +59,7 @@ void Player::setId(int id)
 
 void Player::update(float dt)
 {
-	_input.update();
+	_input.update(dt);
 
 	if (_input.checkActive())
 	{
