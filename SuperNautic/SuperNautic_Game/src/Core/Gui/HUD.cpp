@@ -20,8 +20,8 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_heatOverlayTexture(SFMLTextureCache::get("heatoverlay.png")),
 	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 {
-	_widthStep = windowWidth / 100.f;
-	_heightStep = windowHeight / 100.f;
+	_widthStep = windowWidth / 300.f;
+	_heightStep = windowHeight / 300.f;
 
 	_speeder.setFillColor(sf::Color::Transparent);
 //	_speeder.setOutlineColor(sf::Color::Black);
@@ -33,9 +33,6 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	}
 
 	_heatOverlay.setTexture(_heatOverlayTexture.get());
-
-	//_tSpeed.setFont(*_font.get());
-	//_tSpeed.setFillColor(sf::Color::Red);
 
 	_tPosition.setFont(*_font.get());
 	_tPosition.setFillColor(sf::Color::Cyan);
@@ -101,9 +98,9 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_heatOverlay.setSize(sf::Vector2f(width, height));
 	_heatOverlay.setPosition(sf::Vector2f(offsetX, offsetY));
 
-	_tPosition.setCharacterSize(static_cast<unsigned>(_widthStep * 10));
+	_tPosition.setCharacterSize(static_cast<unsigned>(_widthStep * 30));
 	_tPosition.setOrigin(_tPosition.getGlobalBounds().width / 2, _tPosition.getGlobalBounds().height / 2);
-	_tPosition.setPosition(static_cast<float>(_widthStep * 50 + _offsetX), static_cast<float>(_heightStep * 50 + _offsetY));
+	_tPosition.setPosition(static_cast<float>(_widthStep * 150 + _offsetX), static_cast<float>(_heightStep * 150 + _offsetY));
 }
 
 void HUD::updateCurrent(float dtSeconds)
@@ -143,8 +140,6 @@ void HUD::updateCurrent(float dtSeconds)
 	}
 
 	_heatOverlay.setFillColor(sf::Color(255, 255, 255, trans));
-
-	//_tSpeed.setString("Speed: " + std::to_string(_speed));
 }
 
 void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) const
