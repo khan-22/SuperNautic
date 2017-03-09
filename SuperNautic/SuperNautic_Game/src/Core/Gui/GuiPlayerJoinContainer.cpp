@@ -53,6 +53,10 @@ void GuiPlayerJoinContainer::handleEventCurrent(const sf::Event& event)
             {
                 toggle(event.joystickButton.joystickId);
             }
+			if (event.joystickButton.button == 2)
+			{
+				changeShip(event.joystickButton.joystickId);
+			}
             break;
 
         case sf::Event::JoystickDisconnected:
@@ -104,6 +108,18 @@ void GuiPlayerJoinContainer::drop(unsigned int id)
     }
 }
 
+void GuiPlayerJoinContainer::changeShip(unsigned int id)
+{
+	for (auto& j : _windows)
+	{
+		if (j->bIsAssigned() && j->getId() == id)
+		{
+			j->changeShip();
+			return;
+		}
+	}
+}
+
 
 std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPlayers() const
 {
@@ -120,6 +136,11 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
                 p.color[static_cast<glm::length_t>(k)] = _COLORS[i][k];
             }
             p.id = j->getId();
+			p.maxAcceleration = j->getMaxAcceleration();
+			p.maxTurningSpeed = j->getMaxTurningSpeed();
+			p.cooldownOnObstacleCollision = j->getCooldownOnObstacleCollision();
+			p.overheatTemperature = j->getOverheatTemperature();
+			p.overheatCooldown = j->getOverheatCooldown();
             players.push_back(p);
         }
     }

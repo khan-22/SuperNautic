@@ -25,11 +25,18 @@ class GuiPlayerJoin : public GuiElement
         bool bHasJoined() const;
 
         unsigned int getId() const;
+		float getMaxAcceleration() const;
+		float getMaxTurningSpeed() const;
+		float getCooldownOnObstacleCollision() const;
+		float getOverheatTemperature() const;
+		float getOverheatCooldown() const;
 
         void assign(unsigned int playerId);
         void unassign();
 
         void toggleJoin();
+
+		int changeShip();
 
     private:
         unsigned char _id;
@@ -37,6 +44,9 @@ class GuiPlayerJoin : public GuiElement
         bool _bHasJoined = false;
         bool _bIsAssigned = false;
         sf::RectangleShape _window;
+		sf::RectangleShape _ship;
+
+		unsigned int _shipNumber;
 
         virtual void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
 

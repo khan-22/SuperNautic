@@ -17,7 +17,12 @@ class GuiPlayerJoinContainer : public GuiContainer
         struct Player
         {
             glm::vec4 color; // rgba
-            unsigned int id;
+			unsigned int id;
+			float maxAcceleration;
+			float maxTurningSpeed;
+			float cooldownOnObstacleCollision;
+			float overheatTemperature;
+			float overheatCooldown;
         };
 
         GuiPlayerJoinContainer();
@@ -33,6 +38,7 @@ class GuiPlayerJoinContainer : public GuiContainer
         void createWindows();
         void toggle(unsigned int id);
         void drop(unsigned int id);
+		void changeShip(unsigned int id);
 
         virtual void handleEventCurrent(const sf::Event& event) override;
 };

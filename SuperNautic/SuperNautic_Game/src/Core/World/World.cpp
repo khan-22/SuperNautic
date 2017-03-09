@@ -44,7 +44,7 @@ World::World(ApplicationContext& context)
     for(int i = 0 ; i < context.players.size(); i++)
     {
         GuiPlayerJoinContainer::Player player = context.players[i];
-		_players.emplace_back(player.id, colors[i]);
+		_players.emplace_back(player.id, colors[i], player.maxAcceleration, player.maxTurningSpeed, player.cooldownOnObstacleCollision, player.overheatTemperature, player.overheatCooldown);
         _playerProgression.push_back(TrackProgression{ 0, _track });
         LOG(i);
 

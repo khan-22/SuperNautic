@@ -16,6 +16,22 @@ Player::Player(int id, glm::vec3 color) :
 	_bIsFirstPerson = false;
 }
 
+Player::Player(int id, glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float cooldownOnObstacleCollision, float overheatTemperature, float overheatCooldown) :
+	_playerId(id),
+	_input(id),
+	_ship(color, maxAcceleration, maxTurningSpeed, cooldownOnObstacleCollision, overheatTemperature, overheatCooldown),
+	_hud(1280, 720),
+	_camera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
+	_fpCamera(90.0f, 1280, 720, glm::vec3{ 0,0,0 }, glm::vec3{ 0,0,1 }),
+	_currentCamera(&_camera),
+	_cameraVelocityPositionShake(30.0f, 0.02f, 19.0f, 0.007f, 1.0f, 0.2f),
+	_cameraVelocityDirectionShake(30.5f, 0.002f, 10.1f, 0.0009f, 1.0f, 0.2f),
+	_cameraCollisionPositionShake(40.0f, 0.5f, 27.0f, 0.25f, 1.5f, 0.2f),
+	_cameraCollisionDirectionShake(35.0f, 0.2f, 24.0f, 0.16f, 1.0f, 0.2f)
+{
+	_bIsFirstPerson = false;
+}
+
 Player::Player(const Player& other) : Player{ other._playerId, glm::vec3{0, 0, 0} }
 {
 	LOG_ERROR("Player copy constructor called! That is bad :(");
