@@ -10,7 +10,7 @@ in VS_OUT
 } fs_in;
 
 
-const float FOG_DISTANCE = 100.0;
+uniform float uFogDistance;
 uniform vec3 uCameraPos;
 
 
@@ -27,5 +27,5 @@ void main()
 	float factor = max(dot(dir, -vec3(0.0, 1.0, 0.0)), 0.0);
 
 	outColor = vec4(mix(vec3(0.0, 0.03, 0.06), vec3(0.0, 0.6, 0.7), factor), 0.5);
-	outColor = fogify(outColor, fs_in.camToFragDistance, FOG_DISTANCE);
+	outColor = fogify(outColor, fs_in.camToFragDistance, uFogDistance);
 }

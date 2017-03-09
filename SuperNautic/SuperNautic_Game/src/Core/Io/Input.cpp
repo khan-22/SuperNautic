@@ -7,6 +7,7 @@
 
 Input::Input() :
 	_controllerId(0),
+	_leftStickTimer(0),
 	_bLeftStickDormant(true),
 	_bAWasDormant(true),
 	_bButtonA(false)
@@ -17,6 +18,7 @@ Input::Input() :
 
 Input::Input(int id) :
 	_controllerId(id),
+	_leftStickTimer(0),
 	_bLeftStickDormant(true),
 	_bAWasDormant(true),
 	_bButtonA(false)
@@ -170,36 +172,41 @@ void Input::update(float dt)
 
 		float menuDelay = .2f;
 
-		if (_leftStickY < -thresh && _leftStickTimer < 0.f)
+		if (_leftStickY < -thresh && (_bLeftStickDormant || _leftStickTimer < 0.f))
 		{
 			event.type = sf::Event::KeyPressed;
 			event.key.code = sf::Keyboard::Up;
 			_events.push_back(event);
+			_bLeftStickDormant = false;
 			_leftStickTimer = menuDelay;
 		}
-		else if (_leftStickY > thresh && _leftStickTimer < 0.f)
+		else if (_leftStickY > thresh && (_bLeftStickDormant || _leftStickTimer < 0.f))
 		{
 			event.type = sf::Event::KeyPressed;
 			event.key.code = sf::Keyboard::Down;
 			_events.push_back(event);
+			_bLeftStickDormant = false;
 			_leftStickTimer = menuDelay;
 		}
-		else if (_leftStickX > thresh && _leftStickTimer < 0.f)
+		else if (_leftStickX > thresh && (_bLeftStickDormant || _leftStickTimer < 0.f))
 		{
 			event.type = sf::Event::KeyPressed;
 			event.key.code = sf::Keyboard::Right;
 			_events.push_back(event);
+			_bLeftStickDormant = false;
 			_leftStickTimer = menuDelay;
 		}
-		else if (_leftStickX < -thresh && _leftStickTimer < 0.f)
+		else if (_leftStickX < -thresh && (_bLeftStickDormant || _leftStickTimer < 0.f))
 		{
 			event.type = sf::Event::KeyPressed;
 			event.key.code = sf::Keyboard::Left;
 			_events.push_back(event);
+			_bLeftStickDormant = false;
 			_leftStickTimer = menuDelay;
 		}
 		else if (_leftStickX > -thresh && _leftStickX < thresh && _leftStickY > -thresh && _leftStickY < thresh)
 		{
+			_bLeftStickDormant = true;
 			_leftStickTimer = -1.f;
 		}
 

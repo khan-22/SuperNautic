@@ -46,16 +46,19 @@ void TransparentRenderer::render(Renderable3D& renderable)
 	_drawCalls.push_back(&renderable);
 }
 
+void TransparentRenderer::setFogDistance(float distance)
+{
+    _fogDistance = distance;
+}
+
 void TransparentRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
 
-    Framebuffer::DEFAULT.bindWrite();
+    _resultFramebuffer->bindWrite();
 
-	GLsizei windowWidth = _window->getSize().x;
-	GLsizei windowHeight = _window->getSize().y;
 
-	glViewport(_x * windowWidth, _y * windowHeight, _width * windowWidth, _height * windowHeight);
+	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
 	float uTemperatures[4] = { 1.0, 0.25, -0.25, -1.0 };
 
@@ -64,6 +67,7 @@ void TransparentRenderer::display(Camera& camera)
 
 	_shader.get()->bind();
 	_shader.get()->setUniform("uCameraPos", camera.getPosition());
+	_shader.get()->setUniform("uFogDistance", _fogDistance);
 	for (int i = _drawCalls.size() - 1; i >= 0; --i)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _shader.get()};
@@ -74,6 +78,4 @@ void TransparentRenderer::display(Camera& camera)
 	_drawCalls.clear();
 
 	glDisable(GL_BLEND);
-
-	glViewport(0, 0, windowWidth, windowHeight);
 }

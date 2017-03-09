@@ -12,7 +12,7 @@ in GS_OUT
 
 uniform vec3 uViewPos;
 
-const float FOG_DISTANCE = 100.0;
+uniform float uFogDistance;
 
 vec4 fogify(vec4 inColor, float camToFragDistance, float fogDistance)
 {
@@ -22,5 +22,5 @@ vec4 fogify(vec4 inColor, float camToFragDistance, float fogDistance)
 
 void main()
 {
-	outColor = fogify(vec4(fs_in.color, 1.0), fs_in.camToFragDistance, FOG_DISTANCE);
+	outColor = fogify(vec4(fs_in.color, 1.0), fs_in.camToFragDistance, uFogDistance);
 }

@@ -16,7 +16,7 @@ in VS_OUT
 	float camToFragDistance;
 } fs_in;
 
-const float FOG_DISTANCE = 100.0;
+uniform float uFogDistance;
 
 vec4 fogify(vec4 inColor, float camToFragDistance, float fogDistance)
 {
@@ -30,5 +30,5 @@ void main()
 	vec4 diffuse = texture(uDiffuse, fs_in.uv);
 	diffuse.a = 0.5;
 	
-	outColor = fogify(diffuse, fs_in.camToFragDistance, FOG_DISTANCE);
+	outColor = fogify(diffuse, fs_in.camToFragDistance, uFogDistance);
 }

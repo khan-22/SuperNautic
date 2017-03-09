@@ -315,7 +315,7 @@ void Ship::handleTemperature(float dt)
 	_engineTemperature += (difference == 0.0f ? 1.0f : (std::fabs(difference) / difference)) *  powf(std::fabs(difference), 1.2f) * 0.2f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 
-	if (_engineTemperature > _overheatTemperature)
+	if (_engineTemperature > _overheatTemperature && _engineCooldown < 0.f)
 	{
 		_engineCooldown = 4.0f;
 		_bEngineOverload = true;
