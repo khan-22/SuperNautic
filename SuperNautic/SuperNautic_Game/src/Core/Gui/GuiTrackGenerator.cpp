@@ -49,6 +49,7 @@ void GuiTrackGenerator::update(float dtSeconds)
 
 void GuiTrackGenerator::generate()
 {
+
     if(_generation.valid())
     {
         _bDoAbortGenerate = true;

@@ -55,15 +55,15 @@ SegmentHandler::SegmentHandler(std::string segmentInfoPath, std::string connecti
 
 	// Load structures
 	infoFile >> amount;
-	for (int i = 0; i < amount; i++)
+	for (unsigned int i = 0; i < amount; i++)
 	{
 		float curviness;
-		int probability1, probability2, minInRow, maxInRow, pieces;
+		unsigned int probability1, probability2, minInRow, maxInRow, pieces;
 		infoFile >> curviness >> probability1 >> probability2 >> minInRow >> maxInRow >> pieces;
 		_structures.push_back(Structure(curviness, probability1, probability2, minInRow, maxInRow));
-		for (int j = 0; j < pieces; j++)
+		for (unsigned int j = 0; j < pieces; j++)
 		{
-			int index, minRotation, maxRotation;
+			unsigned int index, minRotation, maxRotation;
 			infoFile >> index >> minRotation >> maxRotation;
 			_structures[i].addPiece(new StructurePiece(index, minRotation, maxRotation));
 		}
@@ -144,13 +144,27 @@ const SegmentHandler::Structure * SegmentHandler::getStructure(const unsigned in
 	return &_structures[index];
 }
 
-const int SegmentHandler::getNrOfStructures() const
+const unsigned int SegmentHandler::getNrOfStructures() const
 {
-	return static_cast<int>(_structures.size());
+	return static_cast<unsigned int>(_structures.size());
 }
 
 // Returns rotation info about connection type 'type'
 int SegmentHandler::getConnectionRotation(const char type)
 {
 	return _connections[type];
+}
+
+unsigned int SegmentHandler::getNrOfSegmentsOfType(const char connectionType, const float difficulty) const
+{
+	unsigned int count = 0;
+	for (unsigned int i = 0; i < _segments.size(); i++)
+	{
+		if (_segments[i]->getStart() == connectionType
+			&& _segments[i]->getInfo()->getProbability(difficulty) != 0)
+		{
+			++count;
+		}
+	}
+	return count;
 }
