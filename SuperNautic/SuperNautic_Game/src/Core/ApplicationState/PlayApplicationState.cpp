@@ -8,7 +8,6 @@
 #include "Core/ApplicationState/PauseMenuApplicationState.hpp"
 #include "Core/ApplicationState/ApplicationStateStack.hpp"
 #include "Core/ApplicationState/ApplicationContext.hpp"
-#include "Core/ApplicationState/TrackGenerationApplicationState.h"
 
 
 PlayApplicationState::PlayApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
