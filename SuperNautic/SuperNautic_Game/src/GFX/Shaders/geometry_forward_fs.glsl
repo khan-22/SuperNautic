@@ -10,15 +10,12 @@ in GS_OUT
 	vec3 fragPos;
 	vec2 uv;
 	vec3 normal;
+	float camToFragDistance;
 } fs_in;
 
 uniform vec3 uViewPos;
 
-
-
-//Should be exposed as uniforms
-const float FOG_DISTANCE = 1500.0;
-const vec4 FOG_COLOR = vec4(0.3, 0.3, 0.3, 1.0);
+const float FOG_DISTANCE = 100.0;
 
 const int NUM_LIGHTS = 8;
 struct PointLightData
@@ -38,19 +35,15 @@ out vec4 outColor;
 
 
 vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3 viewDir);
+vec4 fogify(vec4 inColor, float camToFragDistance, float fogDistance);
 
 
 void main()
 {
 	vec3 diffuse	  = texture(uDiffuse, fs_in.uv).rgb;
-	//vec4 specular	  = texture(uSpecular, fs_in.uv);
-	//vec4 normal		  = texture(uNormal, fs_in.uv);
 	vec4 illumination = texture(uIllumination, fs_in.uv);
 	
-	
-	//outColor = vec4(diffuse.rgb, illumination.r);
 
-	
 	vec3 viewDir = normalize(uViewPos - fs_in.fragPos);
 
 	vec4 lightingResult = vec4(0, 0, 0, 1);
@@ -58,11 +51,9 @@ void main()
 	{
 		lightingResult.rgb += calculatePointLight(i, fs_in.fragPos, diffuse, fs_in.normal, viewDir);
 	}
-	
-	float distanceToFragment = clamp(length(fs_in.fragPos - uViewPos) / FOG_DISTANCE, 0.0, 1.0);
 
-	outColor = mix(mix(lightingResult, vec4(diffuse, 1.0), illumination.r), FOG_COLOR, distanceToFragment);
-
+	outColor = mix(lightingResult, vec4(diffuse, 1.0), illumination);
+	outColor = fogify(outColor, fs_in.camToFragDistance, FOG_DISTANCE);
 }
 
 
@@ -92,4 +83,12 @@ vec3 calculatePointLight(int i, vec3 fragPos, vec3 diffuseTex, vec3 normal, vec3
 	vec3 result	= (diffuseColor + ambientColor + specularVec) * diffuseTex * attenuation;
 
 	return result;
+}
+
+
+
+vec4 fogify(vec4 inColor, float camToFragDistance, float fogDistance)
+{
+	float fragDist = clamp(camToFragDistance / fogDistance, 0.0, 1.0);
+	return mix(inColor, vec4(0.0, 0.0, 0.0, 1.0), fragDist);
 }

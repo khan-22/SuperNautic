@@ -20,6 +20,7 @@ out GS_OUT
 	vec3 fragPos;
 	vec2 uv;
 	vec3 normal;
+	float camToFragDistance;
 } gs_out;
 
 float backfaceCull(vec3 normal)
@@ -37,13 +38,14 @@ void main()
 	vec3 b = gl_in[2].gl_Position.xyz - gl_in[1].gl_Position.xyz; //Edge 2
 	vec3 normal = normalize(cross(a, b));
 
-	if(backfaceCull(normal) >= 0.0)
+	if(!(backfaceCull(normal) < 0.0))
 	{
 		for (int i = 0; i < 3; i++)
 		{
 			gs_out.uv		= gs_in[i].uv;
 			gs_out.normal	= gs_in[i].normal;
 			gs_out.fragPos	= gs_in[i].fragPos;
+			gs_out.camToFragDistance = distance(gs_out.fragPos, uViewPos);
 			gl_Position		= uMVP * gl_in[i].gl_Position;
 			EmitVertex();
 		}
