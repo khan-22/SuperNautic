@@ -23,6 +23,8 @@ namespace GFX
 
 		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer);
 
+		void setFogDistance(float distance);
+
 		void render(Renderable3D& renderable);
 		void display(Camera& camera);
 
@@ -44,6 +46,9 @@ namespace GFX
 		GLsizei _actualY;
 		GLsizei _actualWidth;
 		GLsizei _actualHeight;
+
+		float _fogDistance;
+
 	};
 }
 

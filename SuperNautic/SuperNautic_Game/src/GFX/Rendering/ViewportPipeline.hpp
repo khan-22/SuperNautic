@@ -28,7 +28,7 @@ namespace GFX
 
 		void setDarkFactor(float factor);
 
-		GFX::DeferredRenderer		generalDeferred;
+		GFX::ForwardRenderer		generalForward;
 		GFX::ZoneRenderer			zoneForward;
 		GFX::WindowRenderer			windowForward;
 		GFX::TransparentRenderer	transparentForward;
@@ -39,10 +39,9 @@ namespace GFX
 
 	private:
 		sf::RenderWindow*	_window;
-
 		Framebuffer*		_resultFramebuffer;
 
-		RenderPass			_darkZonePass;
+		float _fogDistance;
 	};
 }
 

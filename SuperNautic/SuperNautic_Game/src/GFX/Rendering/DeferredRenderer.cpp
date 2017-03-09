@@ -192,9 +192,7 @@ void DeferredRenderer::lightPass(Camera& camera, GLsizei width, GLsizei height)
 	std::string uName = "pointLights[" + std::to_string(i) + "]";
 	lpShader->setUniform(uName + ".pos",		_pointLights[i]->getPosition());
 	lpShader->setUniform(uName + ".color",		_pointLights[i]->getLightProperties().diffuseColor);
-
 	glm::vec3 properties(_pointLights[i]->getLightProperties().constant, _pointLights[i]->getLightProperties().linear, _pointLights[i]->getLightProperties().quadratic);
-
 	lpShader->setUniform(uName + ".properties", properties);
 	}*/
 	_pointLights.clear();
