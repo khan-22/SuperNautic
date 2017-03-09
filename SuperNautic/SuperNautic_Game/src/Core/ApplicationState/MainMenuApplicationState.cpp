@@ -105,6 +105,16 @@ void MainMenuApplicationState::render()
 bool MainMenuApplicationState::bUpdate(float dtSeconds)
 {
     _context.menuBackground->update(dtSeconds);
+
+	if (_input.checkActive())
+	{
+		_input.update(dtSeconds);
+		for (const sf::Event& e : _input.getEvents())
+		{
+			_guiContainer.handleEvent(e);
+		}
+	}
+
 	int playersFound = 0;
 	for (int i = 0; i < 5; i++)
 	{
@@ -123,13 +133,5 @@ bool MainMenuApplicationState::bUpdate(float dtSeconds)
 bool MainMenuApplicationState::bHandleEvent(const sf::Event& event)
 {
     _guiContainer.handleEvent(event);
-    if(_input.checkActive())
-    {
-        _input.update(0);
-        for(const sf::Event& e : _input.getEvents())
-        {
-            _guiContainer.handleEvent(e);
-        }
-    }
     return true;
 }
