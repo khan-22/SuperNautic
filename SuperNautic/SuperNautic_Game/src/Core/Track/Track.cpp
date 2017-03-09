@@ -143,7 +143,7 @@ bool Track::bGenerate()
 	// Make the inital stretch straight
 	while (_generatedLength < 400.f)
 	{
-		bInsertNormalSegment(0, false);
+		bInsertNormalSegment(0, true);
 	}
 
 	float failedRecently = 0.f;

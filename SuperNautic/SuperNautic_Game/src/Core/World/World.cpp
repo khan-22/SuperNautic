@@ -74,13 +74,13 @@ World::World(ApplicationContext& context)
 	BoundingBox seaweedBox{ loadedBox.get()->meshes[0] };
 
 	constexpr float seaweedHeight = 10000.0f;
-	for (unsigned i = 0; i < _track->getNrOfSegments(); i += 2)
+	for (unsigned i = 0; i < _track->getNrOfSegments(); ++i)
 	{
 		glm::vec3 segmentPos = _track->getInstance(i)->getModelMatrix() * glm::vec4{ 0, 0, 0, 1 };
 
-		glm::vec3 position{ segmentPos.x + (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * 500.0f,
+		glm::vec3 position{ segmentPos.x + ((static_cast<float>(rand()) / RAND_MAX) * 2.0f - 1.0f) * 500.0f,
 			-seaweedHeight,
-			segmentPos.z + (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * 500.0f };
+			segmentPos.z + ((static_cast<float>(rand()) / RAND_MAX) * 2.0f - 1.0f) * 500.0f };
 
 		seaweedBox.center = position + glm::vec3{ 0.0f, seaweedHeight, 0.0f };
 		CollisionMesh seaweedBoundingBox{ seaweedBox };
