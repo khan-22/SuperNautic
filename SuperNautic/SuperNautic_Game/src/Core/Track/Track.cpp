@@ -675,7 +675,7 @@ bool Track::bEndTrack()
 			}
 		}
 	}
-	// Insert straight track 
+	// Insert straight track
 	while (_generatedLength < _targetLength)
 	{
 		if (!bInsertNormalSegment(0, true))
@@ -841,7 +841,7 @@ void Track::render(GFX::ViewportPipeline& pipeline, const int shipIndex)
 		int index = shipIndex + i;
 		if (index >= 0 && index < _track.size())
 		{
-			pipeline.generalDeferred.render(*_track[index]);
+			pipeline.generalForward.render(*_track[index]);
 			std::vector<ObstacleInstance>& obstacles = _track[index]->getObstacles();
 			for (auto& obstacle : obstacles)
 			{

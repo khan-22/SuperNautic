@@ -2,49 +2,25 @@
 
 out vec4 outColor;
 
-uniform sampler2D uDiffuse;
-//uniform sampler2D uSpecular;
-//uniform sampler2D uNormal;
-
-//in GS_OUT
-//{
-//	//vec3 position;
-//	//vec3 uv;
-//	//vec3 normal;
-//	vec3 color;
-//	//int id;
-//} fs_in;
 
 in GS_OUT
 {
-	//vec3 position;
-	//vec3 uv;
-	//vec3 normal;
 	vec3 color;
-	//float temperature;
-	//int id;
+	vec3 fragPos;
+	float camToFragDistance;
 } fs_in;
 
-//vec3 lightDir = vec3(-0.2, -0.2, -0.2);
+uniform vec3 uViewPos;
+
+uniform float uFogDistance;
+
+vec4 fogify(vec4 inColor, float camToFragDistance, float fogDistance)
+{
+	float fragDist = clamp(camToFragDistance / fogDistance, 0.0, 1.0);
+	return mix(inColor, vec4(0.0, 0.0, 0.0, 1.0), fragDist);
+}
 
 void main()
 {
-	//Just output a basic color
-	//lightDir = normalize(lightDir);
-
-
-	//if (fs_in.temperature < -2.0)
-	//{
-	//	discard;
-	//}
-
-	outColor = vec4(fs_in.color, 1.0);
-
-	//outColor = vec4(
-	//	float(fs_in.id == 0) + 0.5, 
-	//	float(fs_in.id == 1) + 0.5, 
-	//	float(fs_in.id == 2) + 0.5, 
-	//	1.0);
-	
-
+	outColor = fogify(vec4(fs_in.color, 1.0), fs_in.camToFragDistance, uFogDistance);
 }
