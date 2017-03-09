@@ -17,7 +17,7 @@ public:
 
 	void updatePositions(std::vector<float> positions);
 
-	void updateCurrent() override;
+	void updateCurrent(float dtSeconds) override;
 	void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:

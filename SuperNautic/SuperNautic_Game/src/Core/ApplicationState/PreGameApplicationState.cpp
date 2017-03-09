@@ -92,7 +92,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     _guiContainer.select(startButton);
 
-    _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f);
+    _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f, &GFX::Framebuffer::DEFAULT);
 
 
 }
@@ -115,12 +115,12 @@ void PreGameApplicationState::render()
 bool PreGameApplicationState::bUpdate(float dtSeconds)
 {
     _context.menuBackground->update(dtSeconds);
-    _guiContainer.update();
+    _guiContainer.update(dtSeconds);
     _trackGenerator.update(dtSeconds);
 
     if(_input.checkActive())
     {
-        _input.update();
+        _input.update(dtSeconds);
         for(const sf::Event& e : _input.getEvents())
         {
             if(e.type == sf::Event::KeyPressed)

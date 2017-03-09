@@ -59,7 +59,7 @@ void Player::setId(int id)
 
 void Player::update(float dt)
 {
-	_input.update();
+	_input.update(dt);
 
 	if (_input.checkActive())
 	{
@@ -168,7 +168,7 @@ void Player::update(float dt)
 
     _hud.setSpeed(_ship.getSpeed());
 	_hud.setHeat(_ship.getEngineTemperature());
-	_hud.update();
+	_hud.update(dt);
 
 	float speed = _ship.getSpeed();
 	float newFOV = 90.f + 40.f * (speed - 20.f) / 180.f;

@@ -11,7 +11,7 @@ Input::Input() :
 	_bAWasDormant(true),
 	_bButtonA(false)
 {
-    update();
+    update(0);
     _events.clear();
 }
 
@@ -21,7 +21,7 @@ Input::Input(int id) :
 	_bAWasDormant(true),
 	_bButtonA(false)
 {
-    update();
+    update(0);
     _events.clear();
 }
 
@@ -30,7 +30,7 @@ Input::~Input()
 
 }
 
-void Input::update()
+void Input::update(float dt)
 {
 	const int thresh = 20;
 
@@ -38,6 +38,7 @@ void Input::update()
 	{
 		_bButtonA = sf::Joystick::isButtonPressed(_controllerId, 0);
 		_bButtonB = sf::Joystick::isButtonPressed(_controllerId, 1);
+		_bButtonX = sf::Joystick::isButtonPressed(_controllerId, 2);
 		_bButtonY = sf::Joystick::isButtonPressed(_controllerId, 3);
 		_bButtonL = sf::Joystick::isButtonPressed(_controllerId, 4);
 		_bButtonR = sf::Joystick::isButtonPressed(_controllerId, 5);
@@ -47,6 +48,8 @@ void Input::update()
 		_triggers = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::Z);
 		_dPadX = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::PovX);
 		_dPadY = sf::Joystick::getAxisPosition(_controllerId, sf::Joystick::Axis::PovY);
+
+		_leftStickTimer -= dt;
 
 		_events.clear();
 
@@ -59,7 +62,7 @@ void Input::update()
 		{
 			_triggers = 0.f;
 		}
-		
+
 		if (abs(_dPadX) < thresh)
 		{
 			_dPadX = 0.f;
@@ -85,19 +88,6 @@ void Input::update()
 			_bAWasDormant = true;
 		}
 
-		if (_bButtonY && _bYWasDormant)
-		{
-			event.type = sf::Event::KeyPressed;
-			event.key.code = sf::Keyboard::Y;
-			_events.push_back(event);
-			_bButtonY = true;
-			_bYWasDormant = false;
-		}
-		if (!_bButtonY)
-		{
-			_bYWasDormant = true;
-		}
-
 		if (_bButtonB && _bBWasDormant)
 		{
 			event.type = sf::Event::KeyPressed;
@@ -109,6 +99,32 @@ void Input::update()
 		if (!_bButtonB)
 		{
 			_bBWasDormant = true;
+		}
+
+		if (_bButtonX && _bXWasDormant)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::X;
+			_events.push_back(event);
+			_bButtonX = true;
+			_bXWasDormant = false;
+		}
+		if (!_bButtonX)
+		{
+			_bXWasDormant = true;
+		}
+
+		if (_bButtonY && _bYWasDormant)
+		{
+			event.type = sf::Event::KeyPressed;
+			event.key.code = sf::Keyboard::Y;
+			_events.push_back(event);
+			_bButtonY = true;
+			_bYWasDormant = false;
+		}
+		if (!_bButtonY)
+		{
+			_bYWasDormant = true;
 		}
 
 		if (_bButtonL && _bLWasDormant)
@@ -152,37 +168,39 @@ void Input::update()
 			_bStartWasDormant = true;
 		}
 
-		if (_leftStickY < -thresh && _bLeftStickDormant)
+		float menuDelay = .2f;
+
+		if (_leftStickY < -thresh && _leftStickTimer < 0.f)
 		{
 			event.type = sf::Event::KeyPressed;
 			event.key.code = sf::Keyboard::Up;
 			_events.push_back(event);
-			_bLeftStickDormant = false;
+			_leftStickTimer = menuDelay;
 		}
-		else if (_leftStickY > thresh && _bLeftStickDormant)
+		else if (_leftStickY > thresh && _leftStickTimer < 0.f)
 		{
 			event.type = sf::Event::KeyPressed;
 			event.key.code = sf::Keyboard::Down;
 			_events.push_back(event);
-			_bLeftStickDormant = false;
+			_leftStickTimer = menuDelay;
 		}
-		else if (_leftStickX > thresh && _bLeftStickDormant)
+		else if (_leftStickX > thresh && _leftStickTimer < 0.f)
 		{
 			event.type = sf::Event::KeyPressed;
 			event.key.code = sf::Keyboard::Right;
 			_events.push_back(event);
-			_bLeftStickDormant = false;
+			_leftStickTimer = menuDelay;
 		}
-		else if (_leftStickX < -thresh && _bLeftStickDormant)
+		else if (_leftStickX < -thresh && _leftStickTimer < 0.f)
 		{
 			event.type = sf::Event::KeyPressed;
 			event.key.code = sf::Keyboard::Left;
 			_events.push_back(event);
-			_bLeftStickDormant = false;
+			_leftStickTimer = menuDelay;
 		}
 		else if (_leftStickX > -thresh && _leftStickX < thresh && _leftStickY > -thresh && _leftStickY < thresh)
 		{
-			_bLeftStickDormant = true;
+			_leftStickTimer = -1.f;
 		}
 
 		if (_dPadX != 0.f && _bDPadXDormant) {

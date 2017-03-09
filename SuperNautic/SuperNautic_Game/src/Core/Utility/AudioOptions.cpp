@@ -3,8 +3,8 @@
 #include "Core/Utility/Utilities.hpp"
 
 const char* const AudioOptions::_CONFIG_PATH = "config.cfg";
-const float AudioOptions::_DEFAULT_MUSIC_VOLUME = 1.f;
-const float AudioOptions::_DEFAULT_EFFECTS_VOLUME = 1.f;
+const float AudioOptions::_DEFAULT_MUSIC_VOLUME = .5f;
+const float AudioOptions::_DEFAULT_EFFECTS_VOLUME = .5f;
 
 AudioOptions::AudioOptions()
 : _musicVolume(_DEFAULT_MUSIC_VOLUME)

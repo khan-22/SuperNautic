@@ -22,7 +22,7 @@ namespace GFX
 		WindowRenderer();
 		~WindowRenderer();
 
-		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height);
+		void initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer);
 
 		void render(Window& segmentWindow);
 		void render(Renderable3D& renderable);
@@ -40,6 +40,7 @@ namespace GFX
 		ShaderAsset	_outsideShader;
 
 		Framebuffer _outsideFrameBuffer;
+		Framebuffer* _resultFramebuffer;
 
 		sf::RenderWindow* _window;
 		GLfloat _x;

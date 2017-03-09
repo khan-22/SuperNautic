@@ -3,6 +3,8 @@
 #include "GFX/Resources/TemperatureZone.hpp"
 #include "Core/Utility/Camera.h"
 
+
+
 using namespace GFX;
 
 TransparentRenderer::TransparentRenderer()
@@ -14,8 +16,10 @@ TransparentRenderer::~TransparentRenderer()
 {
 }
 
-void TransparentRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height)
+void TransparentRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GLfloat width, GLfloat height, Framebuffer* resultFramebuffer)
 {
+	_resultFramebuffer = resultFramebuffer;
+
 	_shader = ShaderCache::get("transparent_forward");
 	_shader.get()->bind();
     _shader.get()->setSampler("uDiffuse", 0);
@@ -45,6 +49,8 @@ void TransparentRenderer::render(Renderable3D& renderable)
 void TransparentRenderer::display(Camera& camera)
 {
 	assert(_window != nullptr);
+
+	_resultFramebuffer->bindWrite();
 
 	GLsizei windowWidth = _window->getSize().x;
 	GLsizei windowHeight = _window->getSize().y;

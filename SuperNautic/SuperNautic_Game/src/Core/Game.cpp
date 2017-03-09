@@ -114,12 +114,11 @@ bool Game::bInitialize()
 
 
 	_shader = ShaderCache::get("forward");
-	_texture = TextureCache::get("heatchart.png");
 
 	_texturedModel.setModelAndMaterial(ModelCache::get("gizmo.kmf"), materialTest);
 
 	//_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
-	_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
+	//_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f, &GFX::Framebuffer::DEFAULT);
 
     _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos3.txt", "Segments/ConnectionTypes.txt"));
 	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
@@ -133,7 +132,7 @@ bool Game::bInitialize()
 	//_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f }, 2.0f));
 	//_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 0.f, 1.f }, 2.0f));
 
-	_particleRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
+	//_particleRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f, &GFX::Framebuffer::DEFAULT);
 	//_testParticles.init(50, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 5.f, 50.f);
 	_testParticles.init(500, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 0.01f, 5.f, 50.f);
 

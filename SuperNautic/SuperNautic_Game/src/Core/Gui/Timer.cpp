@@ -32,16 +32,10 @@ Timer::~Timer()
 
 void Timer::updateTime(float dt)
 {
-	/*if (_countdown > 0) {
-		_countdown -= dt;
-	}
-	else
-	{*/
-		_time += dt;
-	//}
+	_time += dt;
 }
 
-void Timer::updateCurrent()
+void Timer::updateCurrent(float dtSeconds)
 {
 	int minutes = (int)_time / 60;
 	int seconds = (int)_time % 60;

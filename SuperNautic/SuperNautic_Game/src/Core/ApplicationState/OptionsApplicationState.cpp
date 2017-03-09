@@ -147,11 +147,11 @@ bool OptionsApplicationState::bUpdate(float dtSeconds)
 {
     _context.menuBackground->update(dtSeconds);
 
-    _guiContainer.update();
+    _guiContainer.update(dtSeconds);
 
     if(_input.checkActive())
     {
-        _input.update();
+        _input.update(0);
         for(const sf::Event& e : _input.getEvents())
         {
             if(e.type == sf::Event::KeyPressed)
