@@ -8,26 +8,25 @@ layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 uv; //Supports 3D textures
 layout (location = 2) in vec3 normal;
 
-//uniform mat4 uProjection;
-//uniform mat4 uView;
 uniform mat4 uModel;
-
 uniform mat4 uMVP;
+uniform vec3 uCameraPos;
 
 out VS_OUT
 {
 	vec3 position;
 	vec2 uv;
 	vec3 normal;
+	float camToFragDistance;
 } vs_out;
 
 void main()
 {
-	//We do not use the W component of the UVs, can be changed
 	vs_out.uv	  = vec2(uv.x, 1.0 - uv.y); 
 	vs_out.normal = normal;
 
 	vs_out.position = (uModel * vec4(pos, 1.0f)).xyz;
+	vs_out.camToFragDistance = distance(vs_out.position, uCameraPos);
 	gl_Position = uMVP * vec4(pos, 1.0f);
 	
 }
