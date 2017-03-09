@@ -5,6 +5,8 @@
 #include "Core/Track/SegmentInstance.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 #include "Core/World/Player.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "Core/Geometry/CollisionMesh.hpp"
 
 #include <cmath>
 
@@ -65,6 +67,25 @@ World::World(ApplicationContext& context)
 	
 	//_darkZonePass.initialize(0.f, 0.f, 1.f, 1.f, &_resultFramebuffer, "darkpass_forward");
 
+	// Randomize seaweed positions
+	glm::vec3 center{ _track->getOctreeCenter() };
+	float size{ _track->getOctreeSize() };
+
+	RawMeshAsset loadedBox{ RawMeshCache::get("seaweed_boundingbox.kmf") };
+	BoundingBox seaweedBox{ loadedBox.get()->meshes[0] };
+
+	for (unsigned i = 0; i < 1000; ++i)
+	{
+		glm::vec3 position{ center.x + (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * 2000.0f,
+			center.y - 10000,
+			center.z + (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * 2000.0f };
+
+		seaweedBox.center = position + glm::vec3{ 0.0f, 10000.0f, 0.0f };
+		CollisionMesh seaweedBoundingBox{ seaweedBox };
+
+		if (!_track->bTestCollision(seaweedBoundingBox))
+			_seaweeds.emplace_back(position);
+	}
 
 	if (_players.size() == 1)
 	{
@@ -319,6 +340,16 @@ void World::render()
 
 	for (int i = 0; i < _viewportPipelines.size(); i++)
 	{
+		for (size_t j = 0; j < _seaweeds.size(); ++j)
+		{
+			glm::vec3 difference{ _players[i].getShip().getPosition() - _seaweeds[j].getPosition() };
+			difference -= glm::dot(difference, glm::vec3{ 0,1,0 }) * glm::vec3{ 0,1,0 };
+
+			if (glm::length(difference) < 600.0f)
+			{
+				_viewportPipelines[i].windowForward.render(_seaweeds[j]);
+			}
+		}
 		_track->render(_viewportPipelines[i], _playerProgression[i].getCurrentSegment());
 	}
 

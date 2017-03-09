@@ -19,6 +19,7 @@ namespace sf
 #include "Core/Track/TrackProgression.hpp"
 #include "Core/Gui/Timer.hpp"
 #include "Core/Gui/Progression.hpp"
+#include "Core/World/Seaweed.hpp"
 #include "GFX/Rendering/DeferredRenderer.hpp"
 #include "GFX/Rendering/ZoneRenderer.hpp"
 #include "GFX/Rendering/ForwardRenderer.hpp"
@@ -54,7 +55,9 @@ private:
 	std::vector<Player>						_players;
 	std::vector<std::vector<PointLight>>	_playerPointLights;
 
-	unsigned int								_playersAtFinishLine;
+	std::vector<Seaweed>					_seaweeds;
+
+	unsigned int							_playersAtFinishLine;
 
 	Timer									_timer;
 	Progression								_progression;
