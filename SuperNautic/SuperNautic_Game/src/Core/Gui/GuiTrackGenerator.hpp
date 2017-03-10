@@ -19,6 +19,8 @@ class GuiTrackGenerator : public GFX::Renderable3D
         std::unique_ptr<Track> takeTrack();
         void render(GFX::RenderStates& states) override;
         void update(float dtSeconds);
+		void abortGeneration();
+
 
         void generate();
         void setLength(unsigned int length);

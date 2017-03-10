@@ -37,6 +37,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         }
         _stack.clear();
         _context.track = _trackGenerator.takeTrack();
+		_trackGenerator.abortGeneration();
         _stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context)));
     });
     guiElements.emplace_back(startButton);

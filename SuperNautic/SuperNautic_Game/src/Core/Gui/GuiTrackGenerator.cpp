@@ -10,13 +10,18 @@ GuiTrackGenerator::GuiTrackGenerator(SegmentHandler* segmentHandler, ObstacleHan
 
 GuiTrackGenerator::~GuiTrackGenerator()
 {
-    _bDoAbortGenerate = true;
+	abortGeneration();
+}
+
+void GuiTrackGenerator::abortGeneration()
+{
+	_bDoAbortGenerate = true;
 }
 
 
 std::unique_ptr<Track> GuiTrackGenerator::takeTrack()
 {
-    if(_generation.valid())
+    if(!_bHasTrack && _generation.valid())
     {
         auto pair = _generation.get();
         _track.swap(pair.first);
