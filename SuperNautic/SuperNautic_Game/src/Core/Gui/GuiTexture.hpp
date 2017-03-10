@@ -16,6 +16,7 @@
 class GuiTexture : public GuiElement
 {
 public:
+    GuiTexture();
 	GuiTexture(const std::string& str);
 
 	void setTexture(const std::string& str);
@@ -30,11 +31,6 @@ public:
 private:
 	Asset<sf::Texture> _texture;
 	sf::RectangleShape _sprite;
-
-
-
-	virtual void select() override;
-	virtual void deselect() override;
 
 	void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
 };

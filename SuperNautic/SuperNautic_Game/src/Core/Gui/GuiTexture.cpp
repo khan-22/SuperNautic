@@ -1,27 +1,28 @@
 #include "Core/Gui/GuiTexture.hpp"
 
 
-GuiTexture::GuiTexture(const std::string& str) :
-	_texture(SFMLTextureCache::get(str))
+GuiTexture::GuiTexture()
 {
-    setTexture("");
-	deselect();
+}
+
+GuiTexture::GuiTexture(const std::string& str)
+{
+    setTexture(str);
 }
 
 void GuiTexture::setTexture(const std::string& str)
 {
+    _texture = SFMLTextureCache::get(str);
+
     _sprite.setFillColor(sf::Color::White);
 	_sprite.setTexture(_texture.get(), true);
-//	_sprite.setOrigin(_rect.getLocalBounds().left, _rect.getLocalBounds().top);
-	_sprite.setPosition(0.f, 0.f);
-	_sprite.setSize(sf::Vector2f(100.f, 100.f));
+	_sprite.setSize(sf::Vector2f(_texture.get()->getSize().x, _texture.get()->getSize().y));
 }
 
 void GuiTexture::setSize(float x, float y)
 {
     _sprite.setSize(sf::Vector2f(x, y));
 }
-
 
 void GuiTexture::renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
@@ -35,25 +36,15 @@ sf::FloatRect GuiTexture::getBoundingRect() const
 
 void GuiTexture::setFillColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
-//	_rect.setFillColor(sf::Color(r, g, b, a));
+	_sprite.setFillColor(sf::Color(r, g, b, a));
 }
 
 void GuiTexture::setOutlineThickness(float thickness)
 {
-//	_rect.setOutlineThickness(thickness);
+	_sprite.setOutlineThickness(thickness);
 }
 
 void GuiTexture::setOutlinecolor(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
-//	_rect.setOutlineColor(sf::Color(r, g, b, a));
-}
-
-void GuiTexture::select()
-{
-//	_rect.setFillColor(sf::Color(200, 200, 90));
-}
-
-void GuiTexture::deselect()
-{
-//	_rect.setFillColor(sf::Color::White);
+	_sprite.setOutlineColor(sf::Color(r, g, b, a));
 }
