@@ -877,7 +877,7 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 			if (_darkAreas[i].startIndex + _darkAreas[i].length <= firstPlayer)
 			{
 				_darkAreas[i].timer += dt;
-				if (_darkAreas[i].timer > 1.0f && _darkAreas[i].length > 8)
+				if (_darkAreas[i].timer > 1.0f && _darkAreas[i].length > (6 + 10 * (1 - _difficulty)))
 				{
 					_darkAreas[i].timer = 0.f;
 					_darkAreas[i].length--;
@@ -917,9 +917,9 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 		{
 			// Update values if inside area
 			dapi.factor += 0.7f * dt;
-			if (dapi.factor > 0.93f)
+			if (dapi.factor > 0.85f)
 			{
-				dapi.factor = 0.93f;
+				dapi.factor = 0.85f;
 			}
 			if (playerIndexes[i] > dapi.startIndex + dapi.length)
 			{
