@@ -88,6 +88,7 @@ Ship::Ship(glm::vec3 color)
 
 Ship::Ship(glm::vec3 color, int shipId)
 	:
+	_shipId{ shipId },
 	_destroyed{ false },
 	_stopped{ false },
 	_turningFactor{ 0.0f },
@@ -146,6 +147,9 @@ Ship::Ship(glm::vec3 color, int shipId)
 	_jumping{ false }
 {
 	move(0, 0, 10);
+
+	setShip();
+
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 
 	setInactiveTime(_inactiveAtStart);
@@ -863,4 +867,53 @@ GFX::ParticleSystem& Ship::getRightParticleSystem()
 const BoundingBox& Ship::getBoundingBox() const
 {
 	return _boundingBox;
+}
+
+void Ship::setShip()
+{
+	switch (_shipId)
+	{
+	case 0:
+		_maxAcceleration = 100.f;
+		_maxTurningSpeed = 20.f;
+		_cooldownOnObstacleCollision = 2.f;
+		_overheatTemperature = .95f;
+		_overheatCooldown = 4.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+		break;
+	case 1:
+		_maxAcceleration = 120.f;
+		_maxTurningSpeed = 22.f;
+		_cooldownOnObstacleCollision = 4.f;
+		_immunityoOnObstacleCollision = 6.f;
+		_overheatTemperature = .90f;
+		_overheatCooldown = 6.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+		break;
+	case 2:
+		_maxAcceleration = 100.f;
+		_maxTurningSpeed = 22.f;
+		_cooldownOnObstacleCollision = 2.f;
+		_overheatTemperature = .99f;
+		_overheatCooldown = 10.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+		break;
+	case 3:
+		_maxAcceleration = 90.f;
+		_maxTurningSpeed = 20.f;
+		_cooldownOnObstacleCollision = 1.f;
+		_immunityoOnObstacleCollision = 3.f;
+		_overheatTemperature = .98f;
+		_overheatCooldown = 4.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+		break;
+	default:
+		_maxAcceleration = 100.f;
+		_maxTurningSpeed = 20.f;
+		_cooldownOnObstacleCollision = 2.f;
+		_overheatTemperature = .95f;
+		_overheatCooldown = 4.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+		break;
+	}
 }

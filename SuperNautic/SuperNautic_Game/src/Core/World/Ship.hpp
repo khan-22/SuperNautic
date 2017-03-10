@@ -85,6 +85,7 @@ public:
 	void rotateAtStart(float down, float angle);
 
 private:
+	int			_shipId;
 	bool		_destroyed;
 	bool		_stopped;
 	float		_turningFactor;
@@ -147,8 +148,8 @@ private:
 	glm::mat4	_transformMatrix;
 
 	const float _minAcceleration;
-	const float _maxAcceleration;
-	const float _maxTurningSpeed;
+	float _maxAcceleration;
+	float _maxTurningSpeed;
 	const float _straighteningForce;		// How strongly the velocity direction turns toward track's forward direction
 	const float _steerStraighteningForce;	// How strongly the ship resists turning
 	const float _speedResistance;			// 'Air resistance'
@@ -156,10 +157,10 @@ private:
 
 	const float _rayHeight;			// Height above ship of the origin of the ray used for intersection
 
-	const float _cooldownOnObstacleCollision;
-	const float _immunityoOnObstacleCollision;
+	float _cooldownOnObstacleCollision;
+	float _immunityoOnObstacleCollision;
 
-	const float _overheatTemperature;	// Temperature at which engine overheats
+	float _overheatTemperature;	// Temperature at which engine overheats
 	const float _warningLevel;			// Temperature at which warning light starts blinking
 	const float _warningLightIntensity;
 	float		_warningAccumulator;	// Used for calculating warning light intensity
@@ -181,5 +182,6 @@ private:
 	void updateDirectionsAndPositions(float dt);
 	void trackSurface(float dt);
 	void handleLightsAndParticles(float dt);
+	void setShip();
 };
 #endif // SHIP_HPP
