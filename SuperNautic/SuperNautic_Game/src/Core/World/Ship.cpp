@@ -71,7 +71,7 @@ Ship::Ship(glm::vec3 color)
 	_inactiveAtStart{ 3.5f },
 	_jumping{ false }
 {
-	move(0, 0, 10);
+	move(0, 0, 100);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 
 	setInactiveTime(_inactiveAtStart);
@@ -369,7 +369,8 @@ void Ship::updateDirectionsAndPositions(float dt)
 	// Move forward
 	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _shipForward, 0.0f };
 	glm::vec3 visualTurningDirection = glm::rotate(_currentTurningAngle * 0.5f, _upDirection) * glm::vec4{ _shipForward, 0.0f };
-	move(velocityDirection * _velocity * dt);
+	move((velocityDirection * _velocity - glm::dot(_shipForward, velocityDirection * _velocity) * _shipForward) * dt);	// Move right/left
+	move(_shipForward * _velocity * dt);		// Move forward
 
 	if (_jumping && glm::dot((_meshPosition() - getPosition()), _upDirection) < _velocity * 0.12f)
 	{
@@ -428,7 +429,14 @@ void Ship::trackSurface(float dt)
 		_timeSinceIntersection = 0.0f;
 
 		// Set current surface
-		_currentSurfaceTemperature = atShipIntersection._surface;
+		if (atShipIntersection._length - _rayHeight < _preferredHeight + 0.5f)
+		{
+			_currentSurfaceTemperature = atShipIntersection._surface;
+		}
+		else
+		{
+			_currentSurfaceTemperature = 0.0f;
+		}
 
 		// Update local directions
 		_upDirection = atShipIntersection._normal;
@@ -597,14 +605,14 @@ glm::vec3 Ship::getCameraUp()
 const glm::vec3 Ship::getCameraForward() const
 {
 	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope() -
-		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * glm::cross(_cameraUpDirection(), _cameraForwardDirection()) * 2.0f);
+		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * glm::cross(_cameraUpDirection(), _cameraForwardDirection()) * 0.3f);
 }
 
 const glm::vec3 Ship::getCameraPosition() const
 {
 	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f) +
 		_cameraUpDirection() * (2.0f + _surfaceSlope() * 5.0f) +
-		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f));
+		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f) - _cameraForwardDirection() * 80.0f);
 }
 
 const glm::mat4& Ship::getTransform() const

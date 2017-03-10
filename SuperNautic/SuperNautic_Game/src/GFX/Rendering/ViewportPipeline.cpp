@@ -29,6 +29,8 @@ void GFX::ViewportPipeline::setDarkFactor(float factor)
 
 void GFX::ViewportPipeline::display(Camera& camera)
 {
+    glEnable(GL_DEPTH_TEST);
+
     generalForward.setFogDistance(_fogDistance);
 	generalForward.display(camera);
 
