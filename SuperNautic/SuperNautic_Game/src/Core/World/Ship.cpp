@@ -369,7 +369,8 @@ void Ship::updateDirectionsAndPositions(float dt)
 	// Move forward
 	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _shipForward, 0.0f };
 	glm::vec3 visualTurningDirection = glm::rotate(_currentTurningAngle * 0.5f, _upDirection) * glm::vec4{ _shipForward, 0.0f };
-	move(velocityDirection * _velocity * dt);
+	move((velocityDirection * _velocity - glm::dot(_shipForward, velocityDirection * _velocity) * _shipForward) * dt);	// Move right/left
+	move(_shipForward * _velocity * dt);		// Move forward
 
 	if (_jumping && glm::dot((_meshPosition() - getPosition()), _upDirection) < _velocity * 0.12f)
 	{
