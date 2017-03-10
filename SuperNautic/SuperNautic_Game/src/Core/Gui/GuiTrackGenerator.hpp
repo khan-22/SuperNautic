@@ -26,7 +26,7 @@ class GuiTrackGenerator : public GFX::Renderable3D
         void setDifficulty(unsigned int difficulty);
 
     private:
-        bool _bDoAbortGenerate = false;
+        volatile bool _bDoAbortGenerate = false;
         std::future<std::pair<std::unique_ptr<Track>, std::unique_ptr<TrackPreview>>> _generation;
         SegmentHandler* _segmentHandler;
 		ObstacleHandler* _obstacleHandler;

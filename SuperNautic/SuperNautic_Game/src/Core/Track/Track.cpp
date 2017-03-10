@@ -212,15 +212,15 @@ bool Track::bGenerate()
 		{
 			if (bEndTrack())
 			{
-				if (_difficulty > 0.05f)
-				{
-					placeObstacles();
-				}
-				placeDarkAreas();
 				// End segment
 				if (bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, true)
 					&& bInsertNormalSegment(0, false))
 				{
+					if (_difficulty > 0.05f)
+					{
+						placeObstacles();
+						placeDarkAreas();
+					}
 					LOG("Track generated. Length: ", _generatedLength);
 					return true;
 				}
@@ -251,6 +251,7 @@ bool Track::bGenerate()
 
 	_lengthAfterLastCall = _generatedLength;
 	_totalProgress = _generatedLength / _targetLength;
+	LOG(_totalProgress);
 	return false;
 }
 
@@ -611,8 +612,9 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 	if (segment->nrOfZones() > 0 && _generatedLength > 700.f)
 	{
 		std::vector<float> temperatures;
-		temperatures.reserve(4);
-		for (unsigned int i = 0; i < 4; i++)
+		temperatures.resize(4, -5.f);
+		unsigned int nrOfActive = 0;
+		while (nrOfActive < 2)
 		{
 			int r = rand() % 8;
 			if (r == 0)
@@ -627,6 +629,7 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 			{
 				temperatures.push_back(-5.f);
 			}
+			nrOfActive++;
 		}
 		// Makes sure to only add something to render if at least one part of the zone is active
 		unsigned int count = 0;
@@ -647,7 +650,6 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 // Deletes a certain length of the track (from the end)
 void Track::deleteSegments(const float lengthToDelete)
 {
-	LOG("RUN");
 	_deletionLength += lengthToDelete;
 	float deletedLength = 0.f;
 	while (deletedLength <= _deletionLength && _generatedLength > 500.f)
@@ -795,19 +797,20 @@ void Track::placeObstacles()
 // Place dark areas in the finished track
 void Track::placeDarkAreas()
 {
-	int index = rand() % 400 + 20;
+	int index = rand() % 300 + 20;
 	while (index < _track.size() - 10)
 	{
-		unsigned int length = rand() % 10 + 7;
+		unsigned int length = (unsigned int)(rand() % (int(20 * _difficulty) + 8) + 6 + rand() % (int(10 * _difficulty) + 1));
 		_darkAreas.push_back({ (unsigned int)index, length, 0.f });
 		index += length;
-		index += rand() % 200 + 100;
+		index += (unsigned int)(rand() % (int(200 * (1.f - _difficulty)) + 70) + 100 + rand() % (int(100 * (1.f - _difficulty)) + 1));
 	}
 	// Removes the last area if it is too long
 	if (_darkAreas.size() >= 1 && _darkAreas.back().startIndex + _darkAreas.back().length > _track.size() - 10)
 	{
 		_darkAreas.erase(_darkAreas.end() - 1);
 	}
+	LOG(_darkAreas.size());
 }
 
 size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLength) const
@@ -885,7 +888,7 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 			if (_darkAreas[i].startIndex + _darkAreas[i].length <= firstPlayer)
 			{
 				_darkAreas[i].timer += dt;
-				if (_darkAreas[i].timer > 1.0f && _darkAreas[i].length > 1)
+				if (_darkAreas[i].timer > 1.0f && _darkAreas[i].length > 8)
 				{
 					_darkAreas[i].timer = 0.f;
 					_darkAreas[i].length--;
