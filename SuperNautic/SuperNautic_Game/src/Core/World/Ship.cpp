@@ -429,7 +429,14 @@ void Ship::trackSurface(float dt)
 		_timeSinceIntersection = 0.0f;
 
 		// Set current surface
-		_currentSurfaceTemperature = atShipIntersection._surface;
+		if (atShipIntersection._length - _rayHeight < _preferredHeight + 0.5f)
+		{
+			_currentSurfaceTemperature = atShipIntersection._surface;
+		}
+		else
+		{
+			_currentSurfaceTemperature = 0.0f;
+		}
 
 		// Update local directions
 		_upDirection = atShipIntersection._normal;
