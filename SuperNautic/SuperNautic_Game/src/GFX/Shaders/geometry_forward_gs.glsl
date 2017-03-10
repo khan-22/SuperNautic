@@ -21,8 +21,8 @@ out GS_OUT
 	vec2 uv;
 	vec3 normal;
 	float camToFragDistance;
-	vec3 tangent;
-	vec3 bitangent;
+	//vec3 tangent;
+	//vec3 bitangent;
 } gs_out;
 
 float backfaceCull(vec3 normal)
@@ -42,11 +42,11 @@ void main()
 	{
 		normal = normalize(normal);
 		
-		vec2 deltaUv1 = gs_in[1].uv - gs_in[0].uv;
-		vec2 deltaUv2 = gs_in[2].uv - gs_in[0].uv;
+		//vec2 deltaUv1 = gs_in[1].uv - gs_in[0].uv;
+		//vec2 deltaUv2 = gs_in[2].uv - gs_in[0].uv;
 	
-		gs_out.tangent = normalize(a * deltaUv2.y - b * deltaUv1.y);
-		gs_out.bitangent = normalize(b * deltaUv1.x - a * deltaUv2.x);
+		//gs_out.tangent = normalize(a * deltaUv2.y - b * deltaUv1.y);
+		//gs_out.bitangent = normalize(b * deltaUv1.x - a * deltaUv2.x);
 		for (int i = 0; i < 3; i++)
 		{
 			gs_out.uv		= gs_in[i].uv;

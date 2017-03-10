@@ -150,9 +150,9 @@ void Track::setNrOfPlayers(unsigned int nrOfPlayers)
 bool Track::bGenerate()
 {
 	// Make the inital stretch straight
-	while (_generatedLength < 400.f)
+	while (_generatedLength < 600.f)
 	{
-		bInsertNormalSegment(0, true);
+		bInsertNormalSegment(0);
 	}
 
 	float failedRecently = 0.f;
@@ -171,7 +171,7 @@ bool Track::bGenerate()
 
 			for (unsigned int i = 0; i < inRow; i++)
 			{
-				if (!bInsertNormalSegment(index, true))
+				if (!bInsertNormalSegment(index))
 				{
 					if (failedRecently > 0.1f)
 					{
@@ -224,8 +224,8 @@ bool Track::bGenerate()
 				}
 				placeDarkAreas();
 				// End segment
-				bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, true);
-				bInsertNormalSegment(0, true);
+				bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1);
+				bInsertNormalSegment(0);
 
 				LOG("Track generated. Length: ", _generatedLength);
 				return true;
@@ -285,7 +285,7 @@ int Track::getIndex() const
 		if (infos[i]._startConnection == _endConnection
 			&& infos[i].getProbability(_curviness) != 0)
 		{
-			if (_segmentHandler->getNrOfSegmentsOfType(_endConnection, _difficulty) > 2)
+			if (_segmentHandler->getNrOfSegmentsOfType(_endConnection, _curviness) > 2)
 			{
 				if ((infos[i]._endConnection != _endConnection && _lengthWithCurrentConnectionType >= 600.f)
 					|| infos[i]._endConnection == _endConnection
@@ -463,19 +463,16 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned int& segme
 }
 
 // Inserts a segment with given index at the end of the track
-bool Track::bInsertNormalSegment(const int index, bool testCollision)
+bool Track::bInsertNormalSegment(const int index)
 {
 	const Segment * segment = _segmentHandler->loadSegment(index);
 	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
 	// Check collision
-	if (testCollision)
-	{
-		if(!bInsertIntoOctree(tempInstance))
-        {
-            delete tempInstance;
-            return false;
-        }
-	}
+	if(!bInsertIntoOctree(tempInstance))
+    {
+        delete tempInstance;
+        return false;
+    }
 	addWindowsAndZonesToSegment(segment);
 	// Set up model matrix
 	glm::mat4 modelEndMat = segment->getEndMatrix();
@@ -599,7 +596,7 @@ void Track::insertStructure(const int index)
 	}
 }
 
-// Adds windows and zones to the track based on the given segment type
+// Adds windows and temperature zones
 void Track::addWindowsAndZonesToSegment(const Segment* segment)
 {
 	// Add windows
@@ -608,7 +605,7 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 		_segmentWindows.push_back({ segment->getWindowModel(), _endMatrix, static_cast<unsigned int>(_track.size()) });
 	}
 	// Add temperature zones
-	if (segment->nrOfZones() > 0)
+	if (segment->nrOfZones() > 0 && _generatedLength > 700.f)
 	{
 		std::vector<float> temperatures;
 		temperatures.reserve(4);
@@ -650,7 +647,7 @@ void Track::deleteSegments(const float lengthToDelete)
 	float deletedLength = 0.f;
 	while (deletedLength <= lengthToDelete && _generatedLength > 500.f)
 	{
-		int segmentLength = static_cast<int>(_track.back()->getLength());
+		float segmentLength = _track.back()->getLength();
 		deletedLength += segmentLength;
 		_generatedLength -= segmentLength;
 
@@ -669,6 +666,7 @@ void Track::deleteSegments(const float lengthToDelete)
 			_temperatureZones.pop_back();
 		}
 	}
+
 }
 
 // Tries to end the track with a straight path
@@ -682,7 +680,7 @@ bool Track::bEndTrack()
 			const Segment * test = _segmentHandler->loadSegment(i);
 			if (test->getStart() == _endConnection && test->getEnd() == 'a')
 			{
-				if (!bInsertNormalSegment(i, true))
+				if (!bInsertNormalSegment(i))
 				{
 					deleteSegments(_endMargin + 500);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
@@ -694,7 +692,7 @@ bool Track::bEndTrack()
 	// Insert straight track
 	while (_generatedLength < _targetLength)
 	{
-		if (!bInsertNormalSegment(0, true))
+		if (!bInsertNormalSegment(0))
 		{
 			deleteSegments(_endMargin + 500);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
@@ -803,7 +801,7 @@ void Track::placeDarkAreas()
 	// Removes the last area if it is too long
 	if (_darkAreas.size() >= 1 && _darkAreas.back().startIndex + _darkAreas.back().length > _track.size() - 10)
 	{
-		_darkAreas.erase(_darkAreas.end());
+		_darkAreas.erase(_darkAreas.end() - 1);
 	}
 }
 

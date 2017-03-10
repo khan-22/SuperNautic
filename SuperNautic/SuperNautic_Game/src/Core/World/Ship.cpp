@@ -220,7 +220,7 @@ Ship::Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float 
 	_inactiveAtStart{ 3.5f },
 	_jumping{ false }
 {
-	move(0, 0, 10);
+	move(0, 0, 100);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 
 	setInactiveTime(_inactiveAtStart);
@@ -759,14 +759,14 @@ glm::vec3 Ship::getCameraUp()
 const glm::vec3 Ship::getCameraForward() const
 {
 	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope() -
-		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * glm::cross(_cameraUpDirection(), _cameraForwardDirection()) * 2.0f);
+		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * glm::cross(_cameraUpDirection(), _cameraForwardDirection()) * 0.3f);
 }
 
 const glm::vec3 Ship::getCameraPosition() const
 {
 	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f) +
 		_cameraUpDirection() * (2.0f + _surfaceSlope() * 5.0f) +
-		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f));
+		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f) - _cameraForwardDirection() * 80.0f);
 }
 
 const glm::mat4& Ship::getTransform() const
