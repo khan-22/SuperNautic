@@ -15,6 +15,7 @@
 #include "Core/Utility/TrackPresetManager.hpp"
 #include "Core/Gui/GuiToolTip.hpp"
 #include "Core/Gui/GuiText.hpp"
+#include "Core/Gui/GuiTexture.hpp"
 
 class GuiPlayerJoinContainer;
 
@@ -35,6 +36,8 @@ private:
     GuiTrackGeneratorControls _guiContainer;
     GuiPlayerJoinContainer* _players;
     GuiText            _title;
+    std::array<GuiTexture, 4> _shipImages;
+    std::array<unsigned int, 4> _shipIds;
 
     Input _input;
 
