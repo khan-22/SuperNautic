@@ -10,13 +10,18 @@ GuiTrackGenerator::GuiTrackGenerator(SegmentHandler* segmentHandler, ObstacleHan
 
 GuiTrackGenerator::~GuiTrackGenerator()
 {
-    _bDoAbortGenerate = true;
+	abortGeneration();
+}
+
+void GuiTrackGenerator::abortGeneration()
+{
+	_bDoAbortGenerate = true;
 }
 
 
 std::unique_ptr<Track> GuiTrackGenerator::takeTrack()
 {
-    if(_generation.valid())
+    if(!_bHasTrack && _generation.valid())
     {
         auto pair = _generation.get();
         _track.swap(pair.first);
@@ -24,9 +29,14 @@ std::unique_ptr<Track> GuiTrackGenerator::takeTrack()
 
     std::unique_ptr<Track> ret = std::move(_track);
     _track.reset(new Track(_segmentHandler, _obstacleHandler));
-
+    _bHasTrack = false;
 
     return std::move(ret);
+}
+
+bool GuiTrackGenerator::bHasTrack() const
+{
+    return _bHasTrack;
 }
 
 
@@ -42,6 +52,7 @@ void GuiTrackGenerator::update(float dtSeconds)
         auto pair = _generation.get();
         _track.swap(pair.first);
         _preview->setTrack(*_track);
+        _bHasTrack = true;
     }
 
     _preview->update(dtSeconds);

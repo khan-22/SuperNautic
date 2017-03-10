@@ -11,12 +11,11 @@ SegmentInstance::SegmentInstance()
 }
 
 //Real constructor
-SegmentInstance::SegmentInstance(const Segment * segment, glm::mat4 modelMatrix, const bool lighting)
+SegmentInstance::SegmentInstance(const Segment * segment, glm::mat4 modelMatrix)
 {
 	_parent = segment;
 	_model = modelMatrix;
 	updateGlobalBounds();
-	_bHasLighting = lighting;
 
 	for (unsigned int i = 0; i < _parent->nrOfZones(); ++i)
 	{

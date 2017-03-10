@@ -37,6 +37,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
         }
         _stack.clear();
         _context.track = _trackGenerator.takeTrack();
+		_trackGenerator.abortGeneration();
         _stack.push(std::unique_ptr<ApplicationState>(new PlayApplicationState(_stack, _context)));
     });
     guiElements.emplace_back(startButton);
@@ -148,7 +149,10 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
                     if(!_guiContainer.bIsActive())
                     {
                         _stack.clear();
-                        _context.track = _trackGenerator.takeTrack();
+                        if(_trackGenerator.bHasTrack())
+                        {
+                            _context.track = _trackGenerator.takeTrack();
+                        }
                         _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
                     }
                     break;
@@ -228,7 +232,10 @@ bool PreGameApplicationState::bHandleEvent(const sf::Event& event)
             if(!_guiContainer.bIsActive())
             {
                 _stack.clear();
-                _context.track = _trackGenerator.takeTrack();
+                if(_trackGenerator.bHasTrack())
+                {
+                    _context.track = _trackGenerator.takeTrack();
+                }
                 _stack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stack, _context)));
             }
             break;

@@ -100,6 +100,7 @@ private:
 	char									_endConnection;
 	int										_prevIndex;
 	const Segment *							_lastSegment;
+	float									_deletionLength;
 	float									_lengthWithCurrentConnectionType;
 	std::unique_ptr<Octree<SegmentInstance*>> _octree;
 	std::vector<DarkArea>					_darkAreas;

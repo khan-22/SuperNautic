@@ -134,7 +134,7 @@ void Track::startNewTrack()
 	_segmentWindows.clear();
 	_temperatureZones.clear();
 
-	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength * 1.1f + 1000.f, 2000.f, 5));
+	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength * 1.2f + 10000.f, 2000.f, 5));
 
 	_darkAreas.clear();
 	_darkAreaPlayerValues.clear();
@@ -155,7 +155,6 @@ bool Track::bGenerate()
 		bInsertNormalSegment(0);
 	}
 
-	float failedRecently = 0.f;
 	// Create random path
 	while (_generatedLength - _lengthAfterLastCall < _progressionLength)
 	{
@@ -173,23 +172,18 @@ bool Track::bGenerate()
 			{
 				if (!bInsertNormalSegment(index))
 				{
-					if (failedRecently > 0.1f)
-					{
-						failedRecently += 400.f;
-					}
-					failedRecently += 500.f;
-					deleteSegments(failedRecently);
+					deleteSegments(600.f);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					break;
 				}
 				else
 				{
-					if (failedRecently > 0.1f)
+					if (_deletionLength > 0.1f)
 					{
-						failedRecently -= _lastSegment->getLength();
-						if (failedRecently < 0.f)
+						_deletionLength -= _lastSegment->getLength();
+						if (_deletionLength < 0.f)
 						{
-							failedRecently = 0.f;
+							_deletionLength = 0.f;
 						}
 					}
 				}
@@ -218,21 +212,25 @@ bool Track::bGenerate()
 		{
 			if (bEndTrack())
 			{
-				if (_difficulty > 0.05f)
-				{
-					placeObstacles();
-				}
-				placeDarkAreas();
 				// End segment
-				bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1);
-				bInsertNormalSegment(0);
-
-				LOG("Track generated. Length: ", _generatedLength);
-				return true;
+				if (bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1))
+				{
+					if (_difficulty > 0.05f)
+					{
+						placeObstacles();
+						placeDarkAreas();
+					}
+					LOG("Track generated. Length: ", _generatedLength);
+					return true;
+				}
+				else
+				{
+					deleteSegments(1000.f);
+					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+				}
 			}
 			else
 			{
-				failedRecently += 400.f;
 				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 				char newConnection = _track.back()->getParent()->getEnd();
 				if (newConnection != _endConnection)
@@ -466,13 +464,13 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned int& segme
 bool Track::bInsertNormalSegment(const int index)
 {
 	const Segment * segment = _segmentHandler->loadSegment(index);
-	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix);
 	// Check collision
-	if(!bInsertIntoOctree(tempInstance))
-    {
-        delete tempInstance;
-        return false;
-    }
+	if (!bInsertIntoOctree(tempInstance))
+	{
+		delete tempInstance;
+		return false;
+	}
 	addWindowsAndZonesToSegment(segment);
 	// Set up model matrix
 	glm::mat4 modelEndMat = segment->getEndMatrix();
@@ -563,12 +561,13 @@ void Track::insertStructure(const int index)
 		{
 			const SegmentHandler::StructurePiece * p = sugMig->pieces[j];
 			const Segment * segment = _segmentHandler->loadSegment(p->index);
-			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix);
 
             if(!bInsertIntoOctree(tempInstance))
             {
                 delete tempInstance;
                 deleteSegments(_generatedLength - startLength + 300.f);
+				_deletionLength = 0.f;
                 _endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
                 return;
             }
@@ -608,33 +607,30 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 	if (segment->nrOfZones() > 0 && _generatedLength > 700.f)
 	{
 		std::vector<float> temperatures;
-		temperatures.reserve(4);
-		for (unsigned int i = 0; i < 4; i++)
+		temperatures.resize(4, -5.f);
+		unsigned int nrOfActive = 0;
+		while (nrOfActive < 2)
 		{
-			int r = rand() % 8;
-			if (r == 0)
+			int index = rand() % 4;
+			if (temperatures[index] < -2.f)
 			{
-				temperatures.push_back((float)rand() / RAND_MAX - 1.f);
-			}
-			else if (r <= 2)
-			{
-				temperatures.push_back((float)rand() / RAND_MAX);
-			}
-			else
-			{
-				temperatures.push_back(-5.f);
+				int r = rand() % 8;
+				if (r == 0)
+				{
+					temperatures[index] = (float)rand() / RAND_MAX - 1.f;
+				}
+				else if (r <= 2)
+				{
+					temperatures[index] = (float)rand() / RAND_MAX;
+				}
+				else
+				{
+					temperatures[index] = -5.f;
+				}
+				nrOfActive++;
 			}
 		}
-		// Makes sure to only add something to render if at least one part of the zone is active
-		unsigned int count = 0;
-		for (unsigned int i = 0; i < 4; i++)
-		{
-			if (temperatures[i] > -2.f)
-			{
-				++count;
-			}
-		}
-		if (count != 0)
+		if (nrOfActive >= 1)
 		{
 			_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures });
 		}
@@ -644,8 +640,9 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 // Deletes a certain length of the track (from the end)
 void Track::deleteSegments(const float lengthToDelete)
 {
+	_deletionLength += lengthToDelete;
 	float deletedLength = 0.f;
-	while (deletedLength <= lengthToDelete && _generatedLength > 500.f)
+	while (deletedLength <= _deletionLength && _generatedLength > 500.f)
 	{
 		float segmentLength = _track.back()->getLength();
 		deletedLength += segmentLength;
@@ -705,7 +702,7 @@ bool Track::bEndTrack()
 // Places obstacles in the finished track
 void Track::placeObstacles()
 {
-	const float endLength = 500.f;
+	const float endLength = 900.f;
 	float currentLength = 300;
 	float lastFullSegmentLength = 0.f;
 	size_t index = findTrackIndex(currentLength, lastFullSegmentLength);
@@ -790,13 +787,13 @@ void Track::placeObstacles()
 // Place dark areas in the finished track
 void Track::placeDarkAreas()
 {
-	int index = rand() % 400 + 20;
+	int index = rand() % 300 + 20;
 	while (index < _track.size() - 10)
 	{
-		unsigned int length = rand() % 10 + 7;
+		unsigned int length = (unsigned int)(rand() % (int(20 * _difficulty) + 8) + 6 + 10 * _difficulty);
 		_darkAreas.push_back({ (unsigned int)index, length, 0.f });
 		index += length;
-		index += rand() % 200 + 100;
+		index += (unsigned int)(rand() % (int(400 * (1.f - _difficulty)) + 70) + 100 + 100 * (1.f - _difficulty));
 	}
 	// Removes the last area if it is too long
 	if (_darkAreas.size() >= 1 && _darkAreas.back().startIndex + _darkAreas.back().length > _track.size() - 10)
@@ -859,7 +856,7 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 				{
 					if (temps[j] > -0.99f)
 					{
-						temps[j] -= 0.1f * dt;
+						temps[j] -= 0.17f * dt;
 					}
 				}
 
@@ -880,7 +877,7 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 			if (_darkAreas[i].startIndex + _darkAreas[i].length <= firstPlayer)
 			{
 				_darkAreas[i].timer += dt;
-				if (_darkAreas[i].timer > 1.0f && _darkAreas[i].length > 1)
+				if (_darkAreas[i].timer > 1.0f && _darkAreas[i].length > (6 + 10 * (1 - _difficulty)))
 				{
 					_darkAreas[i].timer = 0.f;
 					_darkAreas[i].length--;
@@ -900,7 +897,7 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 		if (dapi.startIndex == -1)
 		{
 			// Update darkness factor for the player
-			dapi.factor -= 1.0f * dt;
+			dapi.factor -= 0.7f * dt;
 			if (dapi.factor < 0.f)
 			{
 				dapi.factor = 0.f;
@@ -919,10 +916,10 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 		else
 		{
 			// Update values if inside area
-			dapi.factor += 1.0f * dt;
-			if (dapi.factor > 0.96f)
+			dapi.factor += 0.7f * dt;
+			if (dapi.factor > 0.85f)
 			{
-				dapi.factor = 0.96f;
+				dapi.factor = 0.85f;
 			}
 			if (playerIndexes[i] > dapi.startIndex + dapi.length)
 			{
