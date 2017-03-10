@@ -74,13 +74,13 @@ World::World(ApplicationContext& context)
 	BoundingBox seaweedBox{ loadedBox.get()->meshes[0] };
 
 	constexpr float seaweedHeight = 10000.0f;
-	for (unsigned i = 0; i < _track->getNrOfSegments(); ++i)
+	for (unsigned i = 0; i < _track->getNrOfSegments(); i += 3)
 	{
 		glm::vec3 segmentPos = _track->getInstance(i)->getModelMatrix() * glm::vec4{ 0, 0, 0, 1 };
 
-		glm::vec3 position{ segmentPos.x + ((static_cast<float>(rand()) / RAND_MAX) * 2.0f - 1.0f) * 500.0f,
+		glm::vec3 position{ segmentPos.x + ((static_cast<float>(rand()) / RAND_MAX) * 2.0f - 1.0f) * 300.0f,
 			-seaweedHeight,
-			segmentPos.z + ((static_cast<float>(rand()) / RAND_MAX) * 2.0f - 1.0f) * 500.0f };
+			segmentPos.z + ((static_cast<float>(rand()) / RAND_MAX) * 2.0f - 1.0f) * 300.0f };
 
 		seaweedBox.center = position + glm::vec3{ 0.0f, seaweedHeight, 0.0f };
 		CollisionMesh seaweedBoundingBox{ seaweedBox };
@@ -344,8 +344,7 @@ void World::render()
 	{
 		for (size_t j = 0; j < _seaweeds.size(); ++j)
 		{
-			glm::vec3 difference{ _players[i].getShip().getPosition() - _seaweeds[j].getPosition() };
-			difference -= glm::dot(difference, glm::vec3{ 0,1,0 }) * glm::vec3{ 0,1,0 };
+			glm::vec3 difference{ _players[i].getShip().getPosition().x - _seaweeds[j].getPosition().x, 0.0f, _players[i].getShip().getPosition().z - _seaweeds[j].getPosition().z };
 
 			if (glm::length(difference) < 1000.0f)
 			{
