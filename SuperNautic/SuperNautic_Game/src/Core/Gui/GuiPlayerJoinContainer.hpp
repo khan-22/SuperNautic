@@ -18,6 +18,8 @@ class GuiPlayerJoinContainer : public GuiContainer
         {
             glm::vec4 color; // rgba
             unsigned int id;
+			unsigned int inputId;
+			unsigned int shipId;
         };
 
         GuiPlayerJoinContainer();
@@ -33,6 +35,7 @@ class GuiPlayerJoinContainer : public GuiContainer
         void createWindows();
         void toggle(unsigned int id);
         void drop(unsigned int id);
+		void changeShip(unsigned int id);
 
         virtual void handleEventCurrent(const sf::Event& event) override;
 };

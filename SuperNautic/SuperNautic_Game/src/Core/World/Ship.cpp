@@ -62,6 +62,155 @@ Ship::Ship(glm::vec3 color)
 	_intensityOffset{ 1.0f, 1.0f, 20.0f },
 	_timeUntilIntensityUpdate{ 0.0f },
 	_overheatTemperature{ 0.95f },
+	_overheatCooldown{ 4.0f },
+	_warningLevel{ 0.8f },
+	_warningLightIntensity{ 2.0f },
+	_warningAccumulator{ 0.0f },
+	_engineBlinkAccumulator{ 0.0f },
+	_bounceVector{ 0.0f },
+	_bounceDecay{ 1.0f },
+	_inactiveAtStart{ 3.5f },
+	_jumping{ false }
+{
+	move(0, 0, 10);
+	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+
+	setInactiveTime(_inactiveAtStart);
+
+	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.start();
+
+	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
+	_leftChemtrailParticleSystem.start();
+	_rightChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
+	_rightChemtrailParticleSystem.start();
+}
+
+Ship::Ship(glm::vec3 color, int shipId)
+	:
+	_shipId{ shipId },
+	_destroyed{ false },
+	_stopped{ false },
+	_turningFactor{ 0.0f },
+	_currentTurningAngle{ 0.0f },
+	_accelerationFactor{ 0.5f },
+	_jumpCooldown{ .5f },
+	_currentJumpCooldown{ 0.0f },
+	_engineTemperature{ 0.0f },
+	_velocity{ 0.0f },
+	_timeSinceIntersection{ 0.0f },
+	_trackForward{ 0.0f, 0.0f, 1.0f },
+	_shipForward{ 0.0f, 0.0f, 1.0f },
+	_upDirection{ 0.0f, 1.0f, 0.0f },
+	_meshForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 800.0f, 20.0f, false },
+	_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 60.0f, 9.0f, true },
+	_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
+	_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
+	_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0, 1, 0 }, 5.0f, 100.0f },
+	_minAcceleration{ 0.0f },
+	_maxAcceleration{ 100.0f },
+	_maxTurningSpeed{ 20.0f },
+	_straighteningForce{ 3.0f },
+	_steerStraighteningForce{ 15.0f },
+	_speedResistance{ 0.001f },
+	_preferredHeight{ 1.5f },
+	_engineCooldown{ 0 },
+	_engineOverload{ 0 },
+	_engineFlashTime{ 0 },
+	_bEngineFlash{ false },
+	_bEngineOverload{ false },
+	_bObstacleCollision{ false },
+	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
+	_cooldownOnObstacleCollision{ 2.0f },
+	_immunityoOnObstacleCollision{ 4.0f },
+	_immunityTimer{ 0.0f },
+	_blinkFrequency{ 0.1f },
+	_surfaceSlope{ 0.0f, 0.0f, 0.5f },
+	_meshSpringValue{ 100.0f, 100.0f, 2.0f },
+	_rayHeight{ 5.0f },
+	_steeringCooldown{ 0.0f },
+	_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
+	_shipColor{ color },
+	_engineLight{ glm::vec3{ 0.0f }, _shipColor, 1.0f },
+	_warningLight{ glm::vec3{ 0.0f }, glm::vec3{ 1.0f }, 2.0f },
+	_intensityOffset{ 1.0f, 1.0f, 20.0f },
+	_timeUntilIntensityUpdate{ 0.0f },
+	_overheatTemperature{ 0.95f },
+	_overheatCooldown{ 4.0f },
+	_warningLevel{ 0.8f },
+	_warningLightIntensity{ 2.0f },
+	_warningAccumulator{ 0.0f },
+	_engineBlinkAccumulator{ 0.0f },
+	_bounceVector{ 0.0f },
+	_bounceDecay{ 1.0f },
+	_inactiveAtStart{ 3.5f },
+	_jumping{ false }
+{
+	move(0, 0, 10);
+
+	setShip();
+
+	setInactiveTime(_inactiveAtStart);
+
+	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.start();
+
+	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
+	_leftChemtrailParticleSystem.start();
+	_rightChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
+	_rightChemtrailParticleSystem.start();
+}
+
+Ship::Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float cooldownOnObstacleCollision, float overheatTemperature, float overhearCooldown)
+	:
+	_destroyed{ false },
+	_stopped{ false },
+	_turningFactor{ 0.0f },
+	_currentTurningAngle{ 0.0f },
+	_accelerationFactor{ 0.5f },
+	_jumpCooldown{ .5f },
+	_currentJumpCooldown{ 0.0f },
+	_engineTemperature{ 0.0f },
+	_velocity{ 0.0f },
+	_timeSinceIntersection{ 0.0f },
+	_trackForward{ 0.0f, 0.0f, 1.0f },
+	_shipForward{ 0.0f, 0.0f, 1.0f },
+	_upDirection{ 0.0f, 1.0f, 0.0f },
+	_meshForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 800.0f, 20.0f, false },
+	_meshUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 60.0f, 9.0f, true },
+	_cameraUpDirection{ glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, 20.0f, 10.0f, true },
+	_cameraForwardDirection{ glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, 100.0f, 10.0f, false },
+	_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0, 1, 0 }, 5.0f, 100.0f },
+	_minAcceleration{ 0.0f },
+	_maxAcceleration{ maxAcceleration },
+	_maxTurningSpeed{ maxTurningSpeed },
+	_straighteningForce{ 3.0f },
+	_steerStraighteningForce{ 15.0f },
+	_speedResistance{ 0.001f },
+	_preferredHeight{ 1.5f },
+	_engineCooldown{ 0 },
+	_engineOverload{ 0 },
+	_engineFlashTime{ 0 },
+	_bEngineFlash{ false },
+	_bEngineOverload{ false },
+	_bObstacleCollision{ false },
+	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
+	_cooldownOnObstacleCollision{ cooldownOnObstacleCollision },
+	_immunityoOnObstacleCollision{ 4.0f },
+	_immunityTimer{ 0.0f },
+	_blinkFrequency{ 0.1f },
+	_surfaceSlope{ 0.0f, 0.0f, 0.5f },
+	_meshSpringValue{ 100.0f, 100.0f, 2.0f },
+	_rayHeight{ 5.0f },
+	_steeringCooldown{ 0.0f },
+	_shipCollisionShake{ 80.0f, 2.0f, 28.0f, 1.0f, 1.0f, 0.2f },
+	_shipColor{ color },
+	_engineLight{ glm::vec3{ 0.0f }, _shipColor, 1.0f },
+	_warningLight{ glm::vec3{ 0.0f }, glm::vec3{ 1.0f }, 2.0f },
+	_intensityOffset{ 1.0f, 1.0f, 20.0f },
+	_timeUntilIntensityUpdate{ 0.0f },
+	_overheatTemperature{ overheatTemperature },
+	_overheatCooldown{ overhearCooldown },
 	_warningLevel{ 0.8f },
 	_warningLightIntensity{ 2.0f },
 	_warningAccumulator{ 0.0f },
@@ -235,6 +384,11 @@ void Ship::rotateAtStart(float down, float angle)
 	_cameraUpDirection.setVector(_upDirection);
 }
 
+float Ship::getOverheatTemperature()
+{
+	return _overheatTemperature;
+}
+
 void Ship::handleInputs(float dt)
 {
 	if (!_stopped)
@@ -313,14 +467,14 @@ void Ship::handleTemperature(float dt)
 	// Get difference between acceleration [0..1] and temperature [0..1]
 	float difference = (_accelerationFactor + 1.0f) / 2.0f - _engineTemperature;
 
-	difference += _currentSurfaceTemperature * 3.5f;
+	difference += _currentSurfaceTemperature * 2.0f;
 
 	_engineTemperature += (difference == 0.0f ? 1.0f : (std::fabs(difference) / difference)) *  powf(std::fabs(difference), 1.2f) * 0.2f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 
 	if (_engineTemperature > _overheatTemperature && _engineCooldown < 0.f)
 	{
-		_engineCooldown = 4.0f;
+		_engineCooldown = _overheatCooldown;
 		_bEngineOverload = true;
 	}
 
@@ -726,4 +880,53 @@ GFX::ParticleSystem& Ship::getRightParticleSystem()
 const BoundingBox& Ship::getBoundingBox() const
 {
 	return _boundingBox;
+}
+
+void Ship::setShip()
+{
+	switch (_shipId)
+	{
+	case 0:
+		_maxAcceleration = 100.f;
+		_maxTurningSpeed = 20.f;
+		_cooldownOnObstacleCollision = 2.f;
+		_overheatTemperature = .95f;
+		_overheatCooldown = 4.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship0.kmf"), MaterialCache::get("ship0.mat"));
+		break;
+	case 1:
+		_maxAcceleration = 120.f;
+		_maxTurningSpeed = 25.f;
+		_cooldownOnObstacleCollision = 4.f;
+		_immunityoOnObstacleCollision = 6.f;
+		_overheatTemperature = .90f;
+		_overheatCooldown = 6.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship1.kmf"), MaterialCache::get("ship1.mat"));
+		break;
+	case 2:
+		_maxAcceleration = 90.f;
+		_maxTurningSpeed = 15.f;
+		_cooldownOnObstacleCollision = 1.f;
+		_immunityoOnObstacleCollision = 3.f;
+		_overheatTemperature = .98f;
+		_overheatCooldown = 4.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship2.kmf"), MaterialCache::get("ship2.mat"));
+		break;
+	case 3:
+		_maxAcceleration = 100.f;
+		_maxTurningSpeed = 30.f;
+		_cooldownOnObstacleCollision = 2.f;
+		_overheatTemperature = .99f;
+		_overheatCooldown = 10.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship3.kmf"), MaterialCache::get("ship3.mat"));
+		break;
+	default:
+		_maxAcceleration = 100.f;
+		_maxTurningSpeed = 20.f;
+		_cooldownOnObstacleCollision = 2.f;
+		_overheatTemperature = .95f;
+		_overheatCooldown = 4.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship0.kmf"), MaterialCache::get("test.mat"));
+		break;
+	}
 }

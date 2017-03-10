@@ -27,6 +27,7 @@ public:
 	void setSpeed(float speed);
 	void setHeat(float heat);
 	void setPosition(int position);
+	void setOverheatTemperature(float overheatTemperature);
 	void setScreenSize(int width, int height, int offsetX, int offsetY);
 
 	void updateCurrent(float dtSeconds) override;
@@ -43,6 +44,7 @@ private:
 	float				_speed;
 	float				_heat;
 	int					_position;
+	float				_overheatTemperature;
 
 	Asset<sf::Font>		_font;
 

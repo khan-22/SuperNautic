@@ -132,8 +132,7 @@ void Input::update(float dt)
 		if (_bButtonL && _bLWasDormant)
 		{
 			event.type = sf::Event::KeyPressed;
-			// Micke wanted LB to send Z
-			event.key.code = sf::Keyboard::Z;
+			event.key.code = sf::Keyboard::L;
 			_events.push_back(event);
 			_bButtonL = true;
 			_bLWasDormant = false;
@@ -146,8 +145,7 @@ void Input::update(float dt)
 		if (_bButtonR && _bRWasDormant)
 		{
 			event.type = sf::Event::KeyPressed;
-			// Micke wanted RB to send X
-			event.key.code = sf::Keyboard::X;
+			event.key.code = sf::Keyboard::R;
 			_events.push_back(event);
 			_bButtonR = true;
 			_bRWasDormant = false;

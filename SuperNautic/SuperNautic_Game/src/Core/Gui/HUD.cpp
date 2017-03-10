@@ -17,6 +17,7 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_position(0),
 	_speedLine(sf::LineStrip, 150),
 	_overHeatTimer(0.f),
+	_overheatTemperature(0.95f),
 	_heatOverlayTexture(SFMLTextureCache::get("heatoverlay.png")),
 	_font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
 {
@@ -57,6 +58,11 @@ void HUD::setPosition(int position)
 {
 	_position = position;
 	_tPosition.setString(std::to_string(_position));
+}
+
+void HUD::setOverheatTemperature(float overheatTemperature)
+{
+	_overheatTemperature = overheatTemperature;
 }
 
 void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
@@ -116,7 +122,7 @@ void HUD::updateCurrent(float dtSeconds)
 //	_speeder.setFillColor(sf::Color(speederColor.r, speederColor.g, speederColor.b, _heat * 255.f));
 	_speeder.setFillColor(sf::Color(_MAX_SPEEDER_COLOR.r, _MAX_SPEEDER_COLOR.g, _MAX_SPEEDER_COLOR.b, colorModifier * 255.f));
 
-	if(_heat > 0.9f)
+	if(_heat > _overheatTemperature * 0.9f)
     {
         _overHeatTimer += dtSeconds;
 
@@ -134,9 +140,9 @@ void HUD::updateCurrent(float dtSeconds)
 
 	float trans = 0.f;
 
-	if (_heat > .8f)
+	if (_heat > _overheatTemperature * .8f)
 	{
-		trans = (_heat - 0.8) * 5 * 255;
+		trans = (_heat - _overheatTemperature * 0.8) * 5 * 255;
 	}
 
 	_heatOverlay.setFillColor(sf::Color(255, 255, 255, trans));

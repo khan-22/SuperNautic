@@ -4,7 +4,8 @@
 #include "Core/Gui/GuiPlayerJoin.hpp"
 
 GuiPlayerJoin::GuiPlayerJoin()
-: _id(-1)
+: _id(-1),
+_shipNumber(0)
 {
     leave();
 
@@ -64,6 +65,11 @@ unsigned int GuiPlayerJoin::getId() const
     return _id;
 }
 
+unsigned int GuiPlayerJoin::getShipId() const
+{
+	return _shipNumber;
+}
+
 void GuiPlayerJoin::assign(unsigned int playerId)
 {
     _bIsAssigned = true;
@@ -88,4 +94,11 @@ void GuiPlayerJoin::toggleJoin()
     {
         join();
     }
+}
+
+int GuiPlayerJoin::changeShip() 
+{
+	_shipNumber = (_shipNumber + 1) % 4;
+
+	return _shipNumber;
 }

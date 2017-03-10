@@ -53,6 +53,10 @@ void GuiPlayerJoinContainer::handleEventCurrent(const sf::Event& event)
             {
                 toggle(event.joystickButton.joystickId);
             }
+			if (event.joystickButton.button == 2)
+			{
+				changeShip(event.joystickButton.joystickId);
+			}
             break;
 
         case sf::Event::JoystickDisconnected:
@@ -104,6 +108,18 @@ void GuiPlayerJoinContainer::drop(unsigned int id)
     }
 }
 
+void GuiPlayerJoinContainer::changeShip(unsigned int id)
+{
+	for (auto& j : _windows)
+	{
+		if (j->bIsAssigned() && j->getId() == id)
+		{
+			j->changeShip();
+			return;
+		}
+	}
+}
+
 
 std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPlayers() const
 {
@@ -119,20 +135,11 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
             {
                 p.color[static_cast<glm::length_t>(k)] = _COLORS[i][k];
             }
-            p.id = j->getId();
+            p.id = i;
+            p.inputId = j->getId();
+			p.shipId = j->getShipId();
             players.push_back(p);
         }
-    }
-
-    if(players.empty())
-    {
-        Player p;
-        for(size_t k = 0; k < 4; k++)
-        {
-            p.color[static_cast<glm::length_t>(k)] = _COLORS[0][k];
-        }
-        p.id = 0;
-        players.push_back(p);
     }
 
     for(Player& p : players)

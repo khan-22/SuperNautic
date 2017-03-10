@@ -323,7 +323,7 @@ void GuiTrackGeneratorControls::handleEventCurrent(const sf::Event& event)
     {
         switch(event.key.code)
         {
-            case sf::Keyboard::Z:
+            case sf::Keyboard::L:
             {
                 sf::Event e;
                 e.type = sf::Event::KeyPressed;
@@ -332,7 +332,7 @@ void GuiTrackGeneratorControls::handleEventCurrent(const sf::Event& event)
                 break;
             }
 
-            case sf::Keyboard::X:
+            case sf::Keyboard::R:
             {
                 sf::Event e;
                 e.type = sf::Event::KeyPressed;

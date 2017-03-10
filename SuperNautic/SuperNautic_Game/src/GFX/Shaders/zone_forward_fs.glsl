@@ -2,12 +2,15 @@
 
 out vec4 outColor;
 
+uniform sampler2D uPattern;
 
 in GS_OUT
 {
-	vec3 color;
-	vec3 fragPos;
-	float camToFragDistance;
+	vec3	color;
+	float	strength;
+	vec3	fragPos;
+	float	camToFragDistance;
+	vec2	uv;
 } fs_in;
 
 uniform vec3 uViewPos;
@@ -22,5 +25,8 @@ vec4 fogify(vec4 inColor, float camToFragDistance, float fogDistance)
 
 void main()
 {
-	outColor = fogify(vec4(fs_in.color, 1.0), fs_in.camToFragDistance, uFogDistance);
+	vec3 color = fs_in.color * (texture(uPattern, fs_in.uv).r + fs_in.strength);
+	outColor = fogify(vec4(color, 1.0), fs_in.camToFragDistance, uFogDistance);
+
+	//outColor = texture(uPattern, fs_in.uv);
 }
