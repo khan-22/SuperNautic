@@ -233,6 +233,8 @@ void Ship::rotateAtStart(float down, float angle)
 	_meshUpDirection.setVector(_upDirection);
 	_meshPosition.setVector(getPosition());
 	_cameraUpDirection.setVector(_upDirection);
+
+	_particleSystem.setBirthSize(0.0f);	// Prevents particles appearing in a line from spawn position to position after this function
 }
 
 void Ship::handleInputs(float dt)
@@ -306,11 +308,6 @@ void Ship::handleCooldowns(float dt)
 	{
 		_immunityTimer -= dt;
 	}
-
-//	if (_inactiveTimer > 0.0f)
-//	{
-//		_inactiveTimer -= dt;
-//	}
 }
 
 void Ship::handleTemperature(float dt)
@@ -387,7 +384,6 @@ void Ship::updateDirectionsAndPositions(float dt)
 	// Update mesh position
 	_meshPosition.setTarget(getPosition());
 	_meshPosition.setAlternateAxis(_shipForward);
-	//_meshPosition.setSpringConstant(5.0f + 300.0f / powf(std::max(0.01f, glm::length((_meshPosition() - getPosition()) - glm::dot((_meshPosition() - getPosition()), _shipForward) * _shipForward)), 1.0f));
 	_meshPosition.setSpringConstant(_meshSpringValue());
 	_meshPosition.update(dt);
 
@@ -600,7 +596,7 @@ const glm::vec3 Ship::getCameraForward() const
 
 const glm::vec3 Ship::getCameraPosition() const
 {
-	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) +
+	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f) +
 		_cameraUpDirection() * (2.0f + _surfaceSlope() * 5.0f) +
 		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f));
 }
