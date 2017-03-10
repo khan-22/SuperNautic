@@ -59,7 +59,7 @@ private:
 	int getIndex() const;
 	int getInRow(const int index) const;
 	WaypointInfo findNextWaypointInfo(const WaypointInfo& current, unsigned int segmentIndex) const;
-	bool bInsertNormalSegment(const int index, bool testCollision);
+	bool bInsertNormalSegment(const int index);
 	void insertStructure(const int index);
 	void addWindowsAndZonesToSegment(const Segment* segment);
 	void deleteSegments(const float lengthToDelete);
