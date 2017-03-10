@@ -152,7 +152,7 @@ bool Track::bGenerate()
 	// Make the inital stretch straight
 	while (_generatedLength < 600.f)
 	{
-		bInsertNormalSegment(0, true);
+		bInsertNormalSegment(0);
 	}
 
 	// Create random path
@@ -170,7 +170,7 @@ bool Track::bGenerate()
 
 			for (unsigned int i = 0; i < inRow; i++)
 			{
-				if (!bInsertNormalSegment(index, true))
+				if (!bInsertNormalSegment(index))
 				{
 					deleteSegments(600.f);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
@@ -213,7 +213,7 @@ bool Track::bGenerate()
 			if (bEndTrack())
 			{
 				// End segment
-				if (bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, true))
+				if (bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1))
 				{
 					if (_difficulty > 0.05f)
 					{
@@ -461,18 +461,15 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned int& segme
 }
 
 // Inserts a segment with given index at the end of the track
-bool Track::bInsertNormalSegment(const int index, const bool bTestCollision)
+bool Track::bInsertNormalSegment(const int index)
 {
 	const Segment * segment = _segmentHandler->loadSegment(index);
 	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix);
 	// Check collision
-	if (bTestCollision)
+	if (!bInsertIntoOctree(tempInstance))
 	{
-		if (!bInsertIntoOctree(tempInstance))
-		{
-			delete tempInstance;
-			return false;
-		}
+		delete tempInstance;
+		return false;
 	}
 	addWindowsAndZonesToSegment(segment);
 	// Set up model matrix
@@ -680,7 +677,7 @@ bool Track::bEndTrack()
 			const Segment * test = _segmentHandler->loadSegment(i);
 			if (test->getStart() == _endConnection && test->getEnd() == 'a')
 			{
-				if (!bInsertNormalSegment(i, true))
+				if (!bInsertNormalSegment(i))
 				{
 					deleteSegments(_endMargin + 500);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
@@ -692,7 +689,7 @@ bool Track::bEndTrack()
 	// Insert straight track
 	while (_generatedLength < _targetLength)
 	{
-		if (!bInsertNormalSegment(0, true))
+		if (!bInsertNormalSegment(0))
 		{
 			deleteSegments(_endMargin + 500);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
