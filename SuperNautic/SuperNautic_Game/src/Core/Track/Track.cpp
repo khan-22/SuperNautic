@@ -251,7 +251,6 @@ bool Track::bGenerate()
 
 	_lengthAfterLastCall = _generatedLength;
 	_totalProgress = _generatedLength / _targetLength;
-	LOG(_totalProgress);
 	return false;
 }
 
@@ -616,31 +615,26 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 		unsigned int nrOfActive = 0;
 		while (nrOfActive < 2)
 		{
-			int r = rand() % 8;
-			if (r == 0)
+			int index = rand() % 4;
+			if (temperatures[index] < -2.f)
 			{
-				temperatures.push_back((float)rand() / RAND_MAX - 1.f);
-			}
-			else if (r <= 2)
-			{
-				temperatures.push_back((float)rand() / RAND_MAX);
-			}
-			else
-			{
-				temperatures.push_back(-5.f);
-			}
-			nrOfActive++;
-		}
-		// Makes sure to only add something to render if at least one part of the zone is active
-		unsigned int count = 0;
-		for (unsigned int i = 0; i < 4; i++)
-		{
-			if (temperatures[i] > -2.f)
-			{
-				++count;
+				int r = rand() % 8;
+				if (r == 0)
+				{
+					temperatures[index] = (float)rand() / RAND_MAX - 1.f;
+				}
+				else if (r <= 2)
+				{
+					temperatures[index] = (float)rand() / RAND_MAX;
+				}
+				else
+				{
+					temperatures[index] = -5.f;
+				}
+				nrOfActive++;
 			}
 		}
-		if (count != 0)
+		if (nrOfActive >= 1)
 		{
 			_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures });
 		}
@@ -810,7 +804,6 @@ void Track::placeDarkAreas()
 	{
 		_darkAreas.erase(_darkAreas.end() - 1);
 	}
-	LOG(_darkAreas.size());
 }
 
 size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLength) const
@@ -867,7 +860,7 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 				{
 					if (temps[j] > -0.99f)
 					{
-						temps[j] -= 0.1f * dt;
+						temps[j] -= 0.17f * dt;
 					}
 				}
 
