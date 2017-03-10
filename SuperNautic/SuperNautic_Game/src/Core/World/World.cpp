@@ -224,7 +224,7 @@ void World::update(float dt, sf::Window& window)
 				}
 			}
 
-			if (((instances[1] == _track->getInstance(_track->getNrOfSegments() - 2)) && (lengthInSegment > 200.0f)) || instances[1] == _track->getInstance(_track->getNrOfSegments() - 1))
+			if (((instances[1] == _track->getInstance(_track->getNrOfSegments() - 1)) && (lengthInSegment > 330.0f)))// || instances[1] == _track->getInstance(_track->getNrOfSegments() - 1))
 			{
 				if (!_players[i].getShip().getStopped())
 				{

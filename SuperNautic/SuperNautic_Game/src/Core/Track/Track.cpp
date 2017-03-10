@@ -213,8 +213,7 @@ bool Track::bGenerate()
 			if (bEndTrack())
 			{
 				// End segment
-				if (bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, true)
-					&& bInsertNormalSegment(0, false))
+				if (bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, true))
 				{
 					if (_difficulty > 0.05f)
 					{
@@ -706,7 +705,7 @@ bool Track::bEndTrack()
 // Places obstacles in the finished track
 void Track::placeObstacles()
 {
-	const float endLength = 500.f;
+	const float endLength = 900.f;
 	float currentLength = 300;
 	float lastFullSegmentLength = 0.f;
 	size_t index = findTrackIndex(currentLength, lastFullSegmentLength);
@@ -794,10 +793,10 @@ void Track::placeDarkAreas()
 	int index = rand() % 300 + 20;
 	while (index < _track.size() - 10)
 	{
-		unsigned int length = (unsigned int)(rand() % (int(20 * _difficulty) + 8) + 6 + rand() % (int(10 * _difficulty) + 1));
+		unsigned int length = (unsigned int)(rand() % (int(20 * _difficulty) + 8) + 6 + 10 * _difficulty);
 		_darkAreas.push_back({ (unsigned int)index, length, 0.f });
 		index += length;
-		index += (unsigned int)(rand() % (int(200 * (1.f - _difficulty)) + 70) + 100 + rand() % (int(100 * (1.f - _difficulty)) + 1));
+		index += (unsigned int)(rand() % (int(400 * (1.f - _difficulty)) + 70) + 100 + 100 * (1.f - _difficulty));
 	}
 	// Removes the last area if it is too long
 	if (_darkAreas.size() >= 1 && _darkAreas.back().startIndex + _darkAreas.back().length > _track.size() - 10)
@@ -901,7 +900,7 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 		if (dapi.startIndex == -1)
 		{
 			// Update darkness factor for the player
-			dapi.factor -= 1.0f * dt;
+			dapi.factor -= 0.7f * dt;
 			if (dapi.factor < 0.f)
 			{
 				dapi.factor = 0.f;
@@ -920,10 +919,10 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 		else
 		{
 			// Update values if inside area
-			dapi.factor += 1.0f * dt;
-			if (dapi.factor > 0.96f)
+			dapi.factor += 0.7f * dt;
+			if (dapi.factor > 0.93f)
 			{
-				dapi.factor = 0.96f;
+				dapi.factor = 0.93f;
 			}
 			if (playerIndexes[i] > dapi.startIndex + dapi.length)
 			{
