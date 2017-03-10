@@ -33,7 +33,8 @@ namespace GFX
 
 	private:
 		std::vector<TemperatureZone*> _drawCalls;
-		ShaderAsset	_shader;
+		ShaderAsset		_shader;
+		TextureAsset	_texturePattern;
 
 		Framebuffer* _resultFramebuffer;
 

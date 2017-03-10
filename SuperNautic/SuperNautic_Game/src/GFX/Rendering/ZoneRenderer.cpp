@@ -20,9 +20,9 @@ void ZoneRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, GL
 
 	_shader = ShaderCache::get("zone_forward");
 	_shader.get()->bind();
-    _shader.get()->setSampler("uDiffuse", 0);
-    _shader.get()->setSampler("uSpecular", 1);
-    _shader.get()->setSampler("uNormal", 2);
+	_shader.get()->setSampler("uPattern", 0);
+
+	_texturePattern = TextureCache::get("zone_texture.png");
 
 	_window = window;
 	_x		= x;
@@ -56,9 +56,15 @@ void ZoneRenderer::display(Camera& camera)
 
 	glViewport(_actualX, _actualY, _actualWidth, _actualHeight);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
 	_shader.get()->bind();
 	_shader.get()->setUniform("uViewPos", camera.getPosition());
 	_shader.get()->setUniform("uFogDistance", _fogDistance);
+
+	_texturePattern.get()->bind(0);
+
 	for (auto drawCall : _drawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _shader.get()};
@@ -68,6 +74,10 @@ void ZoneRenderer::display(Camera& camera)
 		drawCall->model.get()->setModelMatrix(drawCall->modelMatrix);
 		drawCall->model.get()->render(states);
 	}
+
+	_texturePattern.get()->unbind(0);
+
+	glDisable(GL_BLEND);
 
 	_drawCalls.clear();
 }
