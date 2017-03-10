@@ -150,8 +150,6 @@ Ship::Ship(glm::vec3 color, int shipId)
 
 	setShip();
 
-	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
-
 	setInactiveTime(_inactiveAtStart);
 
 	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
@@ -386,6 +384,11 @@ void Ship::rotateAtStart(float down, float angle)
 	_cameraUpDirection.setVector(_upDirection);
 }
 
+float Ship::getOverheatTemperature()
+{
+	return _overheatTemperature;
+}
+
 void Ship::handleInputs(float dt)
 {
 	if (!_stopped)
@@ -469,7 +472,7 @@ void Ship::handleTemperature(float dt)
 	// Get difference between acceleration [0..1] and temperature [0..1]
 	float difference = (_accelerationFactor + 1.0f) / 2.0f - _engineTemperature;
 
-	difference += _currentSurfaceTemperature * 3.5f;
+	difference += _currentSurfaceTemperature * 2.0f;
 
 	_engineTemperature += (difference == 0.0f ? 1.0f : (std::fabs(difference) / difference)) *  powf(std::fabs(difference), 1.2f) * 0.2f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
@@ -879,7 +882,7 @@ void Ship::setShip()
 		_cooldownOnObstacleCollision = 2.f;
 		_overheatTemperature = .95f;
 		_overheatCooldown = 4.f;
-		_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship0.kmf"), MaterialCache::get("test.mat"));
 		break;
 	case 1:
 		_maxAcceleration = 120.f;
@@ -888,24 +891,24 @@ void Ship::setShip()
 		_immunityoOnObstacleCollision = 6.f;
 		_overheatTemperature = .90f;
 		_overheatCooldown = 6.f;
-		_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship1.kmf"), MaterialCache::get("ship1.mat"));
 		break;
 	case 2:
-		_maxAcceleration = 100.f;
-		_maxTurningSpeed = 22.f;
-		_cooldownOnObstacleCollision = 2.f;
-		_overheatTemperature = .99f;
-		_overheatCooldown = 10.f;
-		_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
-		break;
-	case 3:
 		_maxAcceleration = 90.f;
 		_maxTurningSpeed = 20.f;
 		_cooldownOnObstacleCollision = 1.f;
 		_immunityoOnObstacleCollision = 3.f;
 		_overheatTemperature = .98f;
 		_overheatCooldown = 4.f;
-		_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship2.kmf"), MaterialCache::get("test.mat"));
+		break;
+	case 3:
+		_maxAcceleration = 100.f;
+		_maxTurningSpeed = 22.f;
+		_cooldownOnObstacleCollision = 2.f;
+		_overheatTemperature = .99f;
+		_overheatCooldown = 10.f;
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship3.kmf"), MaterialCache::get("test.mat"));
 		break;
 	default:
 		_maxAcceleration = 100.f;
@@ -913,7 +916,7 @@ void Ship::setShip()
 		_cooldownOnObstacleCollision = 2.f;
 		_overheatTemperature = .95f;
 		_overheatCooldown = 4.f;
-		_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
+		_shipModel = GFX::TexturedModel(ModelCache::get("ship0.kmf"), MaterialCache::get("test.mat"));
 		break;
 	}
 }

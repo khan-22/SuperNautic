@@ -30,6 +30,7 @@ Player::Player(int id, glm::vec3 color, int shipId) :
 	_cameraCollisionDirectionShake(35.0f, 0.2f, 24.0f, 0.16f, 1.0f, 0.2f)
 {
 	_bIsFirstPerson = false;
+	_hud.setOverheatTemperature(_ship.getOverheatTemperature());
 }
 
 Player::Player(int id, glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float cooldownOnObstacleCollision, float overheatTemperature, float overheatCooldown) :

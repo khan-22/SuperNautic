@@ -84,6 +84,8 @@ public:
 	// Used to position ship at start of race
 	void rotateAtStart(float down, float angle);
 
+	float getOverheatTemperature();
+
 private:
 	int			_shipId;
 	bool		_destroyed;
