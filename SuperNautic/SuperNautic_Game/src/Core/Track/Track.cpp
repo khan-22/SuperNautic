@@ -284,7 +284,7 @@ int Track::getIndex() const
 		if (infos[i]._startConnection == _endConnection
 			&& infos[i].getProbability(_curviness) != 0)
 		{
-			if (_segmentHandler->getNrOfSegmentsOfType(_endConnection, _difficulty) > 2)
+			if (_segmentHandler->getNrOfSegmentsOfType(_endConnection, _curviness) > 2)
 			{
 				if ((infos[i]._endConnection != _endConnection && _lengthWithCurrentConnectionType >= 600.f)
 					|| infos[i]._endConnection == _endConnection
