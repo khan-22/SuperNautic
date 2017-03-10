@@ -4,6 +4,7 @@
 #define PRE_GAME_APPLICATION_STATE_HPP
 
 #include "SFML/Graphics/Font.hpp"
+#include <SFML/Graphics/RectangleShape.hpp>
 
 #include "Core/ApplicationState/ApplicationState.hpp"
 #include "Core/Asset/Asset.hpp"
@@ -37,6 +38,7 @@ private:
     GuiPlayerJoinContainer* _players;
     GuiText            _title;
     std::array<GuiTexture, 4> _shipImages;
+	std::array<sf::RectangleShape, 4> _shipBackground;
     std::array<int, 4> _shipIds;
 
     Input _input;

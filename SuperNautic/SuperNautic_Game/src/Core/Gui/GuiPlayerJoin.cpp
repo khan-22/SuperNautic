@@ -70,6 +70,11 @@ unsigned int GuiPlayerJoin::getShipId() const
 	return _shipNumber;
 }
 
+glm::vec4 GuiPlayerJoin::getColor() const
+{
+	return glm::vec4(_color.r, _color.g, _color.b, 255);
+}
+
 void GuiPlayerJoin::assign(unsigned int playerId)
 {
     _bIsAssigned = true;

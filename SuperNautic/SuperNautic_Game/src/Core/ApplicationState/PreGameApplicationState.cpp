@@ -111,16 +111,18 @@ void PreGameApplicationState::render()
     static Camera garbageCam(glm::radians(90.f), 1280, 720);
     _forwardRenderer.display(garbageCam);
 
+	_sfmlRenderer.render(_guiContainer);
+
 	for (size_t i = 0; i < _shipIds.size(); i++)
 	{
 		if (_shipIds[i] != -1)
 		{
 			assert(i < _shipImages.size());
+			_sfmlRenderer.render(_shipBackground[i]);
 			_sfmlRenderer.render(_shipImages[i]);
 		}
 	}
 
-    _sfmlRenderer.render(_guiContainer);
     _sfmlRenderer.render(_toolTip);
     _sfmlRenderer.render(_title);
     _sfmlRenderer.display(_context.window);
@@ -171,8 +173,8 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
 
             sf::Vector2u windowSize = _context.window.getSize();
             sf::FloatRect bounds = img.getBoundingRect();
-            float clipX = std::max(bounds.width - windowSize.x / 2.f, 0.f);
-            float clipY = std::max(bounds.height - windowSize.y / 2.f, 0.f);
+            float clipX = std::max(bounds.width - (windowSize.x * 0.8f) / 2.f, 0.f);
+            float clipY = std::max(bounds.height - (windowSize.y * 0.8f) / 2.f, 0.f);
 
 
 
@@ -190,6 +192,11 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
             float x = (p.id % 2) * (windowSize.x / 2.f) + windowSize.x / 4.f;
             float y = (p.id / 2) * (windowSize.y / 2.f) + windowSize.y / 4.f;
             img.setPosition(sf::Vector2f(x, y));
+
+			_shipBackground[p.id].setSize(sf::Vector2f(bounds.width, bounds.height));
+			_shipBackground[p.id].setOrigin(sf::Vector2f(bounds.width / 2, bounds.height / 2));
+			_shipBackground[p.id].setPosition(sf::Vector2f(x, y));
+			_shipBackground[p.id].setFillColor(sf::Color(255, 255, 255, 200));
 
             _shipIds[p.id] = p.shipId;
         }

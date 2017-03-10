@@ -7,6 +7,7 @@
 
 #include "SFML/Graphics/Text.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
+#include <glm/vec4.hpp>
 
 #include "Core/Gui/GuiElement.hpp"
 #include "Core/Io/Input.hpp"
@@ -26,6 +27,7 @@ class GuiPlayerJoin : public GuiElement
 
         unsigned int getId() const;
 		unsigned int getShipId() const;
+		glm::vec4 getColor() const;
 
         void assign(unsigned int playerId);
         void unassign();

@@ -138,6 +138,7 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
             p.id = i;
             p.inputId = j->getId();
 			p.shipId = j->getShipId();
+			//p.color = j->getColor();
             players.push_back(p);
         }
     }
