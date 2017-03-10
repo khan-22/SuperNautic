@@ -19,7 +19,7 @@ uniform float uFogDistance;
 
 vec4 fogify(vec4 inColor, float camToFragDistance, float fogDistance)
 {
-	float fragDist = clamp(camToFragDistance / fogDistance, 0.0, 1.0);
+	float fragDist = clamp(camToFragDistance / fogDistance, 0.0, 0.8);
 	return mix(inColor, vec4(0.0, 0.0, 0.0, 1.0), fragDist);
 }
 
