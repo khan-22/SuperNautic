@@ -223,7 +223,7 @@ void World::update(float dt, sf::Window& window)
 				}
 			}
 
-			if (instances[1] == _track->getInstance(_track->getNrOfSegments() - 1))
+			if (instances[1] == _track->getInstance(_track->getNrOfSegments() - 2))
 			{
 				if (!_players[i].getShip().getStopped())
 				{
