@@ -239,7 +239,7 @@ void Ship::render(GFX::RenderStates& states)
 	// Update model's matrix
 	_shipModel.getModelAsset().get()->setModelMatrix(_transformMatrix);
 
-	// Achieves blinking effecet
+	// Achieves blinking effect
 	if (static_cast<int>(_immunityTimer / _blinkFrequency) % 2 == 0)
 	{
 		_shipModel.render(states);
@@ -460,11 +460,6 @@ void Ship::handleCooldowns(float dt)
 	{
 		_immunityTimer -= dt;
 	}
-
-//	if (_inactiveTimer > 0.0f)
-//	{
-//		_inactiveTimer -= dt;
-//	}
 }
 
 void Ship::handleTemperature(float dt)
@@ -528,7 +523,8 @@ void Ship::updateDirectionsAndPositions(float dt)
 	// Move forward
 	glm::vec3 velocityDirection = glm::rotate(_currentTurningAngle, _upDirection) * glm::vec4{ _shipForward, 0.0f };
 	glm::vec3 visualTurningDirection = glm::rotate(_currentTurningAngle * 0.5f, _upDirection) * glm::vec4{ _shipForward, 0.0f };
-	move(velocityDirection * _velocity * dt);
+	move((velocityDirection * _velocity - glm::dot(_shipForward, velocityDirection * _velocity) * _shipForward) * dt);	// Move right/left
+	move(_shipForward * _velocity * dt);		// Move forward
 
 	if (_jumping && glm::dot((_meshPosition() - getPosition()), _upDirection) < _velocity * 0.12f)
 	{
@@ -541,7 +537,6 @@ void Ship::updateDirectionsAndPositions(float dt)
 	// Update mesh position
 	_meshPosition.setTarget(getPosition());
 	_meshPosition.setAlternateAxis(_shipForward);
-	//_meshPosition.setSpringConstant(5.0f + 300.0f / powf(std::max(0.01f, glm::length((_meshPosition() - getPosition()) - glm::dot((_meshPosition() - getPosition()), _shipForward) * _shipForward)), 1.0f));
 	_meshPosition.setSpringConstant(_meshSpringValue());
 	_meshPosition.update(dt);
 
@@ -588,7 +583,14 @@ void Ship::trackSurface(float dt)
 		_timeSinceIntersection = 0.0f;
 
 		// Set current surface
-		_currentSurfaceTemperature = atShipIntersection._surface;
+		if (atShipIntersection._length - _rayHeight < _preferredHeight + 0.5f)
+		{
+			_currentSurfaceTemperature = atShipIntersection._surface;
+		}
+		else
+		{
+			_currentSurfaceTemperature = 0.0f;
+		}
 
 		// Update local directions
 		_upDirection = atShipIntersection._normal;
@@ -647,7 +649,15 @@ void Ship::handleLightsAndParticles(float dt)
 	// Engine particles
 	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
 	_particleSystem.setDeathColor(glm::vec3{ 0.0f });
-	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+
+	if (_inactiveTimer > 2.0f)
+	{
+		_particleSystem.setBirthSize(0.0f);
+	}
+	else
+	{
+		_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+	}
 
 	if (sinf(_engineBlinkAccumulator) > 0.0f && (dangerLevel > 0.0f || _engineCooldown > 0.0f))
 	{
@@ -749,12 +759,12 @@ glm::vec3 Ship::getCameraUp()
 const glm::vec3 Ship::getCameraForward() const
 {
 	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope() -
-		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * glm::cross(_cameraUpDirection(), _cameraForwardDirection()) * 6.0f);
+		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * glm::cross(_cameraUpDirection(), _cameraForwardDirection()) * 2.0f);
 }
 
 const glm::vec3 Ship::getCameraPosition() const
 {
-	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) +
+	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f) +
 		_cameraUpDirection() * (2.0f + _surfaceSlope() * 5.0f) +
 		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f));
 }

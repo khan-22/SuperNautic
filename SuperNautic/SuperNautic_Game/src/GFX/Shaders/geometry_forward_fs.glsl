@@ -11,6 +11,8 @@ in GS_OUT
 	vec2 uv;
 	vec3 normal;
 	float camToFragDistance;
+	vec3 tangent;
+	vec3 bitangent;
 } fs_in;
 
 uniform vec3 uViewPos;
@@ -46,10 +48,15 @@ void main()
 
 	vec3 viewDir = normalize(uViewPos - fs_in.fragPos);
 
+	
+	mat3 fromFaceToWorldSpace = mat3(fs_in.tangent, fs_in.bitangent, fs_in.normal);
+	vec3 normal = texture(uNormal, fs_in.uv).xyz * 2.f - 1.f;
+	normal = normalize(fromFaceToWorldSpace * normal);
+	
 	vec4 lightingResult = vec4(0, 0, 0, 1);
 	for(int i = 0; i < NUM_LIGHTS; i++)
 	{
-		lightingResult.rgb += calculatePointLight(i, fs_in.fragPos, diffuse, fs_in.normal, viewDir);
+		lightingResult.rgb += calculatePointLight(i, fs_in.fragPos, diffuse, normal, viewDir);
 	}
 
 	outColor = mix(lightingResult, vec4(diffuse, 1.0), illumination);

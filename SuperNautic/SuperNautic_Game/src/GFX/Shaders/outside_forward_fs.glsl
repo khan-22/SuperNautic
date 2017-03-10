@@ -27,6 +27,11 @@ void main()
 	vec4 normal		  = texture(uNormal, fs_in.uv);
 	vec4 illumination = texture(uIllumination, fs_in.uv);
 	
+	if (diffuse.a < 0.9)
+	{
+		discard;
+	}
+
 	float factor = dot(lightDir, -fs_in.normal);
 
 	vec4 shadedColor = mix(diffuse * vec4(0.2, 0.5, 0.6, 1.0), diffuse * vec4(0.06, 0.07, 0.1, 1.0), factor);
