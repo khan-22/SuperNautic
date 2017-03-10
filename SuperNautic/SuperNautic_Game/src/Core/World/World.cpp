@@ -248,8 +248,8 @@ void World::update(float dt, sf::Window& window)
 				{
 					if (!bAlmostEqual(_players[i].getShip().getBoundingBox().center - _players[j].getShip().getBoundingBox().center, glm::vec3{ 0.0f }))
 					{
-						_players[i].getShip().setBounce(glm::normalize(_players[i].getShip().getBoundingBox().center - _players[j].getShip().getBoundingBox().center) * 2.0f);
-						_players[j].getShip().setBounce(glm::normalize(_players[j].getShip().getBoundingBox().center - _players[i].getShip().getBoundingBox().center) * 2.0f);
+						_players[i].getShip().setBounce(glm::normalize(_players[i].getShip().getBoundingBox().center - _players[j].getShip().getBoundingBox().center) * 0.7f);
+						_players[j].getShip().setBounce(glm::normalize(_players[j].getShip().getBoundingBox().center - _players[i].getShip().getBoundingBox().center) * 0.7f);
 						// Play sound
 						_players[i].shipCollision();
 					}
