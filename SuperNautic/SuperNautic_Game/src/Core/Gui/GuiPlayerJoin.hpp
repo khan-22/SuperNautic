@@ -45,7 +45,6 @@ class GuiPlayerJoin : public GuiElement
         bool _bHasJoined = false;
         bool _bIsAssigned = false;
         sf::RectangleShape _window;
-		sf::RectangleShape _ship;
 
 		unsigned int _shipNumber;
 

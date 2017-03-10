@@ -37,7 +37,7 @@ private:
     GuiPlayerJoinContainer* _players;
     GuiText            _title;
     std::array<GuiTexture, 4> _shipImages;
-    std::array<unsigned int, 4> _shipIds;
+    std::array<int, 4> _shipIds;
 
     Input _input;
 

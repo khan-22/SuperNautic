@@ -98,27 +98,27 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f, &GFX::Framebuffer::DEFAULT);
 
-    _shipIds = {-1U, -1U, -1U, -1U};
+    _shipIds = {-1, -1, -1, -1};
 }
 
 void PreGameApplicationState::render()
 {
     _sfmlRenderer.render(*_context.menuBackground);
 
-    for(size_t i = 0; i < _shipIds.size(); i++)
-    {
-        if(_shipIds[i] != -1U)
-        {
-            assert(i < _shipImages.size());
-            _sfmlRenderer.render(_shipImages[i]);
-        }
-    }
-
     _sfmlRenderer.display(_context.window);
 
     _forwardRenderer.render(_trackGenerator);
     static Camera garbageCam(glm::radians(90.f), 1280, 720);
     _forwardRenderer.display(garbageCam);
+
+	for (size_t i = 0; i < _shipIds.size(); i++)
+	{
+		if (_shipIds[i] != -1)
+		{
+			assert(i < _shipImages.size());
+			_sfmlRenderer.render(_shipImages[i]);
+		}
+	}
 
     _sfmlRenderer.render(_guiContainer);
     _sfmlRenderer.render(_toolTip);
@@ -167,7 +167,7 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
         {
             assert(p.id < _shipImages.size());
             GuiTexture& img = _shipImages[p.id];
-            img.setTexture("ship2selection.png");
+            img.setTexture("ship" + std::to_string(p.shipId) + ".png");
 
             sf::Vector2u windowSize = _context.window.getSize();
             sf::FloatRect bounds = img.getBoundingRect();
@@ -203,7 +203,7 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
         });
         if(foundIt == joinedPlayers.end())
         {
-            _shipIds[i] = -1U;
+            _shipIds[i] = -1;
         }
     }
 
