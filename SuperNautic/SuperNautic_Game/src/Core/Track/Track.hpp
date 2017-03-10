@@ -59,7 +59,7 @@ private:
 	int getIndex() const;
 	int getInRow(const int index) const;
 	WaypointInfo findNextWaypointInfo(const WaypointInfo& current, unsigned int segmentIndex) const;
-	bool bInsertNormalSegment(const int index);
+	bool bInsertNormalSegment(const int index, const bool bTestCollision);
 	void insertStructure(const int index);
 	void addWindowsAndZonesToSegment(const Segment* segment);
 	void deleteSegments(const float lengthToDelete);
@@ -100,6 +100,7 @@ private:
 	char									_endConnection;
 	int										_prevIndex;
 	const Segment *							_lastSegment;
+	float									_deletionLength;
 	float									_lengthWithCurrentConnectionType;
 	std::unique_ptr<Octree<SegmentInstance*>> _octree;
 	std::vector<DarkArea>					_darkAreas;

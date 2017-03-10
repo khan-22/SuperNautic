@@ -134,7 +134,7 @@ void Track::startNewTrack()
 	_segmentWindows.clear();
 	_temperatureZones.clear();
 
-	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength * 1.1f + 1000.f, 2000.f, 5));
+	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength * 1.2f + 10000.f, 2000.f, 5));
 
 	_darkAreas.clear();
 	_darkAreaPlayerValues.clear();
@@ -152,10 +152,9 @@ bool Track::bGenerate()
 	// Make the inital stretch straight
 	while (_generatedLength < 600.f)
 	{
-		bInsertNormalSegment(0);
+		bInsertNormalSegment(0, true);
 	}
 
-	float failedRecently = 0.f;
 	// Create random path
 	while (_generatedLength - _lengthAfterLastCall < _progressionLength)
 	{
@@ -171,25 +170,20 @@ bool Track::bGenerate()
 
 			for (unsigned int i = 0; i < inRow; i++)
 			{
-				if (!bInsertNormalSegment(index))
+				if (!bInsertNormalSegment(index, true))
 				{
-					if (failedRecently > 0.1f)
-					{
-						failedRecently += 400.f;
-					}
-					failedRecently += 500.f;
-					deleteSegments(failedRecently);
+					deleteSegments(600.f);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					break;
 				}
 				else
 				{
-					if (failedRecently > 0.1f)
+					if (_deletionLength > 0.1f)
 					{
-						failedRecently -= _lastSegment->getLength();
-						if (failedRecently < 0.f)
+						_deletionLength -= _lastSegment->getLength();
+						if (_deletionLength < 0.f)
 						{
-							failedRecently = 0.f;
+							_deletionLength = 0.f;
 						}
 					}
 				}
@@ -224,15 +218,20 @@ bool Track::bGenerate()
 				}
 				placeDarkAreas();
 				// End segment
-				bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1);
-				bInsertNormalSegment(0);
-
-				LOG("Track generated. Length: ", _generatedLength);
-				return true;
+				if (bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, true)
+					&& bInsertNormalSegment(0, false))
+				{
+					LOG("Track generated. Length: ", _generatedLength);
+					return true;
+				}
+				else
+				{
+					deleteSegments(1000.f);
+					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
+				}
 			}
 			else
 			{
-				failedRecently += 400.f;
 				_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 				char newConnection = _track.back()->getParent()->getEnd();
 				if (newConnection != _endConnection)
@@ -463,16 +462,19 @@ glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned int& segme
 }
 
 // Inserts a segment with given index at the end of the track
-bool Track::bInsertNormalSegment(const int index)
+bool Track::bInsertNormalSegment(const int index, const bool bTestCollision)
 {
 	const Segment * segment = _segmentHandler->loadSegment(index);
-	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+	SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix);
 	// Check collision
-	if(!bInsertIntoOctree(tempInstance))
-    {
-        delete tempInstance;
-        return false;
-    }
+	if (bTestCollision)
+	{
+		if (!bInsertIntoOctree(tempInstance))
+		{
+			delete tempInstance;
+			return false;
+		}
+	}
 	addWindowsAndZonesToSegment(segment);
 	// Set up model matrix
 	glm::mat4 modelEndMat = segment->getEndMatrix();
@@ -563,12 +565,13 @@ void Track::insertStructure(const int index)
 		{
 			const SegmentHandler::StructurePiece * p = sugMig->pieces[j];
 			const Segment * segment = _segmentHandler->loadSegment(p->index);
-			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix, true);
+			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix);
 
             if(!bInsertIntoOctree(tempInstance))
             {
                 delete tempInstance;
                 deleteSegments(_generatedLength - startLength + 300.f);
+				_deletionLength = 0.f;
                 _endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
                 return;
             }
@@ -644,8 +647,10 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 // Deletes a certain length of the track (from the end)
 void Track::deleteSegments(const float lengthToDelete)
 {
+	LOG("RUN");
+	_deletionLength += lengthToDelete;
 	float deletedLength = 0.f;
-	while (deletedLength <= lengthToDelete && _generatedLength > 500.f)
+	while (deletedLength <= _deletionLength && _generatedLength > 500.f)
 	{
 		float segmentLength = _track.back()->getLength();
 		deletedLength += segmentLength;
@@ -680,7 +685,7 @@ bool Track::bEndTrack()
 			const Segment * test = _segmentHandler->loadSegment(i);
 			if (test->getStart() == _endConnection && test->getEnd() == 'a')
 			{
-				if (!bInsertNormalSegment(i))
+				if (!bInsertNormalSegment(i, true))
 				{
 					deleteSegments(_endMargin + 500);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
@@ -692,7 +697,7 @@ bool Track::bEndTrack()
 	// Insert straight track
 	while (_generatedLength < _targetLength)
 	{
-		if (!bInsertNormalSegment(0))
+		if (!bInsertNormalSegment(0, true))
 		{
 			deleteSegments(_endMargin + 500);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
@@ -801,7 +806,7 @@ void Track::placeDarkAreas()
 	// Removes the last area if it is too long
 	if (_darkAreas.size() >= 1 && _darkAreas.back().startIndex + _darkAreas.back().length > _track.size() - 10)
 	{
-		_darkAreas.erase(_darkAreas.end());
+		_darkAreas.erase(_darkAreas.end() - 1);
 	}
 }
 

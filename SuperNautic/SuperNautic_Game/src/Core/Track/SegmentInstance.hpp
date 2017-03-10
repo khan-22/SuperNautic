@@ -15,7 +15,7 @@
 class SegmentInstance : public GFX::Renderable3D
 {
 public:
-	SegmentInstance(const Segment * segment, glm::mat4 modelMatrix, const bool lighting);
+	SegmentInstance(const Segment * segment, glm::mat4 modelMatrix);
 	virtual ~SegmentInstance();
 	glm::mat4 getEndMatrix() const;
 	glm::mat4 getModelMatrix() const;
@@ -47,7 +47,6 @@ private:
 	glm::mat4						_model;
 	std::vector<BoundingBox>		_globalBoundingBoxes;
 	std::vector<Sphere>				_globalBoundingSpheres;
-	bool							_bHasLighting;
 	std::vector<ObstacleInstance>	_obstacles;
 
 	// temperatures[i] contains temperature of zone i
