@@ -1,4 +1,5 @@
 #include "Core/Io/Log.hpp"
+#include "Octree.hpp"
 
 template<typename ElementT>
 Octree<ElementT>::Octree(const glm::vec3& center, float size, float minNodeSize, unsigned short numElementsPerNode)
@@ -136,6 +137,18 @@ template<typename ElementT>
 void Octree<ElementT>::erase(const ElementT& element)
 {
     _root.erase(element);
+}
+
+template<typename ElementT>
+inline glm::vec3 Octree<ElementT>::getCenter() const
+{
+	return _root.getCenter();
+}
+
+template<typename ElementT>
+inline float Octree<ElementT>::getSize() const
+{
+	return _root.getBoundingSize();
 }
 
 
@@ -287,6 +300,18 @@ template<typename ElementT>
 bool Octree<ElementT>::Node::bIsLeafNode() const
 {
     return _children.empty();
+}
+
+template<typename ElementT>
+inline glm::vec3 Octree<ElementT>::Node::getCenter() const
+{
+	return _center;
+}
+
+template<typename ElementT>
+inline float Octree<ElementT>::Node::getBoundingSize() const
+{
+	return _size;
 }
 
 template<typename ElementT>

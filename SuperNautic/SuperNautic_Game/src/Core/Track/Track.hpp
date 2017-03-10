@@ -49,6 +49,9 @@ public:
 	void render(GFX::ViewportPipeline& pipeline, const unsigned int playerIndex, const unsigned int shipIndex);
 	void update(const float dt, const std::vector<unsigned int> playerIndexes);
 
+	// Test collision against octree
+	bool bTestCollision(const CollisionMesh& mesh) const;
+
 	// Returns the forward vector for a given ship position and segment index (segment index may update). Returns appropriate respawn position in returnPos and length from start of segment
 	glm::vec3 Track::findForward(const glm::vec3 globalPosition, unsigned int& segmentIndex, glm::vec3& returnPos, float& lengthInSegment, glm::vec3& directionDifference);
 

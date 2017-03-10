@@ -35,9 +35,9 @@ Ship::Ship(glm::vec3 color)
 	_meshPosition{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0, 1, 0 }, 5.0f, 100.0f },
 	_minAcceleration{ 0.0f },
 	_maxAcceleration{ 100.0f },
-	_maxTurningSpeed{ 35.0f },
+	_maxTurningSpeed{ 20.0f },
 	_straighteningForce{ 3.0f },
-	_steerStraighteningForce{ 20.0f },
+	_steerStraighteningForce{ 15.0f },
 	_speedResistance{ 0.001f },
 	_preferredHeight{ 1.5f },
 	_engineCooldown{ 0 },
@@ -90,7 +90,7 @@ void Ship::render(GFX::RenderStates& states)
 	// Update model's matrix
 	_shipModel.getModelAsset().get()->setModelMatrix(_transformMatrix);
 
-	// Achieves blinking effecet
+	// Achieves blinking effect
 	if (static_cast<int>(_immunityTimer / _blinkFrequency) % 2 == 0)
 	{
 		_shipModel.render(states);
@@ -100,6 +100,11 @@ void Ship::render(GFX::RenderStates& states)
 void Ship::update(float dt)
 {
 	dt = clamp(dt, 0.0f, 1.0f / 30.0f);
+
+	if (_engineCooldown > 0.0f)
+	{
+		_accelerationFactor = 0.0f;
+	}
 
 	handleInputs(dt);
 	handleCooldowns(dt);
@@ -234,21 +239,24 @@ void Ship::handleInputs(float dt)
 {
 	if (!_stopped)
 	{
+		float addToAngle = 0.0f;
+
 		if (_steeringCooldown <= 0.0f && _inactiveTimer <= 0.0f)
 		{
 			// Update turning angle										reduce maneuverability at high acceleration
-			_currentTurningAngle += -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.0f) * dt;
+			addToAngle = -_turningFactor * _maxTurningSpeed * (1.0f - _accelerationFactor * 0.0f) * dt;
 		}
 		else
 		{
 			_accelerationFactor = -1.0f;
 		}
 		// abs to preserve sign of _currentTurningAngle
-		_currentTurningAngle -= _steerStraighteningForce * _currentTurningAngle * dt;
+		float removeFromAngle = _steerStraighteningForce * _currentTurningAngle * dt;
+
+		_currentTurningAngle += addToAngle - removeFromAngle;
 
 		// Update velocity
-		_velocity += (_minAcceleration + _accelerationFactor * (_maxAcceleration - _minAcceleration)) * dt;
-		_velocity -= (_velocity * _velocity * _speedResistance) * dt;
+		_velocity += (_minAcceleration + _accelerationFactor * (_maxAcceleration - _minAcceleration)) * dt - (_velocity * _velocity * _speedResistance) * dt;
 	}
 	else
 	{
@@ -298,11 +306,6 @@ void Ship::handleCooldowns(float dt)
 	{
 		_immunityTimer -= dt;
 	}
-
-//	if (_inactiveTimer > 0.0f)
-//	{
-//		_inactiveTimer -= dt;
-//	}
 }
 
 void Ship::handleTemperature(float dt)
@@ -315,7 +318,7 @@ void Ship::handleTemperature(float dt)
 	_engineTemperature += (difference == 0.0f ? 1.0f : (std::fabs(difference) / difference)) *  powf(std::fabs(difference), 1.2f) * 0.2f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 
-	if (_engineTemperature > _overheatTemperature)
+	if (_engineTemperature > _overheatTemperature && _engineCooldown < 0.f)
 	{
 		_engineCooldown = 4.0f;
 		_bEngineOverload = true;
@@ -379,7 +382,6 @@ void Ship::updateDirectionsAndPositions(float dt)
 	// Update mesh position
 	_meshPosition.setTarget(getPosition());
 	_meshPosition.setAlternateAxis(_shipForward);
-	//_meshPosition.setSpringConstant(5.0f + 300.0f / powf(std::max(0.01f, glm::length((_meshPosition() - getPosition()) - glm::dot((_meshPosition() - getPosition()), _shipForward) * _shipForward)), 1.0f));
 	_meshPosition.setSpringConstant(_meshSpringValue());
 	_meshPosition.update(dt);
 
@@ -485,7 +487,15 @@ void Ship::handleLightsAndParticles(float dt)
 	// Engine particles
 	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
 	_particleSystem.setDeathColor(glm::vec3{ 0.0f });
-	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+
+	if (_inactiveTimer > 2.0f)
+	{
+		_particleSystem.setBirthSize(0.0f);
+	}
+	else
+	{
+		_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+	}
 
 	if (sinf(_engineBlinkAccumulator) > 0.0f && (dangerLevel > 0.0f || _engineCooldown > 0.0f))
 	{
@@ -587,12 +597,12 @@ glm::vec3 Ship::getCameraUp()
 const glm::vec3 Ship::getCameraForward() const
 {
 	return glm::normalize(_cameraForwardDirection() - _cameraUpDirection() * 1.0f * _surfaceSlope() -
-		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * glm::cross(_cameraUpDirection(), _cameraForwardDirection()) * 6.0f);
+		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * glm::cross(_cameraUpDirection(), _cameraForwardDirection()) * 2.0f);
 }
 
 const glm::vec3 Ship::getCameraPosition() const
 {
-	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f /*+ _velocity / 90.0f*/) +
+	return _meshPosition() - _cameraForwardDirection() * (6.0f - abs(_surfaceSlope()) * 1.0f) +
 		_cameraUpDirection() * (2.0f + _surfaceSlope() * 5.0f) +
 		std::max(_inactiveTimer / _inactiveAtStart, 0.0f) * (_cameraUpDirection() * 20.0f + glm::cross(_cameraUpDirection(), _cameraForwardDirection() * 9.5f));
 }

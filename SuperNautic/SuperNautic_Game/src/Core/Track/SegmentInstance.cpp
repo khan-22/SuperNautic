@@ -18,19 +18,10 @@ SegmentInstance::SegmentInstance(const Segment * segment, glm::mat4 modelMatrix,
 	updateGlobalBounds();
 	_bHasLighting = lighting;
 
-	// TEMPORARY
 	for (unsigned int i = 0; i < _parent->nrOfZones(); ++i)
 	{
-		if (i % 2 == 0)
-		{
-			_temperatures.push_back(1.0f);
-		}
-		else
-		{
-			_temperatures.push_back(-1.0f);
-		}
+		_temperatures.push_back(-5.0f);
 	}
-	////////////
 }
 
 //Destructor

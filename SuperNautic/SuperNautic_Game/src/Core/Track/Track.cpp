@@ -152,7 +152,7 @@ bool Track::bGenerate()
 	// Make the inital stretch straight
 	while (_generatedLength < 400.f)
 	{
-		bInsertNormalSegment(0, false);
+		bInsertNormalSegment(0, true);
 	}
 
 	float failedRecently = 0.f;
@@ -224,8 +224,8 @@ bool Track::bGenerate()
 				}
 				placeDarkAreas();
 				// End segment
-				bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, false);
-				bInsertNormalSegment(0, false);
+				bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, true);
+				bInsertNormalSegment(0, true);
 
 				LOG("Track generated. Length: ", _generatedLength);
 				return true;
@@ -529,6 +529,19 @@ bool Track::bInsertIntoOctree(SegmentInstance* segment)
     });
 }
 
+bool Track::bTestCollision(const CollisionMesh& mesh) const
+{
+	if (_octree.get())
+	{
+		auto collisions = _octree->getCollisions(mesh);
+		return collisions.size() != 0;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 // Inserts a whole pre-defined structure at the end of the track
 void Track::insertStructure(const int index)
 {
@@ -678,7 +691,7 @@ bool Track::bEndTrack()
 			}
 		}
 	}
-	// Insert straight track 
+	// Insert straight track
 	while (_generatedLength < _targetLength)
 	{
 		if (!bInsertNormalSegment(0, true))
@@ -930,7 +943,7 @@ void Track::render(GFX::ViewportPipeline& pipeline, const unsigned int playerInd
 		int index = shipIndex + i;
 		if (index >= 0 && index < _track.size())
 		{
-			pipeline.generalDeferred.render(*_track[index]);
+			pipeline.generalForward.render(*_track[index]);
 			std::vector<ObstacleInstance>& obstacles = _track[index]->getObstacles();
 			for (auto& obstacle : obstacles)
 			{

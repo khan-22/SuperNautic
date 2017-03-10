@@ -13,14 +13,22 @@ in VS_OUT
 	vec3 position;
 	vec2 uv;
 	vec3 normal;
+	float camToFragDistance;
 } fs_in;
+
+uniform float uFogDistance;
+
+vec4 fogify(vec4 inColor, float camToFragDistance, float fogDistance)
+{
+	float fragDist = clamp(camToFragDistance / fogDistance, 0.0, 1.0);
+	return mix(inColor, vec4(0.0, 0.0, 0.0, 1.0), fragDist);
+}
+
 
 void main()
 {
-	vec4 diffuse	  = texture(uDiffuse,		fs_in.uv);
-	vec4 specular	  = texture(uSpecular,		fs_in.uv);
-	vec4 normal		  = texture(uNormal,		fs_in.uv);
-	vec4 illumination = texture(uIllumination,	fs_in.uv);
-
-	outColor		= diffuse;
+	vec4 diffuse = texture(uDiffuse, fs_in.uv);
+	diffuse.a = 0.5;
+	
+	outColor = fogify(diffuse, fs_in.camToFragDistance, uFogDistance);
 }

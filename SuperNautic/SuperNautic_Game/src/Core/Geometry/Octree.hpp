@@ -46,6 +46,12 @@ public:
 	// Hobo erase all elements that compare equal to argument... Does not merge empty nodes. /shrug
 	void erase(const ElementT& element);
 
+	// Return center
+	glm::vec3 getCenter() const;
+
+	// Return size
+	float getSize() const;
+
 private:
     class Node
     {
@@ -58,6 +64,9 @@ private:
         void erase(const ElementT& element);
         void getIntersectingLeafNodes(const CollisionMesh& mesh, std::vector<Node*>& leafNodes) const;
         const std::vector<ElementPtr>& getElements() const;
+
+		glm::vec3 getCenter() const;
+		float getBoundingSize() const;
 
     private:
         static constexpr unsigned int                   _NUM_CHILDREN = 8;

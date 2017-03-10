@@ -5,6 +5,8 @@
 #include "Core/Track/SegmentInstance.hpp"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 #include "Core/World/Player.hpp"
+#include "Core/Asset/LoadAssetFunctions.hpp"
+#include "Core/Geometry/CollisionMesh.hpp"
 
 #include <cmath>
 
@@ -62,23 +64,44 @@ World::World(ApplicationContext& context)
 		abort();
 	}
 
-	GLuint resultColorChannels[] = { 3 };
+	GLuint resultColorChannels[] = { 4 };
 	_resultFramebuffer.initialize(_context.window.getSize().x, _context.window.getSize().y, resultColorChannels, sizeof(resultColorChannels) / sizeof(resultColorChannels[0]));
-	
+
+	GFX::Framebuffer* targetFramebuffer = &GFX::Framebuffer::DEFAULT;
+
 	//_darkZonePass.initialize(0.f, 0.f, 1.f, 1.f, &_resultFramebuffer, "darkpass_forward");
 
+	// Randomize seaweed positions
+	RawMeshAsset loadedBox{ RawMeshCache::get("seaweed_boundingbox.kmf") };
+	BoundingBox seaweedBox{ loadedBox.get()->meshes[0] };
+
+	constexpr float seaweedHeight = 10000.0f;
+	for (unsigned i = 0; i < _track->getNrOfSegments(); ++i)
+	{
+		glm::vec3 segmentPos = _track->getInstance(i)->getModelMatrix() * glm::vec4{ 0, 0, 0, 1 };
+
+		glm::vec3 position{ segmentPos.x + ((static_cast<float>(rand()) / RAND_MAX) * 2.0f - 1.0f) * 500.0f,
+			-seaweedHeight,
+			segmentPos.z + ((static_cast<float>(rand()) / RAND_MAX) * 2.0f - 1.0f) * 500.0f };
+
+		seaweedBox.center = position + glm::vec3{ 0.0f, seaweedHeight, 0.0f };
+		CollisionMesh seaweedBoundingBox{ seaweedBox };
+
+		if (!_track->bTestCollision(seaweedBoundingBox))
+			_seaweeds.emplace_back(position);
+	}
 
 	if (_players.size() == 1)
 	{
-		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f, &_resultFramebuffer);
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.0f, 1.0f, 1.0f, targetFramebuffer);
 		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y, 0, 0);
 	}
 	else if (_players.size() == 2)
 	{
-		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f, targetFramebuffer);
 		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, 0);
 
-		_viewportPipelines[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[1].initialize(&context.window, 0.0f, 0.0f, 1.0f, 0.5f, targetFramebuffer);
 		_players[1].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 
 		//_viewportPipelines[0].initialize(&context.window, 0.0f, 0.0f, 0.5f, 1.0f);
@@ -89,27 +112,27 @@ World::World(ApplicationContext& context)
 	}
 	else if (_players.size() == 3)
 	{
-		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 1.0f, 0.5f, targetFramebuffer);
 		_players[0].setScreenSize(context.window.getSize().x, context.window.getSize().y / 2, 0, 0);
 
-		_viewportPipelines[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[1].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f, targetFramebuffer);
 		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 
-		_viewportPipelines[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[2].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f, targetFramebuffer);
 		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
 	else if (_players.size() == 4)
 	{
-		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[0].initialize(&context.window, 0.0f, 0.5f, 0.5f, 0.5f, targetFramebuffer);
 		_players[0].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, 0);
 
-		_viewportPipelines[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[1].initialize(&context.window, 0.5f, 0.5f, 0.5f, 0.5f, targetFramebuffer);
 		_players[1].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, 0);
 
-		_viewportPipelines[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[2].initialize(&context.window, 0.0f, 0.0f, 0.5f, 0.5f, targetFramebuffer);
 		_players[2].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, 0, context.window.getSize().y / 2);
 
-		_viewportPipelines[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f, &_resultFramebuffer);
+		_viewportPipelines[3].initialize(&context.window, 0.5f, 0.0f, 0.5f, 0.5f, targetFramebuffer);
 		_players[3].setScreenSize(context.window.getSize().x / 2, context.window.getSize().y / 2, context.window.getSize().x / 2, context.window.getSize().y / 2);
 	}
 
@@ -291,7 +314,7 @@ void World::render()
 		{
 			if (!(i == j && _players[j]._bIsFirstPerson))
 			{
-				_viewportPipelines[i].generalDeferred.render(_players[j].getShip());
+				_viewportPipelines[i].generalForward.render(_players[j].getShip());
 			}
 		}
 	}
@@ -299,14 +322,24 @@ void World::render()
 	{
 		for (int j = 0; j < _players.size(); j++)
 		{
-			_viewportPipelines[i].generalDeferred.pushPointLight(_players[j].getShip().getPointLight());
+			_viewportPipelines[i].generalForward.pushPointLight(_players[j].getShip().getPointLight());
 
-			_viewportPipelines[i].generalDeferred.pushPointLight(_players[j].getShip().getWarningLight());
+			_viewportPipelines[i].generalForward.pushPointLight(_players[j].getShip().getWarningLight());
 		}
 	}
 
 	for (int i = 0; i < _viewportPipelines.size(); i++)
 	{
+		for (size_t j = 0; j < _seaweeds.size(); ++j)
+		{
+			glm::vec3 difference{ _players[i].getShip().getPosition() - _seaweeds[j].getPosition() };
+			difference -= glm::dot(difference, glm::vec3{ 0,1,0 }) * glm::vec3{ 0,1,0 };
+
+			if (glm::length(difference) < 1000.0f)
+			{
+				_viewportPipelines[i].windowForward.render(_seaweeds[j]);
+			}
+		}
 		_track->render(_viewportPipelines[i], i, _playerProgression[i].getCurrentSegment());
 	}
 
@@ -319,6 +352,9 @@ void World::render()
 			_viewportPipelines[i].particleForward.render(_players[j].getShip().getRightParticleSystem());
 		}
 	}
+	_resultFramebuffer.bindBoth();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	GFX::Framebuffer::DEFAULT.bindBoth();
 
 	if (!_bDebugging)
 	{
@@ -376,6 +412,7 @@ void World::render()
 	sfml.render(_progression);
 
 	sfml.display(_context.window);
+
 
 	_frameCount++;
 }
