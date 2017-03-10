@@ -33,6 +33,8 @@ World::World(ApplicationContext& context)
 		}
 	}
 
+	_track->setNrOfPlayers(context.players.size());
+
 	std::vector<glm::vec3> colors{ glm::vec3{ 0.8f, 0.2f, 0.1f },
 		glm::vec3{ 0.1f, 0.8f, 0.1f },
 		glm::vec3{ 0.1f, 0.1f, 0.8f },
@@ -263,21 +265,14 @@ void World::update(float dt, sf::Window& window)
 	{
 		_bDebugging = false;
 	}
-	// Get segment index of first and last player to send to track.update(...)
-	size_t max = 0, min = _track->getNrOfSegments() - 1;
-	for (size_t i = 0; i < _playerProgression.size(); i++)
+	//Update track
+	std::vector<unsigned int> playerIndexes;
+	playerIndexes.reserve(_playerProgression.size());
+	for (unsigned int i = 0; i < _playerProgression.size(); i++)
 	{
-		size_t segment = _playerProgression[i].getCurrentSegment();
-		if (segment >= max)
-		{
-			max = segment;
-		}
-		if (segment <= min)
-		{
-			min = segment;
-		}
+		playerIndexes.push_back(_playerProgression[i].getCurrentSegment());
 	}
-	_track->update(dt, static_cast<unsigned int>(max), static_cast<unsigned int>(min));
+	_track->update(dt, playerIndexes);
 
 
 	_timer.updateCurrent(dt);
@@ -285,13 +280,6 @@ void World::update(float dt, sf::Window& window)
 	_progression.updateCurrent(dt);
 
 	_playTime += dt;
-
-
-	//for (int i = 0; i < _players.size(); i++)
-	//{
-	//	_viewportPipelines[i].setDarkFactor(_players[i].getShip().getSpeed() / 200.f);
-
-	//}
 }
 
 void World::render()
@@ -319,7 +307,7 @@ void World::render()
 
 	for (int i = 0; i < _viewportPipelines.size(); i++)
 	{
-		_track->render(_viewportPipelines[i], _playerProgression[i].getCurrentSegment());
+		_track->render(_viewportPipelines[i], i, _playerProgression[i].getCurrentSegment());
 	}
 
 	for (int i = 0; i < _viewportPipelines.size(); i++)
