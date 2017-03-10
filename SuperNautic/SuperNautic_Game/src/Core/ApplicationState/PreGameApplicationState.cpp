@@ -159,14 +159,15 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
         }
     }
 
-    for(const GuiPlayerJoinContainer::Player& p : _players->getJoinedPlayers())
+    std::vector<GuiPlayerJoinContainer::Player> joinedPlayers = _players->getJoinedPlayers();
+    for(const GuiPlayerJoinContainer::Player& p : joinedPlayers)
     {
         assert(p.id < _shipIds.size());
         if(_shipIds[p.id] != p.shipId)
         {
             assert(p.id < _shipImages.size());
             GuiTexture& img = _shipImages[p.id];
-            img.setTexture("ship" + std::to_string(0) + ".png");
+            img.setTexture("ship2selection.png");
 
             sf::Vector2u windowSize = _context.window.getSize();
             sf::FloatRect bounds = img.getBoundingRect();
@@ -191,6 +192,18 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
             img.setPosition(sf::Vector2f(x, y));
 
             _shipIds[p.id] = p.shipId;
+        }
+    }
+
+    for(size_t i = 0; i < _shipIds.size(); i++)
+    {
+        auto foundIt = std::find_if(joinedPlayers.begin(), joinedPlayers.end(), [i](const GuiPlayerJoinContainer::Player& p)
+        {
+            return p.id == i;
+        });
+        if(foundIt == joinedPlayers.end())
+        {
+            _shipIds[i] = -1U;
         }
     }
 
