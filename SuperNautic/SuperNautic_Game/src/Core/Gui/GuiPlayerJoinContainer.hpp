@@ -18,11 +18,12 @@ class GuiPlayerJoinContainer : public GuiContainer
         {
             glm::vec4 color; // rgba
 			unsigned int id;
-			float maxAcceleration;
-			float maxTurningSpeed;
-			float cooldownOnObstacleCollision;
-			float overheatTemperature;
-			float overheatCooldown;
+			unsigned int shipId;
+			//float maxAcceleration;
+			//float maxTurningSpeed;
+			//float cooldownOnObstacleCollision;
+			//float overheatTemperature;
+			//float overheatCooldown;
         };
 
         GuiPlayerJoinContainer();

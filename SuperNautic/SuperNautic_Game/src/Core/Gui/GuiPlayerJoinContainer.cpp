@@ -136,11 +136,12 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
                 p.color[static_cast<glm::length_t>(k)] = _COLORS[i][k];
             }
             p.id = j->getId();
-			p.maxAcceleration = j->getMaxAcceleration();
-			p.maxTurningSpeed = j->getMaxTurningSpeed();
-			p.cooldownOnObstacleCollision = j->getCooldownOnObstacleCollision();
-			p.overheatTemperature = j->getOverheatTemperature();
-			p.overheatCooldown = j->getOverheatCooldown();
+			p.shipId = j->getShipId();
+			//p.maxAcceleration = j->getMaxAcceleration();
+			//p.maxTurningSpeed = j->getMaxTurningSpeed();
+			//p.cooldownOnObstacleCollision = j->getCooldownOnObstacleCollision();
+			//p.overheatTemperature = j->getOverheatTemperature();
+			//p.overheatCooldown = j->getOverheatCooldown();
             players.push_back(p);
         }
     }

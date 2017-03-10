@@ -27,6 +27,7 @@ public:
 	GFX::TexturedModel _shipModel;
 
 	Ship(glm::vec3 color);
+	Ship(glm::vec3 color, int shipId);
 	Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float cooldownOnObstacleCollision, float overheatTemperature, float overhearCooldown);
 
 	void render(GFX::RenderStates& states) override;
