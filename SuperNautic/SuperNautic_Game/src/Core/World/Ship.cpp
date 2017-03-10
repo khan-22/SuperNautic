@@ -77,6 +77,7 @@ Ship::Ship(glm::vec3 color)
 	setInactiveTime(_inactiveAtStart);
 
 	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.setBirthSize(0.0f);
 	_particleSystem.start();
 
 	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
@@ -489,7 +490,15 @@ void Ship::handleLightsAndParticles(float dt)
 	// Engine particles
 	_particleSystem.setBirthColor(_shipColor * (1.0f - interpolation) + glm::vec3{ 0.3f } * interpolation);
 	_particleSystem.setDeathColor(glm::vec3{ 0.0f });
-	_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+
+	if (_inactiveTimer > 2.0f)
+	{
+		_particleSystem.setBirthSize(0.0f);
+	}
+	else
+	{
+		_particleSystem.setBirthSize(powf(_velocity * 0.03f, 1.5f) * 0.1f);
+	}
 
 	if (sinf(_engineBlinkAccumulator) > 0.0f && (dangerLevel > 0.0f || _engineCooldown > 0.0f))
 	{
