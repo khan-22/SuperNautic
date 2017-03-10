@@ -135,7 +135,8 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
             {
                 p.color[static_cast<glm::length_t>(k)] = _COLORS[i][k];
             }
-            p.id = j->getId();
+            p.id = i;
+            p.inputId = j->getId();
 			p.shipId = j->getShipId();
 			//p.maxAcceleration = j->getMaxAcceleration();
 			//p.maxTurningSpeed = j->getMaxTurningSpeed();
@@ -144,17 +145,6 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
 			//p.overheatCooldown = j->getOverheatCooldown();
             players.push_back(p);
         }
-    }
-
-    if(players.empty())
-    {
-        Player p;
-        for(size_t k = 0; k < 4; k++)
-        {
-            p.color[static_cast<glm::length_t>(k)] = _COLORS[0][k];
-        }
-        p.id = 0;
-        players.push_back(p);
     }
 
     for(Player& p : players)

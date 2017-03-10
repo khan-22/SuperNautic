@@ -17,7 +17,8 @@ class GuiPlayerJoinContainer : public GuiContainer
         struct Player
         {
             glm::vec4 color; // rgba
-			unsigned int id;
+            unsigned int id;
+			unsigned int inputId;
 			unsigned int shipId;
 			//float maxAcceleration;
 			//float maxTurningSpeed;
