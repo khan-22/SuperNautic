@@ -134,7 +134,16 @@ void Track::startNewTrack()
 	_segmentWindows.clear();
 	_temperatureZones.clear();
 
-	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength * 1.1 + 1000, 2000.f, 5));
+	_octree.reset(new Octree<SegmentInstance*>(glm::vec3(0.f, 0.f, 0.f), _targetLength * 1.1f + 1000.f, 2000.f, 5));
+
+	_darkAreas.clear();
+	_darkAreaPlayerValues.clear();
+}
+
+// Needs to be called before launching a new track
+void Track::setNrOfPlayers(unsigned int nrOfPlayers)
+{
+	_darkAreaPlayerValues.resize(nrOfPlayers, { 0.f, -1, 0 });
 }
 
 // Generates the track
@@ -151,7 +160,8 @@ bool Track::bGenerate()
 	while (_generatedLength - _lengthAfterLastCall < _progressionLength)
 	{
 		// Randomize segment index
-		int index, inRow;
+		int index;
+		unsigned int inRow;
 		index = getIndex();
 		// Normal segment placement
 		if (index < _segmentHandler->infos().size())
@@ -212,6 +222,7 @@ bool Track::bGenerate()
 				{
 					placeObstacles();
 				}
+				placeDarkAreas();
 				// End segment
 				bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, true);
 				bInsertNormalSegment(0, true);
@@ -473,7 +484,7 @@ bool Track::bInsertNormalSegment(const int index, bool testCollision)
 	float rotVal = 0.f;
 	if (maxRotOffset != 0)
 	{
-		rotVal = (rand() % (2 * maxRotOffset) - maxRotOffset) * angle;
+		rotVal = static_cast<float>((rand() % (2 * maxRotOffset) - maxRotOffset) * angle);
 	}
 	glm::mat4 rotMat = glm::rotate(glm::radians(rotVal), glm::vec3(0, 0, 1));
 	_endMatrix = _endMatrix * modelEndMat * rotMat;
@@ -603,9 +614,14 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 		temperatures.reserve(4);
 		for (unsigned int i = 0; i < 4; i++)
 		{
-			if (rand() % 4 == 0)
+			int r = rand() % 8;
+			if (r == 0)
 			{
-				temperatures.push_back((double)rand() / RAND_MAX * 2.f - 1.f);
+				temperatures.push_back((float)rand() / RAND_MAX - 1.f);
+			}
+			else if (r <= 2)
+			{
+				temperatures.push_back((float)rand() / RAND_MAX);
 			}
 			else
 			{
@@ -773,10 +789,22 @@ void Track::placeObstacles()
 	}
 }
 
-//
-void Track::placeVisibilityArea()
+// Place dark areas in the finished track
+void Track::placeDarkAreas()
 {
-
+	int index = rand() % 400 + 20;
+	while (index < _track.size() - 10)
+	{
+		unsigned int length = rand() % 10 + 7;
+		_darkAreas.push_back({ (unsigned int)index, length, 0.f });
+		index += length;
+		index += rand() % 200 + 100;
+	}
+	// Removes the last area if it is too long
+	if (_darkAreas.size() >= 1 && _darkAreas.back().startIndex + _darkAreas.back().length > _track.size() - 10)
+	{
+		_darkAreas.erase(_darkAreas.end());
+	}
 }
 
 size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLength) const
@@ -794,9 +822,24 @@ size_t Track::findTrackIndex(const float totalLength, float & lastFullSegmentLen
 	return index;
 }
 
-// Update obstacle rotations
-void Track::update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer)
+// Update stuff
+void Track::update(const float dt, const std::vector<unsigned int> playerIndexes)
 {
+	// Calculate which player index is the smallest and largest
+	unsigned int firstPlayer = 0;
+	unsigned int lastPlayer = (unsigned int)_track.size() - 1;
+	for (unsigned int i = 0; i < playerIndexes.size(); i++)
+	{
+		unsigned int index = playerIndexes[i];
+		if (index >= firstPlayer)
+		{
+			firstPlayer = index;
+		}
+		if (index <= lastPlayer)
+		{
+			lastPlayer = index;
+		}
+	}
 	// Obstacles
 	for (unsigned int i = lastPlayer; i < _track.size() && i < firstPlayer + 7; ++i)
 	{
@@ -830,10 +873,69 @@ void Track::update(const float dt, const unsigned int firstPlayer, const unsigne
 			}
 		}
 	}
+
+	// Update dark areas
+	for (unsigned int i = 0; i < _darkAreas.size(); i++)
+	{
+		if (_darkAreas[i].startIndex >= lastPlayer)
+		{
+			if (_darkAreas[i].startIndex + _darkAreas[i].length <= firstPlayer)
+			{
+				_darkAreas[i].timer += dt;
+				if (_darkAreas[i].timer > 1.0f && _darkAreas[i].length > 1)
+				{
+					_darkAreas[i].timer = 0.f;
+					_darkAreas[i].length--;
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	// Update player dark area info
+	for (unsigned int i = 0; i < playerIndexes.size(); i++)
+	{
+		DarkAreaPlayerInfo& dapi = _darkAreaPlayerValues[i];
+		// Not currently inside a dark area
+		if (dapi.startIndex == -1)
+		{
+			// Update darkness factor for the player
+			dapi.factor -= 1.0f * dt;
+			if (dapi.factor < 0.f)
+			{
+				dapi.factor = 0.f;
+			}
+			// Check if inside dark area
+			for (unsigned int j = 0; j < _darkAreas.size(); j++)
+			{
+				if (playerIndexes[i] >= _darkAreas[j].startIndex && playerIndexes[i] <= _darkAreas[j].startIndex + dapi.length)
+				{
+					dapi.startIndex = _darkAreas[j].startIndex;
+					dapi.length = _darkAreas[j].length;
+				}
+			}
+		}
+		// Currently inside dark area
+		else
+		{
+			// Update values if inside area
+			dapi.factor += 1.0f * dt;
+			if (dapi.factor > 0.96f)
+			{
+				dapi.factor = 0.96f;
+			}
+			if (playerIndexes[i] > dapi.startIndex + dapi.length)
+			{
+				dapi.startIndex = -1;
+			}
+		}
+	}
 }
 
 // Render the track
-void Track::render(GFX::ViewportPipeline& pipeline, const int shipIndex)
+void Track::render(GFX::ViewportPipeline& pipeline, const unsigned int playerIndex, const unsigned int shipIndex)
 {
 	// Inside of segments
 	for (int i = -2; i < 7; ++i)
@@ -895,6 +997,9 @@ void Track::render(GFX::ViewportPipeline& pipeline, const int shipIndex)
 			}
 		}
 	}
+
+	// Dark areas
+	pipeline.setDarkFactor(_darkAreaPlayerValues[playerIndex].factor);
 }
 
 WaypointInfo Track::findNextWaypointInfo(const WaypointInfo& current, unsigned int segmentIndex) const

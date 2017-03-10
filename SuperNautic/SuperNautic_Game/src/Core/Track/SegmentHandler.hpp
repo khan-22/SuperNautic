@@ -77,7 +77,6 @@ public:
 	// Returns rotation info about connection type 'type'
 	int getConnectionRotation(const char type);
 
-	std::vector<char> getConnectionTypes() const;
 	unsigned int getNrOfSegmentsOfType(const char connectionType, const float difficulty) const;
 
 private:

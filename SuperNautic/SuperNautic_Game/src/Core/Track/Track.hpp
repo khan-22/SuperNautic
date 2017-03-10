@@ -41,12 +41,13 @@ public:
 	void setCurviness(const unsigned int curviness);
 	void setDifficulty(const unsigned int difficulty);
 	void startNewTrack();
+	void setNrOfPlayers(unsigned int nrOfPlayers);
 	bool bGenerate();
 	int getNrOfSegments() const;
 	SegmentInstance* getInstance(int index);
 	float getProgression() const;
-	void render(GFX::ViewportPipeline& pipeline, const int shipIndex);
-	void update(const float dt, const unsigned int firstPlayer, const unsigned int lastPlayer);
+	void render(GFX::ViewportPipeline& pipeline, const unsigned int playerIndex, const unsigned int shipIndex);
+	void update(const float dt, const std::vector<unsigned int> playerIndexes);
 
 	// Test collision against octree
 	bool bTestCollision(const CollisionMesh& mesh) const;
@@ -57,7 +58,6 @@ public:
 private:
 	int getIndex() const;
 	int getInRow(const int index) const;
-
 	WaypointInfo findNextWaypointInfo(const WaypointInfo& current, unsigned int segmentIndex) const;
 	bool bInsertNormalSegment(const int index, bool testCollision);
 	void insertStructure(const int index);
@@ -65,10 +65,22 @@ private:
 	void deleteSegments(const float lengthToDelete);
 	bool bEndTrack();
 	void placeObstacles();
-	void placeVisibilityArea();
+	void placeDarkAreas();
 	size_t findTrackIndex(const float totalLength, float & lastFullSegmentLength) const;
     bool bInsertIntoOctree(SegmentInstance* segment);
 
+	struct DarkAreaPlayerInfo
+	{
+		float			factor;
+		int				startIndex;
+		unsigned int	length;
+	};
+	struct DarkArea
+	{
+		unsigned int	startIndex;
+		unsigned int	length;
+		float			timer;
+	};
 
 	std::vector<GFX::Window>				_segmentWindows;
 	std::vector<GFX::TemperatureZone>		_temperatureZones;
@@ -90,6 +102,8 @@ private:
 	const Segment *							_lastSegment;
 	float									_lengthWithCurrentConnectionType;
 	std::unique_ptr<Octree<SegmentInstance*>> _octree;
+	std::vector<DarkArea>					_darkAreas;
+	std::vector<DarkAreaPlayerInfo>			_darkAreaPlayerValues;
 };
 
 #endif // !TRACK_HPP
