@@ -90,7 +90,7 @@ void Ship::render(GFX::RenderStates& states)
 	// Update model's matrix
 	_shipModel.getModelAsset().get()->setModelMatrix(_transformMatrix);
 
-	// Achieves blinking effecet
+	// Achieves blinking effect
 	if (static_cast<int>(_immunityTimer / _blinkFrequency) % 2 == 0)
 	{
 		_shipModel.render(states);
