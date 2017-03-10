@@ -76,7 +76,7 @@ World::World(ApplicationContext& context)
 	BoundingBox seaweedBox{ loadedBox.get()->meshes[0] };
 
 	constexpr float seaweedHeight = 10000.0f;
-	for (unsigned i = 0; i < _track->getNrOfSegments(); i += 3)
+	for (unsigned i = 0; i < _track->getNrOfSegments(); i += 1)
 	{
 		glm::vec3 segmentPos = _track->getInstance(i)->getModelMatrix() * glm::vec4{ 0, 0, 0, 1 };
 
