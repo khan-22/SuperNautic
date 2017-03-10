@@ -213,8 +213,8 @@ bool Track::bGenerate()
 					placeObstacles();
 				}
 				// End segment
-				bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, false);
-				bInsertNormalSegment(0, false);
+				bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1, true);
+				bInsertNormalSegment(0, true);
 
 				LOG("Track generated. Length: ", _generatedLength);
 				return true;
