@@ -70,31 +70,6 @@ unsigned int GuiPlayerJoin::getShipId() const
 	return _shipNumber;
 }
 
-//float GuiPlayerJoin::getMaxAcceleration() const
-//{
-//	return 100.f;
-//}
-//
-//float GuiPlayerJoin::getMaxTurningSpeed() const
-//{
-//	return 20.f;
-//}
-//
-//float GuiPlayerJoin::getCooldownOnObstacleCollision() const
-//{
-//	return 2.f;
-//}
-//
-//float GuiPlayerJoin::getOverheatTemperature() const
-//{
-//	return .15f;
-//}
-//
-//float GuiPlayerJoin::getOverheatCooldown() const
-//{
-//	return 4.f;
-//}
-
 void GuiPlayerJoin::assign(unsigned int playerId)
 {
     _bIsAssigned = true;

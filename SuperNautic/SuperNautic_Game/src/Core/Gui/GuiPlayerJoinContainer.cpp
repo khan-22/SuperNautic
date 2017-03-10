@@ -138,11 +138,6 @@ std::vector<GuiPlayerJoinContainer::Player> GuiPlayerJoinContainer::getJoinedPla
             p.id = i;
             p.inputId = j->getId();
 			p.shipId = j->getShipId();
-			//p.maxAcceleration = j->getMaxAcceleration();
-			//p.maxTurningSpeed = j->getMaxTurningSpeed();
-			//p.cooldownOnObstacleCollision = j->getCooldownOnObstacleCollision();
-			//p.overheatTemperature = j->getOverheatTemperature();
-			//p.overheatCooldown = j->getOverheatCooldown();
             players.push_back(p);
         }
     }

@@ -26,11 +26,6 @@ class GuiPlayerJoin : public GuiElement
 
         unsigned int getId() const;
 		unsigned int getShipId() const;
-		//float getMaxAcceleration() const;
-		//float getMaxTurningSpeed() const;
-		//float getCooldownOnObstacleCollision() const;
-		//float getOverheatTemperature() const;
-		//float getOverheatCooldown() const;
 
         void assign(unsigned int playerId);
         void unassign();

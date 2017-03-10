@@ -20,11 +20,6 @@ class GuiPlayerJoinContainer : public GuiContainer
             unsigned int id;
 			unsigned int inputId;
 			unsigned int shipId;
-			//float maxAcceleration;
-			//float maxTurningSpeed;
-			//float cooldownOnObstacleCollision;
-			//float overheatTemperature;
-			//float overheatCooldown;
         };
 
         GuiPlayerJoinContainer();
