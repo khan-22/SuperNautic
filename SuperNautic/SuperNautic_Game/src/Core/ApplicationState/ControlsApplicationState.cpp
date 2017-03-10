@@ -17,19 +17,22 @@ ControlsApplicationState::ControlsApplicationState(ApplicationStateStack& stack,
 {
 	sf::Vector2u windowSize = _context.window.getSize();
 
-	GuiText* title = new GuiText("Controls", _font);
-	title->setCharacterSize(50);
-	title->setOrigin(title->getBoundingRect().width / 2.f, title->getBoundingRect().height / 2.f);
-	title->setPosition(windowSize.x / 2.f, windowSize.y / 5.f);
-	auto titlePtr = std::unique_ptr<SceneNode>(title);
-	_guiGraph.attachChild(titlePtr);
-
 	GuiTexture* controls = new GuiTexture("controls.png");
-	controls->setScale(windowSize.x / 2.f, windowSize.y / 2.f);
-	controls->setOrigin(controls->getBoundingRect().width / 2.f, controls->getBoundingRect().height / 2.f);
+	controls->setSize(windowSize.x / 2.f, windowSize.y / 2.f);
+//	controls->setScale(controls->getBoundingRect().width / (windowSize.x * 2.f), controls->getBoundingRect().height / (windowSize.y * 2.f));
+	sf::FloatRect controlsBounds = controls->getBoundingRect();
+	controls->setOrigin(controlsBounds.width / 2.f, controlsBounds.height / 2.f);
 	controls->setPosition(windowSize.x / 2.f, windowSize.y / 2.f);
 	auto controlsPtr = std::unique_ptr<SceneNode>(controls);
 	_guiGraph.attachChild(controlsPtr);
+
+	GuiText* title = new GuiText("Controls", _font);
+	title->setCharacterSize(50);
+	title->setOrigin(title->getBoundingRect().width / 2.f, title->getBoundingRect().height / 2.f);
+	title->setPosition(windowSize.x / 2.f, controls->getBoundingRect().top / 2.f);
+	auto titlePtr = std::unique_ptr<SceneNode>(title);
+	_guiGraph.attachChild(titlePtr);
+
 }
 
 void ControlsApplicationState::render()
@@ -37,6 +40,7 @@ void ControlsApplicationState::render()
 	GFX::SfmlRenderer renderer;
 	renderer.render(*_context.menuBackground);
 	renderer.render(_guiGraph);
+
 	renderer.display(_context.window);
 }
 
