@@ -77,7 +77,6 @@ Ship::Ship(glm::vec3 color)
 	setInactiveTime(_inactiveAtStart);
 
 	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
-	_particleSystem.setBirthSize(0.0f);
 	_particleSystem.start();
 
 	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
@@ -234,8 +233,6 @@ void Ship::rotateAtStart(float down, float angle)
 	_meshUpDirection.setVector(_upDirection);
 	_meshPosition.setVector(getPosition());
 	_cameraUpDirection.setVector(_upDirection);
-
-	_particleSystem.setBirthSize(0.0f);	// Prevents particles appearing in a line from spawn position to position after this function
 }
 
 void Ship::handleInputs(float dt)
