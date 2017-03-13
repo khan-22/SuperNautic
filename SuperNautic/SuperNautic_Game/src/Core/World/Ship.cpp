@@ -72,7 +72,7 @@ Ship::Ship(glm::vec3 color)
 	_inactiveAtStart{ 3.5f },
 	_jumping{ false }
 {
-	move(0, 0, 10);
+	move(0, 0, 100);
 	_shipModel = GFX::TexturedModel(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
 
 	setInactiveTime(_inactiveAtStart);
@@ -146,7 +146,7 @@ Ship::Ship(glm::vec3 color, int shipId)
 	_inactiveAtStart{ 3.5f },
 	_jumping{ false }
 {
-	move(0, 0, 10);
+	move(0, 0, 100);
 
 	setShip();
 
