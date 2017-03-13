@@ -17,8 +17,8 @@ void GuiShipCard::renderCurrent(sf::RenderTarget& target, sf::RenderStates state
 {
     if(_bHasJoined)
     {
-        target.draw(_card, states);
         target.draw(_background, states);
+        target.draw(_card, states);
     }
 }
 
