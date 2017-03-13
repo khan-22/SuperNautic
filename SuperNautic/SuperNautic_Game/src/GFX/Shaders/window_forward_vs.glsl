@@ -5,6 +5,7 @@
 #version 400 core
 
 layout (location = 0) in vec3 pos;
+layout (location = 1) in vec3 uv;
 
 
 uniform mat4 uModel;
@@ -15,6 +16,7 @@ out VS_OUT
 {
 	vec3 camToFragVector;
 	float camToFragDistance;
+	vec2 uv;
 } vs_out;
 
 
@@ -23,6 +25,8 @@ void main()
 {
 	vs_out.camToFragVector = (uModel * vec4(pos, 1.0) - uCameraPos).xyz;
 	vs_out.camToFragDistance = length(vs_out.camToFragVector);
+
+	vs_out.uv = uv.xy;
 
 	gl_Position = uMVP * vec4(pos, 1.0);
 }
