@@ -16,6 +16,7 @@
 
 #include "Core/Gui/GuiPlayerJoinContainer.hpp"
 #include "Core/Gui/GuiHorizontalList.hpp"
+#include "Core/Gui/GuiShipCard.hpp"
 
 PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
@@ -23,9 +24,13 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 , _toolTip(_font)
 , _trackGenerator(context.segmentHandler.get(), context.obstacleHandler.get())
 , _input()
-, _guiContainer(_trackGenerator, &_toolTip, _context.track.get())
+, _guiContainer(sf::Keyboard::Unknown, sf::Keyboard::Unknown)
 , _title("Lobby", _font)
 {
+
+    GuiTrackGeneratorControls* genControls = new GuiTrackGeneratorControls(_trackGenerator, &_toolTip, _context.track.get());
+
+
     std::vector<std::unique_ptr<GuiElement>> guiElements;
 
     GuiButton* startButton = new GuiButton(sf::Text("Start", *_font.get()), [&]()
@@ -67,7 +72,7 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     _players = new GuiPlayerJoinContainer();
     guiElements.emplace_back(_players);
 
-    sf::Vector2f pos(0.f, _guiContainer.getBoundingRect().top + _guiContainer.getBoundingRect().height);
+    sf::Vector2f pos(0.f, genControls->getBoundingRect().top + genControls->getBoundingRect().height);
     for(const std::unique_ptr<GuiElement>& e : guiElements)
     {
         pos.y += e->getBoundingRect().height * 1.75f;
@@ -75,14 +80,15 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
     }
 
     _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
-    _guiContainer.insert(guiElements);
+    genControls->setBackground(sf::Color::Transparent, sf::Color::Transparent);
+    genControls->insert(guiElements);
 
 
 
     sf::Vector2u windowSize = _context.window.getSize();
-    sf::FloatRect guiBounds = _guiContainer.getBoundingRect();
-    _guiContainer.setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height);
-    _guiContainer.setPosition(windowSize.x / 2.f, windowSize.y * 0.9f);
+    sf::FloatRect guiBounds = genControls->getBoundingRect();
+    genControls->setOrigin(guiBounds.left + guiBounds.width / 2.f, guiBounds.top + guiBounds.height);
+    genControls->setPosition(windowSize.x / 2.f, windowSize.y * 0.9f);
 
     _toolTip.centerAt(static_cast<size_t>(windowSize.x / 2.f), static_cast<size_t>(windowSize.y * 0.95f));
     _toolTip.registerTip(startButton, "Start the game.");
@@ -93,13 +99,32 @@ PreGameApplicationState::PreGameApplicationState(ApplicationStateStack& stack, A
 
     _title.setCharacterSize(50);
     _title.setOrigin(_title.getBoundingRect().width / 2.f, _title.getBoundingRect().height / 2.f);
-    _title.setPosition(windowSize.x / 2.f, _guiContainer.getBoundingRect().top / 4.f);
+    _title.setPosition(windowSize.x / 2.f, genControls->getBoundingRect().top / 4.f);
 
-    _guiContainer.select(startButton);
+    for(size_t i = 0; i < 4; i++)
+    {
+        GuiShipCard* card = new GuiShipCard(i, *_players);
+
+        sf::Vector2u windowSize = _context.window.getSize();
+        card->setMaxSize((windowSize.x * 0.8f) / 2.f, (windowSize.y * 0.8f) / 2.f);
+        sf::FloatRect bounds = card->getBoundingRect();
+
+        float x = (i % 2) * (windowSize.x / 2.f) + windowSize.x / 4.f;
+        float y = (i / 2) * (windowSize.y / 2.f) + windowSize.y / 4.f;
+        card->setPosition(sf::Vector2f(x, y));
+
+        auto ptr = std::unique_ptr<GuiElement>(card);
+        _guiContainer.insert(ptr);
+    }
+
+    auto genControlsPtr = std::unique_ptr<GuiElement>(genControls);
+    _guiContainer.insert(genControlsPtr);
+
+    _guiContainer.toggleSelection();
+    genControls->select(startButton);
+
 
     _forwardRenderer.initialize(&_context.window, 0.f, 0.f, 1.f, 1.f, &GFX::Framebuffer::DEFAULT);
-
-    _shipIds = {-1, -1, -1, -1};
 }
 
 void PreGameApplicationState::render()
@@ -113,16 +138,6 @@ void PreGameApplicationState::render()
     _forwardRenderer.display(garbageCam);
 
 	_sfmlRenderer.render(_guiContainer);
-
-	for (size_t i = 0; i < _shipIds.size(); i++)
-	{
-		if (_shipIds[i] != -1)
-		{
-			assert(i < _shipImages.size());
-			_sfmlRenderer.render(_shipBackground[i]);
-			_sfmlRenderer.render(_shipImages[i]);
-		}
-	}
 
     _sfmlRenderer.render(_toolTip);
     _sfmlRenderer.render(_title);
@@ -162,59 +177,6 @@ bool PreGameApplicationState::bUpdate(float dtSeconds)
                 }
             }
             _guiContainer.handleEvent(e);
-        }
-    }
-
-    std::vector<GuiPlayerJoinContainer::Player> joinedPlayers = _players->getJoinedPlayers();
-    for(const GuiPlayerJoinContainer::Player& p : joinedPlayers)
-    {
-        assert(p.id < _shipIds.size());
-        if(_shipIds[p.id] != p.shipId)
-        {
-            assert(p.id < _shipImages.size());
-            GuiTexture& img = _shipImages[p.id];
-            img.setTexture("ship" + std::to_string(p.shipId) + ".png");
-
-            sf::Vector2u windowSize = _context.window.getSize();
-            sf::FloatRect bounds = img.getBoundingRect();
-            float clipX = std::max(bounds.width - (windowSize.x * 0.8f) / 2.f, 0.f);
-            float clipY = std::max(bounds.height - (windowSize.y * 0.8f) / 2.f, 0.f);
-
-
-
-            if(clipX > 0.f || clipY > 0.f)
-            {
-                float widthPerHeight = bounds.width / bounds.height;
-                float newWidth = std::min(bounds.width - clipX, bounds.width - clipY * widthPerHeight);
-                float newHeight = std::min(bounds.height - clipY, bounds.height - clipX / widthPerHeight);
-                img.setSize(newWidth, newHeight);
-                bounds = img.getBoundingRect();
-            }
-
-            img.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
-
-            float x = (p.id % 2) * (windowSize.x / 2.f) + windowSize.x / 4.f;
-            float y = (p.id / 2) * (windowSize.y / 2.f) + windowSize.y / 4.f;
-            img.setPosition(sf::Vector2f(x, y));
-
-			_shipBackground[p.id].setSize(sf::Vector2f(bounds.width, bounds.height));
-			_shipBackground[p.id].setOrigin(sf::Vector2f(bounds.width / 2, bounds.height / 2));
-			_shipBackground[p.id].setPosition(sf::Vector2f(x, y));
-			_shipBackground[p.id].setFillColor(sf::Color(255, 255, 255, 200));
-
-            _shipIds[p.id] = p.shipId;
-        }
-    }
-
-    for(size_t i = 0; i < _shipIds.size(); i++)
-    {
-        auto foundIt = std::find_if(joinedPlayers.begin(), joinedPlayers.end(), [i](const GuiPlayerJoinContainer::Player& p)
-        {
-            return p.id == i;
-        });
-        if(foundIt == joinedPlayers.end())
-        {
-            _shipIds[i] = -1;
         }
     }
 
