@@ -30,6 +30,8 @@ void WindowRenderer::initialize(sf::RenderWindow* window, GLfloat x, GLfloat y, 
 	_outsideShader.get()->setSampler("uNormal", 2);
 	_outsideShader.get()->setSampler("uIllumination", 3);
 
+	_windowTexture = TextureCache::get("window_scratches.png");
+
 	_window = window;
 	_x		= x;
 	_y		= y;
@@ -115,6 +117,9 @@ void GFX::WindowRenderer::windowPass(Camera & camera)
 	shader->bind();
 	shader->setUniform("uCameraPos", camera.getPosition());
 	shader->setUniform("uFogDistance", _fogDistance);
+
+	_windowTexture.get()->bind(0);
+
 	for (auto windowDrawCall : _windowDrawCalls)
 	{
 		RenderStates states{ &camera , glm::mat4(1.f), _windowShader.get() };
@@ -122,6 +127,8 @@ void GFX::WindowRenderer::windowPass(Camera & camera)
 		windowDrawCall->windowModel.get()->setModelMatrix(windowDrawCall->modelTransform);
 		windowDrawCall->windowModel.get()->render(states);
 	}
+
+	_windowTexture.get()->unbind(0);
 
 	glDisable(GL_BLEND);
 

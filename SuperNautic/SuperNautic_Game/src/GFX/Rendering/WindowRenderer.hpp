@@ -41,6 +41,7 @@ namespace GFX
 		std::vector<Renderable3D*>	_drawCalls;
 		ShaderAsset	_windowShader;
 		ShaderAsset	_outsideShader;
+		TextureAsset _windowTexture;
 
 		Framebuffer _outsideFrameBuffer;
 		Framebuffer* _resultFramebuffer;
