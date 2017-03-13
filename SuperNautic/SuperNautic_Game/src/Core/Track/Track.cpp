@@ -606,33 +606,42 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 	// Add temperature zones
 	if (segment->nrOfZones() > 0 && _generatedLength > 700.f)
 	{
-		std::vector<float> temperatures;
+		std::vector<GLfloat> temperatures;
 		temperatures.resize(4, -5.f);
-		unsigned int nrOfActive = 0;
-		while (nrOfActive < 2)
+		std::vector<unsigned int> untriedIndexes;
+		for (unsigned int i = 0; i < 4; ++i)
 		{
-			int index = rand() % 4;
+			untriedIndexes.push_back(i);
+		}
+		unsigned int nrOfActive = 0;
+		while (untriedIndexes.size() > 0 && nrOfActive < 2)
+		{
+			int indexToRemove = rand() % untriedIndexes.size();
+			int index = untriedIndexes[indexToRemove];
 			if (temperatures[index] < -2.f)
 			{
 				int r = rand() % 8;
 				if (r == 0)
 				{
 					temperatures[index] = (float)rand() / RAND_MAX - 1.f;
+					++nrOfActive;
 				}
 				else if (r <= 2)
 				{
 					temperatures[index] = (float)rand() / RAND_MAX;
+					++nrOfActive;
 				}
-				else
-				{
-					temperatures[index] = -5.f;
-				}
+			}
+			untriedIndexes.erase(untriedIndexes.begin() + indexToRemove);
+			if (nrOfActive >= 3)
+			{
 				nrOfActive++;
 			}
 		}
 		if (nrOfActive >= 1)
 		{
 			_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures });
+			nrOfActive++;
 		}
 	}
 }
@@ -849,7 +858,7 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 	{
 		if (_temperatureZones[i].segmentIndex >= lastPlayer)
 		{
-			if (_temperatureZones[i].segmentIndex <= firstPlayer)
+			if (_temperatureZones[i].segmentIndex < firstPlayer)
 			{
 				std::vector<float>& temps = _temperatureZones[i].temperatures;
 				for (unsigned int j = 0; j < temps.size(); ++j)
