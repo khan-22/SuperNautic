@@ -29,7 +29,7 @@ void ObstacleInstance::decreaseSpeed(const float dt)
 {
 	if (_rotSpeed > 0.f)
 	{
-		_rotSpeed -= 5.0f * dt;
+		_rotSpeed -= 6.0f * dt;
 	}
 }
 

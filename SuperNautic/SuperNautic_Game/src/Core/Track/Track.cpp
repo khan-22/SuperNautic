@@ -31,7 +31,7 @@ Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	, _generatedLength(0.f)
 	, _totalProgress(0.f)
 	, _progressionLength(1500.f)
-	, _endMargin(600.f)
+	, _endMargin(800.f)
 	, _endMatrix(glm::mat4())
 {
 
@@ -215,6 +215,14 @@ bool Track::bGenerate()
 				// End segment
 				if (bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1))
 				{
+				 // Insert end segment
+				/*const Segment * segment = _segmentHandler->loadSegment(_segmentHandler->infos().size() - 1);
+				SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix);
+				glm::mat4 modelEndMat = segment->getEndMatrix();
+				_endMatrix = _endMatrix * modelEndMat;
+				_generatedLength += segment->getLength();
+				_track.push_back(tempInstance);*/
+
 					if (_difficulty > 0.05f)
 					{
 						placeObstacles();
@@ -225,7 +233,7 @@ bool Track::bGenerate()
 				}
 				else
 				{
-					deleteSegments(1000.f);
+					deleteSegments(3000.f);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 				}
 			}
@@ -541,10 +549,10 @@ bool Track::bTestCollision(const CollisionMesh& mesh) const
 void Track::insertStructure(const int index)
 {
 	float startLength = _generatedLength;
-	const SegmentHandler::Structure * sugMig = _segmentHandler->getStructure(index);
+	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
 	// Randomize how many times the structure should be looped
-	int min = sugMig->minInRow;
-	int max = sugMig->maxInRow;
+	int min = s->minInRow;
+	int max = s->maxInRow;
 	double scaled = (double)rand() / RAND_MAX;
 	int amount = static_cast<int>((max - min + 1) * scaled) + min;
 	// Randomize if there should be "negative" rotation
@@ -557,9 +565,9 @@ void Track::insertStructure(const int index)
 	for (int i = 0; i < amount; i++)
 	{
 		// Amount of pieces in each "loop"
-		for (unsigned int j = 0; j < sugMig->pieces.size(); j++)
+		for (unsigned int j = 0; j < s->pieces.size(); j++)
 		{
-			const SegmentHandler::StructurePiece * p = sugMig->pieces[j];
+			const SegmentHandler::StructurePiece * p = s->pieces[j];
 			const Segment * segment = _segmentHandler->loadSegment(p->index);
 			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix);
 
@@ -606,33 +614,42 @@ void Track::addWindowsAndZonesToSegment(const Segment* segment)
 	// Add temperature zones
 	if (segment->nrOfZones() > 0 && _generatedLength > 700.f)
 	{
-		std::vector<float> temperatures;
+		std::vector<GLfloat> temperatures;
 		temperatures.resize(4, -5.f);
-		unsigned int nrOfActive = 0;
-		while (nrOfActive < 2)
+		std::vector<unsigned int> untriedIndexes;
+		for (unsigned int i = 0; i < 4; ++i)
 		{
-			int index = rand() % 4;
+			untriedIndexes.push_back(i);
+		}
+		unsigned int nrOfActive = 0;
+		while (untriedIndexes.size() > 0 && nrOfActive < 2)
+		{
+			int indexToRemove = rand() % untriedIndexes.size();
+			int index = untriedIndexes[indexToRemove];
 			if (temperatures[index] < -2.f)
 			{
 				int r = rand() % 8;
 				if (r == 0)
 				{
 					temperatures[index] = (float)rand() / RAND_MAX - 1.f;
+					++nrOfActive;
 				}
 				else if (r <= 2)
 				{
 					temperatures[index] = (float)rand() / RAND_MAX;
+					++nrOfActive;
 				}
-				else
-				{
-					temperatures[index] = -5.f;
-				}
+			}
+			untriedIndexes.erase(untriedIndexes.begin() + indexToRemove);
+			if (nrOfActive >= 3)
+			{
 				nrOfActive++;
 			}
 		}
 		if (nrOfActive >= 1)
 		{
 			_temperatureZones.push_back({ segment->getZonesModel(), _endMatrix, static_cast<unsigned int>(_track.size()), temperatures });
+			nrOfActive++;
 		}
 	}
 }
@@ -679,7 +696,7 @@ bool Track::bEndTrack()
 			{
 				if (!bInsertNormalSegment(i))
 				{
-					deleteSegments(_endMargin + 500);
+					deleteSegments(_endMargin + 1500);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					return false;
 				}
@@ -691,7 +708,7 @@ bool Track::bEndTrack()
 	{
 		if (!bInsertNormalSegment(0))
 		{
-			deleteSegments(_endMargin + 500);
+			deleteSegments(_endMargin + 1500);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 			return false;
 		}
@@ -787,13 +804,13 @@ void Track::placeObstacles()
 // Place dark areas in the finished track
 void Track::placeDarkAreas()
 {
-	int index = rand() % 300 + 20;
+	int index = rand() % 100 + 20;
 	while (index < _track.size() - 10)
 	{
 		unsigned int length = (unsigned int)(rand() % (int(20 * _difficulty) + 8) + 6 + 10 * _difficulty);
 		_darkAreas.push_back({ (unsigned int)index, length, 0.f });
 		index += length;
-		index += (unsigned int)(rand() % (int(400 * (1.f - _difficulty)) + 70) + 100 + 100 * (1.f - _difficulty));
+		index += (unsigned int)(rand() % (int(300 * (1.f - _difficulty)) + 70) + 50 + 100 * (1.f - _difficulty));
 	}
 	// Removes the last area if it is too long
 	if (_darkAreas.size() >= 1 && _darkAreas.back().startIndex + _darkAreas.back().length > _track.size() - 10)
@@ -849,14 +866,14 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 	{
 		if (_temperatureZones[i].segmentIndex >= lastPlayer)
 		{
-			if (_temperatureZones[i].segmentIndex <= firstPlayer)
+			if (_temperatureZones[i].segmentIndex < firstPlayer)
 			{
 				std::vector<float>& temps = _temperatureZones[i].temperatures;
 				for (unsigned int j = 0; j < temps.size(); ++j)
 				{
 					if (temps[j] > -0.99f)
 					{
-						temps[j] -= 0.17f * dt;
+						temps[j] -= 0.20f * dt;
 					}
 				}
 
@@ -917,9 +934,9 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 		{
 			// Update values if inside area
 			dapi.factor += 0.7f * dt;
-			if (dapi.factor > 0.85f)
+			if (dapi.factor > 0.82f)
 			{
-				dapi.factor = 0.85f;
+				dapi.factor = 0.82f;
 			}
 			if (playerIndexes[i] > dapi.startIndex + dapi.length)
 			{
@@ -951,7 +968,7 @@ void Track::render(GFX::ViewportPipeline& pipeline, const unsigned int playerInd
 	for (unsigned int i = 1; i < 100; ++i)
 	{
 		size_t index = shipIndex + i;
-		if (index >= 0 && index < _track.size())
+		if (index >= 0 && index < _track.size() - 1)
 		{
 			pipeline.windowForward.render(*_track[index]);
 		}
