@@ -29,7 +29,11 @@ void main()
 
 	//outColor = vec4(mix(vec3(0.0, 0.03, 0.06), vec3(0.0, 0.6, 0.7), factor), 0.5);
 	outColor = vec4(mix(vec3(0.05, 0.10, 0.206), vec3(0.0, 0.6, 0.7), factor), 0.5);
-	outColor.a = 0.0;
-	outColor += texture(uTexture, fs_in.uv);
-	outColor = fogify(outColor, fs_in.camToFragDistance, uFogDistance);
+	
+	vec4 dirtColor = texture(uTexture, fs_in.uv);
+
+	//outColor += dirtColor.rgb * clamp(dirtColor.a, 0.0, 1.0);//mix(outColor, dirtColor, dirColor.a);
+	outColor = vec4(mix(outColor.rgb, dirtColor.rgb, dirtColor.a), 0.5);//mix(outColor, dirtColor, dirColor.a);
+
+	outColor = clamp(fogify(outColor, fs_in.camToFragDistance, uFogDistance), vec4(0.0), vec4(1.0));
 }
