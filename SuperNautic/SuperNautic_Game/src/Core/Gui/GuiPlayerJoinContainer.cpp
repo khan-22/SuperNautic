@@ -9,7 +9,7 @@
 
 const unsigned char GuiPlayerJoinContainer::_COLORS[4][_MAX_PLAYERS] =
 {
-    {255, 0, 0, 255},
+    {200, 0, 255, 255},
     {0, 255, 0, 255},
     {0, 0, 255, 255},
     {255, 255, 0, 255}

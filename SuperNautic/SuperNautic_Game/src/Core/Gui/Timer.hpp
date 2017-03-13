@@ -17,6 +17,7 @@ public:
 	~Timer();
 
 	void updateTime(float dt);
+	float getTime();
 
 	void updateCurrent(float dtSeconds) override;
 	void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;

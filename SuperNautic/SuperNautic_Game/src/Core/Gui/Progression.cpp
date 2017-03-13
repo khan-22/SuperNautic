@@ -29,7 +29,7 @@ Progression::Progression(int windowWidth, int windowHeight, int amountOfPlayers)
 		switch (i)
 		{
 		case 0:
-			_progressionMeter[i].setFillColor(sf::Color(255, 0, 0, 200));
+			_progressionMeter[i].setFillColor(sf::Color(200, 0, 255, 200));
 			break;
 		case 1:
 			_progressionMeter[i].setFillColor(sf::Color(0, 255, 0, 200));

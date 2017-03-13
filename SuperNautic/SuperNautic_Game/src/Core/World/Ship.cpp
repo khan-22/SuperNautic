@@ -13,6 +13,7 @@
 #include "Core/Geometry/RayIntersection.hpp"
 #include "Core/Utility/CollisionUtility.hpp"
 
+/* UNUSED CONSTRUCTOR
 Ship::Ship(glm::vec3 color)
 	:
 	_destroyed{ false },
@@ -46,7 +47,7 @@ Ship::Ship(glm::vec3 color)
 	_bEngineFlash{ false },
 	_bEngineOverload{ false },
 	_bObstacleCollision{ false },
-	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
+	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.0f } },
 	_cooldownOnObstacleCollision{ 2.0f },
 	_immunityoOnObstacleCollision{ 4.0f },
 	_immunityTimer{ 0.0f },
@@ -77,7 +78,7 @@ Ship::Ship(glm::vec3 color)
 
 	setInactiveTime(_inactiveAtStart);
 
-	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.5f, 7.f, 50.f);
 	_particleSystem.start();
 
 	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
@@ -85,7 +86,7 @@ Ship::Ship(glm::vec3 color)
 	_rightChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
 	_rightChemtrailParticleSystem.start();
 }
-
+*/
 Ship::Ship(glm::vec3 color, int shipId)
 	:
 	_shipId{ shipId },
@@ -120,7 +121,7 @@ Ship::Ship(glm::vec3 color, int shipId)
 	_bEngineFlash{ false },
 	_bEngineOverload{ false },
 	_bObstacleCollision{ false },
-	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
+	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.0f } },
 	_cooldownOnObstacleCollision{ 2.0f },
 	_immunityoOnObstacleCollision{ 4.0f },
 	_immunityTimer{ 0.0f },
@@ -152,7 +153,7 @@ Ship::Ship(glm::vec3 color, int shipId)
 
 	setInactiveTime(_inactiveAtStart);
 
-	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.5f, 7.f, 50.f);
 	_particleSystem.start();
 
 	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
@@ -160,7 +161,6 @@ Ship::Ship(glm::vec3 color, int shipId)
 	_rightChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
 	_rightChemtrailParticleSystem.start();
 }
-
 Ship::Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float cooldownOnObstacleCollision, float overheatTemperature, float overhearCooldown)
 	:
 	_destroyed{ false },
@@ -194,7 +194,7 @@ Ship::Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float 
 	_bEngineFlash{ false },
 	_bEngineOverload{ false },
 	_bObstacleCollision{ false },
-	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.5f } },
+	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.0f } },
 	_cooldownOnObstacleCollision{ cooldownOnObstacleCollision },
 	_immunityoOnObstacleCollision{ 4.0f },
 	_immunityTimer{ 0.0f },
@@ -225,7 +225,7 @@ Ship::Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float 
 
 	setInactiveTime(_inactiveAtStart);
 
-	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.5f, 7.f, 50.f);
 	_particleSystem.start();
 
 	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
@@ -467,9 +467,9 @@ void Ship::handleTemperature(float dt)
 	// Get difference between acceleration [0..1] and temperature [0..1]
 	float difference = (_accelerationFactor + 1.0f) / 2.0f - _engineTemperature;
 
-	difference += _currentSurfaceTemperature * 2.0f;
+	difference += _currentSurfaceTemperature * 4.0f;
 
-	_engineTemperature += (difference == 0.0f ? 1.0f : (std::fabs(difference) / difference)) *  powf(std::fabs(difference), 1.2f) * 0.2f * dt;
+	_engineTemperature += (difference == 0.0f ? 1.0f : (std::fabs(difference) / difference)) *  powf(std::fabs(difference), 1.2f) * 0.4f * dt;
 	_engineTemperature = clamp(_engineTemperature, 0.0f, 1.0f);
 
 	if (_engineTemperature > _overheatTemperature && _engineCooldown < 0.f)
@@ -480,8 +480,8 @@ void Ship::handleTemperature(float dt)
 
 	if (_engineCooldown > 0.0f)
 	{
-		_shipCollisionShake.setMagnitude(std::max(0.1f, _engineCooldown * 0.08f));
-		_shipCollisionShake.setSpeed(std::max(0.1f, _engineCooldown * 0.08f));
+		_shipCollisionShake.setMagnitude(std::max(0.1f, _engineCooldown * 0.5f / _overheatCooldown));
+		_shipCollisionShake.setSpeed(std::max(0.1f, _engineCooldown * 0.5f / _overheatCooldown));
 	}
 }
 

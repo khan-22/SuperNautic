@@ -1,5 +1,6 @@
 #include "Core/World/Player.hpp"
 
+/* UNUSED CONSTRUCTOR
 Player::Player(int id, glm::vec3 color) :
 	_playerId(id),
 	_input(id),
@@ -15,7 +16,7 @@ Player::Player(int id, glm::vec3 color) :
 {
 	_bIsFirstPerson = false;
 }
-
+*/
 Player::Player(int id, glm::vec3 color, int shipId) :
 	_playerId(id),
 	_input(id),
@@ -33,6 +34,7 @@ Player::Player(int id, glm::vec3 color, int shipId) :
 	_hud.setOverheatTemperature(_ship.getOverheatTemperature());
 }
 
+
 Player::Player(int id, glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float cooldownOnObstacleCollision, float overheatTemperature, float overheatCooldown) :
 	_playerId(id),
 	_input(id),
@@ -49,7 +51,7 @@ Player::Player(int id, glm::vec3 color, float maxAcceleration, float maxTurningS
 	_bIsFirstPerson = false;
 }
 
-Player::Player(const Player& other) : Player{ other._playerId, glm::vec3{0, 0, 0} }
+Player::Player(const Player& other) : Player{ other._playerId, glm::vec3{0, 0, 0}, 0, 0, 0, 0, 0 }
 {
 	LOG_ERROR("Player copy constructor called! That is bad :(");
 }
@@ -220,6 +222,11 @@ void Player::setPosition(int position)
 	_hud.setPosition(position);
 	_audio.setRandomGoalBuffer(position);
 	_audio.playAudio(_audio.goal);
+}
+
+void Player::setTime(float time)
+{
+	_hud.setTime(time);
 }
 
 void Player::swapPerspective()

@@ -37,7 +37,7 @@ World::World(ApplicationContext& context)
 
 	_track->setNrOfPlayers(context.players.size());
 
-	std::vector<glm::vec3> colors{ glm::vec3{ 0.8f, 0.2f, 0.1f },
+	std::vector<glm::vec3> colors{ glm::vec3{ 0.4f, 0.1f, 0.8f },
 		glm::vec3{ 0.1f, 0.8f, 0.1f },
 		glm::vec3{ 0.1f, 0.1f, 0.8f },
 		glm::vec3{ 0.8f, 0.8f, 0.1f } };
@@ -230,6 +230,7 @@ void World::update(float dt, sf::Window& window)
 				{
 					++_playersAtFinishLine;
 					_players[i].setPosition(_playersAtFinishLine);
+					_players[i].setTime(_timer.getTime());
 				}
 				_players[i].getShip().stop();
 			}

@@ -186,31 +186,31 @@ void GuiContainer::selectNext()
         return;
     }
 
-    if(!bHasSelection())
+    if(bHasSelection())
     {
-        _selection = 0;
         getSelection().toggleSelection();
-        onElementSelect();
-        return;
     }
 
 
-    getSelection().toggleSelection();
-
     size_t previousSelection = _selection;
-    unsigned int iteration = 1;
+    unsigned int iteration = 0;
     do
     {
         _selection = (_selection + 1) % _elements.size();
         iteration++;
     } while(!getSelection().bIsSelectable() && iteration < _elements.size());
 
-    getSelection().toggleSelection();
-
-
-    if(previousSelection != _selection)
+    if(getSelection().bIsSelectable())
     {
-        onElementSelect();
+        getSelection().toggleSelection();
+        if(previousSelection != _selection)
+        {
+            onElementSelect();
+        }
+    }
+    else
+    {
+        _selection = -1;
     }
 }
 
@@ -221,28 +221,30 @@ void GuiContainer::selectPrevious()
         return;
     }
 
-    if(!bHasSelection())
+    if(bHasSelection())
     {
-        _selection = _elements.size() - 1;
         getSelection().toggleSelection();
-        onElementSelect();
-        return;
     }
 
-    getSelection().toggleSelection();
-
     size_t previousSelection = _selection;
-    unsigned int iteration = 1;
+    unsigned int iteration = 0;
     do
     {
         _selection = std::min(_elements.size() - 1, _selection - 1);
         iteration++;
     } while(!getSelection().bIsSelectable() && iteration < _elements.size());
-    getSelection().toggleSelection();
 
-    if(previousSelection != _selection)
+    if(getSelection().bIsSelectable())
     {
-        onElementSelect();
+        getSelection().toggleSelection();
+        if(previousSelection != _selection)
+        {
+            onElementSelect();
+        }
+    }
+    else
+    {
+        _selection = -1;
     }
 }
 

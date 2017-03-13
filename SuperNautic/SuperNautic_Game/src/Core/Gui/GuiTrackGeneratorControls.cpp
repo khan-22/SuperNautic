@@ -346,3 +346,9 @@ void GuiTrackGeneratorControls::handleEventCurrent(const sf::Event& event)
         }
     }
 }
+
+bool GuiTrackGeneratorControls::bIsSelectable() const
+{
+    return true;
+}
+
