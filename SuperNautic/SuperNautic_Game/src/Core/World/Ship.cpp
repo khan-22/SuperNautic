@@ -13,6 +13,7 @@
 #include "Core/Geometry/RayIntersection.hpp"
 #include "Core/Utility/CollisionUtility.hpp"
 
+/* UNUSED CONSTRUCTOR
 Ship::Ship(glm::vec3 color)
 	:
 	_destroyed{ false },
@@ -85,7 +86,7 @@ Ship::Ship(glm::vec3 color)
 	_rightChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
 	_rightChemtrailParticleSystem.start();
 }
-
+*/
 Ship::Ship(glm::vec3 color, int shipId)
 	:
 	_shipId{ shipId },
@@ -160,7 +161,6 @@ Ship::Ship(glm::vec3 color, int shipId)
 	_rightChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
 	_rightChemtrailParticleSystem.start();
 }
-
 Ship::Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float cooldownOnObstacleCollision, float overheatTemperature, float overhearCooldown)
 	:
 	_destroyed{ false },
@@ -480,8 +480,8 @@ void Ship::handleTemperature(float dt)
 
 	if (_engineCooldown > 0.0f)
 	{
-		_shipCollisionShake.setMagnitude(std::max(0.1f, _engineCooldown * 0.08f));
-		_shipCollisionShake.setSpeed(std::max(0.1f, _engineCooldown * 0.08f));
+		_shipCollisionShake.setMagnitude(std::max(0.1f, _engineCooldown * 0.5f / _overheatCooldown));
+		_shipCollisionShake.setSpeed(std::max(0.1f, _engineCooldown * 0.5f / _overheatCooldown));
 	}
 }
 
