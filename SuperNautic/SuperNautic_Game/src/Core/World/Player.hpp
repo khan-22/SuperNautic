@@ -38,6 +38,7 @@ public:
 	Camera* getCamera();
 
 	void setPosition(int position);
+	void setTime(float time);
 
 	bool _bIsFirstPerson;
 

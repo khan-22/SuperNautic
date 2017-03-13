@@ -230,6 +230,7 @@ void World::update(float dt, sf::Window& window)
 				{
 					++_playersAtFinishLine;
 					_players[i].setPosition(_playersAtFinishLine);
+					_players[i].setTime(_timer.getTime());
 				}
 				_players[i].getShip().stop();
 			}

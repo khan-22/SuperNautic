@@ -35,6 +35,11 @@ void Timer::updateTime(float dt)
 	_time += dt;
 }
 
+float Timer::getTime()
+{
+	return _time;
+}
+
 void Timer::updateCurrent(float dtSeconds)
 {
 	int minutes = (int)_time / 60;

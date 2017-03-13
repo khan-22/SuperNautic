@@ -38,6 +38,10 @@ HUD::HUD(int windowWidth, int windowHeight) :
 	_tPosition.setFont(*_font.get());
 	_tPosition.setFillColor(sf::Color::Cyan);
 	_tPosition.setString("0");
+
+	_tTime.setFont(*_font.get());
+	_tTime.setFillColor(sf::Color::Cyan);
+	_tTime.setString("00:00:00");
 }
 
 HUD::~HUD()
@@ -58,6 +62,47 @@ void HUD::setPosition(int position)
 {
 	_position = position;
 	_tPosition.setString(std::to_string(_position));
+}
+
+void HUD::setTime(float time)
+{
+	_time = time;
+	int minutes = (int)_time / 60;
+	int seconds = (int)_time % 60;
+	int hundredths = (int)(_time * 100) % 100;
+
+	std::string sMinutes;
+	std::string sSeconds;
+	std::string sHundredths;
+
+	if (minutes < 10)
+	{
+		sMinutes = "0" + std::to_string(minutes);
+	}
+	else
+	{
+		sMinutes = std::to_string(minutes);
+	}
+
+	if (seconds < 10)
+	{
+		sSeconds = "0" + std::to_string(seconds);
+	}
+	else
+	{
+		sSeconds = std::to_string(seconds);
+	}
+
+	if (hundredths < 10)
+	{
+		sHundredths = "0" + std::to_string(hundredths);
+	}
+	else
+	{
+		sHundredths = std::to_string(hundredths);
+	}
+
+	_tTime.setString(sMinutes + ":" + sSeconds + ":" + sHundredths);
 }
 
 void HUD::setOverheatTemperature(float overheatTemperature)
@@ -107,6 +152,10 @@ void HUD::setScreenSize(int width, int height, int offsetX, int offsetY)
 	_tPosition.setCharacterSize(static_cast<unsigned>(_widthStep * 30));
 	_tPosition.setOrigin(_tPosition.getGlobalBounds().width / 2, _tPosition.getGlobalBounds().height / 2);
 	_tPosition.setPosition(static_cast<float>(_widthStep * 150 + _offsetX), static_cast<float>(_heightStep * 150 + _offsetY));
+
+	_tTime.setCharacterSize(static_cast<unsigned>(_widthStep * 10));
+	_tTime.setOrigin(_tTime.getGlobalBounds().width / 2, _tTime.getGlobalBounds().height / 2);
+	_tTime.setPosition(static_cast<float>(_widthStep * 150 + _offsetX), static_cast<float>(_heightStep * 150 + _tPosition.getGlobalBounds().height + _offsetY));
 }
 
 void HUD::updateCurrent(float dtSeconds)
@@ -161,5 +210,6 @@ void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) cons
 	else
 	{
 		target.draw(_tPosition);
+		target.draw(_tTime);
 	}
 }
