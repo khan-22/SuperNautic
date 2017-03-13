@@ -31,7 +31,7 @@ Track::Track(SegmentHandler * segmentHandler, ObstacleHandler * obstacleHandler)
 	, _generatedLength(0.f)
 	, _totalProgress(0.f)
 	, _progressionLength(1500.f)
-	, _endMargin(600.f)
+	, _endMargin(800.f)
 	, _endMatrix(glm::mat4())
 {
 
@@ -215,6 +215,14 @@ bool Track::bGenerate()
 				// End segment
 				if (bInsertNormalSegment(static_cast<int>(_segmentHandler->infos().size()) - 1))
 				{
+				 // Insert end segment
+				/*const Segment * segment = _segmentHandler->loadSegment(_segmentHandler->infos().size() - 1);
+				SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix);
+				glm::mat4 modelEndMat = segment->getEndMatrix();
+				_endMatrix = _endMatrix * modelEndMat;
+				_generatedLength += segment->getLength();
+				_track.push_back(tempInstance);*/
+
 					if (_difficulty > 0.05f)
 					{
 						placeObstacles();
@@ -225,7 +233,7 @@ bool Track::bGenerate()
 				}
 				else
 				{
-					deleteSegments(1000.f);
+					deleteSegments(3000.f);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 				}
 			}
@@ -541,10 +549,10 @@ bool Track::bTestCollision(const CollisionMesh& mesh) const
 void Track::insertStructure(const int index)
 {
 	float startLength = _generatedLength;
-	const SegmentHandler::Structure * sugMig = _segmentHandler->getStructure(index);
+	const SegmentHandler::Structure * s = _segmentHandler->getStructure(index);
 	// Randomize how many times the structure should be looped
-	int min = sugMig->minInRow;
-	int max = sugMig->maxInRow;
+	int min = s->minInRow;
+	int max = s->maxInRow;
 	double scaled = (double)rand() / RAND_MAX;
 	int amount = static_cast<int>((max - min + 1) * scaled) + min;
 	// Randomize if there should be "negative" rotation
@@ -557,9 +565,9 @@ void Track::insertStructure(const int index)
 	for (int i = 0; i < amount; i++)
 	{
 		// Amount of pieces in each "loop"
-		for (unsigned int j = 0; j < sugMig->pieces.size(); j++)
+		for (unsigned int j = 0; j < s->pieces.size(); j++)
 		{
-			const SegmentHandler::StructurePiece * p = sugMig->pieces[j];
+			const SegmentHandler::StructurePiece * p = s->pieces[j];
 			const Segment * segment = _segmentHandler->loadSegment(p->index);
 			SegmentInstance* tempInstance = new SegmentInstance(segment, _endMatrix);
 
@@ -688,7 +696,7 @@ bool Track::bEndTrack()
 			{
 				if (!bInsertNormalSegment(i))
 				{
-					deleteSegments(_endMargin + 500);
+					deleteSegments(_endMargin + 1500);
 					_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 					return false;
 				}
@@ -700,7 +708,7 @@ bool Track::bEndTrack()
 	{
 		if (!bInsertNormalSegment(0))
 		{
-			deleteSegments(_endMargin + 500);
+			deleteSegments(_endMargin + 1500);
 			_endMatrix = _track.back()->getModelMatrix() * _track.back()->getEndMatrix();
 			return false;
 		}
@@ -960,7 +968,7 @@ void Track::render(GFX::ViewportPipeline& pipeline, const unsigned int playerInd
 	for (unsigned int i = 1; i < 100; ++i)
 	{
 		size_t index = shipIndex + i;
-		if (index >= 0 && index < _track.size())
+		if (index >= 0 && index < _track.size() - 1)
 		{
 			pipeline.windowForward.render(*_track[index]);
 		}
