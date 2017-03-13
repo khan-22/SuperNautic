@@ -21,6 +21,8 @@ class GuiTrackGeneratorControls : public GuiContainer
 public:
    GuiTrackGeneratorControls(GuiTrackGenerator& generator, GuiToolTip* toolTip = nullptr, Track* existingTrack = nullptr);
 
+    virtual bool bIsSelectable() const override;
+
 protected:
     void handleEventCurrent(const sf::Event& event) override;
 
