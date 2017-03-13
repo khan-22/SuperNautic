@@ -224,6 +224,11 @@ void Player::setPosition(int position)
 	_audio.playAudio(_audio.goal);
 }
 
+void Player::setTime(float time)
+{
+	_hud.setTime(time);
+}
+
 void Player::swapPerspective()
 {
 	_bIsFirstPerson = !_bIsFirstPerson;
