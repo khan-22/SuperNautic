@@ -804,7 +804,7 @@ void Track::placeObstacles()
 // Place dark areas in the finished track
 void Track::placeDarkAreas()
 {
-	int index = 10; //rand() % 100 + 20;
+	int index = rand() % 100 + 20;
 	while (index < _track.size() - 10)
 	{
 		unsigned int length = (unsigned int)(rand() % (int(20 * _difficulty) + 8) + 6 + 10 * _difficulty);
