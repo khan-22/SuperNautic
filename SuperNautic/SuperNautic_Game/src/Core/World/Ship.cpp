@@ -77,7 +77,7 @@ Ship::Ship(glm::vec3 color)
 
 	setInactiveTime(_inactiveAtStart);
 
-	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.5f, 7.f, 50.f);
 	_particleSystem.start();
 
 	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
@@ -152,7 +152,7 @@ Ship::Ship(glm::vec3 color, int shipId)
 
 	setInactiveTime(_inactiveAtStart);
 
-	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.5f, 7.f, 50.f);
 	_particleSystem.start();
 
 	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
@@ -225,7 +225,7 @@ Ship::Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float 
 
 	setInactiveTime(_inactiveAtStart);
 
-	_particleSystem.init(300, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.2f, 7.f, 50.f);
+	_particleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f), 0.5f, 7.f, 50.f);
 	_particleSystem.start();
 
 	_leftChemtrailParticleSystem.init(600, glm::vec3(0.f), glm::vec3(0.f), 0.2f, 0.f, 0.f);
