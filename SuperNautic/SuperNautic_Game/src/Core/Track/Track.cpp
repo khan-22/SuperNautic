@@ -804,7 +804,7 @@ void Track::placeObstacles()
 // Place dark areas in the finished track
 void Track::placeDarkAreas()
 {
-	int index = rand() % 100 + 20;
+	int index = 10; //rand() % 100 + 20;
 	while (index < _track.size() - 10)
 	{
 		unsigned int length = (unsigned int)(rand() % (int(20 * _difficulty) + 8) + 6 + 10 * _difficulty);
@@ -934,9 +934,9 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 		{
 			// Update values if inside area
 			dapi.factor += 0.7f * dt;
-			if (dapi.factor > 0.85f)
+			if (dapi.factor > 0.82f)
 			{
-				dapi.factor = 0.85f;
+				dapi.factor = 0.82f;
 			}
 			if (playerIndexes[i] > dapi.startIndex + dapi.length)
 			{
