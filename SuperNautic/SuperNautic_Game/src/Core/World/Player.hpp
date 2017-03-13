@@ -16,7 +16,8 @@
 class Player
 {
 public:
-	Player(int id, glm::vec3 color);
+	// UNUSED CONSTRUCTOR
+	//Player(int id, glm::vec3 color);
 	Player(int id, glm::vec3 color, int shipId);
 	Player(int id, glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float cooldownOnObstacleCollision, float overheatTemperature, float overheatCooldown);
 	~Player();
@@ -37,6 +38,7 @@ public:
 	Camera* getCamera();
 
 	void setPosition(int position);
+	void setTime(float time);
 
 	bool _bIsFirstPerson;
 

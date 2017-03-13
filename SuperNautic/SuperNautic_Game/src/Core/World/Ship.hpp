@@ -26,7 +26,8 @@ class Ship : public GFX::Transformable3D, public GFX::Renderable3D
 public:
 	GFX::TexturedModel _shipModel;
 
-	Ship(glm::vec3 color);
+	// UNUSED CONSTRUCTOR
+	//Ship(glm::vec3 color);
 	Ship(glm::vec3 color, int shipId);
 	Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float cooldownOnObstacleCollision, float overheatTemperature, float overhearCooldown);
 
