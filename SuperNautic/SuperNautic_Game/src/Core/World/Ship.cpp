@@ -641,7 +641,7 @@ void Ship::handleLightsAndParticles(float dt)
 	}
 	else
 	{
-		_warningLight.changeIntensity(_warningLightIntensity * (powf(sinf(_warningAccumulator), 5.0f) + 1.0f) / 2.0f * dangerLevel);
+		_warningLight.changeIntensity(std::max(_warningLightIntensity * (powf(sinf(_warningAccumulator), 5.0f) + 1.0f) / 2.0f * dangerLevel, 0.5f));
 	}
 
 	_warningLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
