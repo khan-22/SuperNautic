@@ -866,7 +866,7 @@ void Track::update(const float dt, const std::vector<unsigned int> playerIndexes
 	{
 		if (_temperatureZones[i].segmentIndex >= lastPlayer)
 		{
-			if (_temperatureZones[i].segmentIndex < firstPlayer)
+			if (_temperatureZones[i].segmentIndex <= firstPlayer)
 			{
 				std::vector<float>& temps = _temperatureZones[i].temperatures;
 				for (unsigned int j = 0; j < temps.size(); ++j)
