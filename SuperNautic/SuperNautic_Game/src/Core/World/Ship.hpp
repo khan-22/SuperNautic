@@ -77,6 +77,7 @@ public:
 	PointLight& getWarningLight();
 	const glm::vec3& getColor();
 	void setBounce(const glm::vec3& bounceVector);
+	float getCooldownOnCollision() const;
 
 	GFX::ParticleSystem& getLeftParticleSystem();
 	GFX::ParticleSystem& getRightParticleSystem();
@@ -161,7 +162,7 @@ private:
 	const float _rayHeight;			// Height above ship of the origin of the ray used for intersection
 
 	float _cooldownOnObstacleCollision;
-	float _immunityoOnObstacleCollision;
+	float _immunityOnObstacleCollision;
 
 	float _overheatTemperature;	// Temperature at which engine overheats
 	const float _warningLevel;			// Temperature at which warning light starts blinking

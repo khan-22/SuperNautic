@@ -49,7 +49,7 @@ Ship::Ship(glm::vec3 color)
 	_bObstacleCollision{ false },
 	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.0f } },
 	_cooldownOnObstacleCollision{ 2.0f },
-	_immunityoOnObstacleCollision{ 4.0f },
+	_immunityOnObstacleCollision{ 4.0f },
 	_immunityTimer{ 0.0f },
 	_blinkFrequency{ 0.1f },
 	_surfaceSlope{ 0.0f, 0.0f, 0.5f },
@@ -123,7 +123,7 @@ Ship::Ship(glm::vec3 color, int shipId)
 	_bObstacleCollision{ false },
 	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.0f } },
 	_cooldownOnObstacleCollision{ 2.0f },
-	_immunityoOnObstacleCollision{ 4.0f },
+	_immunityOnObstacleCollision{ 4.0f },
 	_immunityTimer{ 0.0f },
 	_blinkFrequency{ 0.1f },
 	_surfaceSlope{ 0.0f, 0.0f, 0.5f },
@@ -196,7 +196,7 @@ Ship::Ship(glm::vec3 color, float maxAcceleration, float maxTurningSpeed, float 
 	_bObstacleCollision{ false },
 	_boundingBox{ glm::vec3{ 0.0f }, std::array<glm::vec3, 3>{ glm::vec3{ 1.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 1.0f } }, std::array<float, 3>{ 1.0f, 0.5f, 1.0f } },
 	_cooldownOnObstacleCollision{ cooldownOnObstacleCollision },
-	_immunityoOnObstacleCollision{ 4.0f },
+	_immunityOnObstacleCollision{ 4.0f },
 	_immunityTimer{ 0.0f },
 	_blinkFrequency{ 0.1f },
 	_surfaceSlope{ 0.0f, 0.0f, 0.5f },
@@ -366,7 +366,7 @@ void Ship::obstacleCollision()
 	if (_immunityTimer <= 0.0f)
 	{
 		_steeringCooldown = _cooldownOnObstacleCollision;
-		_immunityTimer = _immunityoOnObstacleCollision;
+		_immunityTimer = _immunityOnObstacleCollision;
 		_bObstacleCollision = true;
 	}
 }
@@ -641,7 +641,7 @@ void Ship::handleLightsAndParticles(float dt)
 	}
 	else
 	{
-		_warningLight.changeIntensity(std::max(_warningLightIntensity * (powf(sinf(_warningAccumulator), 5.0f) + 1.0f) / 2.0f * dangerLevel, 0.5f));
+		_warningLight.changeIntensity(std::max(_warningLightIntensity * (powf(sinf(_warningAccumulator), 5.0f) + 1.0f) / 2.0f * dangerLevel, 0.3f));
 	}
 
 	_warningLight.setPosition(_transformMatrix * glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
@@ -867,6 +867,11 @@ void Ship::setBounce(const glm::vec3& bounceVector)
 	_shipCollisionShake.setSpeed(0.5f);
 }
 
+float Ship::getCooldownOnCollision() const
+{
+	return _cooldownOnObstacleCollision;
+}
+
 GFX::ParticleSystem& Ship::getLeftParticleSystem()
 {
 	return _leftChemtrailParticleSystem;
@@ -898,7 +903,7 @@ void Ship::setShip()
 		_maxAcceleration = 120.f;
 		_maxTurningSpeed = 25.f;
 		_cooldownOnObstacleCollision = 4.f;
-		_immunityoOnObstacleCollision = 6.f;
+		_immunityOnObstacleCollision = 6.f;
 		_overheatTemperature = .90f;
 		_overheatCooldown = 6.f;
 		_shipModel = GFX::TexturedModel(ModelCache::get("ship1.kmf"), MaterialCache::get("ship1.mat"));
@@ -907,7 +912,7 @@ void Ship::setShip()
 		_maxAcceleration = 90.f;
 		_maxTurningSpeed = 15.f;
 		_cooldownOnObstacleCollision = 1.f;
-		_immunityoOnObstacleCollision = 3.f;
+		_immunityOnObstacleCollision = 3.f;
 		_overheatTemperature = .98f;
 		_overheatCooldown = 4.f;
 		_shipModel = GFX::TexturedModel(ModelCache::get("ship2.kmf"), MaterialCache::get("ship2.mat"));

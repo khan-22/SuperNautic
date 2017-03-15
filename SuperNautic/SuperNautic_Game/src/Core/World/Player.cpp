@@ -159,12 +159,12 @@ void Player::update(float dt)
 	_cameraVelocityDirectionShake.setSpeed(std::max((glm::length(_ship.getVelocity()) - 80.0f) * 0.01f, 0.0f));
 	_cameraVelocityDirectionShake.update(dt);
 
-	_cameraCollisionPositionShake.setMagnitude(_ship.getSteeringCooldown() / 2.f);
-	_cameraCollisionPositionShake.setSpeed(_ship.getSteeringCooldown() / 2.f);
+	_cameraCollisionPositionShake.setMagnitude(_ship.getSteeringCooldown() / _ship.getCooldownOnCollision() * 1.2f);
+	_cameraCollisionPositionShake.setSpeed(_ship.getSteeringCooldown() / _ship.getCooldownOnCollision() * 1.2f);
 	_cameraCollisionPositionShake.update(dt);
 
-	_cameraCollisionDirectionShake.setMagnitude(_ship.getSteeringCooldown() / 2.f);
-	_cameraCollisionDirectionShake.setSpeed(_ship.getSteeringCooldown() / 2.f);
+	_cameraCollisionDirectionShake.setMagnitude(_ship.getSteeringCooldown() / _ship.getCooldownOnCollision() * 1.2f);
+	_cameraCollisionDirectionShake.setSpeed(_ship.getSteeringCooldown() / _ship.getCooldownOnCollision() * 1.2f);
 	_cameraCollisionDirectionShake.update(dt);
 
 	if (_ship.isEngineOverload())
