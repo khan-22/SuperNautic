@@ -23,7 +23,8 @@ out VS_OUT
 
 void main()
 {
-	vs_out.camToFragVector = (uModel * vec4(pos, 1.0) - uCameraPos).xyz;
+	vs_out.camToFragVector = vec3(uModel * vec4(pos, 1.0)) - uCameraPos;
+	//vs_out.camToFragVector = (uModel * vec4(pos, 1.0) - uCameraPos).xyz;
 	vs_out.camToFragDistance = length(vs_out.camToFragVector);
 
 	vs_out.uv = uv.xy;
