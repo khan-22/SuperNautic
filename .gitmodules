@@ -7,3 +7,6 @@
 [submodule "SuperNautic/thirdparty/SFML"]
 	path = SuperNautic/thirdparty/SFML
 	url = https://github.com/SFML/SFML.git
+[submodule "SuperNautic/thirdparty/glew"]
+	path = SuperNautic/thirdparty/glew
+	url = https://github.com/ssp2018devops/glew.git
