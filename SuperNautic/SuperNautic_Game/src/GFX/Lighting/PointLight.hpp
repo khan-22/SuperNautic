@@ -3,66 +3,66 @@
 #ifndef POINTLIGHT_HPP
 #define POINTLIGHT_HPP
 
-#include "glm\glm.hpp"
-#include "GL\glew.h"
+#include <GL/glew.h>
+#include <glm/glm.hpp>
 
-struct PointLightProperties
-{
-	glm::vec3	position;
-	glm::vec3	diffuseColor;
-	GLfloat		intensity;
+struct PointLightProperties {
+  glm::vec3 position;
+  glm::vec3 diffuseColor;
+  GLfloat intensity;
 
-	bool		bLightActive;
+  bool bLightActive;
 
-	GLfloat		constant;
-	GLfloat		linear;
-	GLfloat		quadratic;
+  GLfloat constant;
+  GLfloat linear;
+  GLfloat quadratic;
 };
 
-class PointLight
-{
-public:
-	PointLight(glm::vec3 position, glm::vec3 diffuseColor, GLfloat intensity);
+class PointLight {
+ public:
+  PointLight(glm::vec3 position, glm::vec3 diffuseColor, GLfloat intensity);
 
-	void setPosition(glm::vec3 position);
-	const glm::vec3 getPosition();
-	void updateColor(glm::vec3 diffuseColor);
-	
-	void changeIntensity(GLfloat intensity);
+  void setPosition(glm::vec3 position);
+  const glm::vec3 getPosition();
+  void updateColor(glm::vec3 diffuseColor);
 
-	void update(GLfloat dt);
-	void transitionTo(GLfloat newIntensity, GLfloat transitionTime);
+  void changeIntensity(GLfloat intensity);
 
-	void toggleLight(bool bLightActive);
+  void update(GLfloat dt);
+  void transitionTo(GLfloat newIntensity, GLfloat transitionTime);
 
-	bool bGetActive();
+  void toggleLight(bool bLightActive);
 
-	//Returns a struct with all of the light's properties
-	const PointLightProperties getLightProperties();
+  bool bGetActive();
 
-	//Calculates the bounding sphere for the light
-	GLfloat calculatePLBoundSize();
+  // Returns a struct with all of the light's properties
+  const PointLightProperties getLightProperties();
 
-	~PointLight();
-private:
-	glm::vec3	_position;
-	glm::vec3	_diffuseColor;
+  // Calculates the bounding sphere for the light
+  GLfloat calculatePLBoundSize();
 
-	GLfloat		_currentIntensity;
-	GLfloat		_newIntensity;
-	GLfloat		_previousIntensity;
-	GLfloat		_transitionTimer;
-	GLfloat		_transitionTotalTime;
+  ~PointLight();
 
-	bool		_bLightActive;
+ private:
+  glm::vec3 _position;
+  glm::vec3 _diffuseColor;
 
-	//Attenuation properties, should probably expose these to allow modifcation in the future
-	GLfloat _constant	= 1.0f;
-	GLfloat _linear		= 0.045f;
-	GLfloat _quadratic	= 0.0075f;
-	GLfloat _lightBoundsRadius;
+  GLfloat _currentIntensity;
+  GLfloat _newIntensity;
+  GLfloat _previousIntensity;
+  GLfloat _transitionTimer;
+  GLfloat _transitionTotalTime;
 
-	PointLight();
+  bool _bLightActive;
+
+  // Attenuation properties, should probably expose these to allow modifcation
+  // in the future
+  GLfloat _constant = 1.0f;
+  GLfloat _linear = 0.045f;
+  GLfloat _quadratic = 0.0075f;
+  GLfloat _lightBoundsRadius;
+
+  PointLight();
 };
 
 #endif

@@ -1,10 +1,8 @@
 #include <iostream>
 
-#include <Windows.h>
-
-#include <assimp/scene.h>
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -13,159 +11,147 @@
 
 #include <vector>
 
-#include "stringFuncs.h"
-#include "mathConverterFuncs.h"
 #include "fileOutputFuncs.h"
+#include "mathConverterFuncs.h"
+#include "stringFuncs.h"
 
+#if !defined(linux)
+#include <Windows.h>
 // Globals
 HANDLE gConsoleHandle;
 CONSOLE_SCREEN_BUFFER_INFO gPreviousState;
-//bool gTransformCoordinates;
-glm::mat4 gCoordinateTransform = glm::mat4(
-	1.f, 0.f, 0.f, 0.f,
-	0.f, 0.f, 1.f, 0.f,
-	0.f, -1.f, 0.f, 0.f,
-	0.f, 0.f, 0.f, 1.f);
+#endif  // !linux
 
-enum LogColor : WORD
-{
-	BLUE	= 0x1 | 0x8,
-	GREEN	= 0x2 | 0x8,
-	RED		= 0x4 | 0x8,
-	
-	CYAN	= BLUE  | GREEN,
-	PURPLE	= BLUE  | RED,
-	YELLOW	= GREEN | RED,
+// bool gTransformCoordinates;
+glm::mat4 gCoordinateTransform =
+    glm::mat4(1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f,
+              0.f, 0.f, 1.f);
 
-	WHITE = BLUE | GREEN | RED,
+enum LogColor : WORD {
+  BLUE = 0x1 | 0x8,
+  GREEN = 0x2 | 0x8,
+  RED = 0x4 | 0x8,
+
+  CYAN = BLUE | GREEN,
+  PURPLE = BLUE | RED,
+  YELLOW = GREEN | RED,
+
+  WHITE = BLUE | GREEN | RED,
 };
 
-std::ostream& log(LogColor color)
-{
-	SetConsoleTextAttribute(gConsoleHandle, color);
-	return std::cout;
+std::ostream& log(LogColor color) {
+#if !defined(linux)
+  SetConsoleTextAttribute(gConsoleHandle, color);
+#endif !linux
+  return std::cout;
 }
 
+void processPositions(std::vector<glm::vec3>& positions,
+                      const aiMesh* importedMesh, const glm::mat4& transform) {
+  log(YELLOW) << "Positions: 0%";
+  positions.reserve(positions.capacity() + importedMesh->mNumVertices);
+  for (unsigned int i = 0; i < importedMesh->mNumVertices; i++) {
+    glm::vec3 pos = toGLM(importedMesh->mVertices[i]);
+    glm::vec3 transformedPos = glm::vec3(transform * glm::vec4(pos, 1.f));
+    positions.push_back(transformedPos);
 
+    // if (gTransformCoordinates)
+    //{
+    //	transformedPos = glm::vec3(gCoordinateTransform *
+    // glm::vec4(transformedPos, 1.f));
+    //}
 
-
-
-void processPositions(std::vector<glm::vec3>& positions, const aiMesh* importedMesh, const glm::mat4& transform)
-{
-	log(YELLOW) << "Positions: 0%";
-	positions.reserve(positions.capacity() + importedMesh->mNumVertices);
-	for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
-	{
-		glm::vec3 pos = toGLM(importedMesh->mVertices[i]);
-		glm::vec3 transformedPos = glm::vec3(transform * glm::vec4(pos, 1.f));
-		positions.push_back(transformedPos);
-
-		//if (gTransformCoordinates)
-		//{
-		//	transformedPos = glm::vec3(gCoordinateTransform * glm::vec4(transformedPos, 1.f));
-		//}
-
-		if (i >= importedMesh->mNumVertices / 2)
-		{
-			log(YELLOW) << "\rPositions: 50%";
-		}
-	}
-	log(GREEN) << "\rPositions: 100%" << std::endl;
+    if (i >= importedMesh->mNumVertices / 2) {
+      log(YELLOW) << "\rPositions: 50%";
+    }
+  }
+  log(GREEN) << "\rPositions: 100%" << std::endl;
 }
 
-void processTexCoords(std::vector<glm::vec3>& texCoords, const aiMesh* importedMesh, int zone)
-{
-	texCoords.reserve(texCoords.capacity() + importedMesh->mNumVertices);
-	if (importedMesh->mTextureCoords[0] != nullptr)
-	{
-		log(YELLOW) << "TexCoord: 0%";
-		for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
-		{
-			glm::vec3 uvw = toGLM(importedMesh->mTextureCoords[0][i]);
-			if (zone == -1)
-			{
-				uvw.z = (float)(importedMesh->mMaterialIndex) + 0.1f;
-			}
-			else
-			{
-				uvw.z = (float)(zone) + 0.1f;
-				//log(YELLOW) << uvw.z << std::endl;
-			}
-			texCoords.push_back(uvw);
+void processTexCoords(std::vector<glm::vec3>& texCoords,
+                      const aiMesh* importedMesh, int zone) {
+  texCoords.reserve(texCoords.capacity() + importedMesh->mNumVertices);
+  if (importedMesh->mTextureCoords[0] != nullptr) {
+    log(YELLOW) << "TexCoord: 0%";
+    for (unsigned int i = 0; i < importedMesh->mNumVertices; i++) {
+      glm::vec3 uvw = toGLM(importedMesh->mTextureCoords[0][i]);
+      if (zone == -1) {
+        uvw.z = (float)(importedMesh->mMaterialIndex) + 0.1f;
+      } else {
+        uvw.z = (float)(zone) + 0.1f;
+        // log(YELLOW) << uvw.z << std::endl;
+      }
+      texCoords.push_back(uvw);
 
-			if (i >= importedMesh->mNumVertices / 2)
-			{
-				log(YELLOW) << "\rTexCoord: 50%";
-			}
-		}
-	}
-	else
-	{
-		log(YELLOW) << "The mesh should have texture coordinates. All are set to 0." << std::endl;
-		for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
-		{
-			texCoords.push_back({ 0.f, 0.f, 0.f });
-		}
-	}
-	log(GREEN) << "\rTexCoord: 100%" << std::endl;
+      if (i >= importedMesh->mNumVertices / 2) {
+        log(YELLOW) << "\rTexCoord: 50%";
+      }
+    }
+  } else {
+    log(YELLOW) << "The mesh should have texture coordinates. All are set to 0."
+                << std::endl;
+    for (unsigned int i = 0; i < importedMesh->mNumVertices; i++) {
+      texCoords.push_back({0.f, 0.f, 0.f});
+    }
+  }
+  log(GREEN) << "\rTexCoord: 100%" << std::endl;
 }
 
-void processNormals(std::vector<glm::vec3>& normals, const aiMesh* importedMesh, const glm::mat4& transform)
-{
-	log(YELLOW) << "Normals: 0%";
-	normals.reserve(normals.capacity() + importedMesh->mNumVertices);
-	for (unsigned int i = 0; i < importedMesh->mNumVertices; i++)
-	{
-		glm::vec3 normal = toGLM(importedMesh->mNormals[i]);
-		glm::vec3 transformedNormal = glm::normalize(glm::vec3(transform * glm::vec4(normal, 0.f)));
+void processNormals(std::vector<glm::vec3>& normals, const aiMesh* importedMesh,
+                    const glm::mat4& transform) {
+  log(YELLOW) << "Normals: 0%";
+  normals.reserve(normals.capacity() + importedMesh->mNumVertices);
+  for (unsigned int i = 0; i < importedMesh->mNumVertices; i++) {
+    glm::vec3 normal = toGLM(importedMesh->mNormals[i]);
+    glm::vec3 transformedNormal =
+        glm::normalize(glm::vec3(transform * glm::vec4(normal, 0.f)));
 
-		//if (gTransformCoordinates)
-		//{
-		//	transformedNormal = glm::vec3(gCoordinateTransform * glm::vec4(transformedNormal, 1.f));
-		//}
+    // if (gTransformCoordinates)
+    //{
+    //	transformedNormal = glm::vec3(gCoordinateTransform *
+    // glm::vec4(transformedNormal, 1.f));
+    //}
 
-		normals.push_back(transformedNormal);
+    normals.push_back(transformedNormal);
 
-		if (i >= importedMesh->mNumVertices / 2)
-		{
-			log(YELLOW) << "\rNormals: 50%";
-		}
-	}
-	log(GREEN) << "\rNormals: 100%" << std::endl;
+    if (i >= importedMesh->mNumVertices / 2) {
+      log(YELLOW) << "\rNormals: 50%";
+    }
+  }
+  log(GREEN) << "\rNormals: 100%" << std::endl;
 }
 
-void processIndices(std::vector<glm::uvec3>& faces, std::vector<GLuint>& indices, const aiMesh* importedMesh, unsigned int& indexOffset)
-{
-	log(YELLOW) << "Indices: 0%";
-	faces.reserve(faces.capacity() + importedMesh->mNumFaces);
-	indices.reserve(indices.capacity() + importedMesh->mNumFaces * 3);
+void processIndices(std::vector<glm::uvec3>& faces,
+                    std::vector<GLuint>& indices, const aiMesh* importedMesh,
+                    unsigned int& indexOffset) {
+  log(YELLOW) << "Indices: 0%";
+  faces.reserve(faces.capacity() + importedMesh->mNumFaces);
+  indices.reserve(indices.capacity() + importedMesh->mNumFaces * 3);
 
-	unsigned int largestIndex = 0;
-	for (unsigned int i = 0; i < importedMesh->mNumFaces; i++)
-	{
-		// We assume all faces only have 3 vertices.
-		glm::uvec3 face;
-		face[0] = importedMesh->mFaces[i].mIndices[0] + indexOffset;
-		face[1] = importedMesh->mFaces[i].mIndices[1] + indexOffset;
-		face[2] = importedMesh->mFaces[i].mIndices[2] + indexOffset;
-		faces.push_back(face);
+  unsigned int largestIndex = 0;
+  for (unsigned int i = 0; i < importedMesh->mNumFaces; i++) {
+    // We assume all faces only have 3 vertices.
+    glm::uvec3 face;
+    face[0] = importedMesh->mFaces[i].mIndices[0] + indexOffset;
+    face[1] = importedMesh->mFaces[i].mIndices[1] + indexOffset;
+    face[2] = importedMesh->mFaces[i].mIndices[2] + indexOffset;
+    faces.push_back(face);
 
-		indices.push_back(face[0]);
-		indices.push_back(face[1]);
-		indices.push_back(face[2]);
+    indices.push_back(face[0]);
+    indices.push_back(face[1]);
+    indices.push_back(face[2]);
 
-		largestIndex = std::max(std::max(std::max(face[0], face[1]), face[2]), largestIndex);
+    largestIndex =
+        std::max(std::max(std::max(face[0], face[1]), face[2]), largestIndex);
 
-		if (i >= importedMesh->mNumVertices / 2)
-		{
-			log(YELLOW) << "\rIndices: 50%";
-		}
-	}
-	log(GREEN) << "\rIndices: 100%" << std::endl;
+    if (i >= importedMesh->mNumVertices / 2) {
+      log(YELLOW) << "\rIndices: 50%";
+    }
+  }
+  log(GREEN) << "\rIndices: 100%" << std::endl;
 
-	indexOffset = largestIndex + 1;
+  indexOffset = largestIndex + 1;
 }
-
 
 void testRead(const char* fileName);
 
@@ -174,390 +160,371 @@ Mesh* accumulatedZoneMesh = nullptr;
 int zoneNumber = -1;
 unsigned int indexOffset = 0;
 
-void processNodeMeshes(const aiScene* scene, const aiNode* currentNode, std::vector<Mesh>& meshes, glm::mat4 accumulatedTransform)
-{
-	int numMeshes = currentNode->mNumMeshes;
+void processNodeMeshes(const aiScene* scene, const aiNode* currentNode,
+                       std::vector<Mesh>& meshes,
+                       glm::mat4 accumulatedTransform) {
+  int numMeshes = currentNode->mNumMeshes;
 
-	accumulatedTransform = accumulatedTransform * toGLM(currentNode->mTransformation);
+  accumulatedTransform =
+      accumulatedTransform * toGLM(currentNode->mTransformation);
 
-	const char* previousName = "";
+  const char* previousName = "";
 
+  for (int meshIndex = 0; meshIndex < numMeshes; meshIndex++) {
+    const aiMesh* importedMesh =
+        scene->mMeshes[currentNode->mMeshes[meshIndex]];
 
-	for (int meshIndex = 0; meshIndex < numMeshes; meshIndex++)
-	{
-		const aiMesh* importedMesh = scene->mMeshes[currentNode->mMeshes[meshIndex]];
+    log(GREEN) << "-- Processing Mesh: " << currentNode->mName.C_Str()
+               << std::endl;
 
-		log(GREEN) << "-- Processing Mesh: " << currentNode->mName.C_Str() << std::endl;
+    bool isZone = false;
+    Mesh* current;
 
-		bool isZone = false;
-		Mesh* current;
-		
-		// If it's a zone, we want it to merge with all other zones.
-		if (currentNode->mName.C_Str()[0] == 'Z')
-		{
-			isZone = true;
-			zoneNumber++;
+    // If it's a zone, we want it to merge with all other zones.
+    if (currentNode->mName.C_Str()[0] == 'Z') {
+      isZone = true;
+      zoneNumber++;
 
-			if (meshes.size() == 0 || accumulatedZoneMesh == nullptr)
-			{
-				meshes.emplace_back();
-				accumulatedZoneMesh = &meshes.back();
-				indexOffset = 0;
-			}
+      if (meshes.size() == 0 || accumulatedZoneMesh == nullptr) {
+        meshes.emplace_back();
+        accumulatedZoneMesh = &meshes.back();
+        indexOffset = 0;
+      }
 
-			current = accumulatedZoneMesh;
+      current = accumulatedZoneMesh;
 
-			log(GREEN) << "This will be treated as a Zone! Number: " << zoneNumber << std::endl;
-		}
-		else if (strcmp(previousName, currentNode->mName.C_Str()) == 0)
-		{
-			log(GREEN) << "Name is the same as previous, adding to it" << std::endl;
+      log(GREEN) << "This will be treated as a Zone! Number: " << zoneNumber
+                 << std::endl;
+    } else if (strcmp(previousName, currentNode->mName.C_Str()) == 0) {
+      log(GREEN) << "Name is the same as previous, adding to it" << std::endl;
 
-			current = &meshes.back();
-		}
-		else if (containsSpecialName(currentNode->mName.C_Str()))
-		{
-			meshes.emplace_back();
-			current = &meshes.back();
-			indexOffset = 0;
-		}
-		else
-		{
-			log(GREEN) << "Name not recognized, adding to accumulated mesh" << std::endl;
-			
-			if (meshes.size() == 0 || accumulatedMesh == nullptr)
-			{
-				meshes.emplace_back();
-				accumulatedMesh = &meshes.back();
-				indexOffset = 0;
-			}
-			
-			current = accumulatedMesh;
-		}
+      current = &meshes.back();
+    } else if (containsSpecialName(currentNode->mName.C_Str())) {
+      meshes.emplace_back();
+      current = &meshes.back();
+      indexOffset = 0;
+    } else {
+      log(GREEN) << "Name not recognized, adding to accumulated mesh"
+                 << std::endl;
 
-		current->name = std::string(currentNode->mName.C_Str());
-		current->textureIndex = importedMesh->mMaterialIndex;
+      if (meshes.size() == 0 || accumulatedMesh == nullptr) {
+        meshes.emplace_back();
+        accumulatedMesh = &meshes.back();
+        indexOffset = 0;
+      }
 
-		glm::mat4 normalTransformation = glm::transpose(glm::inverse(accumulatedTransform));
+      current = accumulatedMesh;
+    }
 
-		
+    current->name = std::string(currentNode->mName.C_Str());
+    current->textureIndex = importedMesh->mMaterialIndex;
 
-		processPositions(current->positions, importedMesh, accumulatedTransform);
-		
-		if (isZone)
-		{
-			processTexCoords(current->texCoords, importedMesh, zoneNumber);
-		}
-		else
-		{
-			processTexCoords(current->texCoords, importedMesh, -1);
-		}
-		processNormals(current->normals, importedMesh, normalTransformation);
-		processIndices(current->faces, current->indices, importedMesh, indexOffset);
+    glm::mat4 normalTransformation =
+        glm::transpose(glm::inverse(accumulatedTransform));
 
-		previousName = currentNode->mName.C_Str();
-	}
-	
-	int numChildren = currentNode->mNumChildren;
-	for (int nodeIndex = 0; nodeIndex < numChildren; nodeIndex++)
-	{
-		processNodeMeshes(scene, currentNode->mChildren[nodeIndex], meshes, accumulatedTransform);
-	}
-	
+    processPositions(current->positions, importedMesh, accumulatedTransform);
+
+    if (isZone) {
+      processTexCoords(current->texCoords, importedMesh, zoneNumber);
+    } else {
+      processTexCoords(current->texCoords, importedMesh, -1);
+    }
+    processNormals(current->normals, importedMesh, normalTransformation);
+    processIndices(current->faces, current->indices, importedMesh, indexOffset);
+
+    previousName = currentNode->mName.C_Str();
+  }
+
+  int numChildren = currentNode->mNumChildren;
+  for (int nodeIndex = 0; nodeIndex < numChildren; nodeIndex++) {
+    processNodeMeshes(scene, currentNode->mChildren[nodeIndex], meshes,
+                      accumulatedTransform);
+  }
 }
 
-void processNodeCameras(const aiScene* scene, std::vector<Camera>& cameras)
-{
-	int numCameras = scene->mNumCameras;
-	if (numCameras > 1)
-	{
-		log(YELLOW) << "The converter can currently not handle more than one camera.\nShould there really be more than one?" << std::endl;
-	}
+void processNodeCameras(const aiScene* scene, std::vector<Camera>& cameras) {
+  int numCameras = scene->mNumCameras;
+  if (numCameras > 1) {
+    log(YELLOW) << "The converter can currently not handle more than one "
+                   "camera.\nShould there really be more than one?"
+                << std::endl;
+  }
 
-	const aiCamera* camera	 = scene->mCameras[0];
-	const aiNode* cameraNode = scene->mRootNode->FindNode(camera->mName);
+  const aiCamera* camera = scene->mCameras[0];
+  const aiNode* cameraNode = scene->mRootNode->FindNode(camera->mName);
 
+  log(GREEN) << "-- Processing Camera: " << cameraNode->mName.C_Str()
+             << std::endl;
 
-	log(GREEN) << "-- Processing Camera: " << cameraNode->mName.C_Str() << std::endl;
-	
-	glm::mat4 cameraTransform = toGLM(cameraNode->mTransformation);
-	/*
-	glm::vec3 pos	 = glm::vec3( cameraTransform * glm::vec4(toGLM(camera->mPosition), 1.f));
-	glm::vec3 lookAt = glm::vec3( cameraTransform * glm::vec4(toGLM(camera->mLookAt), 0.f));
-	glm::vec3 up	 = glm::vec3( cameraTransform * glm::vec4(toGLM(camera->mUp), 0.f));
-	*/
-	
-	glm::vec3 pos	 = toGLM(camera->mPosition) / 100.f;
-	glm::vec3 lookAt = toGLM(camera->mLookAt);
-	glm::vec3 up	 = toGLM(camera->mUp);
+  glm::mat4 cameraTransform = toGLM(cameraNode->mTransformation);
+  /*
+  glm::vec3 pos	 = glm::vec3( cameraTransform *
+  glm::vec4(toGLM(camera->mPosition), 1.f)); glm::vec3 lookAt = glm::vec3(
+  cameraTransform * glm::vec4(toGLM(camera->mLookAt), 0.f));
+  glm::vec3 up	 = glm::vec3( cameraTransform *
+  glm::vec4(toGLM(camera->mUp), 0.f));
+  */
 
-	glm::mat4 endMatrix = glm::inverse(glm::lookAt(pos, pos + glm::normalize(lookAt), up));
+  glm::vec3 pos = toGLM(camera->mPosition) / 100.f;
+  glm::vec3 lookAt = toGLM(camera->mLookAt);
+  glm::vec3 up = toGLM(camera->mUp);
 
-	/*if (gTransformCoordinates)
-	{
-		cameraTransform = gCoordinateTransform * cameraTransform;
-	}*/
-	glm::vec3 temp = glm::normalize(lookAt);
-	log(GREEN) << "Camera lookAt: " << temp.x << ", " << temp.y << ", " << temp.z << ", " << " " << std::endl;
+  glm::mat4 endMatrix =
+      glm::inverse(glm::lookAt(pos, pos + glm::normalize(lookAt), up));
 
-	Camera finalCamera;
-	finalCamera.transform = endMatrix;
+  /*if (gTransformCoordinates)
+  {
+          cameraTransform = gCoordinateTransform * cameraTransform;
+  }*/
+  glm::vec3 temp = glm::normalize(lookAt);
+  log(GREEN) << "Camera lookAt: " << temp.x << ", " << temp.y << ", " << temp.z
+             << ", "
+             << " " << std::endl;
 
-	glm::vec4 camPos = finalCamera.transform * glm::vec4(0.f, 0.f, 0.f, 1.f);
-	log(GREEN) << "Camera location: " << camPos.x << ", " << camPos.y << ", " << camPos.z << ", " << camPos.w << " " << std::endl;
-	
-	cameras.push_back(finalCamera);
+  Camera finalCamera;
+  finalCamera.transform = endMatrix;
+
+  glm::vec4 camPos = finalCamera.transform * glm::vec4(0.f, 0.f, 0.f, 1.f);
+  log(GREEN) << "Camera location: " << camPos.x << ", " << camPos.y << ", "
+             << camPos.z << ", " << camPos.w << " " << std::endl;
+
+  cameras.push_back(finalCamera);
 }
 
-bool convertFile(char* filePath)
-{
-	const aiScene* importedData = aiImportFile(filePath, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes);
+bool convertFile(char* filePath) {
+  const aiScene* importedData = aiImportFile(
+      filePath, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
+                    aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes);
 
-	if (importedData == nullptr)
-	{
-		log(RED) << "FAILED TO PROCESS: " << getNameOfFile(filePath) << std::endl;
-		return false;
-	}
+  if (importedData == nullptr) {
+    log(RED) << "FAILED TO PROCESS: " << getNameOfFile(filePath) << std::endl;
+    return false;
+  }
 
-	const aiNode*  rootNode     = importedData->mRootNode;
+  const aiNode* rootNode = importedData->mRootNode;
 
-	log(GREEN) << "Processing " << importedData->mNumMeshes << " meshes" << std::endl;
-	log(YELLOW) << "Processing " << importedData->mNumLights << " lights (NOT IMPLEMENTED!)" << std::endl;
-	log(YELLOW) << "Processing " << importedData->mNumCameras << " cameras (only one is handled)" << std::endl;
+  log(GREEN) << "Processing " << importedData->mNumMeshes << " meshes"
+             << std::endl;
+  log(YELLOW) << "Processing " << importedData->mNumLights
+              << " lights (NOT IMPLEMENTED!)" << std::endl;
+  log(YELLOW) << "Processing " << importedData->mNumCameras
+              << " cameras (only one is handled)" << std::endl;
 
-	// Open the output file...
-	std::string outputFilePrefix = getPathExceptEnding(filePath);
-	std::string mainOutput = outputFilePrefix + ".kmf";
+  // Open the output file...
+  std::string outputFilePrefix = getPathExceptEnding(filePath);
+  std::string mainOutput = outputFilePrefix + ".kmf";
 
-	FILE* file = nullptr;
-	fopen_s(&file, mainOutput.c_str(), "wb");
+  FILE* file = nullptr;
+  fopen_s(&file, mainOutput.c_str(), "wb");
 
-	if (file == nullptr)
-	{
-		log(RED) << "FAILED TO CREATE FILE!" << std::endl;
-		return false;
-	}
+  if (file == nullptr) {
+    log(RED) << "FAILED TO CREATE FILE!" << std::endl;
+    return false;
+  }
 
-	// Process each mesh
+  // Process each mesh
 
-	std::vector<Mesh>	meshes;
-	std::vector<Light>	lights;
-	std::vector<Camera>	cameras;
+  std::vector<Mesh> meshes;
+  std::vector<Light> lights;
+  std::vector<Camera> cameras;
 
-	// Recursive processing of scene node tree structure.
-	if (importedData->HasMeshes())
-	{
-		processNodeMeshes(importedData, importedData->mRootNode, meshes, glm::mat4(1.f));
-	}
-	if (importedData->HasLights())
-	{
+  // Recursive processing of scene node tree structure.
+  if (importedData->HasMeshes()) {
+    processNodeMeshes(importedData, importedData->mRootNode, meshes,
+                      glm::mat4(1.f));
+  }
+  if (importedData->HasLights()) {
+  }
+  if (importedData->HasCameras()) {
+    processNodeCameras(importedData, cameras);
+  }
 
-	}
-	if (importedData->HasCameras())
-	{
-		processNodeCameras(importedData, cameras);
+  log(GREEN) << "-------------" << std::endl;
+  log(GREEN) << "Summary:" << std::endl;
+  log(GREEN) << "\tMeshes: " << meshes.size() << std::endl;
+  for (Mesh& mesh : meshes) {
+    log(GREEN) << "\t\tVertices: " << mesh.positions.size()
+               << " Indices: " << mesh.indices.size() << std::endl;
+  }
+  log(GREEN) << "\tLights: " << lights.size() << std::endl;
+  log(GREEN) << "\tCameras: " << cameras.size() << std::endl;
 
-	}
+  Header header;
+  header.numMeshes = static_cast<uint32_t>(meshes.size());
+  header.numLights = static_cast<uint32_t>(lights.size());
+  header.numCameras = static_cast<uint32_t>(cameras.size());
 
-	log(GREEN) << "-------------" << std::endl;
-	log(GREEN) << "Summary:" << std::endl;
-	log(GREEN) << "\tMeshes: " << meshes.size() << std::endl;
-	for (Mesh& mesh : meshes)
-	{
-		log(GREEN) << "\t\tVertices: " << mesh.positions.size() << " Indices: " << mesh.indices.size() << std::endl;
-	}
-	log(GREEN) << "\tLights: " << lights.size() << std::endl;
-	log(GREEN) << "\tCameras: " << cameras.size() << std::endl;
+  writeHeader(&header, file);
 
+  // Write Meshes
+  for (int i = 0; i < meshes.size(); i++) {
+    Mesh& current = meshes[i];
 
-	
-	Header header;
-	header.numMeshes  = static_cast<uint32_t>(meshes.size());
-	header.numLights  = static_cast<uint32_t>(lights.size());
-	header.numCameras = static_cast<uint32_t>(cameras.size());
+    MeshHeader meshHeader;
+    meshHeader.numVertices = static_cast<uint32_t>(current.positions.size());
+    meshHeader.numFaces = static_cast<uint32_t>(current.faces.size());
+    meshHeader.nameLength = static_cast<uint32_t>(current.name.size());
 
-	writeHeader(&header, file);
+    writeHeader(&meshHeader, file);
+    writeData(&current, file);
+  }
 
-	// Write Meshes
-	for (int i = 0; i < meshes.size(); i++)
-	{
-		Mesh& current = meshes[i];
+  // Write Lights
+  for (int i = 0; i < lights.size(); i++) {
+    // There is no lights header
 
-		MeshHeader meshHeader;
-		meshHeader.numVertices	= static_cast<uint32_t>(current.positions.size());
-		meshHeader.numFaces		= static_cast<uint32_t>(current.faces.size());
-		meshHeader.nameLength	= static_cast<uint32_t>(current.name.size());
+    writeData(&lights[i], file);
+  }
 
-		writeHeader(&meshHeader, file);
-		writeData(&current, file);
-	}
+  // Write Cameras
+  for (int i = 0; i < cameras.size(); i++) {
+    // There is no camera header
 
-	// Write Lights
-	for (int i = 0; i < lights.size(); i++)
-	{
-		// There is no lights header
+    writeData(&cameras[i], file);
+  }
 
-		writeData(&lights[i], file);
-	}
+  // fwrite(name.data(), sizeof(name[0]), name.size(), file);
+  // fwrite(positions.data(), sizeof(positions[0]), positions.size(), file);
+  // fwrite(texCoords.data(), sizeof(texCoords[0]), texCoords.size(), file);
+  // fwrite(normals.data(), sizeof(normals[0]), normals.size(), file);
+  // fwrite(faces.data(), sizeof(faces[0]), faces.size(), file);
 
-	// Write Cameras
-	for (int i = 0; i < cameras.size(); i++)
-	{
-		// There is no camera header
+  fclose(file);
 
-		writeData(&cameras[i], file);
-	}
+  // testRead(mainOutput.c_str());
 
-	//fwrite(name.data(), sizeof(name[0]), name.size(), file);
-	//fwrite(positions.data(), sizeof(positions[0]), positions.size(), file);
-	//fwrite(texCoords.data(), sizeof(texCoords[0]), texCoords.size(), file);
-	//fwrite(normals.data(), sizeof(normals[0]), normals.size(), file);
-	//fwrite(faces.data(), sizeof(faces[0]), faces.size(), file);
+  aiReleaseImport(importedData);
 
-	fclose(file);
-
-	//testRead(mainOutput.c_str());
-
-	aiReleaseImport(importedData);
-
-	return true;
+  return true;
 }
 
-#define read_buffer(buffer) fread_s(&buffer[0], buffer.size() * sizeof(buffer[0]), sizeof(buffer[0]), buffer.size(), in)
+#define read_buffer(buffer)                                                 \
+  fread_s(&buffer[0], buffer.size() * sizeof(buffer[0]), sizeof(buffer[0]), \
+          buffer.size(), in)
 
-void testRead(const char* fileName)
-{
-	/*std::string name;
+void testRead(const char* fileName) {
+  /*std::string name;
 
-	std::vector<glm::vec3>		positions;
-	std::vector<glm::vec3>		texCoords;
-	std::vector<glm::vec3>		normals;
-	std::vector<glm::uvec3>		faces;
-	std::vector<GLuint>			indices;
+  std::vector<glm::vec3>		positions;
+  std::vector<glm::vec3>		texCoords;
+  std::vector<glm::vec3>		normals;
+  std::vector<glm::uvec3>		faces;
+  std::vector<GLuint>			indices;
 */
 
-	std::vector<Mesh> meshes;
-	std::vector<Light> lights;
-	std::vector<Camera> cameras;
-	Header header;
+  std::vector<Mesh> meshes;
+  std::vector<Light> lights;
+  std::vector<Camera> cameras;
+  Header header;
 
-	FILE* in;
-	fopen_s(&in, fileName, "rb");
+  FILE* in;
+  fopen_s(&in, fileName, "rb");
 
-	fread_s(&header, sizeof(Header), sizeof(Header), 1, in);
+  fread_s(&header, sizeof(Header), sizeof(Header), 1, in);
 
-	for (unsigned int i = 0; i < header.numMeshes; i++)
-	{
-		MeshHeader meshHeader;
-		
-		fread_s(&meshHeader, sizeof(MeshHeader), sizeof(MeshHeader), 1, in);
+  for (unsigned int i = 0; i < header.numMeshes; i++) {
+    MeshHeader meshHeader;
 
-		meshes.emplace_back();
-		Mesh& current = meshes.back();
+    fread_s(&meshHeader, sizeof(MeshHeader), sizeof(MeshHeader), 1, in);
 
-		current.name.resize(meshHeader.nameLength);
-		current.positions.resize(meshHeader.numVertices);
-		current.texCoords.resize(meshHeader.numVertices);
-		current.normals.resize(meshHeader.numVertices);
-		current.faces.resize(meshHeader.numFaces);
-		current.indices.resize(meshHeader.numFaces * 3);
+    meshes.emplace_back();
+    Mesh& current = meshes.back();
 
-		read_buffer(current.name);
-		read_buffer(current.positions);
-		read_buffer(current.texCoords);
-		read_buffer(current.normals);
-		read_buffer(current.faces);
+    current.name.resize(meshHeader.nameLength);
+    current.positions.resize(meshHeader.numVertices);
+    current.texCoords.resize(meshHeader.numVertices);
+    current.normals.resize(meshHeader.numVertices);
+    current.faces.resize(meshHeader.numFaces);
+    current.indices.resize(meshHeader.numFaces * 3);
 
-		// Go back to read index data again
-		fseek(in, -(int)(current.faces.size() * sizeof(current.faces[0])), SEEK_CUR);
+    read_buffer(current.name);
+    read_buffer(current.positions);
+    read_buffer(current.texCoords);
+    read_buffer(current.normals);
+    read_buffer(current.faces);
 
-		read_buffer(current.indices);
-	}
+    // Go back to read index data again
+    fseek(in, -(int)(current.faces.size() * sizeof(current.faces[0])),
+          SEEK_CUR);
 
-	for (unsigned int i = 0; i < header.numLights; i++)
-	{
-		lights.emplace_back();
-		Light& current = lights.back();
-		
-		// Does nothing yet...
-	}
+    read_buffer(current.indices);
+  }
 
-	for (unsigned int i = 0; i < header.numCameras; i++)
-	{
-		cameras.emplace_back();
-		Camera& current = cameras.back();
+  for (unsigned int i = 0; i < header.numLights; i++) {
+    lights.emplace_back();
+    Light& current = lights.back();
 
-		fread_s(&current.transform, sizeof(current.transform), sizeof(current.transform), 1, in);
-	}
-	
-	/*name.resize(test.nameLength);
-	positions.resize(test.numVertices);
-	texCoords.resize(test.numVertices);
-	normals.resize(test.numVertices);
-	faces.resize(test.numFaces);
-	indices.resize(test.numFaces * 3);*/
+    // Does nothing yet...
+  }
 
-	/*read_buffer(name);
+  for (unsigned int i = 0; i < header.numCameras; i++) {
+    cameras.emplace_back();
+    Camera& current = cameras.back();
 
-	read_buffer(positions);
-	read_buffer(texCoords);
-	read_buffer(normals);
-	read_buffer(faces);*/
+    fread_s(&current.transform, sizeof(current.transform),
+            sizeof(current.transform), 1, in);
+  }
 
-	//fread_s(positions.data(), positions.size() * sizeof(positions[0]), sizeof(positions[0]), test.numVertices, in);
+  /*name.resize(test.nameLength);
+  positions.resize(test.numVertices);
+  texCoords.resize(test.numVertices);
+  normals.resize(test.numVertices);
+  faces.resize(test.numFaces);
+  indices.resize(test.numFaces * 3);*/
 
+  /*read_buffer(name);
+
+  read_buffer(positions);
+  read_buffer(texCoords);
+  read_buffer(normals);
+  read_buffer(faces);*/
+
+  // fread_s(positions.data(), positions.size() * sizeof(positions[0]),
+  // sizeof(positions[0]), test.numVertices, in);
 }
 
-int main(int argc, char* argv[])
-{
-	// Initialize log
-	gConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	GetConsoleScreenBufferInfo(gConsoleHandle, &gPreviousState);
-	
+int main(int argc, char* argv[]) {
+  // Initialize log
+  gConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+  GetConsoleScreenBufferInfo(gConsoleHandle, &gPreviousState);
 
-	if (argc > 1)
-	{
-		int successCount = 0;
-		for (int i = 1; i < argc; i++)
-		{
-			log(GREEN) << "-------- Beginning work on: " << getNameOfFile(argv[i]) << " --------" << std::endl;
+  if (argc > 1) {
+    int successCount = 0;
+    for (int i = 1; i < argc; i++) {
+      log(GREEN) << "-------- Beginning work on: " << getNameOfFile(argv[i])
+                 << " --------" << std::endl;
 
-			if (strstr(argv[i], ".blend") != nullptr)
-			{
-				log(RED) << "Warning! .blend files may not be correctly converted!" << std::endl;
-			}
+      if (strstr(argv[i], ".blend") != nullptr) {
+        log(RED) << "Warning! .blend files may not be correctly converted!"
+                 << std::endl;
+      }
 
-			if (convertFile(argv[i]))
-			{
-				successCount++;
-			}
-		}
+      if (convertFile(argv[i])) {
+        successCount++;
+      }
+    }
 
-		LogColor color = GREEN;
-		if (successCount == 0)
-		{
-			color = RED;
-		}
-		else if (successCount != argc - 1)
-		{
-			color = YELLOW;
-		}
+    LogColor color = GREEN;
+    if (successCount == 0) {
+      color = RED;
+    } else if (successCount != argc - 1) {
+      color = YELLOW;
+    }
 
-		log(color) << "--------" << std::endl;
-		log(color) << "Finished! " << successCount << " out of " << argc - 1 << " succeeded!" << std::endl;
-	}
-	else
-	{
+    log(color) << "--------" << std::endl;
+    log(color) << "Finished! " << successCount << " out of " << argc - 1
+               << " succeeded!" << std::endl;
+  } else {
 #if _DEBUG
-		convertFile("s01_straight_ZONES_aa.fbx");
-		//gTransformCoordinates = true;
+    convertFile("s01_straight_ZONES_aa.fbx");
+    // gTransformCoordinates = true;
 #endif
 
-		log(RED) << "No file was given as input" << std::endl;
-	}
+    log(RED) << "No file was given as input" << std::endl;
+  }
 
-	std::cin.get();
+  std::cin.get();
 
-	// Clean up log
-	SetConsoleTextAttribute(gConsoleHandle, gPreviousState.wAttributes);
+  // Clean up log
+  SetConsoleTextAttribute(gConsoleHandle, gPreviousState.wAttributes);
 }

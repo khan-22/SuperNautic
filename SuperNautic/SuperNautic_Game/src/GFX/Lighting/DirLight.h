@@ -3,42 +3,39 @@
 #ifndef DIRLIGHT_H
 #define DIRLIGHT_H
 
-#include "glm\glm.hpp"
-#include "GL\glew.h"
+#include <GL/glew.h>
+#include <glm/glm.hpp>
 
-struct DirLightProperties
-{
-	glm::vec3 direction;
-	glm::vec3 ambientColor;
-	glm::vec3 diffuseColor;
+struct DirLightProperties {
+  glm::vec3 direction;
+  glm::vec3 ambientColor;
+  glm::vec3 diffuseColor;
 
-	GLfloat intensity;
-
+  GLfloat intensity;
 };
 
-class DirLight
-{
-public:
-	DirLight(glm::vec3 direction, glm::vec3 ambientColor, glm::vec3 diffuseColor, GLfloat intensity);
+class DirLight {
+ public:
+  DirLight(glm::vec3 direction, glm::vec3 ambientColor, glm::vec3 diffuseColor,
+           GLfloat intensity);
 
-	void update(GLfloat dt);
-	void changeIntensity(GLfloat newIntensity, GLfloat transitionTime);
+  void update(GLfloat dt);
+  void changeIntensity(GLfloat newIntensity, GLfloat transitionTime);
 
-	const DirLightProperties getLightProperties();
+  const DirLightProperties getLightProperties();
 
-private:
+ private:
+  glm::vec3 _direction;
+  glm::vec3 _ambientColor;
+  glm::vec3 _diffuseColor;
 
-	glm::vec3	_direction;
-	glm::vec3	_ambientColor;
-	glm::vec3	_diffuseColor;
+  GLfloat _currentIntensity;
+  GLfloat _newIntensity;
+  GLfloat _previousIntensity;
+  GLfloat _transitionTimer;
+  GLfloat _transitionTotalTime;
 
-	GLfloat		_currentIntensity;
-	GLfloat		_newIntensity;
-	GLfloat		_previousIntensity;
-	GLfloat		_transitionTimer;
-	GLfloat		_transitionTotalTime;
-
-	DirLight();
+  DirLight();
 };
 
 #endif
