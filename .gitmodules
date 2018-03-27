@@ -1,0 +1,9 @@
+[submodule "SuperNautic/thirdparty/assimp"]
+	path = SuperNautic/thirdparty/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "SuperNautic/thirdparty/glm"]
+	path = SuperNautic/thirdparty/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "SuperNautic/thirdparty/SFML"]
+	path = SuperNautic/thirdparty/SFML
+	url = https://github.com/SFML/SFML.git
