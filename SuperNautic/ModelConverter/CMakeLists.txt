@@ -6,8 +6,8 @@ add_executable(ModelConverter
 )
 
 target_link_libraries(ModelConverter 
-assimp
-glm_static
+  assimp
+  glm
 )
 
 
@@ -19,4 +19,13 @@ target_compile_features(ModelConverter
 target_include_directories(ModelConverter
   PUBLIC 
     ${CMAKE_SOURCE_DIR}/SuperNautic/thirdparty/assimp/include
+    ${CMAKE_BINARY_DIR}/SuperNautic/thirdparty/assimp/include
+
+    ${CMAKE_SOURCE_DIR}/SuperNautic/thirdparty/glm
+    
+)
+
+target_compile_definitions(ModelConverter
+  PUBLIC
+    GLM_ENABLE_EXPERIMENTAL
 )

@@ -15,6 +15,8 @@
 #include "mathConverterFuncs.h"
 #include "stringFuncs.h"
 
+#include <cstdlib>
+
 #if !defined(linux)
 #include <Windows.h>
 // Globals
@@ -27,7 +29,7 @@ glm::mat4 gCoordinateTransform =
     glm::mat4(1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f,
               0.f, 0.f, 1.f);
 
-enum LogColor : WORD {
+enum LogColor : unsigned short {
   BLUE = 0x1 | 0x8,
   GREEN = 0x2 | 0x8,
   RED = 0x4 | 0x8,
@@ -42,7 +44,7 @@ enum LogColor : WORD {
 std::ostream& log(LogColor color) {
 #if !defined(linux)
   SetConsoleTextAttribute(gConsoleHandle, color);
-#endif !linux
+#endif  //! linux
   return std::cout;
 }
 
@@ -314,8 +316,8 @@ bool convertFile(char* filePath) {
   std::string outputFilePrefix = getPathExceptEnding(filePath);
   std::string mainOutput = outputFilePrefix + ".kmf";
 
-  FILE* file = nullptr;
-  fopen_s(&file, mainOutput.c_str(), "wb");
+  FILE* file;
+  file = fopen(mainOutput.c_str(), "wb");
 
   if (file == nullptr) {
     log(RED) << "FAILED TO CREATE FILE!" << std::endl;
@@ -398,9 +400,8 @@ bool convertFile(char* filePath) {
   return true;
 }
 
-#define read_buffer(buffer)                                                 \
-  fread_s(&buffer[0], buffer.size() * sizeof(buffer[0]), sizeof(buffer[0]), \
-          buffer.size(), in)
+#define read_buffer(buffer) \
+  fread(&buffer[0], buffer.size() * sizeof(buffer[0]), sizeof(buffer[0]), in)
 
 void testRead(const char* fileName) {
   /*std::string name;
@@ -418,14 +419,14 @@ void testRead(const char* fileName) {
   Header header;
 
   FILE* in;
-  fopen_s(&in, fileName, "rb");
+  in = fopen(fileName, "rb");
 
-  fread_s(&header, sizeof(Header), sizeof(Header), 1, in);
+  fread(&header, sizeof(Header), sizeof(Header), in);
 
   for (unsigned int i = 0; i < header.numMeshes; i++) {
     MeshHeader meshHeader;
 
-    fread_s(&meshHeader, sizeof(MeshHeader), sizeof(MeshHeader), 1, in);
+    fread(&meshHeader, sizeof(MeshHeader), sizeof(MeshHeader), in);
 
     meshes.emplace_back();
     Mesh& current = meshes.back();
@@ -461,8 +462,8 @@ void testRead(const char* fileName) {
     cameras.emplace_back();
     Camera& current = cameras.back();
 
-    fread_s(&current.transform, sizeof(current.transform),
-            sizeof(current.transform), 1, in);
+    fread(&current.transform, sizeof(current.transform),
+          sizeof(current.transform), in);
   }
 
   /*name.resize(test.nameLength);
@@ -484,9 +485,11 @@ void testRead(const char* fileName) {
 }
 
 int main(int argc, char* argv[]) {
+#if !defined(linux)
   // Initialize log
   gConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
   GetConsoleScreenBufferInfo(gConsoleHandle, &gPreviousState);
+#endif  // !linux
 
   if (argc > 1) {
     int successCount = 0;
@@ -525,6 +528,8 @@ int main(int argc, char* argv[]) {
 
   std::cin.get();
 
+#if !defined(linux)
   // Clean up log
   SetConsoleTextAttribute(gConsoleHandle, gPreviousState.wAttributes);
+#endif  // !linux
 }

@@ -1,308 +1,300 @@
 #include <assimp/cimport.h>
-#include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 #include <glm/gtx/transform.hpp>
 
-
-#include "Core/Game.hpp"
-#include "Core/Io/Log.hpp"
 #include "Core/ApplicationState/MainMenuApplicationState.hpp"
 #include "Core/Asset/LoadAssetFunctions.hpp"
-#include "Core/Geometry/RayIntersection.hpp"
+#include "Core/Game.hpp"
 #include "Core/Geometry/Ray.hpp"
-#include "Core/Track/SegmentHandler.hpp"
+#include "Core/Geometry/RayIntersection.hpp"
+#include "Core/Io/Log.hpp"
 #include "Core/Track/Segment.hpp"
+#include "Core/Track/SegmentHandler.hpp"
 
+#include "GFX/Rendering/Transformable3D.hpp"
+#include "GFX/Resources/Loaders/ShaderLoader.hpp"
 #include "GFX/Resources/Loaders/VertexDataImporter.hpp"
 #include "GFX/Resources/TexturedModel.hpp"
-#include "GFX/Resources/Loaders/ShaderLoader.hpp"
-#include "GFX/Rendering/Transformable3D.hpp"
 
 #include "Core/Utility/VideoOptions.hpp"
 
-
 Game::Game()
-	: _window()
-	, _context(_window)
-	, _quitTimer(0.f)
-	, _fps(60.f)
-	, _camera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
-	, _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f), glm::vec3(0.f, 0.f, 1.f))
-{
-	LOG("Game is being constructed...");
+    : _window(),
+      _context(_window),
+      _quitTimer(0.f),
+      _fps(60.f),
+      _camera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f),
+              glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f)),
+      _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f),
+                   glm::vec3(0.f, 0.f, 1.f)) {
+  LOG("Game is being constructed...");
 
-    VideoOptions videoOptions(_window);
-    videoOptions.recreateWindow();
+  VideoOptions videoOptions(_window);
+  videoOptions.recreateWindow();
 }
 
-Game::~Game()
-{
-	LOG("Game is being destructed...");
-	CLOSE_LOG();
+Game::~Game() {
+  LOG("Game is being destructed...");
+  CLOSE_LOG();
 }
 
-bool Game::bInitialize()
-{
+bool Game::bInitialize() {
+  glEnable(GL_DEPTH_TEST);
+  glCullFace(GL_BACK);
 
-	
-	glEnable(GL_DEPTH_TEST);
-	glCullFace(GL_BACK);
+  GLint vertexUniCount = 0;
+  glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &vertexUniCount);
+  GLint geoUniCount = 0;
+  glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &geoUniCount);
+  GLint fragUniCount = 0;
+  glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &fragUniCount);
+  LOG("[VERTEX] There are ", vertexUniCount, " available uniform locations");
+  LOG("[GEOMETRY] There are ", geoUniCount, " available uniform locations");
+  LOG("[FRAGMENT] There are ", fragUniCount, " available uniform locations");
 
-	GLint vertexUniCount = 0;
-	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &vertexUniCount);
-	GLint geoUniCount = 0;
-	glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &geoUniCount);
-	GLint fragUniCount = 0;
-	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &fragUniCount);
-	LOG("[VERTEX] There are ", vertexUniCount, " available uniform locations");
-	LOG("[GEOMETRY] There are ", geoUniCount, " available uniform locations");
-	LOG("[FRAGMENT] There are ", fragUniCount, " available uniform locations");
+  Asset<GFX::Shader> testShader = ShaderCache::get("forward");
 
+  if (testShader.get() == 0) {
+    LOG("Failed to load shader... Oopsie poopsie!");
+  } else {
+    LOG("The test shader has been loaded!");
+  }
 
-	Asset<GFX::Shader> testShader = ShaderCache::get("forward");
+  // Model loading **DEMO**
+  // ModelAsset testModel = ModelCache::get("test2.fbx");
 
-	if (testShader.get() == 0)
-	{
-		LOG("Failed to load shader... Oopsie poopsie!");
-	}
-	else
-	{
-		LOG("The test shader has been loaded!");
-	}
+  // if (testModel.get() == nullptr)
+  //{
+  //	LOG("Failed to load model to GPU... :,(((");
+  //}
+  // else
+  //{
+  //	LOG("WOOOOOW!!");
+  //}
 
-	// Model loading **DEMO**
-	//ModelAsset testModel = ModelCache::get("test2.fbx");
+  // TextureAsset textureTest = TextureCache::get("heatchart.png");
+  // if(textureTest.get() == nullptr)
+  //{
+  //    LOG("Failed to load texture.");
+  //}
 
-	//if (testModel.get() == nullptr)
-	//{
-	//	LOG("Failed to load model to GPU... :,(((");
-	//}
-	//else
-	//{
-	//	LOG("WOOOOOW!!");
-	//}
+  MaterialAsset materialTest = MaterialCache::get("test.mat");
+  if (materialTest.get() == nullptr) {
+    LOG("Failed to load material.");
+  }
 
-    //TextureAsset textureTest = TextureCache::get("heatchart.png");
-    //if(textureTest.get() == nullptr)
-    //{
-    //    LOG("Failed to load texture.");
-    //}
+  //_model = ModelCache::get("ship.fbx");
+  /*We can create a loop here (or where relevant) that loops through a list
+  of all the things we want to render and add them to the model array, such as
+  segments, ships etc.*/
+  ModelArray.emplace_back(ModelCache::get("ship.kmf"),
+                          MaterialCache::get("test.mat"));
+  ModelArray.emplace_back(ModelCache::get("gizmo.kmf"),
+                          MaterialCache::get("gizmo.mat"));
+  ModelArray.emplace_back(ModelCache::get("./segmentkmf/s01_straight_aa.kmf"),
+                          MaterialCache::get("test3pipe.mat"));
+  // ModelArray.emplace_back(ModelCache::get("./segmentkmf/s02_90degbend_aa.kmf"),
+  // MaterialCache::get("test3pipe.mat"));
+  // ModelArray.emplace_back(ModelCache::get("./segmentkmf/s03_10degbend_aa.kmf"),
+  // MaterialCache::get("test3pipe.mat"));
 
-    MaterialAsset materialTest = MaterialCache::get("test.mat");
-    if(materialTest.get() == nullptr)
-    {
-        LOG("Failed to load material.");
+  ////ModelArray.push_back(ModelCache::get("segments/s01_straight_aa.fbx"));
+  // for (unsigned int i = 0; i < _track.getNrOfSegments(); i++)
+  //{
+  //	ModelArray.push_back(_track.getMeshBySegmentIndex(i));
+  //}
+
+  _shader = ShaderCache::get("forward");
+
+  _texturedModel.setModelAndMaterial(ModelCache::get("gizmo.kmf"),
+                                     materialTest);
+
+  //_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
+  //_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f,
+  //&GFX::Framebuffer::DEFAULT);
+
+  _context.segmentHandler.reset(new SegmentHandler(
+      "segments/segmentinfos3.txt", "segments/ConnectionTypes.txt"));
+  _context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
+
+  _context.menuBackground.reset(new MenuBackground(
+      _context.window.getSize().x, _context.window.getSize().y));
+
+  _stateStack.push(std::unique_ptr<ApplicationState>(
+      new MainMenuApplicationState(_stateStack, _context)));
+
+  _pointLights.push_back(PointLight({0.f, -2.f, 0.f}, {1.f, 1.f, 1.f}, 2.0f));
+  //_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f
+  //}, 2.0f)); _pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f,
+  // 0.f, 1.f }, 2.0f));
+
+  //_particleRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f,
+  //&GFX::Framebuffer::DEFAULT); _testParticles.init(50, glm::vec3(0.f),
+  // glm::vec3(0.f, 3.f, 0.f), 5.f, 50.f);
+  _testParticles.init(500, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 0.01f, 5.f,
+                      50.f);
+
+  return true;
+}
+
+void Game::run() {
+  sf::Clock clock;
+  sf::Time deltaTime = clock.restart();
+
+  // sf::Clock performanceClock;
+  // float eventTime = 0.f;
+  // float updateTime = 0.f;
+  // float renderTime = 0.f;
+  //
+  // float totalTime = 0.f;
+  // sf::Clock totalClock;
+
+  while (_window.isOpen()) {
+    // performanceClock.restart();
+    handleEvents();
+    // eventTime += performanceClock.restart().asSeconds();
+    update(deltaTime.asSeconds());
+    // updateTime += performanceClock.restart().asSeconds();
+    render();
+    // renderTime += performanceClock.restart().asSeconds();
+
+    if (_stateStack.bIsEmpty()) {
+      _window.close();
     }
 
+    deltaTime = clock.restart();
+  }
 
-	//_model = ModelCache::get("ship.fbx");
-	/*We can create a loop here (or where relevant) that loops through a list
-	of all the things we want to render and add them to the model array, such as
-	segments, ships etc.*/
-	ModelArray.emplace_back(ModelCache::get("ship.kmf"), MaterialCache::get("test.mat"));
-	ModelArray.emplace_back(ModelCache::get("gizmo.kmf"), MaterialCache::get("gizmo.mat"));
-	ModelArray.emplace_back(ModelCache::get("./segmentkmf/s01_straight_aa.kmf"), MaterialCache::get("test3pipe.mat"));
-	//ModelArray.emplace_back(ModelCache::get("./segmentkmf/s02_90degbend_aa.kmf"), MaterialCache::get("test3pipe.mat"));
-	//ModelArray.emplace_back(ModelCache::get("./segmentkmf/s03_10degbend_aa.kmf"), MaterialCache::get("test3pipe.mat"));
-
-	////ModelArray.push_back(ModelCache::get("segments/s01_straight_aa.fbx"));
-	//for (unsigned int i = 0; i < _track.getNrOfSegments(); i++)
-	//{
-	//	ModelArray.push_back(_track.getMeshBySegmentIndex(i));
-	//}
-
-
-	_shader = ShaderCache::get("forward");
-
-	_texturedModel.setModelAndMaterial(ModelCache::get("gizmo.kmf"), materialTest);
-
-	//_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
-	//_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f, &GFX::Framebuffer::DEFAULT);
-
-    _context.segmentHandler.reset(new SegmentHandler("Segments/segmentinfos3.txt", "Segments/ConnectionTypes.txt"));
-	_context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
-
-    _context.menuBackground.reset(new MenuBackground(_context.window.getSize().x, _context.window.getSize().y));
-
-	_stateStack.push(std::unique_ptr<ApplicationState>(new MainMenuApplicationState(_stateStack, _context)));
-
-
-	_pointLights.push_back(PointLight({ 0.f,-2.f,0.f }, { 1.f, 1.f, 1.f }, 2.0f));
-	//_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f }, 2.0f));
-	//_pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f, 0.f, 1.f }, 2.0f));
-
-	//_particleRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f, &GFX::Framebuffer::DEFAULT);
-	//_testParticles.init(50, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 5.f, 50.f);
-	_testParticles.init(500, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 0.01f, 5.f, 50.f);
-
-	return true;
+  // totalTime = totalClock.restart().asSeconds();
+  //
+  // LOG("---------------");
+  // LOG("Event time: ", eventTime, "s,\t",	 100.f * eventTime / totalTime,
+  // "% of total");  LOG("Update time: ", updateTime, "s,\t", 100.f * updateTime
+  // / totalTime, "% of total");  LOG("Render time: ", renderTime, "s,\t", 100.f
+  // * renderTime / totalTime, "% of total");  LOG("---------------");
 }
 
-void Game::run()
-{
-	sf::Clock clock;
-	sf::Time deltaTime = clock.restart();
+void Game::handleEvents() {
+  sf::Event event;
+  while (_window.pollEvent(event)) {
+    switch (event.type) {
+      case sf::Event::Closed:
+        _window.close();
+        break;
 
-	//sf::Clock performanceClock;
-	//float eventTime = 0.f;
-	//float updateTime = 0.f;
-	//float renderTime = 0.f;
-	//
-	//float totalTime = 0.f;
-	//sf::Clock totalClock;
-
-	while (_window.isOpen())
-	{
-		//performanceClock.restart();
-		handleEvents();
-		//eventTime += performanceClock.restart().asSeconds();
-		update(deltaTime.asSeconds());
-		//updateTime += performanceClock.restart().asSeconds();
-		render();
-		//renderTime += performanceClock.restart().asSeconds();
-
-		if(_stateStack.bIsEmpty())
-        {
-            _window.close();
-        }
-
-		deltaTime = clock.restart();
-	}
-
-	//totalTime = totalClock.restart().asSeconds();
-	//
-	//LOG("---------------");
-	//LOG("Event time: ", eventTime, "s,\t",	 100.f * eventTime / totalTime, "% of total");
-	//LOG("Update time: ", updateTime, "s,\t", 100.f * updateTime / totalTime, "% of total");
-	//LOG("Render time: ", renderTime, "s,\t", 100.f * renderTime / totalTime, "% of total");
-	//LOG("---------------");
-
-
+      default:
+        _stateStack.handleEvent(event);
+        break;
+    }
+  }
 }
 
-void Game::handleEvents()
-{
-	sf::Event event;
-	while (_window.pollEvent(event))
-	{
-		switch (event.type)
-		{
-		case sf::Event::Closed:
-			_window.close();
-			break;
+void Game::update(float dt) {
+  _fps = _fps * 0.9f + 0.1f / dt;
 
-        default:
-            _stateStack.handleEvent(event);
-            break;
-		}
-	}
+  //_debugCamera.update(dt, _window);
 
+  static float t = 0.0;
+  t += dt;
+  //_pointLights[0].setPosition(glm::vec3(5.f * sinf(t*2.f), 2.f, 5.f *
+  // cosf(t*2.f)));
+
+  static glm::vec3 currentPos =
+      glm::vec3(5.f * sinf(t * 2.f), 2.f, 5.f * cosf(t * 2.f));
+  static glm::vec3 prevPos = currentPos;
+  currentPos = glm::vec3(5.f * sinf(t * 2.f), 2.f, 5.f * cosf(t * 2.f));
+  ;
+
+  // ModelArray[1].getModelAsset().get()->setModelMatrix(glm::translate(glm::vec3(100.f)));
+
+  //_testParticles.update(
+  //	dt,
+  //	currentPos,
+  //	(currentPos - prevPos) * 20.f);
+
+  prevPos = currentPos;
+
+  _stateStack.update(dt);
 }
 
-void Game::update(float dt)
-{
-    _fps = _fps * 0.9f + 0.1f / dt;
+void Game::render() {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//_debugCamera.update(dt, _window);
+  static float time = 0.f;
+  time += 0.009f;
 
-	static float t = 0.0;
-	t += dt;
-	//_pointLights[0].setPosition(glm::vec3(5.f * sinf(t*2.f), 2.f, 5.f * cosf(t*2.f)));
+  _camera.setPos(glm::vec3(0.f, 0.f, 5.f));
+  _camera.setViewDir(glm::vec3(0.f, 0.f, 1.f));
 
-	static glm::vec3 currentPos = glm::vec3(5.f * sinf(t*2.f), 2.f, 5.f * cosf(t*2.f));
-	static glm::vec3 prevPos	= currentPos;
-	currentPos = glm::vec3(5.f * sinf(t*2.f), 2.f, 5.f * cosf(t*2.f));;
+  // for (auto& pointLight : _pointLights)
+  //{
+  //	_deferredRenderer.pushPointLight(pointLight);
+  //}
 
-	//ModelArray[1].getModelAsset().get()->setModelMatrix(glm::translate(glm::vec3(100.f)));
+  // for (auto& model : ModelArray)
+  //{
+  //	_deferredRenderer.render(model);
+  //}
 
-	//_testParticles.update(
-	//	dt,
-	//	currentPos,
-	//	(currentPos - prevPos) * 20.f);
+  ////glm::vec3 pos = _debugCamera.getPosition();
+  ////std::string title = "( " + std::to_string((int)pos.x) + ", " +
+  /// std::to_string((int)pos.y) + ", " + std::to_string((int)pos.z) + " )";
+  ////_window.setTitle(std::to_string(_fps));
 
-	prevPos = currentPos;
+  ////_deferredRenderer.render(_texturedModel);
 
-    _stateStack.update(dt);
-}
+  //_deferredRenderer.display(_debugCamera);
 
-void Game::render()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  //_particleRenderer.render(_testParticles);
+  //_particleRenderer.display(_debugCamera);
 
+  //_window.display();
+  // return;
 
-	static float time = 0.f;
-	time += 0.009f;
+  //_deferredRenderer1.render(_texturedModel);
+  //_deferredRenderer1.display(_debugCamera);
 
-	_camera.setPos(glm::vec3(0.f, 0.f, 5.f));
-	_camera.setViewDir(glm::vec3(0.f, 0.f, 1.f));
+  //_deferredRenderer2.render(*_model.get());
+  //_deferredRenderer3.render(*_model.get());
+  //_deferredRenderer4.render(*_model.get());
 
+  /*glm::mat4 model(1.f);
+  glm::mat4 view = glm::lookAt(glm::vec3{ 20.f * sinf(time), 0.f, 20.f *
+  cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
+  glm::mat4 projection = glm::perspective(70.f, (float)_window.getSize().x /
+  (float)_window.getSize().y, 0.3f, 100.f);
 
+  glm::vec4 color(1.f, 0.f, 0.f, 1.f);
 
-	//for (auto& pointLight : _pointLights)
-	//{
-	//	_deferredRenderer.pushPointLight(pointLight);
-	//}
+  _shader.get()->setUniform("uModel", model);
+  _shader.get()->setUniform("uView", view);
+  _shader.get()->setUniform("uProjection", projection);
 
-	//for (auto& model : ModelArray)
-	//{
-	//	_deferredRenderer.render(model);
-	//}
+  _shader.get()->setUniform("uColor", color);
 
-	////glm::vec3 pos = _debugCamera.getPosition();
-	////std::string title = "( " + std::to_string((int)pos.x) + ", " + std::to_string((int)pos.y) + ", " + std::to_string((int)pos.z) + " )";
-	////_window.setTitle(std::to_string(_fps));
+  _model.get()->render();*/
 
-	////_deferredRenderer.render(_texturedModel);
+  _camera.setPos(glm::vec3(
+      0.f, 0.f,
+      -5.f));  // glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
+  //_forwardRenderer.render(*_model.get());
+  //_forwardRenderer.render(_texturedModel);
+  //_forwardRenderer.display(_debugCamera);
+  // LOG_GL_ERRORS();
 
-	//_deferredRenderer.display(_debugCamera);
+  static Asset<sf::Font> font =
+      AssetCache<sf::Font, std::string>::get("res/arial.ttf");
+  sf::Text fps;
+  fps.setFont(*font.get());
+  fps.setString("FPS: " + std::to_string(_fps));
 
-	//_particleRenderer.render(_testParticles);
-	//_particleRenderer.display(_debugCamera);
+  _stateStack.render();
 
-	//_window.display();
-	//return;
+  _window.pushGLStates();
+  _window.draw(fps);
+  _window.popGLStates();
 
-	//_deferredRenderer1.render(_texturedModel);
-	//_deferredRenderer1.display(_debugCamera);
-
-	//_deferredRenderer2.render(*_model.get());
-	//_deferredRenderer3.render(*_model.get());
-	//_deferredRenderer4.render(*_model.get());
-
-
-
-	/*glm::mat4 model(1.f);
-	glm::mat4 view = glm::lookAt(glm::vec3{ 20.f * sinf(time), 0.f, 20.f * cosf(time) }, glm::vec3{ 0.f, 0.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f });
-	glm::mat4 projection = glm::perspective(70.f, (float)_window.getSize().x / (float)_window.getSize().y, 0.3f, 100.f);
-
-	glm::vec4 color(1.f, 0.f, 0.f, 1.f);
-
-	_shader.get()->setUniform("uModel", model);
-	_shader.get()->setUniform("uView", view);
-	_shader.get()->setUniform("uProjection", projection);
-
-	_shader.get()->setUniform("uColor", color);
-
-	_model.get()->render();*/
-
-
-	_camera.setPos(glm::vec3(0.f, 0.f, -5.f));//glm::vec3(20.f * sinf(time), 0.f, 20.f * cosf(time)));
-    //_forwardRenderer.render(*_model.get());
-	//_forwardRenderer.render(_texturedModel);
-	//_forwardRenderer.display(_debugCamera);
-	//LOG_GL_ERRORS();
-
-    static Asset<sf::Font> font = AssetCache<sf::Font, std::string>::get("res/arial.ttf");
-    sf::Text fps;
-    fps.setFont(*font.get());
-    fps.setString("FPS: " + std::to_string(_fps));
-
-    _stateStack.render();
-
-    _window.pushGLStates();
-    _window.draw(fps);
-    _window.popGLStates();
-
-	_window.display();
+  _window.display();
 }

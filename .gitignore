@@ -1,2 +1,7 @@
 build/
 .vscode/
+res/
+*.zip
+
+config.cfg
+tracks.cfg

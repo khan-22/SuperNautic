@@ -3,45 +3,39 @@
 #ifndef UTILITIES_HPP
 #define UTILITIES_HPP
 
+#include <glm/vec3.hpp>
 #include "Core/Io/Log.hpp"
-#include "glm/vec3.hpp"
 
-template<typename T>
-inline T clamp(T value, T low, T high)
-{
-	if (low > high)
-	{
-		LOG_ERROR("Clamp error: low > high");
-		return value;
-	}
+template <typename T>
+inline T clamp(T value, T low, T high) {
+  if (low > high) {
+    LOG_ERROR("Clamp error: low > high");
+    return value;
+  }
 
-	if (value < low)
-	{
-		return low;
-	}
+  if (value < low) {
+    return low;
+  }
 
-	if (value > high)
-	{
-		return high;
-	}
+  if (value > high) {
+    return high;
+  }
 
-	return value;
+  return value;
 }
 
 // True if two floats are almost equal
 bool bIsFloatEq(float a, float b);
 
 // True if two vectors are almost equal
-inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2)
-{
-	return (0.0001f > abs(vector1.x - vector2.x)) &&
-		(0.0001f > abs(vector1.y - vector2.y)) &&
-		(0.0001f > abs(vector1.z - vector2.z));
+inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2) {
+  return (0.0001f > abs(vector1.x - vector2.x)) &&
+         (0.0001f > abs(vector1.y - vector2.y)) &&
+         (0.0001f > abs(vector1.z - vector2.z));
 }
 
 // Create random string of specified size using the following characters
 // A-Z, a-z, 0-9
 std::string randString(size_t size);
-
 
 #endif

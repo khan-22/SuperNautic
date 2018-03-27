@@ -55,10 +55,9 @@ class Track {
   // Returns the forward vector for a given ship position and segment index
   // (segment index may update). Returns appropriate respawn position in
   // returnPos and length from start of segment
-  glm::vec3 Track::findForward(const glm::vec3 globalPosition,
-                               unsigned int& segmentIndex, glm::vec3& returnPos,
-                               float& lengthInSegment,
-                               glm::vec3& directionDifference);
+  glm::vec3 findForward(const glm::vec3 globalPosition,
+                        unsigned int& segmentIndex, glm::vec3& returnPos,
+                        float& lengthInSegment, glm::vec3& directionDifference);
 
  private:
   int getIndex() const;

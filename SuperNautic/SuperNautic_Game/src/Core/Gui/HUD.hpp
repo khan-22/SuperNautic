@@ -3,66 +3,62 @@
 #ifndef HUD_HPP
 #define HUD_HPP
 
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
-
-#include "Core/Gui/SceneNode.hpp"
 #include "Core/Asset/Asset.hpp"
+#include "Core/Gui/SceneNode.hpp"
 
+class HUD : public SceneNode {
+ public:
+  HUD(int windowWidth, int windowHeight);
+  ~HUD();
 
+  void setSpeed(float speed);
+  void setHeat(float heat);
+  void setPosition(int position);
+  void setTime(float time);
+  void setOverheatTemperature(float overheatTemperature);
+  void setScreenSize(int width, int height, int offsetX, int offsetY);
 
-class HUD : public SceneNode
-{
-public:
-	HUD(int windowWidth, int windowHeight);
-	~HUD();
+  void updateCurrent(float dtSeconds) override;
+  void renderCurrent(sf::RenderTarget& target,
+                     sf::RenderStates states) const override;
 
-	void setSpeed(float speed);
-	void setHeat(float heat);
-	void setPosition(int position);
-	void setTime(float time);
-	void setOverheatTemperature(float overheatTemperature);
-	void setScreenSize(int width, int height, int offsetX, int offsetY);
+ private:
+  static const glm::vec4 _MIN_SPEEDER_COLOR;
+  static const glm::vec4 _MAX_SPEEDER_COLOR;
 
-	void updateCurrent(float dtSeconds) override;
-	void renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
+  float _widthStep;
+  float _heightStep;
+  int _offsetX;
+  int _offsetY;
+  float _speed;
+  float _heat;
+  int _position;
+  float _time;
+  float _overheatTemperature;
 
-private:
-    static const glm::vec4 _MIN_SPEEDER_COLOR;
-    static const glm::vec4 _MAX_SPEEDER_COLOR;
+  Asset<sf::Font> _font;
 
-	float				_widthStep;
-	float				_heightStep;
-	int					_offsetX;
-	int					_offsetY;
-	float				_speed;
-	float				_heat;
-	int					_position;
-	float				_time;
-	float				_overheatTemperature;
+  // sf::RectangleShape	_speedMeter;
+  sf::CircleShape _speeder;
 
-	Asset<sf::Font>		_font;
+  sf::VertexArray _speedLine;
 
-	//sf::RectangleShape	_speedMeter;
-	sf::CircleShape		_speeder;
+  sf::RectangleShape _heatOverlay;
+  Asset<sf::Texture> _heatOverlayTexture;
 
-	sf::VertexArray		_speedLine;
+  float _overHeatTimer;
 
-	sf::RectangleShape	_heatOverlay;
-	Asset<sf::Texture>	_heatOverlayTexture;
-
-	float               _overHeatTimer;
-
-	sf::Text			_tPosition;
-	sf::Text			_tTime;
-
+  sf::Text _tPosition;
+  sf::Text _tTime;
 };
 
-#endif // !HUD_HPP
+#endif  // !HUD_HPP

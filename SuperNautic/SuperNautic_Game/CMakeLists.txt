@@ -99,18 +99,31 @@ add_executable(SuperNautic
 )
 
 target_link_libraries(SuperNautic
-glm_static
-SFML
-glew
+  glm
+  sfml-graphics
+  sfml-audio
+  # sfml-main
+  sfml-window
+  glew
+  pthread
 )
 
 target_include_directories(SuperNautic
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/SuperNautic/thirdparty/assimp/include
+    ${CMAKE_BINARY_DIR}/SuperNautic/thirdparty/assimp/include
+
+    ${CMAKE_SOURCE_DIR}/SuperNautic/thirdparty/glm
+
 )
 
 target_compile_features(SuperNautic
   PUBLIC
     cxx_std_14
+)
+
+target_compile_definitions(SuperNautic
+  PUBLIC
+    GLM_ENABLE_EXPERIMENTAL
 )
