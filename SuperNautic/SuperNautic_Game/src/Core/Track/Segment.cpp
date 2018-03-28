@@ -364,6 +364,7 @@ void Segment::createAverageWaypoints(std::vector<unsigned int>& meshIndices) {
     }
 
     // Divide by number of vertices to obtain average
+
     _waypoints[index] /= _scene.get()->meshes[meshIndices[i]].vertices.size();
   }
 }
