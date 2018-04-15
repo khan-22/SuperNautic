@@ -8,6 +8,7 @@ add_executable(ModelConverter
 target_link_libraries(ModelConverter 
   assimp
   glm
+  glew
 )
 
 
