@@ -4,6 +4,8 @@
 #include "Core/Gui/GuiSlider.hpp"
 #include "Core/Utility/Utilities.hpp"
 
+#include <cmath>
+
 GuiSlider::GuiSlider(float min, float max, float sliderWidth, size_t numSteps, const sf::Text& leftLabel, const sf::Text& rightLabel)
 : _leftLabel(leftLabel)
 , _rightLabel(rightLabel)

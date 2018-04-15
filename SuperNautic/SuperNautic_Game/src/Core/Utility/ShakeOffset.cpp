@@ -4,6 +4,8 @@
 
 #include "Core/Io/Log.hpp"
 
+#include <cmath>
+
 ShakeOffset::ShakeOffset(float horizontalSpeed, float horizontalMagnitude,
                          float verticalSpeed, float verticalMagnitude,
                          float decaySpeed, float baseShakeSpeed)
@@ -43,8 +45,8 @@ void ShakeOffset::update(float dt) {
 }
 
 glm::vec3 ShakeOffset::getVector() const {
-  return glm::vec3{sinf(_hAccumulator) * _horizontalMagnitude * _shakeMagnitude,
-                   sinf(_vAccumulator) * _verticalMagnitude * _shakeMagnitude,
+  return glm::vec3{std::sin(_hAccumulator) * _horizontalMagnitude * _shakeMagnitude,
+                   std::sin(_vAccumulator) * _verticalMagnitude * _shakeMagnitude,
                    0.0f};
 }
 

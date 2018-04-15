@@ -1,5 +1,6 @@
 #include "SFML/Graphics/RenderTarget.hpp"
 
+#include <cmath>
 #include <cassert>
 
 #include "Core/Gui/MenuBackground.hpp"
