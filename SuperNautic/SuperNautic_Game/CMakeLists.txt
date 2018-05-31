@@ -95,6 +95,10 @@ add_executable(SuperNautic
 ./src/Core/Utility/CollisionUtility.cpp
 ./src/Core/Utility/Camera.cpp
 ./src/Core/Utility/AudioOptions.cpp
+./src/Core/Utility/Timer.cpp
+./src/Core/Utility/Timer.hpp
+./src/Core/Utility/TimeSummary.cpp
+./src/Core/Utility/TimeSummary.hpp
 ./src/Core/Asset/LoadAssetFunctions.cpp
 )
 
