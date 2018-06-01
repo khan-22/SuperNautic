@@ -1,21 +1,24 @@
 #include "Core/Utility/Timer.hpp"
 #include "Core/Utility/TimeSummary.hpp"
 
+namespace prof
+{
+
+
+
 #ifdef PROFILE
 
 Timer::Timer(const char* name)
 : _name(name)
-, _start(Clock::now())
 {
-
+  TimeSummary::startEntry(_name, Clock::now());
 }
+
 
 
 Timer::~Timer()
 {
-    TimeSummary::add(
-        _name,
-        duration_cast<duration<double>>(_start - Clock::now());
+  TimeSummary::stopEntry(_name, Clock::now());
 }
 
 #else
@@ -26,3 +29,5 @@ Timer::Timer(const char* name)
 }
 
 #endif // PROFILE
+
+}

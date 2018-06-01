@@ -96,9 +96,7 @@ add_executable(SuperNautic
 ./src/Core/Utility/Camera.cpp
 ./src/Core/Utility/AudioOptions.cpp
 ./src/Core/Utility/Timer.cpp
-./src/Core/Utility/Timer.hpp
 ./src/Core/Utility/TimeSummary.cpp
-./src/Core/Utility/TimeSummary.hpp
 ./src/Core/Asset/LoadAssetFunctions.cpp
 )
 
@@ -130,4 +128,6 @@ target_compile_features(SuperNautic
 target_compile_definitions(SuperNautic
   PUBLIC
     GLM_ENABLE_EXPERIMENTAL
+    $<$<CONFIG:Debug>:PROFILE>
+
 )
