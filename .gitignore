@@ -1,6 +1,5 @@
 build/
 .vscode/
-res/
 *.zip
 
 config.cfg

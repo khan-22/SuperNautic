@@ -1,0 +1,4 @@
+DIFFUSE   0    shipC_diffuse.png
+SPECULAR   0  heatchart.png  
+NORMAL 0   shipB_normal.png   
+ILLUM 0   shipC_illumination.png

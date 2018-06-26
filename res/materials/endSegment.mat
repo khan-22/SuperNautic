@@ -1,0 +1,4 @@
+DIFFUSE   0    endsegmentdiffuse.png
+SPECULAR   0  heatchart.png  
+NORMAL 0   MyShip_Normals.png   
+ILLUM 0   endsegmentillum.png

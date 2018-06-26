@@ -1,0 +1,4 @@
+DIFFUSE   0    seaweed.png
+SPECULAR   0  fullbright_illumination.png
+NORMAL 0   seaweed_normal.png   
+ILLUM 0   seaweed_illumination.png

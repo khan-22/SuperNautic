@@ -1,0 +1,8 @@
+DIFFUSE   0    MyShip_UV.png
+SPECULAR   0  heatchart.png  
+NORMAL 0   MyShip_Normals.png   
+ILLUM 0   default_illumination.png
+SPECULAR   1  heatchart.png  
+NORMAL 1   heatchart.png   
+DIFFUSE   1    heatchart.png 
+ILLUM 1   default_illumination.png
