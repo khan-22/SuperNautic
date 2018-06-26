@@ -116,9 +116,12 @@ std::string TimeSummary::summarize()
     summary << "SUMMARY" << std::endl;;
     for(const AccumulatedEntry& entry : accumulatedEntries)
     {
+      if (entry.name != root.name)
+      {
         summary << entry.name << "\t" << entry.inclusiveTime << "s"
                 << "\t" << entry.count << " times"
                 << "\t" << entry.inclusiveTime / double(entry.count) << "s/time" << std::endl;
+      }
     }
 
 
