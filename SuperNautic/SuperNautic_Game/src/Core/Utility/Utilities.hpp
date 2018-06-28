@@ -5,6 +5,7 @@
 
 #include <glm/vec3.hpp>
 #include "Core/Io/Log.hpp"
+#include <cmath>
 
 template <typename T>
 inline T clamp(T value, T low, T high) {
@@ -29,9 +30,9 @@ bool bIsFloatEq(float a, float b);
 
 // True if two vectors are almost equal
 inline bool bAlmostEqual(glm::vec3 vector1, glm::vec3 vector2) {
-  return (0.0001f > abs(vector1.x - vector2.x)) &&
-         (0.0001f > abs(vector1.y - vector2.y)) &&
-         (0.0001f > abs(vector1.z - vector2.z));
+  return (0.0001f > std::abs(vector1.x - vector2.x)) &&
+         (0.0001f > std::abs(vector1.y - vector2.y)) &&
+         (0.0001f > std::abs(vector1.z - vector2.z));
 }
 
 // Create random string of specified size using the following characters
