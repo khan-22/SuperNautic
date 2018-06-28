@@ -104,11 +104,15 @@ target_link_libraries(SuperNautic
   glm
   sfml-graphics
   sfml-audio
-  # sfml-main
   sfml-window
   glew
-  pthread
 )
+
+if(UNIX)
+  target_link_libraries(SuperNautic
+    pthread
+  )
+endif(UNIX)
 
 target_include_directories(SuperNautic
   PUBLIC
@@ -129,5 +133,4 @@ target_compile_definitions(SuperNautic
   PUBLIC
     GLM_ENABLE_EXPERIMENTAL
     $<$<CONFIG:Debug>:PROFILE>
-
 )
