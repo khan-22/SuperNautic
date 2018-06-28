@@ -96,7 +96,7 @@ void Track::setDifficulty(const unsigned int difficulty) {
 void Track::startNewTrack() {
   _generatedLength = 0.f;
   _totalProgress = 0.f;
-  _endMatrix = glm::mat4();
+  _endMatrix = glm::mat4(1.f);
   _endConnection = 'a';
   _prevIndex = -1;
   _lastSegment = nullptr;
@@ -124,7 +124,8 @@ void Track::setNrOfPlayers(unsigned int nrOfPlayers) {
 // Generates the track
 bool Track::bGenerate() {
   // Make the inital stretch straight
-  while (_generatedLength < 600.f) {
+   while (_generatedLength < 600.f) {
+  //while (_generatedLength < _targetLength) {
     bInsertNormalSegment(0);
   }
 

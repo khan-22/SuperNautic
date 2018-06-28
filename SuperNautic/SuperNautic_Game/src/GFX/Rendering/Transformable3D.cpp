@@ -4,7 +4,12 @@
 
 using namespace GFX;
 
-Transformable3D::Transformable3D() : _bTransformNeedsUpdate{false}, _bInverseTransformNeedsUpdate{false}
+Transformable3D::Transformable3D()
+: _bTransformNeedsUpdate{false}
+, _bInverseTransformNeedsUpdate{false}
+, _origin({0})
+, _position({0})
+, _scale({0})
 {
 	setScale(1.0f);
 }
