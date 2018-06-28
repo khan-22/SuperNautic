@@ -25,7 +25,7 @@ namespace prof
         struct Node
         {
           const char* name = nullptr;
-          double time = 0.d;
+          double time = 0;
 
           std::vector<Node> children;
         };
@@ -33,8 +33,8 @@ namespace prof
         struct AccumulatedEntry
         {
           const char* name = nullptr;
-          double inclusiveTime = 0.d;
-          double exclusiveTime = 0.d;
+          double inclusiveTime = 0;
+          double exclusiveTime = 0;
           size_t count = 0;
         };
 
