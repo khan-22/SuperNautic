@@ -307,10 +307,12 @@ int Track::getInRow(int index) const {
   return static_cast<int>((max - min + 1) * scaled) + min;
 }
 
+#include "Core/Utility/Timer.hpp"
 glm::vec3 Track::findForward(const glm::vec3 globalPosition,
                              unsigned int& segmentIndex, glm::vec3& returnPos,
                              float& lengthInSegment,
                              glm::vec3& directionDifference) {
+  prof::Timer timer("Track::findForward");
   WaypointInfo closest;
   closest.found = false;
   unsigned int closestIndex;

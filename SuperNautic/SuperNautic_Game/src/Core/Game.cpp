@@ -37,7 +37,6 @@ Game::Game()
 
 Game::~Game() {
   LOG("Game is being destructed...");
-  CLOSE_LOG();
 }
 
 bool Game::bInitialize() {

@@ -91,9 +91,11 @@ void Player::setId(int id)
 {
 	_input.setControllerId(id);
 }
-
+#include "Core/Utility/Timer.hpp"
 void Player::update(float dt)
 {
+	prof::Timer timer("Player::update");
+	
 	_input.update(dt);
 
 	if (_input.checkActive())

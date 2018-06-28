@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef TIMER_HPP
-#define TIMER_HPP
+#ifndef PROF_TIMER_HPP
+#define PROF_TIMER_HPP
 
 #ifdef PROFILE
 #include <chrono>
@@ -37,4 +37,4 @@ public:
 
 #endif // PROFILE
 
-#endif //TIMER_HPP
+#endif //PROF_TIMER_HPP
