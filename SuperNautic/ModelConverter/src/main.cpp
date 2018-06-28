@@ -16,6 +16,7 @@
 #include "stringFuncs.h"
 
 #include <cstdlib>
+#include <algorithm>
 
 #if !defined(linux)
 #include <Windows.h>
@@ -23,6 +24,9 @@
 HANDLE gConsoleHandle;
 CONSOLE_SCREEN_BUFFER_INFO gPreviousState;
 #endif  // !linux
+
+#undef max
+
 
 // bool gTransformCoordinates;
 glm::mat4 gCoordinateTransform =
