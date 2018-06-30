@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <vector>
+#include <memory>
 
 #include "SFML/Audio/Sound.hpp"
 
@@ -32,7 +33,7 @@ public:
 
 protected:
     static Asset<sf::SoundBuffer> _stepSoundBuffer;
-    static sf::Sound              _stepSound;
+    static std::unique_ptr<sf::Sound>              _stepSound;
 
 private:
     bool _bIsSelected;

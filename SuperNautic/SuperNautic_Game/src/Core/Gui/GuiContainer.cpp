@@ -79,7 +79,7 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
                 if(!bIsActive())
                 {
                     toggleActivation();
-                    _stepSound.play();
+                    _stepSound->play();
                 }
                 break;
 
@@ -88,7 +88,7 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
                 if(bIsActive())
                 {
                     toggleActivation();
-                    _stepSound.play();
+                    _stepSound->play();
                 }
                 break;
 
@@ -96,12 +96,12 @@ void GuiContainer::handleEventCurrent(const sf::Event& event)
                 if(event.key.code == _nextKey)
                 {
                     selectNext();
-                    _stepSound.play();
+                    _stepSound->play();
                 }
                 else if(event.key.code == _previousKey)
                 {
                     selectPrevious();
-                    _stepSound.play();
+                    _stepSound->play();
                 }
                 else if(bHasSelection())
                 {

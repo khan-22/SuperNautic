@@ -98,11 +98,11 @@ void GuiSlider::handleEventCurrent(const sf::Event& event)
         switch(event.key.code)
         {
             case sf::Keyboard::Left:
-                _stepSound.play();
+                _stepSound->play();
                 setValue(_value - _step);
                 break;
             case sf::Keyboard::Right:
-                _stepSound.play();
+                _stepSound->play();
                 setValue(_value + _step);
                 break;
             default:

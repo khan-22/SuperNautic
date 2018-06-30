@@ -6,7 +6,7 @@
 
 
 Asset<sf::SoundBuffer> GuiElement::_stepSoundBuffer;
-sf::Sound              GuiElement::_stepSound;
+std::unique_ptr<sf::Sound>              GuiElement::_stepSound;
 
 GuiElement::GuiElement()
 : SceneNode()
@@ -17,9 +17,10 @@ GuiElement::GuiElement()
         static bool doOnce = ([]()
         {
             _stepSoundBuffer = AssetCache<sf::SoundBuffer, std::string>::get("menu");
-            _stepSound.setBuffer(*_stepSoundBuffer.get());
+            _stepSound.reset(new sf::Sound());
+            _stepSound->setBuffer(*_stepSoundBuffer.get());
             AudioOptions options;
-            _stepSound.setVolume(options.getEffectsVolume() * 100.f);
+            _stepSound->setVolume(options.getEffectsVolume() * 100.f);
             return true;
         })();
     }
@@ -119,5 +120,5 @@ void GuiElement::registerOnDeselect(const std::function<void()>& callback)
 
 void GuiElement::setStepVolume(float volume)
 {
-    _stepSound.setVolume(volume * 100.f);
+    _stepSound->setVolume(volume * 100.f);
 }
