@@ -1,6 +1,8 @@
-add_executable(SuperNautic
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-./src/main.cpp
+add_library(SuperNautic SHARED
+
+#./src/main.cpp
 ./src/GFX/Lighting/PointLight.cpp
 ./src/GFX/Lighting/DirLight.cpp
 ./src/GFX/Rendering/Transformable3D.cpp
@@ -136,3 +138,10 @@ target_compile_definitions(SuperNautic
     GLM_ENABLE_EXPERIMENTAL
     $<$<CONFIG:Debug>:PROFILE>
 )
+
+
+add_executable(SuperNauticMain
+  ./src/main.cpp
+)
+
+target_link_libraries(SuperNauticMain SuperNautic)
