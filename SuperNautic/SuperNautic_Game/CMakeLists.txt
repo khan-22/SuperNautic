@@ -97,8 +97,6 @@ add_library(SuperNautic SHARED
 ./src/Core/Utility/CollisionUtility.cpp
 ./src/Core/Utility/Camera.cpp
 ./src/Core/Utility/AudioOptions.cpp
-./src/Core/Utility/Timer.cpp
-./src/Core/Utility/TimeSummary.cpp
 ./src/Core/Asset/LoadAssetFunctions.cpp
 
 ./src/gal/gal.cpp

@@ -11,8 +11,6 @@
 #include "Core/Game.hpp"
 #include "Core/Io/Log.hpp"
 
-#include "Core/Utility/TimeSummary.hpp"
-
 int main() {
   // _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
   {
@@ -26,9 +24,5 @@ int main() {
     }
   }
   CLOSE_LOG();
-
-
-  std::cout << prof::TimeSummary::summarize() << std::endl;
-  getchar();
   return 0;
 }

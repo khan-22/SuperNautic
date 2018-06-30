@@ -8,7 +8,6 @@
 #include "Core/Asset/LoadAssetFunctions.hpp"
 #include "Core/Geometry/CollisionMesh.hpp"
 
-#include "Core/Utility/Timer.hpp"
 
 #include "gal/gal.hpp"
 
@@ -183,7 +182,6 @@ void World::resume()
 
 void World::update(float dt, sf::Window& window)
 {
-	prof::Timer timer("World::update");
 	if (!_countdown.isPlaying())
 	{
 		_timer.updateTime(dt);
@@ -205,8 +203,6 @@ void World::update(float dt, sf::Window& window)
 		// Update players
 		for (unsigned int i = 0; i < _players.size(); ++i)
 		{
-			prof::Timer timer("World::updatePlayer");
-			
 			// Finds forward vector of ship and updates segment index
 			glm::vec3 returnPos;
 			glm::vec3 directionDifference;
@@ -216,14 +212,12 @@ void World::update(float dt, sf::Window& window)
 
 			// Update progression
 			{
-				prof::Timer timer("World::updatePlayerProgression");
 				_playerProgression[i].setCurrentSegment(segmentIndex);
 				_playerProgression[i].update(lengthInSegment);
 			}
 
 			// Update ship forward position and respawn position
 			{
-				prof::Timer timer("World::updatePlayerShipForward");
 				_players[i].getShip().setForward(forward);
 				_players[i].getShip().setReturnPos(returnPos);
 				_players[i].getShip().setWaypointDifference(directionDifference);
@@ -232,8 +226,6 @@ void World::update(float dt, sf::Window& window)
 			// Find segments adjacent to ship
 			std::vector<SegmentInstance*> instances;
 			{
-
-				prof::Timer timer("World::updatePlayerAdjacentSegments");
 				for (long j = static_cast<long>(_playerProgression[i].getCurrentSegment() - 1); j <= static_cast<long>(_playerProgression[i].getCurrentSegment()) + 1; ++j)
 				{
 					if (j >= 0 && j < _track->getNrOfSegments())
@@ -264,8 +256,6 @@ void World::update(float dt, sf::Window& window)
 
 			// Check for ship-ship collisions
 			{
-
-				prof::Timer timer("World::updatePlayerCollisions");
 				for (unsigned int j = i + 1; j < _players.size(); ++j)
 				{
 					if (bTestCollision(_players[i].getShip().getBoundingBox(), _players[j].getShip().getBoundingBox()))
@@ -332,8 +322,6 @@ void World::update(float dt, sf::Window& window)
 
 void World::render()
 {
-	prof::Timer timer("World::render");
-
 	gal::commit();
 
 
