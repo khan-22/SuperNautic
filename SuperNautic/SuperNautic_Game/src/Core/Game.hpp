@@ -69,6 +69,8 @@ private:
 	DebugCamera				_debugCamera;
 
 	std::vector<PointLight>	_pointLights;
+
+	FontAsset _font;
 };
 
 #endif //GAME_HPP

@@ -28,7 +28,9 @@ Game::Game()
       _camera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f),
               glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f)),
       _debugCamera(90.f, 1280, 720, glm::vec3(0.f, 0.f, -4.f),
-                   glm::vec3(0.f, 0.f, 1.f)) {
+                   glm::vec3(0.f, 0.f, 1.f)),
+      _font(AssetCache<sf::Font, std::string>::get("res/arial.ttf"))
+                    {
   LOG("Game is being constructed...");
 
   VideoOptions videoOptions(_window);
@@ -283,10 +285,8 @@ void Game::render() {
   //_forwardRenderer.display(_debugCamera);
   // LOG_GL_ERRORS();
 
-  static Asset<sf::Font> font =
-      AssetCache<sf::Font, std::string>::get("res/arial.ttf");
   sf::Text fps;
-  fps.setFont(*font.get());
+  fps.setFont(*_font.get());
   fps.setString("FPS: " + std::to_string(_fps));
 
   _stateStack.render();
