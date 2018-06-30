@@ -3,6 +3,8 @@
 #include "Core/Gui/Timer.hpp"
 #include "Core/Asset/AssetCache.hpp"
 
+#include "gal/gal.hpp"
+
 Timer::Timer(int windowWidth, int windowHeight, int amountOfPlayers) :
 	SceneNode(),
 	_time(0.0f),
@@ -77,7 +79,7 @@ void Timer::updateCurrent(float dtSeconds)
 		sHundredths = std::to_string(hundredths);
 	}
 
-	_tTime.setString(sMinutes + ":" + sSeconds + ":" + sHundredths);
+	gal::setString(_tTime, sMinutes + ":" + sSeconds + ":" + sHundredths);
 }
 
 void Timer::renderCurrent(sf::RenderTarget& target, sf::RenderStates states) const

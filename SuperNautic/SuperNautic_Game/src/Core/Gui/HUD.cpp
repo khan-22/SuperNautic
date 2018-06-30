@@ -4,6 +4,8 @@
 #include "Core/Gui/HUD.hpp"
 #include "Core/Asset/LoadAssetFunctions.hpp"
 
+#include "gal/gal.hpp"
+
 //const glm::vec4 HUD::_MIN_SPEEDER_COLOR(255, 200, 100, 200);
 const glm::vec4 HUD::_MIN_SPEEDER_COLOR(150, 150, 200, 200);
 const glm::vec4 HUD::_MAX_SPEEDER_COLOR(255, 0, 0, 200);
@@ -61,7 +63,7 @@ void HUD::setHeat(float heat)
 void HUD::setPosition(int position)
 {
 	_position = position;
-	_tPosition.setString(std::to_string(_position));
+	gal::setString(_tPosition, std::to_string(_position));
 }
 
 void HUD::setTime(float time)
@@ -102,7 +104,7 @@ void HUD::setTime(float time)
 		sHundredths = std::to_string(hundredths);
 	}
 
-	_tTime.setString(sMinutes + ":" + sSeconds + ":" + sHundredths);
+	gal::setString(_tTime, sMinutes + ":" + sSeconds + ":" + sHundredths);
 }
 
 void HUD::setOverheatTemperature(float overheatTemperature)
@@ -162,14 +164,14 @@ void HUD::updateCurrent(float dtSeconds)
 {
 //	_speeder.setPosition(static_cast<float>(_offsetX) + _widthStep * 35.0f + _widthStep * 30.0f * (_speed - 50.0f) / 150.0f, _offsetY + _heightStep * 70.0f - _heightStep * 25.0f * sinf(_speed / 250.0f * 3.1415f));
 //	_speeder.setPosition(static_cast<float>(_offsetX) + _widthStep * 30.0f * (_speed - 50.0f) / 150.0f, _offsetY - _heightStep * 25.0f * sinf(_speed / 250.0f * 3.1415f));
-	_speeder.setPosition(_widthStep * 30.0f * (_speed - 50.0f) / 150.0f, -_heightStep * 25.0f * sinf(_speed / 250.0f * 3.1415f));
+	gal::setPosition(_speeder, _widthStep * 30.0f * (_speed - 50.0f) / 150.0f, -_heightStep * 25.0f * sinf(_speed / 250.0f * 3.1415f));
 
 
     float colorModifier = std::pow(_heat, 6.f);
 	glm::vec4 speederColor = _MIN_SPEEDER_COLOR * (1.f - colorModifier) + _MAX_SPEEDER_COLOR * colorModifier;
 //	_speeder.setFillColor(sf::Color(speederColor.r, speederColor.g, speederColor.b, speederColor.a));
 //	_speeder.setFillColor(sf::Color(speederColor.r, speederColor.g, speederColor.b, _heat * 255.f));
-	_speeder.setFillColor(sf::Color(_MAX_SPEEDER_COLOR.r, _MAX_SPEEDER_COLOR.g, _MAX_SPEEDER_COLOR.b, colorModifier * 255.f));
+	gal::setFillColor(_speeder, sf::Color(_MAX_SPEEDER_COLOR.r, _MAX_SPEEDER_COLOR.g, _MAX_SPEEDER_COLOR.b, colorModifier * 255.f));
 
 	if(_heat > _overheatTemperature * 0.9f)
     {
@@ -179,7 +181,7 @@ void HUD::updateCurrent(float dtSeconds)
 
         if(size_t(_overHeatTimer * flipsPerSecond) % 2 == 0)
         {
-            _speeder.setFillColor(sf::Color::White);
+			gal::setFillColor(_speeder, sf::Color::White);
         }
     }
     else
@@ -194,7 +196,7 @@ void HUD::updateCurrent(float dtSeconds)
 		trans = (_heat - _overheatTemperature * 0.8) * 5 * 255;
 	}
 
-	_heatOverlay.setFillColor(sf::Color(255, 255, 255, trans));
+	gal::setFillColor(_heatOverlay, sf::Color(255, 255, 255, trans));
 }
 
 void HUD::renderCurrent(sf::RenderTarget & target, sf::RenderStates states) const

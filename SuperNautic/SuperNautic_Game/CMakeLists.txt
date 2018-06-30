@@ -98,6 +98,8 @@ add_executable(SuperNautic
 ./src/Core/Utility/Timer.cpp
 ./src/Core/Utility/TimeSummary.cpp
 ./src/Core/Asset/LoadAssetFunctions.cpp
+
+./src/gal/gal.cpp
 )
 
 target_link_libraries(SuperNautic

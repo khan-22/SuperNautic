@@ -10,7 +10,11 @@
 
 #include "Core/Utility/Timer.hpp"
 
+#include "gal/gal.hpp"
+
 #include <cmath>
+
+
 
 World::World(ApplicationContext& context)
 	: _context{ context }
@@ -329,6 +333,9 @@ void World::update(float dt, sf::Window& window)
 void World::render()
 {
 	prof::Timer timer("World::render");
+
+	gal::commit();
+
 
 	for (int i = 0; i < _viewportPipelines.size(); i++)
 	{
