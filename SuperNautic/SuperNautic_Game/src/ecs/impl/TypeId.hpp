@@ -12,7 +12,7 @@ namespace impl
     class TypeId
     {
         public:
-            static const std::vector<size_t>& sizes();
+            static const std::vector<size_t>* sizes();
             
             template<typename T>
             static const TypeIndex index = register_type(sizeof(T));

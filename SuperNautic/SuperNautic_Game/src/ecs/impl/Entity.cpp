@@ -20,7 +20,7 @@ Entity::Entity(EntityId id)
 
 Entity Entity::create()
 {
-    return Entity(DefaultManager.create_entity());
+    return Entity(DefaultContext::Manager.create_entity());
 }
 
 void Entity::destroy(Entity& entity)
@@ -30,24 +30,24 @@ void Entity::destroy(Entity& entity)
 
 void Entity::destroy()
 {
-    DefaultManager.destroy_entity(_id);
+    DefaultContext::Manager.destroy_entity(_id);
     _id = 0;
 }
 
 
 std::vector<Entity> Entity::get_with(const std::vector<TypeIndex>& ids)
 {
-    return from_ids(DefaultManager.get_entities_with(ids));
+    return from_ids(DefaultContext::Manager.get_entities_with(ids));
 }
 
 std::vector<Entity> Entity::get_like(const Entity& entity)
 {
-    return from_ids(DefaultManager.get_entities_like(entity._id));
+    return from_ids(DefaultContext::Manager.get_entities_like(entity._id));
 }
 
 std::vector<Entity> Entity::get_like() const
 {
-    return from_ids(DefaultManager.get_entities_like(_id));
+    return from_ids(DefaultContext::Manager.get_entities_like(_id));
 }
 
 std::vector<Entity> Entity::from_ids(const std::vector<EntityId>& ids)
@@ -65,22 +65,22 @@ std::vector<Entity> Entity::from_ids(const std::vector<EntityId>& ids)
 
 void* Entity::get(TypeIndex id) const
 {
-    return DefaultManager.get_component(id, _id);
+    return DefaultContext::Manager.get_component(id, _id);
 }
 
 void* Entity::attach(TypeIndex id)
 {
-    return DefaultManager.attach(id, _id);
+    return DefaultContext::Manager.attach(id, _id);
 }
 
 bool Entity::detach(TypeIndex id, void* data)
 {
-    return DefaultManager.detach(id, data, _id);
+    return DefaultContext::Manager.detach(id, data, _id);
 }
 
 std::vector<void*> Entity::detach(TypeIndex id)
 {
-    return DefaultManager.detach(id, _id);
+    return DefaultContext::Manager.detach(id, _id);
 }
 
 

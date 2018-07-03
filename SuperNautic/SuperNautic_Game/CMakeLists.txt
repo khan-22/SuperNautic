@@ -146,3 +146,10 @@ add_executable(SuperNauticMain
 )
 
 target_link_libraries(SuperNauticMain SuperNautic)
+
+
+add_custom_command(TARGET SuperNauticMain POST_BUILD        # Adds a post-build event to MyTest
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        $<TARGET_FILE:ecs>                 # <--this is in-file
+        $<TARGET_FILE_DIR:SuperNauticMain> # <--this is out-file path
+)                 

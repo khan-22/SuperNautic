@@ -20,6 +20,8 @@
 
 #include "Core/Utility/VideoOptions.hpp"
 
+#include <ecs/ecs.hpp>
+
 Game::Game()
     : _window(),
       _context(_window),
@@ -42,6 +44,9 @@ Game::~Game() {
 }
 
 bool Game::bInitialize() {
+  ecs::initialize();
+
+
   glEnable(GL_DEPTH_TEST);
   glCullFace(GL_BACK);
 
@@ -55,87 +60,87 @@ bool Game::bInitialize() {
   LOG("[GEOMETRY] There are ", geoUniCount, " available uniform locations");
   LOG("[FRAGMENT] There are ", fragUniCount, " available uniform locations");
 
-  Asset<GFX::Shader> testShader = ShaderCache::get("forward");
+  // Asset<GFX::Shader> testShader = ShaderCache::get("forward");
 
-  if (testShader.get() == 0) {
-    LOG("Failed to load shader... Oopsie poopsie!");
-  } else {
-    LOG("The test shader has been loaded!");
-  }
+  // if (testShader.get() == 0) {
+  //   LOG("Failed to load shader... Oopsie poopsie!");
+  // } else {
+  //   LOG("The test shader has been loaded!");
+  // }
 
-  // Model loading **DEMO**
-  // ModelAsset testModel = ModelCache::get("test2.fbx");
+  // // Model loading **DEMO**
+  // // ModelAsset testModel = ModelCache::get("test2.fbx");
 
-  // if (testModel.get() == nullptr)
-  //{
-  //	LOG("Failed to load model to GPU... :,(((");
-  //}
-  // else
-  //{
-  //	LOG("WOOOOOW!!");
-  //}
+  // // if (testModel.get() == nullptr)
+  // //{
+  // //	LOG("Failed to load model to GPU... :,(((");
+  // //}
+  // // else
+  // //{
+  // //	LOG("WOOOOOW!!");
+  // //}
 
-  // TextureAsset textureTest = TextureCache::get("heatchart.png");
-  // if(textureTest.get() == nullptr)
-  //{
-  //    LOG("Failed to load texture.");
-  //}
+  // // TextureAsset textureTest = TextureCache::get("heatchart.png");
+  // // if(textureTest.get() == nullptr)
+  // //{
+  // //    LOG("Failed to load texture.");
+  // //}
 
-  MaterialAsset materialTest = MaterialCache::get("test.mat");
-  if (materialTest.get() == nullptr) {
-    LOG("Failed to load material.");
-  }
+  // MaterialAsset materialTest = MaterialCache::get("test.mat");
+  // if (materialTest.get() == nullptr) {
+  //   LOG("Failed to load material.");
+  // }
 
-  //_model = ModelCache::get("ship.fbx");
-  /*We can create a loop here (or where relevant) that loops through a list
-  of all the things we want to render and add them to the model array, such as
-  segments, ships etc.*/
-  ModelArray.emplace_back(ModelCache::get("ship.kmf"),
-                          MaterialCache::get("test.mat"));
-  ModelArray.emplace_back(ModelCache::get("gizmo.kmf"),
-                          MaterialCache::get("gizmo.mat"));
-  ModelArray.emplace_back(ModelCache::get("./segmentkmf/s01_straight_aa.kmf"),
-                          MaterialCache::get("test3pipe.mat"));
-  // ModelArray.emplace_back(ModelCache::get("./segmentkmf/s02_90degbend_aa.kmf"),
-  // MaterialCache::get("test3pipe.mat"));
-  // ModelArray.emplace_back(ModelCache::get("./segmentkmf/s03_10degbend_aa.kmf"),
-  // MaterialCache::get("test3pipe.mat"));
+  // //_model = ModelCache::get("ship.fbx");
+  // /*We can create a loop here (or where relevant) that loops through a list
+  // of all the things we want to render and add them to the model array, such as
+  // segments, ships etc.*/
+  // ModelArray.emplace_back(ModelCache::get("ship.kmf"),
+  //                         MaterialCache::get("test.mat"));
+  // ModelArray.emplace_back(ModelCache::get("gizmo.kmf"),
+  //                         MaterialCache::get("gizmo.mat"));
+  // ModelArray.emplace_back(ModelCache::get("./segmentkmf/s01_straight_aa.kmf"),
+  //                         MaterialCache::get("test3pipe.mat"));
+  // // ModelArray.emplace_back(ModelCache::get("./segmentkmf/s02_90degbend_aa.kmf"),
+  // // MaterialCache::get("test3pipe.mat"));
+  // // ModelArray.emplace_back(ModelCache::get("./segmentkmf/s03_10degbend_aa.kmf"),
+  // // MaterialCache::get("test3pipe.mat"));
 
-  ////ModelArray.push_back(ModelCache::get("segments/s01_straight_aa.fbx"));
-  // for (unsigned int i = 0; i < _track.getNrOfSegments(); i++)
-  //{
-  //	ModelArray.push_back(_track.getMeshBySegmentIndex(i));
-  //}
+  // ////ModelArray.push_back(ModelCache::get("segments/s01_straight_aa.fbx"));
+  // // for (unsigned int i = 0; i < _track.getNrOfSegments(); i++)
+  // //{
+  // //	ModelArray.push_back(_track.getMeshBySegmentIndex(i));
+  // //}
 
-  _shader = ShaderCache::get("forward");
+  // _shader = ShaderCache::get("forward");
 
-  _texturedModel.setModelAndMaterial(ModelCache::get("gizmo.kmf"),
-                                     materialTest);
+  // _texturedModel.setModelAndMaterial(ModelCache::get("gizmo.kmf"),
+  //                                    materialTest);
 
-  //_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
-  //_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f,
-  //&GFX::Framebuffer::DEFAULT);
+  // //_forwardRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f);
+  // //_deferredRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f,
+  // //&GFX::Framebuffer::DEFAULT);
 
-  _context.segmentHandler.reset(new SegmentHandler(
-      "segments/segmentinfos3.txt", "segments/ConnectionTypes.txt"));
-  _context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
+  // _context.segmentHandler.reset(new SegmentHandler(
+  //     "segments/segmentinfos3.txt", "segments/ConnectionTypes.txt"));
+  // _context.obstacleHandler.reset(new ObstacleHandler("obstacleinfo.txt"));
 
-  _context.menuBackground.reset(new MenuBackground(
-      _context.window.getSize().x, _context.window.getSize().y));
+   _context.menuBackground.reset(new MenuBackground(
+       _context.window.getSize().x, _context.window.getSize().y));
 
-  _stateStack.push(std::unique_ptr<ApplicationState>(
-      new MainMenuApplicationState(_stateStack, _context)));
+   _stateStack.push(std::unique_ptr<ApplicationState>(
+       new MainMenuApplicationState(_stateStack, _context)));
 
-  _pointLights.push_back(PointLight({0.f, -2.f, 0.f}, {1.f, 1.f, 1.f}, 2.0f));
-  //_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f
-  //}, 2.0f)); _pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f,
-  // 0.f, 1.f }, 2.0f));
+  // _pointLights.push_back(PointLight({0.f, -2.f, 0.f}, {1.f, 1.f, 1.f}, 2.0f));
+  // //_pointLights.push_back(PointLight({ 6.f,0.f,0.f }, { 0.f, 1.f, 0.f
+  // //}, 2.0f)); _pointLights.push_back(PointLight({ 0.f,2.f,6.f }, { 0.f,
+  // // 0.f, 1.f }, 2.0f));
 
-  //_particleRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f,
-  //&GFX::Framebuffer::DEFAULT); _testParticles.init(50, glm::vec3(0.f),
-  // glm::vec3(0.f, 3.f, 0.f), 5.f, 50.f);
-  _testParticles.init(500, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 0.01f, 5.f,
-                      50.f);
+  // //_particleRenderer.initialize(&_window, 0.0f, 0.0f, 1.0f, 1.0f,
+  // //&GFX::Framebuffer::DEFAULT); _testParticles.init(50, glm::vec3(0.f),
+  // // glm::vec3(0.f, 3.f, 0.f), 5.f, 50.f);
+  // _testParticles.init(500, glm::vec3(0.f), glm::vec3(0.f, 3.f, 0.f), 0.01f, 5.f,
+  //                     50.f);
 
   return true;
 }

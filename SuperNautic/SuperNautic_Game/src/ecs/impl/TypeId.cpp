@@ -12,7 +12,7 @@ namespace impl
 {
 
 
-const std::vector<size_t>* TypeId::_sizes;
+const std::vector<size_t>* TypeId::_sizes = nullptr;
 
 TypeIndex TypeId::register_type(size_t size)
 {
@@ -23,9 +23,9 @@ TypeIndex TypeId::register_type(size_t size)
     return (TypeIndex)(sizes.size() - 1);
 }
 
-const std::vector<size_t>& TypeId::sizes()
+const std::vector<size_t>* TypeId::sizes()
 {
-    return *_sizes;
+    return _sizes;
 }
 
 

@@ -6,6 +6,10 @@ namespace ecs
 {
 namespace impl
 {
-    extern EntityManager DefaultManager;
+    class DefaultContext
+    {
+        public:
+            static EntityManager Manager;
+    };
 }
 }

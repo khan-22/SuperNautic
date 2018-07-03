@@ -4,6 +4,8 @@
 
 namespace ecs
 {
+    void initialize();
+
     Entity create_entity();
     void destroy_entity();
 

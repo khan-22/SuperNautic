@@ -4,7 +4,6 @@ namespace ecs
 {
 namespace impl
 {
-    EntityManager DefaultManager;
-
+    EntityManager DefaultContext::Manager;
 }
 }

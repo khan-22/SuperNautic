@@ -12,9 +12,12 @@ using namespace impl;
 EntityManager::EntityManager()
 : _next_entity_id(1)
 {
-    for(size_t size : TypeId::sizes())
+    if (TypeId::sizes())
     {
-        _stores.emplace_back(size);
+        for(size_t size : *TypeId::sizes())
+        {
+            _stores.emplace_back(size);
+        }
     }
 }
 
@@ -68,7 +71,7 @@ std::vector<EntityId> EntityManager::get_entities_with(std::vector<TypeIndex> co
     struct Entry
     {
         size_t count = 0;
-        TypeIndex previous_type = 0;
+        TypeIndex previous_type = -1;
     };
     std::map<EntityId, Entry> entities;
 

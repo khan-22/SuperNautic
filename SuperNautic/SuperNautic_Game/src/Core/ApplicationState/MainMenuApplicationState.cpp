@@ -16,6 +16,12 @@
 #include "Core/Utility/Camera.h"
 #include "GFX/Rendering/SfmlRenderer.hpp"
 
+#include <ecs/ecs.hpp>
+
+struct IsClickable
+{
+};
+
 
 MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
@@ -51,12 +57,12 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
 		_stack.push(std::unique_ptr<ApplicationState>(new ControlsApplicationState(_stack, _context)));
 	}));
 
-    text.setString("About");
-    auto about = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
-    {
-        _stack.clear();
-        _stack.push(std::unique_ptr<ApplicationState>(new AboutApplicationState(_stack, _context)));
-    }));
+    
+    // auto about = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
+    // {
+    //     _stack.clear();
+    //     _stack.push(std::unique_ptr<ApplicationState>(new AboutApplicationState(_stack, _context)));
+    // }));
 
     text.setString("Quit");
     auto quit = std::unique_ptr<GuiElement>(new GuiButton(text, [&]()
@@ -64,17 +70,33 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
         _stack.clear();
     }));
 
+
+
     options->move(0.f, play->getBoundingRect().height * 1.5f);
 	controls->setPosition(options->getPosition());
 	controls->move(0.f, options->getBoundingRect().height * 1.5f);
-	about->setPosition(controls->getPosition());
-	about->move(0.f, controls->getBoundingRect().height * 1.5f);
-    quit->setPosition(about->getPosition());
-    quit->move(0.f, about->getBoundingRect().height * 1.5f);
+
+    ecs::Entity about = ecs::create_entity();
+    about += std::function<void()>([&]()
+    {
+        _stack.clear();
+        _stack.push(std::unique_ptr<ApplicationState>(new AboutApplicationState(_stack, _context)));
+    });
+
+    text.setString("About");
+    text.setPosition(controls->getPosition());
+    text.move(0.f, controls->getBoundingRect().height * 1.5f);
+    
+
+
+	//about->setPosition(controls->getPosition());
+	//about->move(0.f, controls->getBoundingRect().height * 1.5f);
+    quit->setPosition(text.getPosition());
+    quit->move(0.f, text.getGlobalBounds().height * 1.5f);
     _guiContainer.insert(play);
     _guiContainer.insert(options);
 	_guiContainer.insert(controls);
-    _guiContainer.insert(about);
+    //_guiContainer.insert(about);
     _guiContainer.insert(quit);
 
     sf::Vector2u windowSize = _context.window.getSize();
@@ -84,6 +106,11 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     _guiContainer.toggleSelection();
     _guiContainer.setBackground(sf::Color(27, 173, 222, 100), sf::Color(19, 121, 156, 100), 5.f);
 
+    text.move(_guiContainer.getWorldPosition());
+    about += text;
+    about += text.getPosition();
+    about += text.getGlobalBounds();
+    about += IsClickable();
 
     _titleText.setCharacterSize(100);
     _titleText.setOrigin(_titleText.getBoundingRect().width / 2.f, _titleText.getBoundingRect().height / 2.f);
@@ -98,6 +125,12 @@ void MainMenuApplicationState::render()
     renderer.render(*_context.menuBackground);
     renderer.render(_guiContainer);
     renderer.render(_titleText);
+
+    for(sf::Text* text : ecs::get_components_with<sf::Text>())
+    {
+        renderer.render(*text);
+    }
+
     renderer.display(_context.window);
 //    _context.window.draw(_guiContainer);
 }
@@ -133,5 +166,24 @@ bool MainMenuApplicationState::bUpdate(float dtSeconds)
 bool MainMenuApplicationState::bHandleEvent(const sf::Event& event)
 {
     _guiContainer.handleEvent(event);
+    
+    if(event.type == sf::Event::EventType::MouseButtonPressed &&
+       event.mouseButton.button == sf::Mouse::Button::Left)
+    {
+        float x = event.mouseButton.x;
+        float y = event.mouseButton.y;
+        for(ecs::Entity button : ecs::Entity::get_with<std::function<void()>, IsClickable, sf::FloatRect>())
+        {
+            sf::FloatRect* rect = button;
+            if(rect->contains(x, y))
+            {
+                std::function<void()>* callback = button;
+                callback->operator()();
+                break;
+            }
+        }
+    }
+    
+    
     return true;
 }
