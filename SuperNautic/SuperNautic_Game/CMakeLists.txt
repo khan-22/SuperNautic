@@ -1,5 +1,7 @@
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+add_subdirectory(src/ecs)
+
 add_library(SuperNautic SHARED
 
 #./src/main.cpp
@@ -108,6 +110,7 @@ target_link_libraries(SuperNautic
   sfml-audio
   sfml-window
   glew
+  ecs
 )
 
 if(UNIX)
