@@ -6,23 +6,16 @@
 
 namespace ecs
 {
+    namespace impl
+    {
+        class EcsHelper;
+    }
     using namespace impl;
 
     class Entity
     {
         public:
             Entity();
-
-            static Entity create();
-            static void destroy(Entity& entity);
-            void destroy();
-
-            template<typename... T>
-            static std::vector<Entity> get_with();
-
-            static std::vector<Entity> get_like(const Entity& entity);
-
-            std::vector<Entity> get_like() const;
 
             template<typename T>
             operator T*();
@@ -32,6 +25,12 @@ namespace ecs
 
             template<typename T>
             bool has() const;
+
+            template<typename T>
+            T* get();
+
+            template<typename T>
+            const T* get() const;
 
             template<typename T>
             T& operator+=(const T& component);
@@ -52,10 +51,9 @@ namespace ecs
             bool detach();
 
         private:
+            friend class ::ecs::impl::EcsHelper;
             Entity(EntityId id);
             
-            static std::vector<Entity> get_with(const std::vector<TypeIndex>& ids);
-            static std::vector<Entity> from_ids(const std::vector<EntityId>& ids);
             void* get(TypeIndex id) const;
             void* attach(TypeIndex id);
             bool detach(TypeIndex id, void* data);

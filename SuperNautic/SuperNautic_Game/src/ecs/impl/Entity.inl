@@ -8,21 +8,28 @@ namespace ecs
 
 using namespace impl;
 
-template<typename... T>
-static std::vector<Entity> Entity::get_with() 
-{ 
-    return get_with({TypeId::index<T>...}); 
-}
 
 template<typename T>
 Entity::operator T*()
-{ 
-    return (T*)get(TypeId::index<T>); 
-} 
+{
+    return get<T>();
+}
 
 template<typename T>
 Entity::operator const T*() const 
 { 
+    return get<T>();
+}
+
+template<typename T>
+T* Entity::get()
+{
+    return (T*)get(TypeId::index<T>); 
+}
+
+template<typename T>
+const T* Entity::get() const
+{
     return (const T*)get(TypeId::index<T>); 
 }
 

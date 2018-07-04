@@ -7,7 +7,6 @@
 
 namespace ecs
 {
-
     using namespace impl;
 
 class EntityManager

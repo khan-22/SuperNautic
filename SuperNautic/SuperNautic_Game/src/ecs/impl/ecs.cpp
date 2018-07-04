@@ -7,11 +7,6 @@ namespace ecs
 namespace impl
 {
 
-std::vector<void*> get_components_with(TypeIndex type, std::vector<TypeIndex> with_types)
-{
-    return DefaultContext::Manager.get_components_with(type, with_types);
-}
-
 }
 
 void initialize()
@@ -27,14 +22,18 @@ void initialize()
 
 Entity create_entity()
 {
-    return Entity::create();
+    return EcsHelper::create_entity();
 }
 
 void destroy_entity(Entity& entity)
 {
-    entity.destroy();
+    EcsHelper::destroy_entity(entity);
 }
 
+std::vector<Entity> get_entities_like(const Entity& entity)
+{
+    return EcsHelper::get_entities_like(entity);
+}
 
 
 }
