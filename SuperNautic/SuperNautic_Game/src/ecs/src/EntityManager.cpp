@@ -48,6 +48,70 @@ void* EntityManager::attach(TypeIndex component, EntityId entity)
     return component_id;
 }
 
+
+EntityId EntityManager::get_entity_with(std::vector<TypeIndex> components) const
+{
+    size_t num_unique_components = 0;
+    for(size_t i = 0; i < components.size(); i++)
+    {
+        if(components[i] == -1)
+        {
+            continue;
+        }
+
+        num_unique_components++;
+        for(size_t j = i + 1; j < components.size(); j++)
+        {
+            if(components[i] == components[j])
+            {
+                components[j] = -1;
+            }
+        }
+    }
+
+    struct Entry
+    {
+        size_t count = 0;
+        TypeIndex previous_type = -1;
+    };
+    std::map<EntityId, Entry> entities;
+
+    std::vector<size_t> indices;
+    for(TypeIndex component : components)
+    {
+        if(component == -1)
+        {
+            continue;
+        }
+
+        for(size_t i = 0; i < _components.types.size(); i++)
+        {
+            if(_components.types[i] == component)
+            {
+                indices.push_back(i);
+            }
+        }    
+
+        for(size_t i : indices)
+        {
+            Entry& e = entities[_components.entities[i]];
+            if(e.previous_type != component)
+            {
+                e.count++;
+                if(e.count == num_unique_components)
+                {
+                    return _components.entities[i];
+                }
+                e.previous_type = component;
+            }
+        }
+
+        indices.clear();
+    }
+
+    return 0;
+}
+
 std::vector<EntityId> EntityManager::get_entities_with(std::vector<TypeIndex> components) const
 {
     size_t num_unique_components = 0;
@@ -172,6 +236,23 @@ void* EntityManager::get_component(TypeIndex component, EntityId entity)
     return nullptr;
 }
 
+
+
+void* EntityManager::get_component_with(TypeIndex type, std::vector<TypeIndex> with_types) const
+{
+    with_types.push_back(type);
+    EntityId entity = get_entity_with(with_types);
+    for(size_t i = 0; i < _components.entities.size(); i++)
+    {
+        if(_components.entities[i] == entity &&
+           _components.types[i] == type)
+        {
+            return _components.components[i];
+        }
+    }
+    return nullptr;
+}
+
 std::vector<void*> EntityManager::get_components_with(TypeIndex type, std::vector<TypeIndex> with_types) const
 {
     with_types.push_back(type);
@@ -225,7 +306,7 @@ void* EntityManager::ComponentStore::insert()
     if(_block_cursor == _block_size)
     {
         append_block();
-        _block_cursor = 0;
+        _block_cursor = _size;
         return _blocks.back()->data();
     }
 

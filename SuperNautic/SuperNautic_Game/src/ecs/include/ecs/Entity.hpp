@@ -32,6 +32,11 @@ namespace ecs
             template<typename T>
             const T* get() const;
 
+            bool operator!() const;
+            bool is_null() const;
+            bool operator==(std::nullptr_t null_ptr) const;
+            operator bool() const;
+
             template<typename T>
             T& operator+=(const T& component);
 

@@ -18,6 +18,12 @@ void EcsHelper::destroy_entity(Entity& entity)
     entity._id = 0;    
 }
 
+Entity EcsHelper::get_entity_with(const std::vector<TypeIndex>& ids)
+{
+    return Entity(DefaultContext::Manager.get_entity_with(ids));
+}
+
+
 std::vector<Entity> EcsHelper::get_entities_with(const std::vector<TypeIndex>& ids)
 {
     return from_ids(DefaultContext::Manager.get_entities_with(ids));
@@ -28,6 +34,10 @@ std::vector<Entity> EcsHelper::get_entities_like(const Entity& entity)
     return from_ids(DefaultContext::Manager.get_entities_like(entity._id));
 }
 
+void* EcsHelper::get_component_with(TypeIndex type, std::vector<TypeIndex> with_types)
+{
+    return DefaultContext::Manager.get_component_with(type, with_types);
+}
 
 std::vector<void*> EcsHelper::get_components_with(TypeIndex type, std::vector<TypeIndex> with_types)
 {

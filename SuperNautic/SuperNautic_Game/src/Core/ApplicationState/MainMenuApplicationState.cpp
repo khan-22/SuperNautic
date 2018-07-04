@@ -22,6 +22,43 @@ struct IsClickable
 {
 };
 
+struct IsActiveMenuItem
+{
+};
+
+struct MenuItem
+{
+    ecs::Entity previous;
+    ecs::Entity next;
+};
+
+struct Origin
+{
+
+};
+
+void make_button(ecs::Entity& button, 
+                 sf::Text text, 
+                 const std::function<void()>& callback,
+                 ecs::Entity previous, 
+                 ecs::Entity next)
+{
+    //text.setOrigin(text.getLocalBounds().left, text.getLocalBounds().top);
+    //text.setPosition(0.f, 0.f);
+    //sf::FloatRect textBounds = text.getGlobalBounds();
+    //setOrigin(textBounds.width / 2.f, textBounds.height / 2.f);
+    text.setFillColor(sf::Color::White);
+    text.setOutlineColor(sf::Color::Black);
+    text.setOutlineThickness(2.f);
+
+    button += text;
+    MenuItem& item = button += MenuItem();
+    item.previous = previous;
+    item.next = next;
+
+    button += callback;
+}
+
 
 MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack, ApplicationContext& context)
 : ApplicationState(stack, context)
@@ -117,6 +154,30 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     _titleText.setPosition(windowSize.x / 2.f, windowSize.y / 4.f);
     _titleText.setScale(1.5f, 1.f);
     _titleText.setOutlineThickness(0.f);
+
+
+
+    ecs::Entity button_a = ecs::create_entity();
+    ecs::Entity button_b = ecs::create_entity();
+
+    text.setString("A");
+    text.setPosition(100.f, 100.f);
+    make_button(button_a, 
+                text, 
+                std::function<void()>([](){std::cout << "A" << std::endl;}),
+                button_b,
+                button_b);
+
+
+    text.setString("B");
+    text.move(0.f, 100.f);
+    make_button(button_b, 
+                text, 
+                std::function<void()>([](){std::cout << "B" << std::endl;}),
+                button_a,
+                button_a);
+
+    button_a += IsActiveMenuItem();
 }
 
 void MainMenuApplicationState::render()
@@ -172,15 +233,98 @@ bool MainMenuApplicationState::bHandleEvent(const sf::Event& event)
     {
         float x = event.mouseButton.x;
         float y = event.mouseButton.y;
-        for(ecs::Entity button : ecs::Entity::get_with<std::function<void()>, IsClickable, sf::FloatRect>())
+        for(ecs::Entity button : ecs::get_entities_with<std::function<void()>, IsClickable, sf::FloatRect>())
         {
-            sf::FloatRect* rect = button;
-            if(rect->contains(x, y))
+            if(button.get<sf::FloatRect>()->contains(x, y))
             {
-                std::function<void()>* callback = button;
-                callback->operator()();
+                (*button.get<std::function<void()>>())();
                 break;
             }
+        }
+    }
+
+    if(event.type == sf::Event::EventType::KeyPressed)
+    {
+        switch(event.key.code)
+        {
+            case sf::Keyboard::Down:
+            {
+                ecs::Entity current = ecs::get_entity_with<IsActiveMenuItem, MenuItem>();
+                if(!current)
+                {
+                    break;
+                }
+                ecs::Entity& next = current.get<MenuItem>()->next;
+                if(!next)
+                {
+                    break;
+                }
+
+                current.detach<IsActiveMenuItem>();
+                next.attach<IsActiveMenuItem>();
+
+                sf::Text* current_text = current;
+                sf::Text* next_text = next;
+
+                if(current_text)
+                {
+                    current_text->setScale(1.f, 1.f);
+                }
+
+                if(next_text)
+                {
+                    next_text->setScale(1.2f, 1.2f);
+                }
+                
+                break;
+            }
+            
+            case sf::Keyboard::Up:
+            {   
+                ecs::Entity current = ecs::get_entity_with<IsActiveMenuItem, MenuItem>();
+                if(!current)
+                {
+                    break;
+                }
+                ecs::Entity& previous = current.get<MenuItem>()->previous;
+                if(!previous)
+                {
+                    break;
+                }
+
+                current.detach<IsActiveMenuItem>();
+                previous.attach<IsActiveMenuItem>();
+                
+
+                sf::Text* current_text = current;
+                sf::Text* previous_text = previous;
+
+                if(current_text)
+                {
+                    current_text->setScale(1.f, 1.f);
+                }
+
+                if(previous_text)
+                {
+                    previous_text->setScale(1.2f, 1.2f);
+                }
+
+                break;
+            }
+            case sf::Keyboard::Space:
+            {
+                std::function<void()>* callback = ecs::get_component_with<std::function<void()>, IsActiveMenuItem>();
+                if(callback)
+                {
+                    (*callback)();
+                }
+                break;
+            }
+
+            default:
+                break;
+
+
         }
     }
     

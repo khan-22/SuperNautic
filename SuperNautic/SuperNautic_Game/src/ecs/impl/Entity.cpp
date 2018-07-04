@@ -18,6 +18,26 @@ Entity::Entity(EntityId id)
 {
 }
 
+bool Entity::is_null() const
+{
+    return _id == 0;
+}
+
+bool Entity::operator==(std::nullptr_t null_ptr) const
+{
+    return is_null();
+}
+
+bool Entity::operator!() const
+{
+    return is_null();
+}
+
+Entity::operator bool() const
+{
+    return !is_null();
+}
+
 void* Entity::get(TypeIndex id) const
 {
     return DefaultContext::Manager.get_component(id, _id);
