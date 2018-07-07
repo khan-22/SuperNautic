@@ -23,8 +23,6 @@ public:
 
 private:
     GuiContainer _guiContainer;
-    FontAsset _font;
-    GuiText _titleText;
     Input _input;
 
 	int _playersActive;
