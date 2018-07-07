@@ -38,6 +38,12 @@ Entity::operator bool() const
     return !is_null();
 }
 
+Entity& Entity::operator=(std::nullptr_t null_ptr)
+{
+    _id = 0;
+    return *this;
+}
+
 void* Entity::get(TypeIndex id) const
 {
     return DefaultContext::Manager.get_component(id, _id);

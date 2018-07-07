@@ -37,6 +37,8 @@ namespace ecs
             bool operator==(std::nullptr_t null_ptr) const;
             operator bool() const;
 
+            Entity& operator=(std::nullptr_t null_ptr);
+
             template<typename T>
             T& operator+=(const T& component);
 
