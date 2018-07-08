@@ -474,8 +474,10 @@ void TextSystem::update(GFX::SfmlRenderer& renderer)
         {
             sf::Vector2f p1 = transform->transformPoint(0.f, 0.f);
             sf::Vector2f p2 = transform->transformPoint(1.f, 1.f);
-            text->text.setPosition(p1);
+
             text->text.setScale(p2 - p1);
+            sf::FloatRect bounds = text->text.getGlobalBounds();
+            text->text.setPosition(p1.x - bounds.width / 2.f, p1.y - bounds.height / 2.f);
         }
     }
 
@@ -495,13 +497,13 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     std::cout << "Welcome to MainMenu state." << std::endl;
 
     MenuElement& root = menu->get_root();
-    root.set_position(100.f, 100.f);
-
     sf::Vector2u windowSize = context.window.getSize();
+    root.set_position(windowSize.x / 2.f, windowSize.y / 2.f);
+
 
     MenuElement& title = root.add_text();
-    title.set_position(windowSize.x / 2.f, windowSize.y / 4.f);
-    
+    title.set_position(0.f, -100.f);
+
     Font font;
     font.font = FontCache::get("res/basictitlefont.ttf");
     font.char_size = 100;
@@ -513,7 +515,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
 
 
     MenuElement& play = root.add_button();
-    play.set_position(100.f, 100.f);
+    play.set_position(0.f, 0.f);
     play.set_text("Play");
     play.set_on_click([&](MenuElement&)
     {
@@ -523,7 +525,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     play.select();
 
     MenuElement& options = root.add_button();
-    options.set_position(100.f, 200.f);
+    options.set_position(0.f, 40.f);
     options.set_text("Options");
     options.set_on_click([&](MenuElement&)
     {
@@ -532,7 +534,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     });
 
     MenuElement& controls = root.add_button();
-    controls.set_position(100.f, 300.f);
+    controls.set_position(0.f, 80.f);
     controls.set_text("Controls");
     controls.set_on_click([&](MenuElement&)
     {
@@ -541,7 +543,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     });
 
     MenuElement& about = root.add_button();
-    about.set_position(100.f, 400.f);
+    about.set_position(0.f, 120.f);
     about.set_text("About");
     about.set_on_click([&](MenuElement&)
     {
@@ -550,7 +552,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     });
 
     MenuElement& quit = root.add_button();
-    quit.set_position(100.f, 500.f);
+    quit.set_position(0.f, 160.f);
     quit.set_text("Quit");
     quit.set_on_click([&](MenuElement&)
     {
