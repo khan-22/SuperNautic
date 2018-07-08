@@ -64,6 +64,11 @@ add_library(SuperNautic SHARED
 ./src/Core/Gui/HUD.cpp
 ./src/Core/Gui/GuiTexture.cpp
 ./src/Core/Gui/GuiTrackGenerator.cpp
+./src/Core/Gui/Menu.cpp
+./src/Core/Gui/MenuElement.cpp
+./src/Core/Gui/MenuItemSystem.cpp
+./src/Core/Gui/TextSystem.cpp
+./src/Core/Gui/WorldTransformSystem.cpp
 ./src/Core/Io/ConfigFile.cpp
 ./src/Core/Io/Input.cpp
 ./src/Core/Io/Log.cpp

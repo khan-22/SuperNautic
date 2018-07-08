@@ -450,21 +450,21 @@ bool EntityManager::ComponentManager::erase(size_t index)
 
 bool EntityManager::ComponentManager::erase(const std::vector<size_t>& indices)
 {
-    for(size_t i : indices)
+    for(auto it = indices.rbegin(); it != indices.rend(); it++)
     {
-        entities[i] = entities.back();
+        entities[*it] = entities.back();
         entities.pop_back();
     }
 
-    for(size_t i : indices)
+    for(auto it = indices.rbegin(); it != indices.rend(); it++)
     {
-        types[i] = types.back();
+        types[*it] = types.back();
         types.pop_back();
     }
 
-    for(size_t i : indices)
+    for(auto it = indices.rbegin(); it != indices.rend(); it++)
     {
-        components[i] = components.back();
+        components[*it] = components.back();
         components.pop_back();
     }
 

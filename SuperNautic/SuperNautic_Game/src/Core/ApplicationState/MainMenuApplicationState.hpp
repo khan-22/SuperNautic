@@ -9,8 +9,8 @@
 #include "Core/Asset/Asset.hpp"
 #include "Core/Gui/GuiContainer.hpp"
 #include "Core/Gui/GuiText.hpp"
+#include "Core/Gui/Menu.hpp"
 #include "Core/Io/Input.hpp"
-
 
 class MainMenuApplicationState : public ApplicationState
 {
@@ -26,6 +26,7 @@ private:
     Input _input;
 
 	int _playersActive;
+    Menu _menu;
 };
 
 

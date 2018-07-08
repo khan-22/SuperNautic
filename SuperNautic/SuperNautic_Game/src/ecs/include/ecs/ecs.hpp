@@ -7,7 +7,7 @@ namespace ecs
     void initialize();
 
     Entity create_entity();
-    void destroy_entity();
+    void destroy_entity(Entity& entity);
 
     template<typename... T>
     Entity get_entity_with();
