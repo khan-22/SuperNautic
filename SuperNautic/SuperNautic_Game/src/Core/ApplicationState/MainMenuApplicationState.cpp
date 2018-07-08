@@ -72,6 +72,14 @@ struct WorldTransform : public sf::Transform
 {
 };
 
+struct TransformNode
+{
+    TransformNode* parent = nullptr;
+    Transform* local = nullptr;
+    WorldTransform* world = nullptr;
+    std::vector<TransformNode*> children;
+};
+
 struct Callback
 {
     std::function<void()> callback;
@@ -104,6 +112,7 @@ class MenuElement
         MenuElement* _parent;
         std::vector<std::unique_ptr<MenuElement>> _children;
         MenuItem& _item;
+        TransformNode& _transform;
 };
 
 
@@ -133,8 +142,11 @@ MenuElement::MenuElement()
 : _entity(ecs::create_entity())
 , _parent(nullptr)
 , _item(_entity += MenuItem())
+, _transform(_entity += TransformNode())
 {
-    
+    _transform.parent = nullptr;
+    _transform.local = &(_entity += Transform());
+    _transform.world = &(_entity += WorldTransform());
 }
 
 void MenuElement::select()
@@ -162,7 +174,9 @@ MenuElement& MenuElement::add_element()
     
     child->_parent = this;
 
-    child->_entity += Transform();
+    child->_transform.parent = &_transform;
+    _transform.children.push_back(&child->_transform);
+
     MenuItem& child_item = child->_item;
     child_item.parent = _entity;
     if(_children.empty())
@@ -391,19 +405,43 @@ class WorldTransformSystem
 {
     public:
         static void update();
+
+    private:
+        static void update_node(TransformNode& node);
 };
+
+
+void WorldTransformSystem::update_node(TransformNode& node)
+{
+    assert(node.world);
+    for(TransformNode* child : node.children)
+    {
+        assert(child->world);
+        child->world->sf::Transform::operator=(*node.world * *child->world);
+    }
+
+    for(TransformNode* child : node.children)
+    {
+        update_node(*child);
+    }
+}
 
 void WorldTransformSystem::update()
 {
-    for(ecs::Entity e : ecs::get_entities_with<Transform>())
+    for(ecs::Entity e : ecs::get_entities_with<Transform, WorldTransform>())
     {
         WorldTransform* world = e;
-        if(!world)
-        {
-            world = &(e += WorldTransform());
-        }
+        Transform* local = e;
+        world->sf::Transform::operator=(*local);
+    }
 
-        world->sf::Transform::operator=(*e.get<Transform>());
+
+    for(TransformNode* node : ecs::get_components_with<TransformNode>())
+    {
+        if(!node->parent)
+        {
+            update_node(*node);
+        }
     }
 }
 
@@ -457,6 +495,7 @@ MainMenuApplicationState::MainMenuApplicationState(ApplicationStateStack& stack,
     std::cout << "Welcome to MainMenu state." << std::endl;
 
     MenuElement& root = menu->get_root();
+    root.set_position(100.f, 100.f);
 
     sf::Vector2u windowSize = context.window.getSize();
 
