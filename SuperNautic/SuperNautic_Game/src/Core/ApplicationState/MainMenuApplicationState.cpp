@@ -64,18 +64,12 @@ struct IsSelectable
 
 };
 
-
-
-struct Position
+struct Transform : public sf::Transform
 {
-    float x = 0.f;
-    float y = 0.f;
 };
 
-struct Scale
+struct WorldTransform : public sf::Transform
 {
-    float x = 1.f;
-    float y = 1.f;
 };
 
 struct Callback
@@ -158,9 +152,8 @@ void MenuElement::select()
 
     _entity += IsActiveMenuItem();
 
-    Scale* scale = _entity;
-    scale->x = 1.2f;
-    scale->y = 1.2f;
+    Transform* transform = _entity;
+    transform->scale(1.2f, 1.2f);
 }
 
 MenuElement& MenuElement::add_element()
@@ -169,7 +162,7 @@ MenuElement& MenuElement::add_element()
     
     child->_parent = this;
 
-    child->_entity += Scale();
+    child->_entity += Transform();
     MenuItem& child_item = child->_item;
     child_item.parent = _entity;
     if(_children.empty())
@@ -241,14 +234,9 @@ void MenuElement::set_font(const Font& font)
 
 void MenuElement::set_position(float x, float y)
 {
-    Position* pos = _entity;
-    if(!pos)
-    {
-        pos = &(_entity += Position());
-    }
-
-    pos->x = x;
-    pos->y = y;
+    Transform* transform = _entity;
+    sf::Vector2f p = transform->transformPoint(0.f, 0.f);
+    transform->translate(x - p.x, y - p.y);
 }
 
 void MenuElement::set_on_click(const std::function<void(MenuElement&)>& callback)
@@ -265,14 +253,8 @@ void MenuElement::set_on_click(const std::function<void(MenuElement&)>& callback
 
 void MenuElement::set_scale(float x, float y)
 {
-    Scale* scale = _entity;
-    if(!scale)
-    {
-        scale = &(_entity += Scale());
-    }
-
-    scale->x = x;
-    scale->y = y;
+    Transform* transform = _entity;
+    transform->scale(1.f, 1.f);
 }
 
 namespace
@@ -321,19 +303,19 @@ void MenuItemSystem::handle_event(const sf::Event& event)
                 current.detach<IsActiveMenuItem>();
                 next.attach<IsActiveMenuItem>();
 
-                Scale* current_scale = current;
-                Scale* next_scale = next;
+                Transform* current_transform = current;
+                Transform* next_transform = next;
 
-                if(current_scale)
+                if(current_transform)
                 {
-                    current_scale->x = 1.f;
-                    current_scale->y = 1.f;
+                    sf::Vector2f p1 = current_transform->transformPoint(0.f, 0.f);
+                    sf::Vector2f p2 = current_transform->transformPoint(1.f, 1.f);
+                    current_transform->scale(1.f / (p2.x - p1.x), 1.f / (p2.y - p1.y));
                 }
 
-                if(next_scale)
+                if(next_transform)
                 {
-                    next_scale->x = 1.2f;
-                    next_scale->y = 1.2f;
+                    next_transform->scale(1.2f, 1.2f);
                 }
                 
                 break;
@@ -365,19 +347,19 @@ void MenuItemSystem::handle_event(const sf::Event& event)
                 current.detach<IsActiveMenuItem>();
                 previous.attach<IsActiveMenuItem>();
                 
-                Scale* current_scale = current;
-                Scale* previous_scale = previous;
+                Transform* current_transform = current;
+                Transform* previous_transform = previous;
 
-                if(current_scale)
+                if(current_transform)
                 {
-                    current_scale->x = 1.f;
-                    current_scale->y = 1.f;
+                    sf::Vector2f p1 = current_transform->transformPoint(0.f, 0.f);
+                    sf::Vector2f p2 = current_transform->transformPoint(1.f, 1.f);
+                    current_transform->scale(1.f / (p2.x - p1.x), 1.f / (p2.y - p1.y));
                 }
 
-                if(previous_scale)
+                if(previous_transform)
                 {
-                    previous_scale->x = 1.2f;
-                    previous_scale->y = 1.2f;
+                    previous_transform->scale(1.2f, 1.2f);
                 }
 
                 break;
@@ -405,6 +387,26 @@ void MenuItemSystem::update()
 
 }
 
+class WorldTransformSystem
+{
+    public:
+        static void update();
+};
+
+void WorldTransformSystem::update()
+{
+    for(ecs::Entity e : ecs::get_entities_with<Transform>())
+    {
+        WorldTransform* world = e;
+        if(!world)
+        {
+            world = &(e += WorldTransform());
+        }
+
+        world->sf::Transform::operator=(*e.get<Transform>());
+    }
+}
+
 
 class TextSystem
 {
@@ -429,15 +431,13 @@ void TextSystem::update(GFX::SfmlRenderer& renderer)
         text->text.setOutlineColor(text->font.outline_color);
         text->text.setOutlineThickness(text->font.outline_thickness);
         
-        Scale* scale = e;
-        if(scale)
+        WorldTransform* transform = e;
+        if(transform)
         {
-            text->text.setScale(scale->x, scale->y);
-        }
-        Position* pos = e;
-        if(pos)
-        {
-            text->text.setPosition(pos->x, pos->y);
+            sf::Vector2f p1 = transform->transformPoint(0.f, 0.f);
+            sf::Vector2f p2 = transform->transformPoint(1.f, 1.f);
+            text->text.setPosition(p1);
+            text->text.setScale(p2 - p1);
         }
     }
 
@@ -535,6 +535,8 @@ void MainMenuApplicationState::render()
 
 bool MainMenuApplicationState::bUpdate(float dtSeconds)
 {
+    WorldTransformSystem::update();
+
     _context.menuBackground->update(dtSeconds);
 
 	if (_input.checkActive())
